@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"licong.link","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="现在 CNN 网络中，没有不加 BN 层，来优化网络的，但是一直不怎么清楚原理，所以，在这里探究一下。">
+  <meta name="description" content="现在 CNN 网络中，没有不加 BN 层，来优化网络的，但是一直不怎么清楚原理，所以，在这里探究一下。 虽然，这里主要针对的是 CNN 之后的 BN 层，但是，其中的部分原理，对于数据的预处理归一化或者标准化也适用。 毕竟 Normalization 是数据标准化（归一化，规范化），Batch 可以理解为批量，加起来就是批量标准化。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="为什么在 CNN 中加 BN">
 <meta property="og:url" content="http://licong.link/2021/02/19/deeplearning9/index.html">
 <meta property="og:site_name" content="犀牛的博客">
-<meta property="og:description" content="现在 CNN 网络中，没有不加 BN 层，来优化网络的，但是一直不怎么清楚原理，所以，在这里探究一下。">
+<meta property="og:description" content="现在 CNN 网络中，没有不加 BN 层，来优化网络的，但是一直不怎么清楚原理，所以，在这里探究一下。 虽然，这里主要针对的是 CNN 之后的 BN 层，但是，其中的部分原理，对于数据的预处理归一化或者标准化也适用。 毕竟 Normalization 是数据标准化（归一化，规范化），Batch 可以理解为批量，加起来就是批量标准化。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-02-19T07:18:42.000Z">
-<meta property="article:modified_time" content="2021-02-19T07:21:45.229Z">
+<meta property="article:modified_time" content="2021-02-19T09:15:49.199Z">
 <meta property="article:author" content="犀牛">
 <meta property="article:tag" content="深度学习">
 <meta name="twitter:card" content="summary">
@@ -245,7 +245,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-02-19 15:18:42 / 修改时间：15:21:45" itemprop="dateCreated datePublished" datetime="2021-02-19T15:18:42+08:00">2021-02-19</time>
+              <time title="创建时间：2021-02-19 15:18:42 / 修改时间：17:15:49" itemprop="dateCreated datePublished" datetime="2021-02-19T15:18:42+08:00">2021-02-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -297,7 +297,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>现在 CNN 网络中，没有不加 BN 层，来优化网络的，但是一直不怎么清楚原理，所以，在这里探究一下。</p>
+        <p>现在 <code>CNN</code> 网络中，没有不加 <code>BN</code> 层，来优化网络的，但是一直不怎么清楚原理，所以，在这里探究一下。</p>
+<p>虽然，这里主要针对的是 <code>CNN</code> 之后的 <code>BN</code> 层，但是，其中的部分原理，对于数据的预处理归一化或者标准化也适用。</p>
+<p>毕竟</p>
+<p><code>Normalization</code> 是数据标准化（归一化，规范化），Batch 可以理解为批量，加起来就是批量标准化。 </p>
 <a id="more"></a>
 
 <br/>
@@ -307,8 +310,25 @@
 <ul>
 <li><a href="https://www.zhihu.com/question/38102762">深度学习中 Batch Normalization为什么效果好？</a></li>
 <li><a href="https://www.zhihu.com/question/282672547">BatchNorm2d增加的参数track_running_stats如何理解？</a></li>
+<li><a href="https://blog.csdn.net/weixin_44278406/article/details/105554268">nn.BatchNorm2d</a></li>
 </ul>
+<br/>
 
+<h1 id="论文"><a href="#论文" class="headerlink" title="论文"></a>论文</h1><br/>
+
+<ul>
+<li><a href="https://arxiv.org/abs/1502.03167">Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift</a></li>
+<li><a href="https://arxiv.org/abs/1803.08494">Group Normalization</a></li>
+</ul>
+<br/>
+
+<h1 id="BN-要解决的事情"><a href="#BN-要解决的事情" class="headerlink" title="BN 要解决的事情"></a>BN 要解决的事情</h1><br/>
+
+<ul>
+<li>梯度消失和梯度爆炸</li>
+<li>数据分布不均</li>
+</ul>
+<h2 id="梯度消失和梯度爆炸"><a href="#梯度消失和梯度爆炸" class="headerlink" title="梯度消失和梯度爆炸"></a>梯度消失和梯度爆炸</h2>
     </div>
 
     
@@ -349,7 +369,10 @@
     <a href="/2021/02/19/CNN2/" rel="prev" title="torch | 和 CNN 有关的方法">
       <i class="fa fa-chevron-left"></i> torch | 和 CNN 有关的方法
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/19/deeplearning10/" rel="next" title="梯度消失和梯度爆炸">
+      梯度消失和梯度爆炸 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -410,7 +433,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#论文"><span class="nav-number">2.</span> <span class="nav-text">论文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BN-要解决的事情"><span class="nav-number">3.</span> <span class="nav-text">BN 要解决的事情</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#梯度消失和梯度爆炸"><span class="nav-number">3.1.</span> <span class="nav-text">梯度消失和梯度爆炸</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -425,20 +448,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">1007</span>
+          <span class="site-state-item-count">1010</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">500</span>
+        <span class="site-state-item-count">504</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">497</span>
+        <span class="site-state-item-count">499</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
