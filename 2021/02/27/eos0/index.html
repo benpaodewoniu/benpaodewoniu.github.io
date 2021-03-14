@@ -28,7 +28,7 @@
 <meta property="og:description" content="最近 defi 挖矿的时候，经常遇到 cpu 不足，所以，在这里说一下其中的原理。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-02-27T10:00:35.000Z">
-<meta property="article:modified_time" content="2021-02-27T10:03:30.635Z">
+<meta property="article:modified_time" content="2021-03-14T03:58:35.611Z">
 <meta property="article:author" content="犀牛">
 <meta property="article:tag" content="eos">
 <meta name="twitter:card" content="summary">
@@ -243,10 +243,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-02-27 18:00:35 / 修改时间：18:03:30" itemprop="dateCreated datePublished" datetime="2021-02-27T18:00:35+08:00">2021-02-27</time>
+              <time title="创建时间：2021-02-27 18:00:35" itemprop="dateCreated datePublished" datetime="2021-02-27T18:00:35+08:00">2021-02-27</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-14 11:58:35" itemprop="dateModified" datetime="2021-03-14T11:58:35+08:00">2021-03-14</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -311,6 +317,17 @@
 <ul>
 <li><a href="https://bihu.com/article/1542624317?i=1bsA&c=1&s=1GoH3n">一文讲明EOS的CPU不足是怎么回事，要如何解决</a></li>
 </ul>
+<p><code>EOS</code>的资源模型分为</p>
+<ul>
+<li>CPU NET（带宽）</li>
+<li>RAM（内存）</li>
+</ul>
+<p><code>RAM</code>用于存储，<code>NET</code>代表传输交易消耗的网络带宽，这两个一般情况下都是不用管的，够用。而<code>CPU</code>则成了<code>EOS</code>上的短缺资源。其实<code>CPU</code>和带宽合起来可以看作是以太坊的<code>gas</code>，不过不同的是以太坊<code>gas</code>是在交易时用<code>ETH</code>抵扣，而<code>EOS</code>的<code>CPU</code>和带宽是抵押<code>EOS</code>来获取，只要不解除抵押，消耗的资源<code>24小时</code>后可以恢复，最终不再使用时可以赎回，这样就达到了交易免费的效果。</p>
+<p><code>CPU</code>的抵押价格是波动的，当前由于从去年开始的<code>EIDOS</code>挖矿，导致<code>CPU</code>抵押价格一直处于高位，现在抵押<code>10EOS</code>能获得<code>1ms</code>的<code>CPU</code>（大约能转账两次），这个价格会实时变化，账号拥有的资源也随着价格变化而变化，所以可能刚刚资源还充足，突然<code>CPU</code>价格上涨于是就不足了，或者反过来本来资源不足由于<code>CPU</code>价格下跌就有资源了。这时大家能看出来了，对于普通用户来说，抵押<code>10</code>个EOS一天里才能转账两次，这实在是难以接受，于是就出现了资源租赁和资源代付。</p>
+<h2 id="资源租赁"><a href="#资源租赁" class="headerlink" title="资源租赁"></a>资源租赁</h2><p>资源租赁，最典型的代表就是<code>REX</code>，<code>EOS</code>持币者将闲置的<code>EOS</code>存入<code>REX</code>，而需要使用资源的人可以租用其中的<code>EOS</code>，存入的人赚取租金。<code>REX</code>会自动将租来的EOS转换成资源投入到租赁者的账号中。<code>REX</code>的租赁价格也是实时波动的，池中被租赁的<code>EOS</code>占比越高，价格越贵，写文章时的价格大约为支付<code>1EOS</code>可以租到<code>4900EOS</code>的资源，租期为一个月，按现在的<code>CPU</code>价格计算，花<code>1</code>个<code>EOS</code>可以在一个月内每天转账<code>1000</code>次以上（不同的操作消耗资源不同，如果是最普通的转账可以转<code>1400</code>次左右），实际上大部分人是用不到这么多的，我想对于大多数人来说，租<code>0.05</code>就已经用不完的用了，按现状的EOS价格算相当于每个月只需要付出一块钱的资源成本，也可以看作是免费了。</p>
+<h2 id="资源代付"><a href="#资源代付" class="headerlink" title="资源代付"></a>资源代付</h2><p>而资源代付则是另一种形式了，部分<code>dapp</code>的合约会承担资源消耗，也就是不需要消耗用户的资源，那么在没资源时也照样可以使用；</p>
+<p>另外以<code>TokenPocket</code>为首的众多钱包推出的顺畅模式，可以直接在没有资源的情况下支付<code>EOS</code>或其他币种购买使用次数，然后开启顺畅模式，之后你的交易消耗的资源都会由顺畅模式代为支付，这种形式的好处是按交易笔数收费，不像<code>REX</code>租来不管用不用钱都必须花，但是如果操作较多的话，肯定是<code>REX</code>成本要低很多。「我暂时使用的就是这个方法」</p>
+<p>原参考资料中有更多的细节，建议看一下。</p>
 
     </div>
 
@@ -416,7 +433,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#资源租赁"><span class="nav-number">1.1.</span> <span class="nav-text">资源租赁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源代付"><span class="nav-number">1.2.</span> <span class="nav-text">资源代付</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -431,20 +448,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">1043</span>
+          <span class="site-state-item-count">1045</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">522</span>
+        <span class="site-state-item-count">526</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">499</span>
+        <span class="site-state-item-count">501</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
