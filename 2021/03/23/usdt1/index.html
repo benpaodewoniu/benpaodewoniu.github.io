@@ -28,7 +28,7 @@
 <meta property="og:description" content="BTC 自带的协议是不支持解析 USDT ，而 USDT 在 BTC 的网络中，又叫染色币，这篇博文，主要是说明如何在 BTC 网络上解析 USDT 转账记录。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-03-23T06:31:49.000Z">
-<meta property="article:modified_time" content="2021-03-23T13:02:17.601Z">
+<meta property="article:modified_time" content="2021-03-25T09:06:06.916Z">
 <meta property="article:author" content="犀牛">
 <meta property="article:tag" content="usdt">
 <meta name="twitter:card" content="summary">
@@ -243,10 +243,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-03-23 14:31:49 / 修改时间：21:02:17" itemprop="dateCreated datePublished" datetime="2021-03-23T14:31:49+08:00">2021-03-23</time>
+              <time title="创建时间：2021-03-23 14:31:49" itemprop="dateCreated datePublished" datetime="2021-03-23T14:31:49+08:00">2021-03-23</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-25 17:06:06" itemprop="dateModified" datetime="2021-03-25T17:06:06+08:00">2021-03-25</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -301,7 +307,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>BTC 自带的协议是不支持解析 USDT ，而 USDT 在 BTC 的网络中，又叫染色币，这篇博文，主要是说明如何在 BTC 网络上解析 USDT 转账记录。</p>
+        <p><code>BTC</code> 自带的协议是不支持解析 <code>USDT</code> ，而 <code>USDT</code> 在 <code>BTC</code> 的网络中，又叫染色币，这篇博文，主要是说明如何在 <code>BTC</code> 网络上解析 <code>USDT</code> 转账记录。</p>
 <a id="more"></a>
 
 <br/>
@@ -316,7 +322,77 @@
 </ul>
 <br/>
 
-<h1 id=""><a href="#" class="headerlink" title=""></a></h1>
+<h1 id="染色币"><a href="#染色币" class="headerlink" title="染色币"></a>染色币</h1><br/>
+
+<p><code>ETH</code> 因为智能合约系统而受到了广泛地关注，大家可以用 <code>5</code> 分钟时间就发出自己的第一个代币，而代币的发行、转账则都依赖于智能合约，底层则是由 <code>ETH</code> 公链承载。事实上，远在 <code>ETH</code> 诞生之前，大家就想用比特币主链做点啥。</p>
+<p>其中，一个重要的概念被提出来了：染色币。具体来说，染色币是指在普通的比特币交易中附上一些信息，借助比特币底层基础设施来记录。然而，比特币官方开发组(<code>Core</code>)对这种方式颇有争议，将用于存储信息的 <code>OP_RETURN</code> 字段从 <code>80</code> 字节骤然缩小到了 <code>40</code> 字节 。</p>
+<ul>
+<li><a href="https://github.com/bitcoin/bitcoin/pull/3737">123</a></li>
+</ul>
+<h2 id="Omni-Layer（原名-Mastercoin）"><a href="#Omni-Layer（原名-Mastercoin）" class="headerlink" title="Omni Layer（原名 Mastercoin）"></a>Omni Layer（原名 Mastercoin）</h2><p><code>Omni Layer</code> 也属于染色币，其核心思想是将 <code>Omni Protocol</code> 层的数据用某种方式写入比特币区块链中，目前在协议定义中有三种，<code>Class A</code>、<code>Class B</code>和 <code>Class C</code> 。</p>
+<ul>
+<li><p><code>Class A</code> - 这种方法是利用了比特币每个地址本质上都是大小为 <code>20 bytes</code> 的二进制字符串。先将数据分割成 <code>20 bytes</code> 为一组的数据块，然后使用 <code>Base58</code> 编码作为目标地址发送即可。当然这些被发送的 <code>UTXO</code> 将永远丢失。使用这项技术的还有 <code>cryptograffiti</code>。</p>
+</li>
+<li><p><code>Class B</code> - 这种方法利用了比特币的 <code>multisig</code> ，即多签特性。发送一笔 <code>1 of n</code>的多重签名交易（即，<code>n</code> 个地址中，任何一个地址签名即可花费这笔 <code>UTXO</code>）。当前版本的 <code>Omni Layer</code> 协议中最大支持 <code>n = 3</code>。</p>
+</li>
+<li><p><code>Class C</code> - 这种方法则利用了<code>OP_RETURN</code>操作码储存数据，目前来看，基本上所有的 <code>Omni layer</code> 层的交易都采用了这种方式。使用这项技术的还有 <code>CoinSpark</code> 。</p>
+</li>
+</ul>
+<p><code>Omni Protocol</code> 能让用户发行自己的数字资产，其中资产编号为<code>31</code> 的就是被广泛使用的 <code>USDT</code> 。而日常中，发送 <code>USDT</code> 使用的交易类型是 <code>Simple Send</code>。</p>
+<p>下面是对 <code>Simple Send</code>交易的定义。</p>
+<p>举一个经典的 <code>USDT</code> 在 <code>BTC</code> 链上的 <code>OP_RETURN</code> 数据。</p>
+<pre><code>OP_RETURN 6f6d6e69000000000000001f00000002553fa2b8</code></pre><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>位置</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>6f6d6e69</td>
+<td>[10:18]</td>
+<td>omni 对应的 ASCII 编码，因为交易备注与 omni 协议有关</td>
+</tr>
+<tr>
+<td>0000</td>
+<td>[18:22]</td>
+<td>交易版本</td>
+</tr>
+<tr>
+<td>0000</td>
+<td>[22:26]</td>
+<td>交易类型，代表 简单发送</td>
+</tr>
+<tr>
+<td>0000001f</td>
+<td>[26:34]</td>
+<td>31，代表 USDT</td>
+</tr>
+<tr>
+<td>00000002553fa2b8</td>
+<td>[34:]</td>
+<td>USDT 转账金额，1000 00000000 最小单位 = 1000 USDT,16进制</td>
+</tr>
+</tbody></table>
+<p><code>Simple Send</code> 是一项将 <code>Omni Layer</code> 层中特定的数字资产从原地址转移到目标地址的操作，注意原地址和目标地址均使用比特币的地址。</p>
+<p>可以看到上面的交易并没有任何的余额信息，这就是说，原地址的 <code>Omni Layer</code> 层数字资产，由 <code>Omni Core</code> 自己维护一个额外的账本并校验。</p>
+<p>换句话说，所谓的染色币只不过是借住了比特币的脚本功能，Omni 协议就是利用该功能在比特币区块中嵌入 <code>Omni</code> 协议的数据。通过 <code>OP_RETURN</code> 操作码区分。比特币网络并不会解析 <code>Omni</code> 协议对应的 <code>OP_RETURN</code> 数据段，对其来说只是‘备注信息’，由 <code>Omni</code> 所在的二级网络解析对应的交易信息。</p>
+<p>假如说，<code>用户 A</code> 想要通过 <code>Omni 协议</code>，转给<code>用户 B</code> 一定数额的 <code>USDT</code>。<code>用户 A</code> 需要给<code>用户 B</code> 转 <code>BTC</code> ，然后，在这个转账块中，在备注上写下关于 <code>USDT</code> 的转账信息。所以，<code>USDT</code> 的转账是依附于 <code>BTC</code> 的，矿工费之类的也是 <code>USDT</code> ，因为，这笔转账的本质还是 <code>BTC 转账</code>。所以，<code>Omni 协议</code>下，用户的 <code>BTC 地址</code>和 <code>USDT</code> 是相同的。</p>
+<br/>
+
+<h1 id="业务需求"><a href="#业务需求" class="headerlink" title="业务需求"></a>业务需求</h1><br/>
+
+<p>解析 <code>BTC</code> 链上的 <code>USDT</code> 转账。</p>
+<br/>
+
+<h1 id="特殊转账记录"><a href="#特殊转账记录" class="headerlink" title="特殊转账记录"></a>特殊转账记录</h1><br/>
+
+<ul>
+<li>870ccc55f0a4106cb7993acca535e9150ba7be19bbe24c7e8a0cb9264412ff2c</li>
+<li>fa1bcd8ea077414608290d9e3c39b4f33a83deaaba35409c1c54710b75d85bf4</li>
+</ul>
+
     </div>
 
     
@@ -421,7 +497,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#null"><span class="nav-number">2.</span> <span class="nav-text"></span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#染色币"><span class="nav-number">2.</span> <span class="nav-text">染色币</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Omni-Layer（原名-Mastercoin）"><span class="nav-number">2.1.</span> <span class="nav-text">Omni Layer（原名 Mastercoin）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#业务需求"><span class="nav-number">3.</span> <span class="nav-text">业务需求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#特殊转账记录"><span class="nav-number">4.</span> <span class="nav-text">特殊转账记录</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -436,14 +512,14 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">1061</span>
+          <span class="site-state-item-count">1062</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">541</span>
+        <span class="site-state-item-count">542</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
