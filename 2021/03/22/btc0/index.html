@@ -28,7 +28,7 @@
 <meta property="og:description" content="这是 BTC 解析中，必须要知道的结构，可以说，没有什么 BTC 有的只是 UTXO。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-03-22T09:23:26.000Z">
-<meta property="article:modified_time" content="2021-03-25T07:53:33.896Z">
+<meta property="article:modified_time" content="2021-04-04T16:41:22.247Z">
 <meta property="article:author" content="犀牛">
 <meta property="article:tag" content="btc">
 <meta name="twitter:card" content="summary">
@@ -251,7 +251,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-03-25 15:53:33" itemprop="dateModified" datetime="2021-03-25T15:53:33+08:00">2021-03-25</time>
+                <time title="修改时间：2021-04-05 00:41:22" itemprop="dateModified" datetime="2021-04-05T00:41:22+08:00">2021-04-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -307,7 +307,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>这是 BTC 解析中，必须要知道的结构，可以说，没有什么 BTC 有的只是 UTXO。</p>
+        <p>这是 <code>BTC</code> 解析中，必须要知道的结构，可以说，没有什么 <code>BTC</code> 有的只是 <code>UTXO</code>。</p>
 <a id="more"></a>
 
 <br/>
@@ -323,6 +323,94 @@
 <li><a href="https://segmentfault.com/a/1190000016757805?utm_source=sf-related">一个比特币交易的完整流程</a></li>
 <li><a href="https://segmentfault.com/a/1190000012514187">比特币交易</a></li>
 </ul>
+<br/>
+
+<h1 id="UTXO"><a href="#UTXO" class="headerlink" title="UTXO"></a>UTXO</h1><br/>
+
+<p>比特币的区块链由一个个区块串联构成，而每个区块又包含一个或多个交易。</p>
+<p>如果我们观察任何一个交易，它总是由若干个输入（<code>Input</code>）和若干个输出（<code>Output</code>）构成，一个Input指向的是前面区块的某个<code>Output</code>，只有<code>Coinbase</code>交易（矿工奖励的铸币交易）没有输入，只有凭空输出。所以，任何交易，总是可以由<code>Input</code>溯源到<code>Coinbase</code>交易。</p>
+<p>这些交易的<code>Input</code>和<code>Output</code>总是可以串联起来：</p>
+<pre><code>┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│Block #1     │     │Block #2     │     │Block #3     │     │Block #4     │
+│┌──┬────┬───┐│     │┌──┬────┬───┐│     │┌──┬────┬───┐│     │┌──┬────┬───┐│
+││CB│50.0│OUT├┼──┐  ││CB│50.0│OUT├┼──┐  ││CB│50.0│OUT├┼──┐  ││CB│50.0│OUT││
+│└──┴────┴───┘│  │  │└──┴────┴───┘│  │  │└──┴────┴───┘│  │  │└──┴────┴───┘│
+│             │  │  │┌──┬────┬───┐│  │  │┌──┬────┬───┐│  │  │┌──┬────┬───┐│
+│             │  │  ││  │8.70│OUT├┼──┼──&gt;│IN│    │   ││  └──&gt;│IN│25.0│OUT││
+│             │  └──&gt;│IN├────┼───┤│  │  │├──┤58.7│OUT││     │├──┼────┼───┤│
+│             │     ││  │41.3│OUT├┼─┐└──&gt;│IN│    │   ││  ┌──&gt;│IN│66.3│OUT││
+│             │     │└──┴────┴───┘│ │   │└──┴────┴───┘│  │  │└──┴────┴───┘│
+└─────────────┘     └─────────────┘ │   └─────────────┘  │  └─────────────┘
+                                    └────────────────────┘</code></pre><p>还没有被下一个交易花费的<code>Output</code>被称为<code>UTXO：Unspent TX Output</code>，即未花费交易输出。给定任何一个区块，计算当前所有的<code>UXTO</code>金额之和，等同于自创世区块到给定区块的挖矿奖励之和。</p>
+<p>因此，比特币的交易模型和我们平时使用的银行账号有所不同，它并没有账户这个说法，只有<code>UTXO</code>。想要确定某个人拥有的比特币，并无法通过某个账户查到，必须知道此人控制的所有<code>UTXO</code>金额之和。</p>
+<p>在钱包程序中，钱包管理的是一组私钥，对应的是一组公钥和地址。钱包程序必须从创世区块开始扫描每一笔交易，如果：</p>
+<ul>
+<li>遇到某笔交易的某个<code>Output</code>是钱包管理的地址之一，则钱包余额增加；</li>
+<li>遇到某笔交易的某个<code>Input</code>是钱包管理的地址之一，则钱包余额减少。</li>
+<li>钱包的当前余额总是钱包地址关联的所有<code>UTXO</code>金额之和。</li>
+</ul>
+<p>如果刚装了一个新钱包，导入了一组私钥，在钱包扫描完整个比特币区块之前，是无法得知当前管理的地址余额的。</p>
+<p>那么，给定一个地址，要查询该地址的余额，难道要从头扫描几百GB的区块链数据？</p>
+<p>当然不是。</p>
+<p>要做到瞬时查询，我们知道，使用关系数据库的主键进行查询，由于用了索引，速度极快。</p>
+<p>因此，对区块链进行查询之前，首先要扫描整个区块链，重建一个类似关系数据库的地址-余额映射表。这个表的结构如下：</p>
+<table>
+<thead>
+<tr>
+<th>address</th>
+<th>balance</th>
+<th>lastUpdatedAtBlock</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>address-1</td>
+<td>50.0</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>一开始，这是一个空表。每当扫描一个区块的所有交易后，某些地址的余额增加，另一些地址的余额减少，两者之差恰好为区块奖励：</p>
+<table>
+<thead>
+<tr>
+<th>address</th>
+<th>balance</th>
+<th>lastUpdatedAtBlock</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>address-1</td>
+<td>50.0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>address-2</td>
+<td>40.0</td>
+<td>3</td>
+</tr>
+<tr>
+<td>address-3</td>
+<td>50.0</td>
+<td>3</td>
+</tr>
+<tr>
+<td>address-4</td>
+<td>10.0</td>
+<td>3</td>
+</tr>
+</tbody></table>
+<p>这样，扫描完所有区块后，我们就得到了整个区块链所有地址的完整余额记录，查询的时候，并不是从区块链查询，而是从本地数据库查询。大多数钱包程序使用<code>LevelDB</code>来存储这些信息，手机钱包程序则是请求服务器，由服务器查询数据库后返回结果。</p>
+<p>如果我们把<code>MySQL</code>这样的数据库看作可修改的，那么区块链就是不可修改，只能追加的只读数据库。但是，<code>MySQL</code>这样的数据库虽然其状态是可修改的，但它的状态改变却是由修改语句（<code>INSERT/UPDATE/DELETE</code>）引起的。把<code>MySQL的binlog</code>日志完整地记录下来，再进行重放，即可在另一台机器上完整地重建整个数据库。把区块链看作不可修改的<code>binlog</code>日志，我们只要把每个区块的所有交易重放一遍，即可重建一个地址-余额的数据库。</p>
+<p>可见，比特币的区块链记录的是修改日志，而不是当前状态。</p>
+<br/>
+
+<h1 id="UTXO-内部表现"><a href="#UTXO-内部表现" class="headerlink" title="UTXO 内部表现"></a>UTXO 内部表现</h1><br/>
+
+<p>这一节，我们将介绍一下经典的几种 UTXO 的转账记录。</p>
+<p>其中，数据的输出是通过 ethereum-etl 这个项目获取的。</p>
+<ul>
+<li><a href="/categories/项目经历/中型/ethereum-etl/">ethereum-etl</a></li>
+</ul>
+<h2 id="出块转账"><a href="#出块转账" class="headerlink" title="出块转账"></a>出块转账</h2><p>所谓的出块，即挖出 btc 的那个地址。</p>
 
     </div>
 
@@ -428,7 +516,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UTXO"><span class="nav-number">2.</span> <span class="nav-text">UTXO</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UTXO-内部表现"><span class="nav-number">3.</span> <span class="nav-text">UTXO 内部表现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#出块转账"><span class="nav-number">3.1.</span> <span class="nav-text">出块转账</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
