@@ -27,11 +27,14 @@
 <meta property="og:site_name" content="犀牛的博客">
 <meta property="og:description" content="这里讲述什么是 abi。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://licong.link/images/eth/7_0.jpg">
+<meta property="og:image" content="http://licong.link/images/eth/7_1.jpg">
 <meta property="article:published_time" content="2021-05-22T13:56:15.000Z">
-<meta property="article:modified_time" content="2021-05-22T13:58:59.719Z">
+<meta property="article:modified_time" content="2021-05-25T11:00:16.257Z">
 <meta property="article:author" content="犀牛">
 <meta property="article:tag" content="eth">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://licong.link/images/eth/7_0.jpg">
 
 <link rel="canonical" href="http://licong.link/2021/05/22/eth7/">
 
@@ -243,10 +246,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-05-22 21:56:15 / 修改时间：21:58:59" itemprop="dateCreated datePublished" datetime="2021-05-22T21:56:15+08:00">2021-05-22</time>
+              <time title="创建时间：2021-05-22 21:56:15" itemprop="dateCreated datePublished" datetime="2021-05-22T21:56:15+08:00">2021-05-22</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-25 19:00:16" itemprop="dateModified" datetime="2021-05-25T19:00:16+08:00">2021-05-25</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -314,7 +323,64 @@
 
 <ul>
 <li><a href="https://learnblockchain.cn/2018/08/09/understand-abi/">如何理解以太坊ABI - 应用程序二进制接口</a></li>
+<li><a href="https://cloud.tencent.com/developer/article/1652603">涨知识 | 使用imToken钱包还能调用合约！</a></li>
+<li><a href="https://blog.csdn.net/dspring9981/article/details/103221405">关于墨客的abi decode/encode</a></li>
 </ul>
+<p>说实话，现在暂时没太懂 <code>abi</code> 到底是什么，只能先记录一下。</p>
+<br/>
+
+<h1 id="ABI-是什么"><a href="#ABI-是什么" class="headerlink" title="ABI 是什么"></a>ABI 是什么</h1><br/>
+
+<p><code>ABI</code> 全称是 <code>Application Binary Interface</code>，翻译过来就是：应用程序二进制接口，简单来说就是 以太坊的调用合约时的接口说明。还不是很理解，没关系。</p>
+<br/>
+
+<h1 id="调用合约函数发生了什么"><a href="#调用合约函数发生了什么" class="headerlink" title="调用合约函数发生了什么"></a>调用合约函数发生了什么</h1><br/>
+
+<p>从外部施加给以太坊的行为都称之为向以太坊网络提交了一个交易， 调用合约函数其实是向合约地址（账户）提交了一个交易，这个交易有一个附加数据，这个附加的数据就是ABI的编码数据。</p>
+<p><img src="/images/eth/7_0.jpg" alt=""></p>
+<blockquote>
+<p>比特币的交易也可以附加数据，以太坊革命性的地方就是能把附加数据转化为都函数的执行。</p>
+</blockquote>
+<p>因此要想和合约交互，就离不开ABI数据。</p>
+<br/>
+
+<h1 id="演示调用函数"><a href="#演示调用函数" class="headerlink" title="演示调用函数"></a>演示调用函数</h1><br/>
+
+<p>以下面以个最简单的合约为例，我们看看用参数 <code>1</code> 调用 <code>set(uint x)</code>，这个交易附带的数据是什么。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.4</span><span class="number">.0</span>;</span><br><span class="line"></span><br><span class="line">contract SimpleStorage &#123;</span><br><span class="line">    </span><br><span class="line">    uint storedData;</span><br><span class="line">    </span><br><span class="line">    function set(uint x) public &#123;</span><br><span class="line">        storedData = x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function get() public constant returns (uint) &#123;</span><br><span class="line">        <span class="keyword">return</span> storedData;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">pragma solidity ^<span class="number">0.4</span><span class="number">.0</span>;</span><br><span class="line"></span><br><span class="line">contract SimpleStorage &#123;</span><br><span class="line">    </span><br><span class="line">    uint storedData;</span><br><span class="line">    </span><br><span class="line">    function set(uint x) public &#123;</span><br><span class="line">        storedData = x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function get() public constant returns (uint) &#123;</span><br><span class="line">        <span class="keyword">return</span> storedData;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当然第一步需要先把合约部署到以太坊网络（其实部署也是一个）上，然后用 <code>1</code> 作为参数调用 <code>set</code>，如下图:</p>
+<p><img src="/images/eth/7_1.jpg" alt=""></p>
+<ul>
+<li><a href="https://ropsten.etherscan.io/tx/0xd773a6909808f99c5a26c0c890af8b0bb6d784f29a3af55e04fa35d44d7716e2">记录 | 区块链浏览器</a></li>
+</ul>
+<p>其中 <code>input data</code> 如下</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Function</span>: set(uint256 x) ***</span><br><span class="line"></span><br><span class="line"><span class="attribute">MethodID</span>: 0x60fe47b1</span><br><span class="line">[0]:  0000000000000000000000000000000000000000000000000000000000000001</span><br></pre></td></tr></table></figure>
+
+<p>全部的为</p>
+<pre><code>0x60fe47b10000000000000000000000000000000000000000000000000000000000000001</code></pre><br/>
+
+<h1 id="ABI-编码分析"><a href="#ABI-编码分析" class="headerlink" title="ABI 编码分析"></a>ABI 编码分析</h1><br/>
+
+<p>我把上面交易的附加数据拷贝出来分析一下，这个数据可以分成两个子部分：</p>
+<ul>
+<li>函数选择器(4字节)<ul>
+<li><code>0x60fe47b1</code></li>
+</ul>
+</li>
+<li>第一个参数(32字节)<ul>
+<li><code>00000000000000000000000000000000000000000000000000000000000000001</code></li>
+</ul>
+</li>
+</ul>
+<p>函数选择器值，实际是对函数签名字符串进行<code>sha3</code>（<code>keccak256</code>）哈希运算之后，取前<code>4</code>个字节，用代码表示就是：</p>
+<pre><code>bytes4(sha3(“set(uint256)”)) == 0x60fe47b1</code></pre><p><code>python</code> 代码为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sha3</span><br><span class="line"></span><br><span class="line">s = sha3.keccak_256()</span><br><span class="line">s.update(<span class="string">b"set(uint256)"</span>)</span><br><span class="line">print(s.hexdigest())</span><br></pre></td></tr></table></figure>
+
+<p>输入</p>
+<pre><code>60fe47b16ed402aae66ca03d2bfc51478ee897c26a1158669c7058d5f24898f4</code></pre><p>参数部分则是使用对应的<code>16</code>进制数。</p>
+<p>现在就好理解 附加数据怎么转化为对应的函数调用。</p>
+<p>ps: 关于合约部分我暂时还没理解，所以，后期我再补充</p>
 
     </div>
 
@@ -420,7 +486,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABI-是什么"><span class="nav-number">2.</span> <span class="nav-text">ABI 是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#调用合约函数发生了什么"><span class="nav-number">3.</span> <span class="nav-text">调用合约函数发生了什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#演示调用函数"><span class="nav-number">4.</span> <span class="nav-text">演示调用函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ABI-编码分析"><span class="nav-number">5.</span> <span class="nav-text">ABI 编码分析</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
