@@ -28,7 +28,7 @@
 <meta property="og:description" content="和选用线程池来关系多线程类似，当程序中设置到多进程编程时，Python 提供了更好的管理多个进程的方式，就是使用进程池。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-05-23T10:08:43.000Z">
-<meta property="article:modified_time" content="2020-05-23T10:17:20.000Z">
+<meta property="article:modified_time" content="2021-06-11T09:03:15.931Z">
 <meta property="article:author" content="犀牛">
 <meta property="article:tag" content="multiprocess">
 <meta property="article:tag" content="多进程">
@@ -245,10 +245,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-23 18:08:43 / 修改时间：18:17:20" itemprop="dateCreated datePublished" datetime="2020-05-23T18:08:43+08:00">2020-05-23</time>
+              <time title="创建时间：2020-05-23 18:08:43" itemprop="dateCreated datePublished" datetime="2020-05-23T18:08:43+08:00">2020-05-23</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-11 17:03:15" itemprop="dateModified" datetime="2021-06-11T17:03:15+08:00">2021-06-11</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -373,7 +379,12 @@ http://c.biancheng.net/shell/  --当前进程： 10944</code></pre><p>除此之�
 <p>程序执行结果为：</p>
 <pre><code>http://c.biancheng.net/python/ --当前进程：24464
 http://c.biancheng.net/java/ --当前进程：22900
-http://c.biancheng.net/shell/ --当前进程：23324</code></pre>
+http://c.biancheng.net/shell/ --当前进程：23324</code></pre><br/>
+
+<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><br/>
+
+<h2 id="案例一"><a href="#案例一" class="headerlink" title="案例一"></a>案例一</h2><p>上千个数组地址，使用进城池进行处理。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Pool</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> xlrd</span><br><span class="line"><span class="keyword">from</span> web3 <span class="keyword">import</span> Web3</span><br><span class="line"></span><br><span class="line">w3 = Web3(Web3.HTTPProvider(<span class="string">'https://http-mainnet.hoosmartchain.com'</span>))</span><br><span class="line"></span><br><span class="line">file_name = <span class="string">"3000_1.xlsx"</span></span><br><span class="line"></span><br><span class="line">ixt_contract = <span class="string">"0x80c6A3A493aFd7C52f89E6504C90cE6A639783FC"</span></span><br><span class="line">iusdt_contract = <span class="string">"0x09e6030537f0582d51C00bdC2d590031d9b1c86c"</span></span><br><span class="line"></span><br><span class="line">abi = json.loads(</span><br><span class="line">    <span class="string">'[&#123;"constant": true,"inputs": [&#123;"name": "who", "type": "address"&#125;],"name": "balanceOf","outputs": [&#123;"name": "", "type": "uint256"&#125;],"payable": false,"stateMutability": "view","type": "function"&#125;]'</span>)</span><br><span class="line"></span><br><span class="line">iXT_ADDRESS = w3.toChecksumAddress(<span class="string">'0x80c6A3A493aFd7C52f89E6504C90cE6A639783FC'</span>)</span><br><span class="line">iUSDT_ADDRESS = w3.toChecksumAddress(<span class="string">'0x09e6030537f0582d51C00bdC2d590031d9b1c86c'</span>)</span><br><span class="line">iXT_CONTRACT = w3.eth.contract(address=iXT_ADDRESS, abi=abi)</span><br><span class="line">iUSDT_CONTRACT = w3.eth.contract(address=iUSDT_ADDRESS, abi=abi)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">init_address</span><span class="params">()</span>:</span></span><br><span class="line">    data = defaultdict(list)</span><br><span class="line">    xls = xlrd.open_workbook(file_name)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(xls.sheets()[<span class="number">0</span>].col_values(<span class="number">0</span>))):</span><br><span class="line">        data[xls.sheets()[<span class="number">0</span>].col_values(<span class="number">0</span>)[i]] = xls.sheets()[<span class="number">0</span>].col_values(<span class="number">1</span>)[i]</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_ixt</span><span class="params">(address)</span>:</span></span><br><span class="line">    address = Web3.toChecksumAddress(address)</span><br><span class="line">    print(address + <span class="string">" "</span> + str(os.getpid()) + <span class="string">" "</span> + str(</span><br><span class="line">        w3.fromWei(iXT_CONTRACT.functions.balanceOf(address).call(), <span class="string">'ether'</span>)))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># def get_iusdt(address):</span></span><br><span class="line"><span class="comment">#     address = Web3.toChecksumAddress(address)</span></span><br><span class="line"><span class="comment">#     return w3.fromWei(iUSDT_CONTRACT.functions.balanceOf(address).call(), 'ether')</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_erc20</span><span class="params">(address, private)</span>:</span></span><br><span class="line">    toAddress = Web3.toChecksumAddress(<span class="string">'0x126c2C418aE620da41D14bD96c5af49164794C88'</span>)</span><br><span class="line">    fromAddress = Web3.toChecksumAddress(address)</span><br><span class="line">    nonce = w3.eth.getTransactionCount(fromAddress)</span><br><span class="line">    transaction = &#123;</span><br><span class="line">        <span class="string">'from'</span>: fromAddress,</span><br><span class="line">        <span class="string">'to'</span>: toAddress,</span><br><span class="line">        <span class="string">'gas'</span>: <span class="number">241838</span>,</span><br><span class="line">        <span class="string">'gasPrice'</span>: w3.toWei(<span class="string">'1'</span>, <span class="string">'gwei'</span>),</span><br><span class="line">        <span class="string">'nonce'</span>: nonce,</span><br><span class="line">        <span class="string">'data'</span>: <span class="string">"c9972e44"</span>,</span><br><span class="line">        <span class="comment"># 'chainId': 70</span></span><br><span class="line">    &#125;</span><br><span class="line">    signed_tx = w3.eth.account.signTransaction(transaction, private)</span><br><span class="line">    txn_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction)</span><br><span class="line">    print(address + <span class="string">" "</span> + str(os.getpid()) + <span class="string">" "</span> + Web3.toHex(txn_hash))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    data = init_address()</span><br><span class="line">    pool = Pool(processes=<span class="number">20</span>)</span><br><span class="line">    <span class="keyword">for</span> address, private <span class="keyword">in</span> data.items():</span><br><span class="line">        pool.apply_async(get_ixt, args=(address,))</span><br><span class="line">    pool.close()</span><br><span class="line">    pool.join()</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -480,6 +491,7 @@ http://c.biancheng.net/shell/ --当前进程：23324</code></pre>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#案例"><span class="nav-number">1.</span> <span class="nav-text">案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#案例一"><span class="nav-number">1.1.</span> <span class="nav-text">案例一</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -494,20 +506,20 @@ http://c.biancheng.net/shell/ --当前进程：23324</code></pre>
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">1129</span>
+          <span class="site-state-item-count">1132</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">580</span>
+        <span class="site-state-item-count">588</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">505</span>
+        <span class="site-state-item-count">506</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
