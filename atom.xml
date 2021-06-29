@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://benpaodewoniu.github.io/"/>
-  <updated>2021-06-23T08:17:22.996Z</updated>
+  <updated>2021-06-29T09:32:57.440Z</updated>
   <id>http://benpaodewoniu.github.io/</id>
   
   <author>
@@ -15,6 +15,132 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>maven ｜ jar 包管理以及配置文件的书写</title>
+    <link href="http://benpaodewoniu.github.io/2021/06/29/maven4/"/>
+    <id>http://benpaodewoniu.github.io/2021/06/29/maven4/</id>
+    <published>2021-06-29T09:20:12.000Z</published>
+    <updated>2021-06-29T09:32:57.440Z</updated>
+    
+    <content type="html"><![CDATA[<p>这个算是基础了。</p><a id="more"></a><br/><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/><ul><li><a href="https://cloud.tencent.com/developer/article/1698351">maven的安装与使用</a></li></ul><br/><h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><br/><p>创建 <code>maven</code> 项目后，项目中将有一个 <code>pom.xml</code> 文件，这个文件是我们管理项目依赖的关键。</p><p>下面是一个最基础的 <code>pom.xml</code>：</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.example<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fastjson.version</span>&gt;</span>1.2.47<span class="tag">&lt;/<span class="name">fastjson.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>fastjson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;fastjson.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure><p>可以看到文件中有很多属性，下面简要概述一下这些属性都起到什么作用：</p><ul><li>modelVersion<ul><li>指定了当前 <code>Maven</code> 模型的版本号，对于 <code>Maven2</code> 和<code>Maven3</code>来说，它只能是<code>4.0.0</code></li></ul></li><li>groupId<ul><li>顾名思义，是公司名或是组织名。一般，groupId是由三个部分组成，每个部分之间以”.“分隔<ul><li>第一部分是项目用途，比如用于商业的就是<code>com</code>，用于非营利性组织的就是<code>org</code>；</li><li>第二部分是公司名，比如 <code>baidu</code>、<code>alibaba</code>；</li><li>第三部分是你的项目名</li></ul></li></ul></li><li>artifactId<ul><li><code>Maven</code>构建的项目名，比如你的项目中有子项目，就可以使用”项目名-子项目名”的命名方式</li></ul></li><li>version<ul><li>版本号，SNAPSHOT意为快照，说明该项目还在开发中，是不稳定的版本。</li></ul></li><li>properties<ul><li>定义的一些属性，比如jar包的版本，在后面可以直接引用这些属性，便于集中管理</li></ul></li><li>dependency<ul><li>依赖的信息，例如上文中在<code>dependency</code> 中描述了 <code>fastjson</code> 的信息，<code>dependency</code> 包裹在 <code>dependencies</code> 标签中</li></ul></li></ul><p>在 <code>Maven</code> 中很重要的一点是，<code>groupId</code>、<code>artifactId</code>、<code>version</code>三个元素生成了一个<code>Maven</code>项目的基本坐标，例如：</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>fastjson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure><p>接下来，我们了解一下<code>maven</code>管理项目依赖的基本原理：</p><p>一个项目会有很多<code>jar</code>的依赖，<code>Maven</code>工程首先会从本地仓库中获取<code>jar</code>包，当无法获取指定<code>jar</code>包时，本地仓库会从远程仓库（中央仓库）中下载<code>jar</code>包，并放入本地仓库以备将来使用。</p><p>补充一点，在 <code>IDEA</code> 中，每次新建项目后，会使用默认的本地仓库地址，要做一下设置：<code>file–settings–Maven</code>。</p><p><img src="/images/maven/4_0.png" alt=""></p><p>每个项目都要单独放一个存储 <code>jar</code> 包的地方。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;这个算是基础了。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="java" scheme="http://benpaodewoniu.github.io/categories/java/"/>
+    
+      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/"/>
+    
+      <category term="maven" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/maven/"/>
+    
+    
+      <category term="maven" scheme="http://benpaodewoniu.github.io/tags/maven/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>maven | 配置文件</title>
+    <link href="http://benpaodewoniu.github.io/2021/06/29/maven3/"/>
+    <id>http://benpaodewoniu.github.io/2021/06/29/maven3/</id>
+    <published>2021-06-29T09:03:29.000Z</published>
+    <updated>2021-06-29T09:21:50.418Z</updated>
+    
+    <content type="html"><![CDATA[<p>详细介绍，使用过的配置文件的属性。</p><a id="more"></a><br/><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/><ul><li><a href="https://cloud.tencent.com/developer/article/1698351">maven的安装与使用</a></li></ul><br/><h1 id="win10"><a href="#win10" class="headerlink" title="win10"></a>win10</h1><br/><p>假设你解压到了某一个文件夹中。</p><p>配置文件是 conf 文件夹中的 settings.xml。</p><h2 id="配置-jar-包安装路径"><a href="#配置-jar-包安装路径" class="headerlink" title="配置 jar 包安装路径"></a>配置 jar 包安装路径</h2><p><code>maven</code> 默认仓库地址是 <code>C:\Users\用户名.m2</code>。所以，我们要修改这个路径</p><pre><code>&lt;localRepository&gt;新的路径&lt;/localRepository&gt;</code></pre><h2 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h2>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;详细介绍，使用过的配置文件的属性。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="java" scheme="http://benpaodewoniu.github.io/categories/java/"/>
+    
+      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/"/>
+    
+      <category term="maven" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/maven/"/>
+    
+    
+      <category term="maven" scheme="http://benpaodewoniu.github.io/tags/maven/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>maven ｜ 生命周期</title>
+    <link href="http://benpaodewoniu.github.io/2021/06/29/maven2/"/>
+    <id>http://benpaodewoniu.github.io/2021/06/29/maven2/</id>
+    <published>2021-06-29T05:33:17.000Z</published>
+    <updated>2021-06-29T09:04:50.980Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="java" scheme="http://benpaodewoniu.github.io/categories/java/"/>
+    
+      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/"/>
+    
+      <category term="maven" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/maven/"/>
+    
+    
+      <category term="maven" scheme="http://benpaodewoniu.github.io/tags/maven/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>maven | IDEA 配置 maven 项目环境</title>
+    <link href="http://benpaodewoniu.github.io/2021/06/29/maven1/"/>
+    <id>http://benpaodewoniu.github.io/2021/06/29/maven1/</id>
+    <published>2021-06-29T03:11:21.000Z</published>
+    <updated>2021-06-29T09:03:23.204Z</updated>
+    
+    <content type="html"><![CDATA[<p>因为公司的项目是 <code>mvn</code> 管理，所以，需要在 <code>IDEA</code> 中配置。</p><a id="more"></a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;因为公司的项目是 &lt;code&gt;mvn&lt;/code&gt; 管理，所以，需要在 &lt;code&gt;IDEA&lt;/code&gt; 中配置。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="java" scheme="http://benpaodewoniu.github.io/categories/java/"/>
+    
+      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/"/>
+    
+      <category term="maven" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/maven/"/>
+    
+      <category term="IDEA" scheme="http://benpaodewoniu.github.io/categories/java/%E5%9F%BA%E7%A1%80/maven/IDEA/"/>
+    
+    
+      <category term="maven" scheme="http://benpaodewoniu.github.io/tags/maven/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ubuntu | 开机启动不了桌面</title>
+    <link href="http://benpaodewoniu.github.io/2021/06/29/ubuntu8/"/>
+    <id>http://benpaodewoniu.github.io/2021/06/29/ubuntu8/</id>
+    <published>2021-06-29T02:32:05.000Z</published>
+    <updated>2021-06-29T03:02:00.230Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天，在公司遇到的第一个任务就是修复机器开不了机的问题。</p><a id="more"></a><br/><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/><ul><li><a href="https://blog.csdn.net/qq_36786467/article/details/108156413">在Ubuntu上使用恢复模式及Recovery Mode各选项的使用方法</a></li><li><a href="https://www.jianshu.com/p/66ac9441fd1b">ubuntu的recovery mode解决用户一些实际问题</a></li><li><a href="https://blog.csdn.net/BigData_Mining/article/details/102548368">Ubuntu开机一直卡在OK Started GNOME Display Manager处，解决方案！</a></li></ul><br/><h1 id="环境和问题描述"><a href="#环境和问题描述" class="headerlink" title="环境和问题描述"></a>环境和问题描述</h1><br/><ul><li><code>ubuntu 18.04</code></li><li>开机进不了桌面，一直卡在开机的 <code>ubuntu</code> 的图标上</li><li>如果进入查看引导启动「按 esc」<ul><li>会卡在 <code>［OK] Started GNOME Display Manager</code> 「其实也不一定，但是，就是卡在某一步的 OK 进行不下去」</li></ul></li></ul><p>查阅资料可知，出现这种情况一般有两种</p><ul><li>硬盘空间不足</li><li>软件更新错误</li></ul><br/><h1 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h1><br/><p>首先，在卡住开机的时候，进入引导项，就是，在开机画面中按一下 「ESC 当然，不同的机器可能不一样，试一下就行」</p><p>会出现类似下面的画面</p><p><img src="/images/ubuntu/8_0.png" alt=""></p><p>一般网上教程是让你按</p><p><code>alt+ctrl+F1~F6</code>，进入命令行，输入用户名和密码，然后操作。</p><p>但是，我这边已经卡死，进也进不了。所以，这个方法放弃。</p><p>重启，然后不断的按 <code>esc</code> 或者 <code>del</code>。会进入一个系统修改，然后上下移一下，退出该画面，会进入类似下面的画面</p><p><img src="/images/ubuntu/8_1.png" alt=""></p><p>ps: 很可能你的机器不是这样操作，比如，你的机器可能开机就进入这个画面了，但是，都无所谓，只要能进入这个画面就行。</p><p>选择，<code>ubuntu 高级选项</code>。这个时候可能你有很多个重复选项，我选择的是第一个带有 「<code>recovery mode</code>」 的选项。</p><p>这个时候，会出现下面的画面</p><p><img src="/images/ubuntu/8_2.png" alt=""></p><p>这时候重点说一下这些选项代表什么意思。</p><ul><li><code>Resume normal boot</code><ul><li>继续正常启动，是给不小心进入这个页面的人的选择。</li></ul></li><li><code>Recovery Mode：Clean</code><ul><li>允许你快速释放系统分区上的空间。</li></ul></li><li><code>Recovery Mode：Dpkg</code><ul><li>允许修复和卸载导致系统出现问题的任何可能损坏的软件包。</li><li>注意：此功能需要互联网连接，在恢复模式列表中选择 <code>Network</code> 以在尝试使用之前联机。</li></ul></li><li><code>Recovery Mode：Fsck</code><ul><li>可以通过扫描损坏的硬盘并删除它们来快速修复损坏的硬盘，此功能非常有用。</li></ul></li><li><code>Recovery Mode：Grub</code><ul><li>重新设置Grub系统来扫描你的系统并自动更新引导加载程序。</li></ul></li><li><code>Recovery Mode：Root</code><ul><li>无需使用密码。进入命令行</li></ul></li></ul><p>所以，我首先应该排除的是是不是空间已经满了。</p><p>选择 <code>Recovery Mode：Root</code> 然后输入</p><pre><code>df -h</code></pre><p>发现，空间还剩下很多，所以，不是磁盘原因。这里猜测，可能是某一次更新软件导致软件更新不对，出现错误。「这个时候，已经猜到是 MySQL 了，因为，在关机的时候，总是卡在 MySQL」。</p><p>所以，我还运行了</p><ul><li><code>Recovery Mode：Fsck</code></li><li><code>Recovery Mode：Grub</code></li></ul><p>但是，都不奏效，我接着运行了</p><ul><li><code>Recovery Mode：Dpkg</code></li></ul><p>因为，这个机器本来就是联网的，所以，我不需要配置 network ，进行了很多更新，尤其是 mysql ，还让我手动选择更新，更新完成后，就可以正确的打开机器了。</p><p>ps: 整个过程没有上面描述的富有逻辑，事实上，我第一次使用 Recovery Mode：Dpkg 更新了软件，开机并不奏效，所以，我重启后，依次执行了</p><ul><li><code>Recovery Mode：Fsck</code></li><li><code>Recovery Mode：Grub</code></li></ul><p>然后执行</p><ul><li><code>Recovery Mode：Dpkg</code></li></ul><p>才奏效，所以，整个过程需要多进行测试。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;今天，在公司遇到的第一个任务就是修复机器开不了机的问题。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="linux" scheme="http://benpaodewoniu.github.io/categories/linux/"/>
+    
+      <category term="ubuntu" scheme="http://benpaodewoniu.github.io/categories/linux/ubuntu/"/>
+    
+    
+      <category term="ubuntu" scheme="http://benpaodewoniu.github.io/tags/ubuntu/"/>
+    
+  </entry>
   
   <entry>
     <title>txstreet | 一个有趣的可视化网站</title>
@@ -478,134 +604,6 @@
     
     
       <category term="pycharm" scheme="http://benpaodewoniu.github.io/tags/pycharm/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>奇淫巧技 | 构建邮箱服务器</title>
-    <link href="http://benpaodewoniu.github.io/2021/05/29/cunning14/"/>
-    <id>http://benpaodewoniu.github.io/2021/05/29/cunning14/</id>
-    <published>2021-05-29T06:46:35.000Z</published>
-    <updated>2021-05-29T07:38:54.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>这个我暂时还没走通。</p><a id="more"></a><br/><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/><ul><li><a href="https://zhuanlan.zhihu.com/p/121725774">Python爬虫干货之如何通过邮箱批量注册账号？</a></li><li><a href="https://github.com/leegohi/mailserver">mailserver</a></li><li><a href="https://cloud.tencent.com/developer/article/1511808">一沟绝望的死水：模拟邮件服务器，批量注册利器</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;这个我暂时还没走通。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="奇淫巧技" scheme="http://benpaodewoniu.github.io/categories/%E5%A5%87%E6%B7%AB%E5%B7%A7%E6%8A%80/"/>
-    
-      <category term="活动助力" scheme="http://benpaodewoniu.github.io/categories/%E5%A5%87%E6%B7%AB%E5%B7%A7%E6%8A%80/%E6%B4%BB%E5%8A%A8%E5%8A%A9%E5%8A%9B/"/>
-    
-    
-      <category term="奇淫巧技" scheme="http://benpaodewoniu.github.io/tags/%E5%A5%87%E6%B7%AB%E5%B7%A7%E6%8A%80/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>代理云 | 代理 IP 池</title>
-    <link href="http://benpaodewoniu.github.io/2021/05/28/dailiyun0/"/>
-    <id>http://benpaodewoniu.github.io/2021/05/28/dailiyun0/</id>
-    <published>2021-05-28T13:10:54.000Z</published>
-    <updated>2021-05-28T13:28:50.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>这个是一个收费的代理 <code>IP</code> 池。</p><p>我用过蛮不错的。</p><a id="more"></a><br/><h1 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h1><br/><ul><li><a href="http://console.v4.dailiyun.com/user/?channel=djx">注册</a></li><li><a href="http://i0k.cn/5lUmB">注册 | 防止上面失效</a></li></ul><br/><h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><br/><ul><li>可以联系客服，进行测试</li><li>按量的话是一天一万个，共 50 块</li></ul><br/><h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><br/><ul><li>python<ul><li>selenium<ul><li><a href="/2021/05/28/python137/">python | selenium 换 IP</a></li></ul></li></ul></li></ul><br/><h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><br/><p>登录账号后，在下面</p><p><img src="/images/dailiyun/0_0.png" alt=""></p><p>我们直接用 <code>requests</code> 库去 <code>get</code> 请求框内的地址就好了。</p><p>上面的按键也很清晰，就不说了，但是，该代理是需要输入账号和密码的，其中账号和密码就是你的登录账号和密码。</p><p>在「验证设置」中有相关 <code>demo</code>，这里我也贴一下地址。</p><ul><li><a href="https://share.weiyun.com/XzSjjKoL">demo</a></li></ul><p>但是，对于 <code>python</code> 而言，里面只是给了 <code>requests</code> 的案例，并没有给 <code>selenium</code> 的，请参考。</p><ul><li><a href="/2021/05/28/python137/">python | selenium 换 IP</a></li></ul><p>OK，使用起来很简单，这里就不再多说了。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;这个是一个收费的代理 &lt;code&gt;IP&lt;/code&gt; 池。&lt;/p&gt;
-&lt;p&gt;我用过蛮不错的。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="奇淫巧技" scheme="http://benpaodewoniu.github.io/categories/%E5%A5%87%E6%B7%AB%E5%B7%A7%E6%8A%80/"/>
-    
-      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%A5%87%E6%B7%AB%E5%B7%A7%E6%8A%80/%E5%9F%BA%E7%A1%80/"/>
-    
-    
-      <category term="奇淫巧技" scheme="http://benpaodewoniu.github.io/tags/%E5%A5%87%E6%B7%AB%E5%B7%A7%E6%8A%80/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ETHProMiner | 庞氏骗局</title>
-    <link href="http://benpaodewoniu.github.io/2021/05/28/ETHProMiner0/"/>
-    <id>http://benpaodewoniu.github.io/2021/05/28/ETHProMiner0/</id>
-    <published>2021-05-28T13:04:21.000Z</published>
-    <updated>2021-05-28T15:52:33.000Z</updated>
-    
-    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">过段时间再开放</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="105d3acd9dd76b2e1b5aa1315422504892f165dfd9b9e57ea91795d8d01de8f8">301f74d2125c814ac7a4107816fea455e408d70b2985e10ad6cc4448ae5ffd752b3cf59a919133e643432d9a0e01a9db1fe9fcea9fe8ed37cd1bc4203f4af95b3e255df8ec51f595664a98a56946053d42309da83e4b452d92f4b3232297499af3e493b6c70a712d18ca647b7ba3a2107f42636bbc34520f3340018ae5865e0053c44c0376dcf7e992232e0027c2425ef69b16de8024278b13980efdcad4173b73b98fcb31efbbe3057d66d16d507804b8d15ada0884f72fb2151c05b0e55e9d90580debab9438bfc257e0ea4758383c0f88acec6734ad88b1a172cee6544590b6351f37c191405899f58d66b3c9eacfc1af9cebc63501e8b009231c9f44f92eaaef1571ea59345116f568bb0d95134ecee92bb0308234d0018c95c2ccd3cdb74679dd1ce784a80e410f5f1b3b431a6d8e78b1320a5ae065de790e958890ce3603849dff2cceadf7d15e896977d3acdd2c131ae19713fb4ee3acff17e0fd6d7f80aa5a1593008a957ca4d0ac7190208b8713d4d34a14af5d3fa67faf7b1ec4edac589ee485446bb5b35a34132055cf394c149f3002cab7bfae19d62a1b9685459405353b00090912670d8e97c74fa66608da6cb263220b76cc10859ad45cc0f60564bff30f2dc85ae7862c940b60fbd2bd20a4d25c3c28cffc63a0e2a93855d78d47fb0b28d45a8fc493232ed369351fcf7d15f2e4275dc29c376a1e599b6f63ee41e528d10fa5cf9ea8fee614f63afde42d52d39e47145ffdd6fb513630b14cbaa3771f74adbe5c2a9180c344593e77d35dd32d60d9f3b222d6a4308fb399df703f6160e16e36c01b7c51d3c40cd14d5cf43f5d316864df345ca3dbcdb3f6e3a56f1fab2db817a8490e5bdeb8fc1aea11b527ca3c8defefb3b9c261a14053e702c1bd5970c6d7e818f61f0ba9a84f89e3603fb72a8ff2ae7432859171c719cd79b7cf08ddd3593f51fb78c3e5d16e3ffc3ffee4ca4d57de2ac513ee8ce8614ceafdcb847750df8b94cf8e38a760c48b569aa101c3d98177eee11e0f555904ac742d103f6c140f799e570c2705df836ea13eb90a03b583cc98f9cf84c014a3a917e65db4143e9a078961a2b962f17926ac2115f8e5923c944934b30c62e7ecd68e974f63c2a9503906a54a014658f35f94bf88d5fc24f7074d85fb38088e454104c6c71c4b6e0cde0da0d9ca13ee8f3b9670a10b7b780d91fee2a4b65fca8f5b17e8fadb3475b65574f517044ab0971d429a4a67a173963ddb0fd4ea3f11197ff1037e90a3b321e302f3c8be3cfbc060c6930a884fc8f3f50cb2c796476b4719472daa87407b730155e582c655434dbf4bdcb7af6077d4dadcacb22ee8996855f1870153483e866c9793eca295b8fec82bcfdd3e773ddd4f683a42580e9f645c3218f30211e86d333d91af0fe44e398f5587ff92a5fb7e9b68a17bd775cf539ccef1a2d9e35f1713a4053b9bcc275d4c795ed28458ea73120a6ff551c5276e30f740065ead75698b5af724f504088acd95ddedeedf083d42f87630bde7cbcac2f981648b5edc50c985f99204c723ad7138fb211afd6feb39d77045fb8c6e8a2dfc14927878e94183a456fe745ab8cd7a87aa98adee171486465ac2d535642b9423d185bc95239eb543daa4b281aa921c745ac5d8e9c5af1e28bc7cd637db9975a096a3a506b87d54bca48d8d9b7d027296be38ae66f1dc53b951cff6ddf8a5ddcee21a84e394953791ef6798d397dd18380b3f578e2b3b877afa352dcd5dda14959e15eecd52450ec60c0cda1e7a5ebd885740dfde378cbe552dfeece1e50eed26319381d5d0a6604dd123b967fdf909335d8d79ed0987211c053c57de89838df402dca95618e4c72997719ed36478ae6d64e911ac12358a9deb5547b0971fa4ea89fbd8f009ed228dabb63025a1392fc436db4e5285bc4eefa3ba9fe835c37e</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
-    
-    <summary type="html">
-    
-      密码等级 2
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>python | selenium 换 IP</title>
-    <link href="http://benpaodewoniu.github.io/2021/05/28/python137/"/>
-    <id>http://benpaodewoniu.github.io/2021/05/28/python137/</id>
-    <published>2021-05-28T13:01:45.000Z</published>
-    <updated>2021-05-29T17:31:20.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><code>slenium</code> 使用代理，主要分为两个情况。</p><ul><li>无密码模式</li><li>有密码模式</li></ul><a id="more"></a><br/><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/><ul><li><a href="https://cloud.tencent.com/developer/article/1406450">Selenium + Chrome Diver密码认证的HTTP代理</a></li><li><a href="https://blog.csdn.net/zwq912318834/article/details/78626739">selenium+python设置爬虫代理IP</a></li><li><a href="https://www.cnblogs.com/roystime/p/6935543.html">Selenium chrome配置代理Python版</a></li><li><a href="https://github.com/RobinDev/Selenium-Chrome-HTTP-Private-Proxy">Selenium Chrome HTTP Private Proxy</a></li></ul><br/><h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><br/><ul><li>python</li><li>macbook</li></ul><br/><h1 id="无密码模式"><a href="#无密码模式" class="headerlink" title="无密码模式"></a>无密码模式</h1><br/><p>这个非常简单，直接看一个网上的 demo 吧。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line">chromeOptions = webdriver.ChromeOptions()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置代理</span></span><br><span class="line">chromeOptions.add_argument(<span class="string">"--proxy-server=http://202.20.16.82:10152"</span>)</span><br><span class="line"><span class="comment"># 一定要注意，=两边不能有空格，不能是这样--proxy-server = http://202.20.16.82:10152</span></span><br><span class="line">browser = webdriver.Chrome(chrome_options = chromeOptions)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看本机ip，查看代理是否起作用</span></span><br><span class="line">browser.get(<span class="string">"http://httpbin.org/ip"</span>)</span><br><span class="line">print(browser.page_source)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 退出，清除浏览器缓存</span></span><br><span class="line">browser.quit()</span><br></pre></td></tr></table></figure><br/><h1 id="有密码模式"><a href="#有密码模式" class="headerlink" title="有密码模式"></a>有密码模式</h1><br/><p>我自己测试过的是用代理云，参考</p><ul><li><a href="/2021/05/28/dailiyun0/">代理云 | 代理 IP 池</a></li></ul><p>使用该代理打开页面会出现一个弹出框，叫你输入账号和密码，一般弹出的时候，程序就会报错，无法继续运行。</p><p>默认情况下，<code>Chrome</code>的<code>–proxy-server=&quot;http://ip:port&quot;</code>参数不支持设置用户名和密码认证。这样就使得<code>Selenium + Chrome Driver</code>无法使用<code>HTTP Basic Authentication</code>的<code>HTTP</code>代理。一种变通的方式就是采用<code>IP</code>地址认证，但在国内网络环境下，大多数用户都采用<code>ADSL</code>形式网络接入，<code>IP</code>是变化的，也无法采用IP地址绑定认证。因此迫切需要找到一种让<code>Chrome</code>自动实现<code>HTTP</code>代理用户名密码认证的方案。</p><p><code>Stackoverflow</code>上有人分享了一种利用<code>Chrome</code>插件实现自动代理用户密码认证的方案非常不错</p><ul><li><a href="http://stackoverflow.com/questions/9888323/how-to-override-basic-authentication-in-selenium2-with-java-using-chrome-driver">详细地址</a></li></ul><p>有人在该思路的基础上用<code>Python</code>实现了自动化的<code>Chrome</code>插件创建过程，即根据指定的代理<code>username:password@ip:port</code>自动创建一个<code>Chrome</code>代理插件，然后就可以在<code>Selenium + Chrome Driver</code>中通过安装该插件实现代理配置功能。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium <span class="keyword">import</span> webdriver</span><br><span class="line"><span class="keyword">from</span> selenium.webdriver.chrome.options <span class="keyword">import</span> Options</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_proxyauth_extension</span><span class="params">(proxy_host, proxy_port,</span></span></span><br><span class="line"><span class="function"><span class="params">                               proxy_username, proxy_password,</span></span></span><br><span class="line"><span class="function"><span class="params">                               scheme=<span class="string">'http'</span>, plugin_path=None)</span>:</span></span><br><span class="line">    <span class="string">"""Proxy Auth Extension</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    args:</span></span><br><span class="line"><span class="string">        proxy_host (str): domain or ip address, ie proxy.domain.com</span></span><br><span class="line"><span class="string">        proxy_port (int): port</span></span><br><span class="line"><span class="string">        proxy_username (str): auth username</span></span><br><span class="line"><span class="string">        proxy_password (str): auth password</span></span><br><span class="line"><span class="string">    kwargs:</span></span><br><span class="line"><span class="string">        scheme (str): proxy scheme, default http</span></span><br><span class="line"><span class="string">        plugin_path (str): absolute path of the extension</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    return str -&gt; plugin_path</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">import</span> string</span><br><span class="line">    <span class="keyword">import</span> zipfile</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> plugin_path <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        plugin_path = <span class="string">'./vimm_chrome_proxyauth_plugin.zip'</span></span><br><span class="line"></span><br><span class="line">    manifest_json = <span class="string">"""</span></span><br><span class="line"><span class="string">    &#123;</span></span><br><span class="line"><span class="string">        "version": "1.0.0",</span></span><br><span class="line"><span class="string">        "manifest_version": 2,</span></span><br><span class="line"><span class="string">        "name": "Chrome Proxy",</span></span><br><span class="line"><span class="string">        "permissions": [</span></span><br><span class="line"><span class="string">            "proxy",</span></span><br><span class="line"><span class="string">            "tabs",</span></span><br><span class="line"><span class="string">            "unlimitedStorage",</span></span><br><span class="line"><span class="string">            "storage",</span></span><br><span class="line"><span class="string">            "&lt;all_urls&gt;",</span></span><br><span class="line"><span class="string">            "webRequest",</span></span><br><span class="line"><span class="string">            "webRequestBlocking"</span></span><br><span class="line"><span class="string">        ],</span></span><br><span class="line"><span class="string">        "background": &#123;</span></span><br><span class="line"><span class="string">            "scripts": ["background.js"]</span></span><br><span class="line"><span class="string">        &#125;,</span></span><br><span class="line"><span class="string">        "minimum_chrome_version":"22.0.0"</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    background_js = string.Template(</span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        var config = &#123;</span></span><br><span class="line"><span class="string">                mode: "fixed_servers",</span></span><br><span class="line"><span class="string">                rules: &#123;</span></span><br><span class="line"><span class="string">                  singleProxy: &#123;</span></span><br><span class="line"><span class="string">                    scheme: "$&#123;scheme&#125;",</span></span><br><span class="line"><span class="string">                    host: "$&#123;host&#125;",</span></span><br><span class="line"><span class="string">                    port: parseInt($&#123;port&#125;)</span></span><br><span class="line"><span class="string">                  &#125;,</span></span><br><span class="line"><span class="string">                  bypassList: ["foobar.com"]</span></span><br><span class="line"><span class="string">                &#125;</span></span><br><span class="line"><span class="string">              &#125;;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        chrome.proxy.settings.set(&#123;value: config, scope: "regular"&#125;, function() &#123;&#125;);</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        function callbackFn(details) &#123;</span></span><br><span class="line"><span class="string">            return &#123;</span></span><br><span class="line"><span class="string">                authCredentials: &#123;</span></span><br><span class="line"><span class="string">                    username: "$&#123;username&#125;",</span></span><br><span class="line"><span class="string">                    password: "$&#123;password&#125;"</span></span><br><span class="line"><span class="string">                &#125;</span></span><br><span class="line"><span class="string">            &#125;;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        chrome.webRequest.onAuthRequired.addListener(</span></span><br><span class="line"><span class="string">                    callbackFn,</span></span><br><span class="line"><span class="string">                    &#123;urls: ["&lt;all_urls&gt;"]&#125;,</span></span><br><span class="line"><span class="string">                    ['blocking']</span></span><br><span class="line"><span class="string">        );</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">    ).substitute(</span><br><span class="line">        host=proxy_host,</span><br><span class="line">        port=proxy_port,</span><br><span class="line">        username=proxy_username,</span><br><span class="line">        password=proxy_password,</span><br><span class="line">        scheme=scheme,</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">with</span> zipfile.ZipFile(plugin_path, <span class="string">'w'</span>) <span class="keyword">as</span> zp:</span><br><span class="line">        zp.writestr(<span class="string">"manifest.json"</span>, manifest_json)</span><br><span class="line">        zp.writestr(<span class="string">"background.js"</span>, background_js)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> plugin_path</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_windows</span><span class="params">(proxy=<span class="string">""</span>, proxyauth_plugin_path=<span class="string">""</span>)</span>:</span></span><br><span class="line">    chrome_options = Options()</span><br><span class="line">    chrome_options.add_argument(<span class="string">f"--proxy-server=<span class="subst">&#123;proxy&#125;</span>"</span>)</span><br><span class="line">    chrome_options.add_argument(</span><br><span class="line">        <span class="string">'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'</span>)</span><br><span class="line">    chrome_options.add_experimental_option(<span class="string">'useAutomationExtension'</span>, <span class="literal">True</span>)</span><br><span class="line">    chrome_options.add_experimental_option(<span class="string">'excludeSwitches'</span>, [<span class="string">'enable-automation'</span>])</span><br><span class="line">    chrome_options.add_argument(<span class="string">"--disable-blink-features=AutomationControlled"</span>)</span><br><span class="line">    chrome_options.add_extension(proxyauth_plugin_path)</span><br><span class="line">    dr = webdriver.Chrome(options=chrome_options)</span><br><span class="line"></span><br><span class="line">    dr.get(<span class="string">"http://httpbin.org/ip"</span>)</span><br><span class="line">    print(dr.page_source)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">        ip,port = get_ip() <span class="comment"># 自己定义</span></span><br><span class="line">        ip_port = <span class="string">"http://"</span> + ip + <span class="string">":"</span> + str(port)</span><br><span class="line">        proxyauth_plugin_path = create_proxyauth_extension(</span><br><span class="line">            proxy_host=ip,</span><br><span class="line">            proxy_port=port,</span><br><span class="line">            proxy_username=<span class="string">"代理云账号"</span>,</span><br><span class="line">            proxy_password=<span class="string">"代理云密码"</span></span><br><span class="line">        )</span><br><span class="line">        set_windows(ip_port, proxyauth_plugin_path)</span><br></pre></td></tr></table></figure><p>OK，经过我测试，上面的代码运行没问题。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;code&gt;slenium&lt;/code&gt; 使用代理，主要分为两个情况。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;无密码模式&lt;/li&gt;
-&lt;li&gt;有密码模式&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="python" scheme="http://benpaodewoniu.github.io/categories/python/"/>
-    
-      <category term="模块" scheme="http://benpaodewoniu.github.io/categories/python/%E6%A8%A1%E5%9D%97/"/>
-    
-      <category term="爬虫" scheme="http://benpaodewoniu.github.io/categories/%E7%88%AC%E8%99%AB/"/>
-    
-      <category term="selenium" scheme="http://benpaodewoniu.github.io/categories/python/%E6%A8%A1%E5%9D%97/selenium/"/>
-    
-      <category term="进阶" scheme="http://benpaodewoniu.github.io/categories/%E7%88%AC%E8%99%AB/%E8%BF%9B%E9%98%B6/"/>
-    
-    
-      <category term="selenium" scheme="http://benpaodewoniu.github.io/tags/selenium/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>mncoin | 小黄人 手机挖矿</title>
-    <link href="http://benpaodewoniu.github.io/2021/05/28/mncoin0/"/>
-    <id>http://benpaodewoniu.github.io/2021/05/28/mncoin0/</id>
-    <published>2021-05-28T12:58:42.000Z</published>
-    <updated>2021-05-28T13:59:39.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>额，怎么说呢？过时的概念，过时的挖矿方式，为什么还来呢？</p><p>主要是，耗费的精力不高，一天也就 <code>1</code> 分钟，还是可以尝试的。</p><a id="more"></a><br/><h1 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h1><br/><ul><li><a href="http://www.mncoin.one/#/register?code=0QUH0">注册</a></li></ul><br/><h1 id="相关事项"><a href="#相关事项" class="headerlink" title="相关事项"></a>相关事项</h1><br/><ul><li>模拟器可以挖</li><li><code>24</code> 小时点一次就好了，其他时间可以把模拟器关了</li><li>每小时挖一次</li><li>目前只有 <code>QQ</code> 邮箱可以注册</li></ul><p>额，好像就没啥要说的了。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;额，怎么说呢？过时的概念，过时的挖矿方式，为什么还来呢？&lt;/p&gt;
-&lt;p&gt;主要是，耗费的精力不高，一天也就 &lt;code&gt;1&lt;/code&gt; 分钟，还是可以尝试的。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    
-      <category term="小项目" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B0%8F%E9%A1%B9%E7%9B%AE/"/>
-    
-      <category term="mncoin" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B0%8F%E9%A1%B9%E7%9B%AE/mncoin/"/>
-    
-    
-      <category term="mncoin" scheme="http://benpaodewoniu.github.io/tags/mncoin/"/>
     
   </entry>
   
