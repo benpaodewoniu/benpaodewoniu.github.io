@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="如题。。。另外，我怎么记得我之前好像写过类似的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="激活函数">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/11/08/deeplearning6/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="如题。。。另外，我怎么记得我之前好像写过类似的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_7.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_5.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_8.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_9.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_10.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_14.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_11.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_15.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_12.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_16.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_13.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_17.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_18.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_19.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_20.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/neural_network/1_21.png">
+<meta property="article:published_time" content="2018-11-08T14:08:23.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:26:26.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="deep learning">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="neural network">
+<meta property="article:tag" content="激活函数">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/neural_network/1_7.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/11/08/deeplearning6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>激活函数 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/11/08/deeplearning6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          激活函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-08 22:08:23" itemprop="dateCreated datePublished" datetime="2018-11-08T22:08:23+08:00">2018-11-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:26:26" itemprop="dateModified" datetime="2020-05-12T10:26:26+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/11/08/deeplearning6/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/11/08/deeplearning6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如题。。。另外，我怎么记得我之前好像写过类似的。</p>
+<a id="more"></a>
+
+<p>我们为什么需要激活函数，那是因为现实是很复杂滴。。。</p>
+<p>假如说，一个女生特别漂亮，嘿嘿，那应该是有很多男生喜欢，越漂亮就越多人喜欢，可能如下图：</p>
+<p><img src="/images/neural_network/1_7.png" alt=""></p>
+<p>我们计算机可能会处理线性方程，当然，你也可能会说计算机也可以处理非线性方程，但是，对于计算机来说，处理一个非线性问题最好的办法就是用多个线性函数共同描述。</p>
+<p>OK，那我们如何将线性问题转化为非线性呢？此时，就是激活函数登上舞台了。</p>
+<p>所谓的激活函数，就是给线性添加了一个壳，从而掰弯它。。。</p>
+<pre><code>y = W * x
+y = AF( W * x)
+    其中，AF 就是激活函数</code></pre><p>那么 AF 就是一种非线性方程而已。</p>
+<p>从知乎上看了一个蛮不错的解释，下面分享过来。</p>
+<p><a href="https://www.zhihu.com/question/22334626/answer/103835591">激活函数解释</a></p>
+<p>这是一个单层的感知机, 也是我们最常用的神经网络组成单元啦. 用它可以划出一条线, 把平面分割开。</p>
+<p><img src="/images/neural_network/1_0.png" alt=""></p>
+<p>那么很容易地我们就会想用多个感知机来进行组合, 获得更强的分类能力, 这是没问题的啦</p>
+<p><img src="/images/neural_network/1_1.png" alt=""></p>
+<p>那么我们动笔算一算, 就可以发现, 这样一个神经网络组合起来,输出的时候无论如何都还是一个线性方程哎,纳尼, 说好的非线性分类呢!!???</p>
+<p><img src="/images/neural_network/1_2.png" alt=""></p>
+<p>再盗用一幅经常在课堂上用的图…然而我已经不知道出处是哪了, 好像好多老师都是直接用的, 那我就不客气了嘿嘿嘿,这幅图就跟前面的图一样, 描述了当我们直接使用step activation function的时候所能获得的分类器, 其实只能还是线性的, 最多不过是复杂的线性组合罢了,当然你可以说我们可以用无限条直线去逼近一条曲线啊……额,当然可以, 不过比起用non-linear的activation function来说就太傻了嘛….</p>
+<p><img src="/images/neural_network/1_3.png" alt=""></p>
+<p>祭出主菜. 题主问的激励函数作用是什么, 就在这里了!!</p>
+<p>我们在每一层叠加完了以后, 加一个激活函数, 如图中的y=sigma(a). 这样输出的就是一个不折不扣的非线性函数!</p>
+<p><img src="/images/neural_network/1_4.png" alt=""></p>
+<p>于是就很容易拓展到多层的情况啦, 更刚刚一样的结构, 加上non-linear activation function之后, 输出就变成了一个复杂的, 复杂的, 超级复杂的函数….额别问我他会长成什么样, 没人知道的<del>我们只能说, 有了这样的非线性激活函数以后, 神经网络的表达能力更加强大了</del>(比起纯线性组合, 那是必须得啊!)</p>
+<p><img src="/images/neural_network/1_5.png" alt=""></p>
+<p>继续厚颜无耻地放一张跟之前那副图并列的图, 加上非线性激活函数之后, 我们就有可能学习到这样的平滑分类平面. 这个比刚刚那个看起来牛逼多了有木有!</p>
+<p><img src="/images/neural_network/1_6.png" alt=""></p>
+<h2 id="典型的激活函数"><a href="#典型的激活函数" class="headerlink" title="典型的激活函数"></a>典型的激活函数</h2><p><img src="/images/neural_network/1_8.jpg" alt=""></p>
+<p>事实上，我们也可以创造自己的激活函数，但必须保证创造的激活函数是可以微分的。因为在反向传播中我们需要微分来传递误差。</p>
+<p>那这个激活究竟是什么意思？</p>
+<p>首先我们应该知道，神经网络对于特征是有偏置的，也就是说，如果识别一张图片是不是人，那么手可能就是重点识别区域。</p>
+<p>我们以 sigmoid 激活函数为例。我们看到当 x 向负数的方向移动的时候，我们的值是越来越小的，所以，这部分的特征值不是重点，但是如果 x 的权值很大，导致 sigmoid 出来的值接近于 1，那么就证明这个特征确实十分重要，它也就相应的被激活了。</p>
+<p>OK，现在你是不是又有一个疑问，那就是激活函数用在哪里？</p>
+<p>假设，我们有一个输入，两个隐藏，一个输出。</p>
+<p>我们对于第一个隐藏，会得到一种 W 和 b，于是我们得到后会 WX1 + b，但是我们的激活函数也是对所求的函数进行激活，从而得到比较重要的特征。</p>
+<p>所以第一隐藏层传到第二隐藏层的时候，会加上激活函数，最后应该是 y = AF(WX1 + b)。</p>
+<p>我们第二个隐藏层再对 y 进行处理，得到函数 Z = W2y + b2</p>
+<p>当把数传到输出层的时候，我们再添加激活函数。</p>
+<p>AF(W2y + b2)</p>
+<p>经过激活函数求解后输出的是大都是概率。</p>
+<p>现在我们已经了解了激活函数了，但是激活函数这么多，我们应该什么时候使用哪种激活函数？</p>
+<h2 id="激活函数的应用场景"><a href="#激活函数的应用场景" class="headerlink" title="激活函数的应用场景"></a>激活函数的应用场景</h2><p>非线性激活函数有 Sigmoid、Tanh、ReLU、LReLU、PReLU、Swish 等。</p>
+<p>下面我将推荐几个极好的文章。</p>
+<p><a href="https://www.jiqizhixin.com/articles/2017-11-02-26">一文概览深度学习中的激活函数</a></p>
+<p><a href="https://www.jiqizhixin.com/articles/2017-10-10-3">26种神经网络激活函数可视化</a></p>
+<p><a href="https://www.jianshu.com/p/22d9720dbf1a">常用激活函数比较</a></p>
+<h3 id="sigmoid"><a href="#sigmoid" class="headerlink" title="sigmoid"></a>sigmoid</h3><p>其函数形式如下：</p>
+<p><img src="/images/neural_network/1_9.png" alt=""></p>
+<p><img src="/images/neural_network/1_10.png" alt=""></p>
+<p>其导数图像</p>
+<p><img src="/images/neural_network/1_14.png" alt=""></p>
+<p>Sigmoid 函数的三个主要缺陷：</p>
+<ol>
+<li><p>梯度消失：注意：Sigmoid 函数趋近 0 和 1 的时候变化率会变得平坦，也就是说，Sigmoid 的梯度趋近于 0。神经网络使用 Sigmoid 激活函数进行反向传播时，输出接近 0 或 1 的神经元其梯度趋近于 0。这些神经元叫作饱和神经元。因此，这些神经元的权重不会更新。此外，与此类神经元相连的神经元的权重也更新得很慢。该问题叫作梯度消失。因此，想象一下，如果一个大型神经网络包含 Sigmoid 神经元，而其中很多个都处于饱和状态，那么该网络无法执行反向传播。如果你的初始值很大的话，大部分神经元可能都会处在saturation的状态而把gradient kill掉，这会导致网络变的很难学习。</p>
+</li>
+<li><p>不以零为中心：Sigmoid 输出不以零为中心的。</p>
+</li>
+<li><p>计算成本高昂：exp() 函数与其他非线性激活函数相比，计算成本高昂。</p>
+</li>
+</ol>
+<h3 id="Tanh"><a href="#Tanh" class="headerlink" title="Tanh"></a>Tanh</h3><p><img src="/images/neural_network/1_11.png" alt=""></p>
+<p>其导数图像</p>
+<p><img src="/images/neural_network/1_15.png" alt=""></p>
+<p>Tanh 激活函数又叫作双曲正切激活函数（hyperbolic tangent activation function）。与 Sigmoid 函数类似，Tanh 函数也使用真值，但 Tanh 函数将其压缩至-1 到 1 的区间内。与 Sigmoid 不同，Tanh 函数的输出以零为中心，因为区间在-1 到 1 之间。你可以将 Tanh 函数想象成两个 Sigmoid 函数放在一起。在实践中，Tanh 函数的使用优先性高于 Sigmoid 函数。负数输入被当作负值，零输入值的映射接近零，正数输入被当作正值。唯一的缺点是：</p>
+<p>Tanh 函数也会有梯度消失的问题，因此在饱和时也会「杀死」梯度。</p>
+<p>为了解决梯度消失问题，我们来讨论另一个非线性激活函数——修正线性单元（rectified linear unit，ReLU），该函数明显优于前面两个函数，是现在使用最广泛的函数。</p>
+<h3 id="修正线性单元（ReLU）"><a href="#修正线性单元（ReLU）" class="headerlink" title="修正线性单元（ReLU）"></a>修正线性单元（ReLU）</h3><p><img src="/images/neural_network/1_12.png" alt=""></p>
+<p>其导数图像</p>
+<p><img src="/images/neural_network/1_16.png" alt=""></p>
+<p>从上图可以看到，ReLU 是从底部开始半修正的一种函数。数学公式为：</p>
+<p><img src="/images/neural_network/1_13.png" alt=""></p>
+<p>当输入 x&lt;0 时，输出为 0，当 x&gt; 0 时，输出为 x。该激活函数使网络更快速地收敛。它不会饱和，即它可以对抗梯度消失问题，至少在正区域（x&gt; 0 时）可以这样，因此神经元至少在一半区域中不会把所有零进行反向传播。由于使用了简单的阈值化（thresholding），ReLU 计算效率很高。但是 ReLU 神经元也存在一些缺点：</p>
+<ol>
+<li><p>不以零为中心：和 Sigmoid 激活函数类似，ReLU 函数的输出不以零为中心。</p>
+</li>
+<li><p>前向传导（forward pass）过程中，如果 x &lt; 0，则神经元保持非激活状态，且在后向传导（backward pass）中「杀死」梯度。这样权重无法得到更新，网络无法学习。当 x = 0 时，该点的梯度未定义，但是这个问题在实现中得到了解决，通过采用左侧或右侧的梯度的方式。</p>
+</li>
+</ol>
+<p>为了解决 ReLU 激活函数中的梯度消失问题，当 x &lt; 0 时，我们使用 Leaky ReLU——该函数试图修复 dead ReLU 问题。下面我们就来详细了解 Leaky ReLU。</p>
+<h3 id="Leaky-ReLU"><a href="#Leaky-ReLU" class="headerlink" title="Leaky ReLU"></a>Leaky ReLU</h3><p><img src="/images/neural_network/1_17.png" alt=""></p>
+<p>该函数试图缓解 dead ReLU 问题。数学公式为：</p>
+<p><img src="/images/neural_network/1_18.png" alt=""></p>
+<p>Leaky ReLU 的概念是：当 x &lt; 0 时，它得到 0.1 的正梯度。该函数一定程度上缓解了 dead ReLU 问题，但是使用该函数的结果并不连贯。尽管它具备 ReLU 激活函数的所有特征，如计算高效、快速收敛、在正区域内不会饱和。</p>
+<p>Leaky ReLU 可以得到更多扩展。不让 x 乘常数项，而是让 x 乘超参数，这看起来比 Leaky ReLU 效果要好。该扩展就是 Parametric ReLU。</p>
+<h3 id="Parametric-ReLU"><a href="#Parametric-ReLU" class="headerlink" title="Parametric ReLU"></a>Parametric ReLU</h3><p>Parametric ReLU的数学公式：</p>
+<p><img src="/images/neural_network/1_19.png" alt=""></p>
+<p>其中是超参数。这里引入了一个随机的超参数，它可以被学习，因为你可以对它进行反向传播。这使神经元能够选择负区域最好的梯度，有了这种能力，它们可以变成 ReLU 或 Leaky ReLU。</p>
+<p>总之，最好使用 ReLU，但是你可以使用 Leaky ReLU 或 Parametric ReLU 实验一下，看看它们是否更适合你的问题。</p>
+<h3 id="Swish"><a href="#Swish" class="headerlink" title="Swish"></a>Swish</h3><p><img src="/images/neural_network/1_20.png" alt=""></p>
+<p>该函数又叫作自门控激活函数，它近期由谷歌的研究者发布，数学公式为：</p>
+<p><img src="/images/neural_network/1_21.png" alt=""></p>
+<p>根据论文（<a href="https://arxiv.org/abs/1710.05941v1），Swish">https://arxiv.org/abs/1710.05941v1），Swish</a> 激活函数的性能优于 ReLU 函数。</p>
+<p>根据上图，我们可以观察到在 x 轴的负区域曲线的形状与 ReLU 激活函数不同，因此，Swish 激活函数的输出可能下降，即使在输入值增大的情况下。大多数激活函数是单调的，即输入值增大的情况下，输出值不可能下降。而 Swish 函数为 0 时具备单侧有界（one-sided boundedness）的特性，它是平滑、非单调的。更改一行代码再来查看它的性能，似乎也挺有意思。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/neural-network/" rel="tag"># neural network</a>
+              <a href="/tags/%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0/" rel="tag"># 激活函数</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/11/08/deeplearning5/" rel="prev" title="神经网络初篇">
+      <i class="fa fa-chevron-left"></i> 神经网络初篇
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/11/09/machinelearning3/" rel="next" title="什么是机器学习以及相关的概念">
+      什么是机器学习以及相关的概念 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#典型的激活函数"><span class="nav-number">1.</span> <span class="nav-text">典型的激活函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#激活函数的应用场景"><span class="nav-number">2.</span> <span class="nav-text">激活函数的应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sigmoid"><span class="nav-number">2.1.</span> <span class="nav-text">sigmoid</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tanh"><span class="nav-number">2.2.</span> <span class="nav-text">Tanh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修正线性单元（ReLU）"><span class="nav-number">2.3.</span> <span class="nav-text">修正线性单元（ReLU）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Leaky-ReLU"><span class="nav-number">2.4.</span> <span class="nav-text">Leaky ReLU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Parametric-ReLU"><span class="nav-number">2.5.</span> <span class="nav-text">Parametric ReLU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Swish"><span class="nav-number">2.6.</span> <span class="nav-text">Swish</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

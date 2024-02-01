@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在看这个文章之前，建议你先看一下我之前的博文。 linux | 查看文件内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux | 如何查看日志文件">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/07/15/linux14/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="在看这个文章之前，建议你先看一下我之前的博文。 linux | 查看文件内容">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-15T06:55:30.000Z">
+<meta property="article:modified_time" content="2021-02-05T03:01:49.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/07/15/linux14/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>linux | 如何查看日志文件 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/07/15/linux14/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux | 如何查看日志文件
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-15 14:55:30" itemprop="dateCreated datePublished" datetime="2020-07-15T14:55:30+08:00">2020-07-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-05 11:01:49" itemprop="dateModified" datetime="2021-02-05T11:01:49+08:00">2021-02-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/15/linux14/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/15/linux14/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在看这个文章之前，建议你先看一下我之前的博文。</p>
+<p><a href="/2020/04/27/linux11/">linux | 查看文件内容</a></p>
+<a id="more"></a>
+
+<h2 id="head"><a href="#head" class="headerlink" title="head"></a>head</h2><p>linux 如何显示一个文件的某几行(中间几行)</p>
+<p>从第3000行开始，显示1000行。即显示3000~3999行</p>
+<pre><code>cat test.log | tail -n +3000 | head -n 1000</code></pre><p>显示1000行到3000行</p>
+<pre><code>cat test.log | head -n 3000 | tail -n +1000</code></pre><p>注意两种方法的顺序</p>
+<p>分解：</p>
+<pre><code>tail -n 1000：显示最后1000行
+tail -n +1000：从1000行开始显示，显示1000行以后的
+head -n 1000：显示前面1000行</code></pre><p>用sed命令</p>
+<pre><code>sed -n &apos;5,10p&apos; test.log 这样你就可以只查看文件的第5行到第10行
+cat test.log | tail -n 1000 # 输出mylog.log 文件最后一千行</code></pre><h2 id="cat"><a href="#cat" class="headerlink" title="cat"></a>cat</h2><p>cat主要有三大功能：</p>
+<h3 id="一次显示整个文件。"><a href="#一次显示整个文件。" class="headerlink" title="一次显示整个文件。"></a>一次显示整个文件。</h3><pre><code>cat filename</code></pre><h3 id="从键盘创建一个文件。"><a href="#从键盘创建一个文件。" class="headerlink" title="从键盘创建一个文件。"></a>从键盘创建一个文件。</h3><pre><code>cat &gt; filename </code></pre><p>只能创建新文件,不能编辑已有文件.</p>
+<h3 id="将几个文件合并为一个文件："><a href="#将几个文件合并为一个文件：" class="headerlink" title="将几个文件合并为一个文件："></a>将几个文件合并为一个文件：</h3><pre><code>cat file1 file2 &gt; file</code></pre><p>参数：</p>
+<ul>
+<li><code>-n</code> 或 <code>--number</code> 由 1 开始对所有输出的行数编号</li>
+<li><code>-b</code> 或 <code>--number-nonblank</code> 和 <code>-n</code> 相似，只不过对于空白行不编号</li>
+<li><code>-s</code> 或 <code>--squeeze-blank</code> 当遇到有连续两行以上的空白行，就代换为一行的空白行</li>
+<li><code>-v</code> 或 <code>--show-nonprinting</code></li>
+</ul>
+<p>例：</p>
+<p>把 textfile1 的档案内容加上行号后输入 textfile2 这个档案里</p>
+<pre><code>cat -n textfile1 &gt; textfile2</code></pre><p>把 textfile1 和 textfile2 的档案内容加上行号（空白行不加）之后将内容附加到 textfile3 里。</p>
+<pre><code>cat -b textfile1 textfile2 &gt;&gt; textfile3</code></pre><p>把test.txt文件扔进垃圾箱，赋空值test.txt</p>
+<pre><code>cat /dev/null &gt; /etc/test.txt </code></pre><p>注意：<code>&gt;</code>意思是创建，<code>&gt;&gt;</code>是追加。千万不要弄混了。</p>
+<h2 id="tac"><a href="#tac" class="headerlink" title="tac"></a>tac</h2><p>tac (反向列示)</p>
+<p>tac 是将 cat 反写过来，所以他的功能就跟 cat 相反。</p>
+<p>cat 是由第一行到最后一行连续显示在萤幕上，</p>
+<p>而 tac 则是由最后一行到第一行反向在萤幕上显示出来！</p>
+<h2 id="echo"><a href="#echo" class="headerlink" title="echo"></a>echo</h2><p>在Linux中echo命令用来在标准输出上显示一段字符，比如：</p>
+<pre><code>echo &quot;the echo command test!&quot;</code></pre><p>这个就会输出“the echo command test!”这一行文字！</p>
+<pre><code>echo &quot;the echo command test!&quot;&gt;a.sh</code></pre><p>这个就会在 <code>a.sh</code> 文件中输出“the echo command test!”这一行文字！</p>
+<p>该命令的一般格式为： <code>echo [ -n ]</code> 字符串其中选项n表示输出文字后不换行；字符串能加引号，也能不加引号。</p>
+<p>用echo命令输出加引号的字符串时，将字符串原样输出；</p>
+<p>用echo命令输出不加引号的字符串时，将字符串中的各个单词作为字符串输出，各字符串之间用一个空格分割。</p>
+<h2 id="grep-同时满足多个关键字和满足任意关键字"><a href="#grep-同时满足多个关键字和满足任意关键字" class="headerlink" title="grep 同时满足多个关键字和满足任意关键字"></a>grep 同时满足多个关键字和满足任意关键字</h2><h3 id="满足任意条件"><a href="#满足任意条件" class="headerlink" title="满足任意条件"></a>满足任意条件</h3><pre><code>grep -E &quot;word1|word2|word3&quot;   file.txt</code></pre><p>满足任意条件（word1、word2和word3之一）将匹配。</p>
+<h3 id="满足所有条件"><a href="#满足所有条件" class="headerlink" title="满足所有条件"></a>满足所有条件</h3><pre><code>grep word1 file.txt | grep word2 |grep word3</code></pre><p>必须同时满足三个条件（word1、word2和word3）才匹配。</p>
+<p>多管道，多次筛选。</p>
+<h3 id="使用正则表达式-E-选项"><a href="#使用正则表达式-E-选项" class="headerlink" title="使用正则表达式 -E 选项"></a>使用正则表达式 -E 选项</h3><pre><code>grep -E &quot;[1-9]+&quot; </code></pre><p>或</p>
+<pre><code>egrep &quot;[1-9]+&quot;</code></pre><h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><h3 id="查看日志常用命令"><a href="#查看日志常用命令" class="headerlink" title="查看日志常用命令"></a>查看日志常用命令</h3><pre><code>tail:  
+   -n  是显示行号；相当于nl命令；例子如下：
+        tail -100f      test.log        实时监控100行日志
+        tail  -n  10    test.log        查询日志尾部最后10行的日志;
+        tail -n +10     test.log        查询10行之后的所有日志;
+head:  
+    跟tail是相反的，tail是看后多少行日志；例子如下：
+        head -n 10      test.log   查询日志文件中的头10行日志;
+        head -n -10     test.log   查询日志文件除了最后10行的其他所有日志;
+cat： 
+    tac是倒序查看，是cat单词反写；例子如下：
+        cat -n test.log |grep &quot;debug&quot;   查询关键字的日志</code></pre><h3 id="按行号查看—过滤出关键字附近的日志"><a href="#按行号查看—过滤出关键字附近的日志" class="headerlink" title="按行号查看—过滤出关键字附近的日志"></a>按行号查看—过滤出关键字附近的日志</h3><pre><code>cat -n test.log | grep &quot;debug&quot;</code></pre><p>得到关键日志的行号</p>
+<pre><code>cat -n test.log | tail -n +92 | head -n 20
+    tail -n +92 表示查询92行之后的日志
+    head -n 20 则表示在前面的查询结果里再查前20条记录</code></pre><p>另外，假如说，我们一个目录下面有多个文件比如</p>
+<pre><code>error.02-03.log
+error.02-04.log
+error.02-05.log</code></pre><p>我们执行 <code>cat error* | grep -i bitmex_swap</code></p>
+<p>假设出现</p>
+<pre><code>12222 2021-02-04 06:26:32.946 [BITMEX_SWAP] ERROR okhttp3.WebSocketListener - sub BITMEX_SWAP connection is closing due to error</code></pre><p>你如果使用</p>
+<pre><code>cat error.02-04.log | tail -n +12222 | head -n 20</code></pre><p>是查不到这个数据的，因为，这个 <code>12222</code> 是三者的综合排序，所以，你应该查一下</p>
+<pre><code>cat -n error.02-04.log | grep &quot;bitmex_swap&quot;</code></pre><p>这里面的正确序号。</p>
+<h3 id="根据日期查询日志"><a href="#根据日期查询日志" class="headerlink" title="根据日期查询日志"></a>根据日期查询日志</h3><pre><code>sed -n &apos;/2017-08-23 00:05:00,446/,/2017-08-23 00:05:00,546/p&apos;  test.log</code></pre><p>特别说明:上面的两个日期必须是日志中打印出来的日志,否则无效；</p>
+<p>先 grep ‘2014-12-17 16:17:20’ test.log 来确定日志中是否有该 时间点</p>
+<h3 id="日志内容特别多，打印在屏幕上不方便查看"><a href="#日志内容特别多，打印在屏幕上不方便查看" class="headerlink" title="日志内容特别多，打印在屏幕上不方便查看"></a>日志内容特别多，打印在屏幕上不方便查看</h3><h4 id="使用-more-和-less-命令"><a href="#使用-more-和-less-命令" class="headerlink" title="使用 more 和 less 命令,"></a>使用 more 和 less 命令,</h4><pre><code>cat -n test.log |grep &quot;debug&quot; |more     </code></pre><p>这样就分页打印了,通过点击空格键翻页</p>
+<p>使用 &gt;xxx.txt 将其保存到文件中,到时可以拉下这个文件分析</p>
+<pre><code>cat -n test.log |grep &quot;debug&quot;  &gt;debug.txt</code></pre><h2 id="more命令"><a href="#more命令" class="headerlink" title="more命令"></a>more命令</h2><p>more命令是一个基于vi编辑器文本过滤器，它以全屏幕的方式按页显示文本文件的内容，支持vi中的关键字定位操作。</p>
+<p>该命令一次显示一屏文本，满屏后停下来，并且在屏幕的底部出现一个提示信息，给出至今己显示的该文件的百分比：<code>–More–（XX%）</code></p>
+<p>可以用下列不同的方法对提示做出回答：</p>
+<table>
+<thead>
+<tr>
+<th>按键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>按Space键</td>
+<td>显示文本的下一屏内容。</td>
+</tr>
+<tr>
+<td>按B键</td>
+<td>显示上一屏内容。</td>
+</tr>
+<tr>
+<td>按Enter键</td>
+<td>只显示文本的下一行内容。</td>
+</tr>
+<tr>
+<td>按斜线符</td>
+<td>接着输入一个模式，可以在文本中寻找下一个相匹配的模式。</td>
+</tr>
+<tr>
+<td>按H键</td>
+<td>显示帮助屏，该屏上有相关的帮助信息。</td>
+</tr>
+<tr>
+<td>按Q键</td>
+<td>退出more命令</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/15/java3/" rel="prev" title="java | nexus 私有仓库">
+      <i class="fa fa-chevron-left"></i> java | nexus 私有仓库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/15/kafka2/" rel="next" title="kafka | 获取数据">
+      kafka | 获取数据 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#head"><span class="nav-number">1.</span> <span class="nav-text">head</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cat"><span class="nav-number">2.</span> <span class="nav-text">cat</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一次显示整个文件。"><span class="nav-number">2.1.</span> <span class="nav-text">一次显示整个文件。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从键盘创建一个文件。"><span class="nav-number">2.2.</span> <span class="nav-text">从键盘创建一个文件。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将几个文件合并为一个文件："><span class="nav-number">2.3.</span> <span class="nav-text">将几个文件合并为一个文件：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tac"><span class="nav-number">3.</span> <span class="nav-text">tac</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#echo"><span class="nav-number">4.</span> <span class="nav-text">echo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#grep-同时满足多个关键字和满足任意关键字"><span class="nav-number">5.</span> <span class="nav-text">grep 同时满足多个关键字和满足任意关键字</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#满足任意条件"><span class="nav-number">5.1.</span> <span class="nav-text">满足任意条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#满足所有条件"><span class="nav-number">5.2.</span> <span class="nav-text">满足所有条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用正则表达式-E-选项"><span class="nav-number">5.3.</span> <span class="nav-text">使用正则表达式 -E 选项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用命令"><span class="nav-number">6.</span> <span class="nav-text">常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看日志常用命令"><span class="nav-number">6.1.</span> <span class="nav-text">查看日志常用命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#按行号查看—过滤出关键字附近的日志"><span class="nav-number">6.2.</span> <span class="nav-text">按行号查看—过滤出关键字附近的日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据日期查询日志"><span class="nav-number">6.3.</span> <span class="nav-text">根据日期查询日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#日志内容特别多，打印在屏幕上不方便查看"><span class="nav-number">6.4.</span> <span class="nav-text">日志内容特别多，打印在屏幕上不方便查看</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-more-和-less-命令"><span class="nav-number">6.4.1.</span> <span class="nav-text">使用 more 和 less 命令,</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#more命令"><span class="nav-number">7.</span> <span class="nav-text">more命令</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

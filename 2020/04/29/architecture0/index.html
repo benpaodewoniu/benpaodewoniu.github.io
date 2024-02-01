@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="自 2008 年双 11 以来，在每年双 11 超大规模流量的冲击上，蚂蚁金服都会不断突破现有技术的极限。2010 年双 11 的支付峰值为 2 万笔&#x2F;分钟，到 2017 年双 11 时这个数字变为了 25.6 万笔&#x2F;秒。 2019 年双 11 的支付峰值比2018 年双 11 支付峰值为 多了十几 万笔&#x2F;秒，创下新纪录，是 2009 年第一次双 11 的 1360 倍。 在如此之大的支付 TPS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编程之道 | 支付宝的架构到底有多牛逼！还没看完我就跪了！「转载」">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/29/architecture0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="自 2008 年双 11 以来，在每年双 11 超大规模流量的冲击上，蚂蚁金服都会不断突破现有技术的极限。2010 年双 11 的支付峰值为 2 万笔&#x2F;分钟，到 2017 年双 11 时这个数字变为了 25.6 万笔&#x2F;秒。 2019 年双 11 的支付峰值比2018 年双 11 支付峰值为 多了十几 万笔&#x2F;秒，创下新纪录，是 2009 年第一次双 11 的 1360 倍。 在如此之大的支付 TPS">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/0_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/0_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/0_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/0_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/0_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/0_5.png">
+<meta property="article:published_time" content="2020-04-29T04:01:30.000Z">
+<meta property="article:modified_time" content="2021-08-08T15:16:41.480Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="架构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/architecture/0_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/29/architecture0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>编程之道 | 支付宝的架构到底有多牛逼！还没看完我就跪了！「转载」 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/29/architecture0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          编程之道 | 支付宝的架构到底有多牛逼！还没看完我就跪了！「转载」
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-29 12:01:30" itemprop="dateCreated datePublished" datetime="2020-04-29T12:01:30+08:00">2020-04-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-08 23:16:41" itemprop="dateModified" datetime="2021-08-08T23:16:41+08:00">2021-08-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">架构算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E6%9E%B6%E6%9E%84/%E7%BB%BC%E5%90%88/" itemprop="url" rel="index"><span itemprop="name">综合</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/29/architecture0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/29/architecture0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>自 2008 年双 11 以来，在每年双 11 超大规模流量的冲击上，蚂蚁金服都会不断突破现有技术的极限。2010 年双 11 的支付峰值为 2 万笔/分钟，到 2017 年双 11 时这个数字变为了 25.6 万笔/秒。</p>
+<p>2019 年双 11 的支付峰值比2018 年双 11 支付峰值为 多了十几 万笔/秒，创下新纪录，是 2009 年第一次双 11 的 1360 倍。</p>
+<p>在如此之大的支付 TPS 背后除了削峰等锦上添花的应用级优化，最解渴最实质的招数当数基于分库分表的单元化了，蚂蚁技术称之为 LDC（逻辑数据中心）。</p>
+<p>本文不打算讨论具体到代码级的分析，而是尝试用最简单的描述来说明其中最大快人心的原理。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<p><a href="https://mp.weixin.qq.com/s/b4xKm6IxsP8lcoSxE75dHg">支付宝的架构到底有多牛逼！还没看完我就跪了！</a></p>
+<p>我想关心分布式系统设计的人都曾被下面这些问题所困扰过：</p>
+<ul>
+<li><p>支付宝海量支付背后最解渴的设计是啥？换句话说，实现支付宝高 TPS 的最关键的设计是啥？</p>
+</li>
+<li><p>LDC 是啥？LDC 怎么实现异地多活和异地灾备的？</p>
+</li>
+<li><p>CAP 魔咒到底是啥？P 到底怎么理解？</p>
+</li>
+<li><p>什么是脑裂？跟 CAP 又是啥关系？</p>
+</li>
+<li><p>什么是 PAXOS，它解决了啥问题？</p>
+</li>
+<li><p>PAXOS 和 CAP 啥关系？PAXOS 可以逃脱 CAP 魔咒么？</p>
+</li>
+<li><p>Oceanbase 能逃脱 CAP 魔咒么？</p>
+</li>
+</ul>
+<p>如果你对这些感兴趣，不妨看一场赤裸裸的论述，拒绝使用晦涩难懂的词汇，直面最本质的逻辑。</p>
+<br/>
+
+<h1 id="LDC-和单元化"><a href="#LDC-和单元化" class="headerlink" title="LDC 和单元化"></a>LDC 和单元化</h1><br/>
+
+<p>LDC（logic data center）是相对于传统的（Internet Data Center-IDC）提出的，逻辑数据中心所表达的中心思想是无论物理结构如何的分布，整个数据中心在逻辑上是协同和统一的。</p>
+<p>这句话暗含的是强大的体系设计，分布式系统的挑战就在于整体协同工作（可用性，分区容忍性）和统一（一致性）。</p>
+<p>单元化是大型互联网系统的必然选择趋势，举个最最通俗的例子来说明单元化。</p>
+<p>我们总是说 TPS 很难提升，确实任何一家互联网公司（比如淘宝、携程、新浪）它的交易 TPS 顶多以十万计量（平均水平），很难往上串了。</p>
+<p>因为数据库存储层瓶颈的存在再多水平扩展的服务器都无法绕开，而从整个互联网的视角看，全世界电商的交易 TPS 可以轻松上亿。</p>
+<p>这个例子带给我们一些思考：为啥几家互联网公司的 TPS 之和可以那么大，服务的用户数规模也极为吓人，而单个互联网公司的 TPS 却很难提升？</p>
+<p>究其本质，每家互联网公司都是一个独立的大型单元，他们各自服务自己的用户互不干扰。</p>
+<p>这就是单元化的基本特性，任何一家互联网公司，其想要成倍的扩大自己系统的服务能力，都必然会走向单元化之路。</p>
+<p>它的本质是分治，我们把广大的用户分为若干部分，同时把系统复制多份，每一份都独立部署，每一份系统都服务特定的一群用户。</p>
+<p>以淘宝举例，这样之后，就会有很多个淘宝系统分别为不同的用户服务，每个淘宝系统都做到十万 TPS 的话，N 个这样的系统就可以轻松做到 N*十万的 TPS 了。</p>
+<p>LDC 实现的关键就在于单元化系统架构设计，所以在蚂蚁内部，LDC 和单元化是不分家的，这也是很多同学比较困扰的地方，看似没啥关系，实则是单元化体系设计成就了 LDC。</p>
+<p>小结：分库分表解决的最大痛点是数据库单点瓶颈，这个瓶颈的产生是由现代二进制数据存储体系决定的（即 I/O 速度）。</p>
+<p>单元化只是分库分表后系统部署的一种方式，这种部署模式在灾备方面也发挥了极大的优势。</p>
+<br/>
+
+<h1 id="系统架构演化史"><a href="#系统架构演化史" class="headerlink" title="系统架构演化史"></a>系统架构演化史</h1><br/>
+
+<p>几乎任何规模的互联网公司，都有自己的系统架构迭代和更新，大致的演化路径都大同小异。</p>
+<p>最早一般为了业务快速上线，所有功能都会放到一个应用里，系统架构如下图所示：</p>
+<div style="width: 70%;padding-left: 15%">
+
+<p><img src="/images/architecture/0_0.png" alt=""></p>
+</div>
+
+<p>这样的架构显然是有问题的，单机有着明显的单点效应，单机的容量和性能都是很局限的，而使用中小型机会带来大量的浪费。</p>
+<p>随着业务发展，这个矛盾逐渐转变为主要矛盾，因此工程师们采用了以下架构：</p>
+<div style="width: 70%;padding-left: 15%">
+
+<p><img src="/images/architecture/0_1.png" alt=""></p>
+</div>
+
+<p>这是整个公司第一次触碰到分布式，也就是对某个应用进行了水平扩容，它将多个微机的计算能力团结了起来，可以完胜同等价格的中小型机器。</p>
+<p>慢慢的，大家发现，应用服务器 CPU 都很正常了，但是还是有很多慢请求，究其原因，是因为单点数据库带来了性能瓶颈。</p>
+<p>于是程序员们决定使用主从结构的数据库集群，如下图所示：</p>
+<div style="width: 70%;padding-left: 15%">
+
+<p><img src="/images/architecture/0_2.png" alt=""></p>
+</div>
+
+<p>其中大部分读操作可以直接访问从库，从而减轻主库的压力。然而这种方式还是无法解决写瓶颈，写依旧需要主库来处理，当业务量量级再次增高时，写已经变成刻不容缓的待处理瓶</p>
+<p>这时候，分库分表方案出现了：</p>
+<div style="width: 70%;padding-left: 15%">
+
+<p><img src="/images/architecture/0_3.png" alt=""></p>
+</div>
+
+<p>分库分表不仅可以对相同的库进行拆分，还可以对相同的表进行拆分，对表进行拆分的方式叫做水平拆分。</p>
+<p>不同功能的表放到不同的库里，一般对应的是垂直拆分（按照业务功能进行拆分），此时一般还对应了微服务化。</p>
+<p>这种方法做到极致基本能支撑 TPS 在万级甚至更高的访问量了。然而随着相同应用扩展的越多，每个数据库的链接数也巨量增长，这让数据库本身的资源成为了瓶颈。</p>
+<p>这个问题产生的本质是全量数据无差别的分享了所有的应用资源，比如 A 用户的请求在负载均衡的分配下可能分配到任意一个应用服务器上，因而所有应用全部都要链接 A 用户所在的分库，数据库连接数就变成笛卡尔乘积了。</p>
+<p>在本质点说，这种模式的资源隔离性还不够彻底。要解决这个问题，就需要把识别用户分库的逻辑往上层移动，从数据库层移动到路由网关层。</p>
+<p>这样一来，从应用服务器 a 进来的来自 A 客户的所有请求必然落库到 DB-A，因此 a 也不用链接其他的数据库实例了，这样一个单元化的雏形就诞生了。</p>
+<p>思考一下，应用间其实也存在交互（比如 A 转账给 B），也就意味着，应用不需要链接其他的数据库了，但是还需要链接其他应用。</p>
+<p>如果是常见的 RPC 框架如 Dubbo 等，使用的是 TCP/IP 协议，那么等同于把之前与数据库建立的链接，换成与其他应用之间的链接了。</p>
+<p>为啥这样就消除瓶颈了呢？首先由于合理的设计，应用间的数据交互并不巨量，其次应用间的交互可以共享 TCP 链接，比如 A-&gt;B 之间的 Socket 链接可以被 A 中的多个线程复用。</p>
+<p>而一般的数据库如 MySQL 则不行，所以 MySQL 才需要数据库链接池。</p>
+<div style="width: 70%;padding-left: 15%">
+
+<p><img src="/images/architecture/0_4.png" alt=""></p>
+</div>
+
+<p>如上图所示，但我们把整套系统打包为单元化时，每一类的数据从进单元开始就注定在这个单元被消化，由于这种彻底的隔离性，整个单元可以轻松的部署到任意机房而依然能保证逻辑上的统一。</p>
+<p>下图为一个三地五机房的部署方式：</p>
+<div style="width: 70%;padding-left: 15%">
+
+<p><img src="/images/architecture/0_5.png" alt=""></p>
+</div>
+
+<br/>
+
+<h1 id="蚂蚁单元化架构实践"><a href="#蚂蚁单元化架构实践" class="headerlink" title="蚂蚁单元化架构实践"></a>蚂蚁单元化架构实践</h1><br/>
+
+<p>蚂蚁支付宝应该是国内最大的支付工具，其在双 11 等活动日当日的支付 TPS 可达几十万级，未来这个数字可能会更大，这决定了蚂蚁单元化架构从容量要求上看必然从单机房走向多机房。</p>
+<p>另一方面，异地灾备也决定了这些 IDC 机房必须是异地部署的。整体上支付宝也采用了三地五中心（IDC 机房）来保障系统的可用性。</p>
+<p>跟上文中描述的有所不同的是，支付宝将单元分成了三类（也称 CRG 架构）：</p>
+<ul>
+<li><p>RZone（Region Zone）：直译可能有点反而不好理解。实际上就是所有可以分库分表的业务系统整体部署的最小单元。每个 RZone 连上数据库就可以撑起一片天空，把业务跑的溜溜的。</p>
+</li>
+<li><p>GZone（Global Zone）：全局单元，意味着全局只有一份。部署了不可拆分的数据和服务，比如系统配置等。实际情况下，GZone 异地也会部署，不过仅是用于灾备，同一时刻，只有一地 GZone 进行全局服务。GZone 一般被 RZone 依赖，提供的大部分是读取服务。</p>
+</li>
+<li><p>CZone（City Zone）：顾名思义，这是以城市为单位部署的单元。同样部署了不可拆分的数据和服务，比如用户账号服务，客户信息服务等。理论上 CZone 会被 RZone 以比访问 GZone 高很多的频率进行访问。CZone 是基于特定的 GZone 场景进行优化的一种单元，它把 GZone 中有些有着”写读时间差现象”的数据和服务进行了的单独部署，这样 RZone 只需要访问本地的 CZone 即可，而不是访问异地的 GZone。</p>
+</li>
+</ul>
+<p>剩下的还没有看完，等理解了，继续写剩下的。你也可以直接看参考资料。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/29/redis4/" rel="prev" title="Redis | 7000字笔记总结，超详细！「转载」">
+      <i class="fa fa-chevron-left"></i> Redis | 7000字笔记总结，超详细！「转载」
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/29/architecture1/" rel="next" title="架构 | 什么是微服务?">
+      架构 | 什么是微服务? <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LDC-和单元化"><span class="nav-number">2.</span> <span class="nav-text">LDC 和单元化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#系统架构演化史"><span class="nav-number">3.</span> <span class="nav-text">系统架构演化史</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#蚂蚁单元化架构实践"><span class="nav-number">4.</span> <span class="nav-text">蚂蚁单元化架构实践</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

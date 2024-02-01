@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="决策树是常见的机器学习分类算法。 这里讲述的是 ID3 算法。 github">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/06/10/machinelearning7/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="决策树是常见的机器学习分类算法。 这里讲述的是 ID3 算法。 github">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/1_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/1_1.png">
+<meta property="article:published_time" content="2018-06-10T06:48:16.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:14:22.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="决策树">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/1_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/06/10/machinelearning7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>决策树 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/06/10/machinelearning7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          决策树
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-06-10 14:48:16" itemprop="dateCreated datePublished" datetime="2018-06-10T14:48:16+08:00">2018-06-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-22 14:14:22" itemprop="dateModified" datetime="2021-01-22T14:14:22+08:00">2021-01-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%86%B3%E7%AD%96%E6%A0%91/" itemprop="url" rel="index"><span itemprop="name">决策树</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/06/10/machinelearning7/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/06/10/machinelearning7/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>决策树是常见的机器学习分类算法。</p>
+<p>这里讲述的是 ID3 算法。</p>
+<p><a href="https://github.com/benpaodewoniu/Machine-Learning-in-Action">github</a></p>
+ <a id="more"></a>
+
+<p>它的原理很简单，比如有如下数据：判断是否是鱼，我们有特征在水中生活，有鳞。可以画出决策树图：</p>
+<p><img src="/images/machinelearningalgorithm/1_0.png" alt=""></p>
+<p>根据这幅图，我们就可以收集数据，然后在根据特征来判断是否是鱼。</p>
+<p>但是，这里有一个问题，我们如何确认第一个判断标准是在水中生活，还有有鳞呢？</p>
+<p>如果判断的第一个标准是有鳞，那么在 分支 no 上也可能会出现有鱼的分支，所以分支数的增加，会导致算法越来越复杂，效率下降。</p>
+<p>所以，我们引入信息熵来判断，如何选取判断标准。</p>
+<h2 id="信息熵"><a href="#信息熵" class="headerlink" title="信息熵"></a>信息熵</h2><p>关于信息熵，我的一个文章已经很好的介绍过了。</p>
+<p><a href="/2018/06/09/math1/">信息熵到底是什么</a></p>
+<p>但是，在这里我还是要简单的介绍下里面的注意点。</p>
+<h3 id="划分选择"><a href="#划分选择" class="headerlink" title="划分选择"></a>划分选择</h3><p>我们还是举例子：</p>
+<p>信息熵的定义：</p>
+<p>Ent(D) = -∑ p * log(p,2)</p>
+<p>信息增益：</p>
+<p>Gain(D,a) = Ent(D) - ∑ (|Dv| / |D| ) * Ent(Dv)</p>
+<p>其中 Ent(D) 为该分支节点的信息熵 Ent(Dv) 代表的是某一属性的信息熵 |Dv| / |D| 代表这一属性值占样本总数的比例。</p>
+<p>上述的三个描述很复杂，我也觉得充满不可理解的地方，所以还是直接看例子有助于消化。</p>
+<p>一般而言，信息增益越大，就意味着用该属性来划分所得的“纯度提升” 越大。</p>
+<p>如一共拥有17个训练数据，二分类问题（是否为鱼），其中不是鱼为 8 例，是鱼为 9 例。</p>
+<p>所以正例 P1 = 9 / 17 反例 P2 = 8 / 17</p>
+<h3 id="计算二维信息熵"><a href="#计算二维信息熵" class="headerlink" title="计算二维信息熵"></a>计算二维信息熵</h3><p>Ent(D) = -(8/17 * log(8/17,2) + 9/17 * log(9/17,2)) = 0.998</p>
+<p>在计算各个特征的信息增益：</p>
+<p>假设在是否水生中 是占10例 不是占 7例，则：</p>
+<p>而在 是水生 的例子中，是鱼占 5 例，不是鱼占 5 例：</p>
+<p>所以信息熵为：</p>
+<p>Ent(D1) = -(5/10 * log(5/10,2) + 5/10 * log(5/10,2)) = 0.500</p>
+<p>在 不是水生 的例子中，是鱼占 0 例，不是鱼占 7 例，</p>
+<p>计算信息熵为：</p>
+<p>Ent(D2) = -(7/7 * log(7/7,2)) = 0.000</p>
+<p>计算水生的信息增益：</p>
+<p>Gain(D,是否水生) = Ent(D) - (Ent(D1) * 10/17 + Ent(D2) * 7/17) = 0.198</p>
+<p>我们在计算其它特征的信息增益，如是否为有鳞，计算得：</p>
+<p>Gain(D,是否有鳞) = 0.720</p>
+<p>这时候我们发现 Gain(D,是否水生) &gt; Gain(D，是否有鳞)，所以，我们选用是否水生作为第一个判断标准。</p>
+<p>PS：上面的计算值都是我乱编的，你要知道我们的目的不是计算数值，而是阐述思想。</p>
+<h3 id="复杂例子的信息增益的计算"><a href="#复杂例子的信息增益的计算" class="headerlink" title="复杂例子的信息增益的计算"></a>复杂例子的信息增益的计算</h3><p>我们再来考虑一个复杂一点的例子。</p>
+<p>假设有如下数据，判断西瓜是否为好瓜的二分类问题。我们一共有 17 个训练数据，其中正例 8 个 ，反例 9 个。</p>
+<p>计算初始信息熵：</p>
+<p>Ent(D) = -(8/17 * log(8/17,2) + 9/17 * log(9/17 ,2)) = 0.998</p>
+<p>计算色泽的信息增益：</p>
+<p>比如 色泽 = （青绿，乌黑，浅白），设这个属性代号为 C</p>
+<p>对于青绿我们一共有 6 个样例。其中 3 个反例，3 个正例。</p>
+<p>Ent(C,青绿) = -(3/6 * log(3/6,2) + 3/6 * log(3/6,2)) = 1.000</p>
+<p>对于乌黑我们一共有 6 个样例，其中 4 个正例，2 个反例</p>
+<p>Ent(C,乌黑) = -(4/6 * log(4/6,2) + 2/6 * log(2/6,2)) = 0.918</p>
+<p>对于浅白我们一共有 5 个样例，其中 1 个正例，4 个反例</p>
+<p>Ent(C,浅白) = -(1/5 * log(1/5,2) + 4/5 * log(4/5,2)) = 0.722</p>
+<p>计算色泽的信息增益：</p>
+<p>Gain(D,色泽) = Ent(D) - ∑ (|Dv| / |D| ) * Ent(Dv)</p>
+<p>即</p>
+<p>Gain(D,色泽) = 0.998 - (6/17 * 1.000 + 6/17 * 0.918 + 5/17 * 0.722) = 0.109</p>
+<p>我们在计算其它特征，比如纹理，敲声的等信息增益，选取最大的那个作为判断标准，如果同时存在多个最大增益，则可以任意选取一个。</p>
+<h3 id="对于信息增益的注意点"><a href="#对于信息增益的注意点" class="headerlink" title="对于信息增益的注意点"></a>对于信息增益的注意点</h3><p>事实上，我们的每一次划分都会将一个属性减去，然后在这个属性上再次划分分支，比如我们上面判断西瓜是好坏，假设我们判断的根节点是色泽。如图所示：</p>
+<p><img src="/images/machinelearningalgorithm/1_1.png" alt=""></p>
+<p>我们发现上面已经分成了 3 个分支。</p>
+<p>而，在上面的例子我们可以知道，以青绿为例，青绿的例子一共有 6 个，其中 3 个正例，3 个反例。</p>
+<p>因为现在的样例合集变成了青绿合集，所以，我们的信息熵也要相应的变成青绿信息熵，而不是原来的信息熵。</p>
+<p>即，信息熵为</p>
+<p>Ent(青绿) = - (3/6 * log(3/6,2) + 3/6 * log(3/6,2)) = 1.000</p>
+<p>然后我们在根据青绿旗下的其他属性，计算各自的信息增益，然后有信息增益继续划分分支。</p>
+<p>在这里，我们可以很清晰的得到，分支就完全各自为政了，所以，各自分支下判断标准也可能不一样。如青绿下的判断标准是纹理，而乌黑下的判断标准是敲声。</p>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><h3 id="创建数据"><a href="#创建数据" class="headerlink" title="创建数据"></a>创建数据</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">createData</span><span class="params">()</span>:</span></span><br><span class="line">    dataSet = [</span><br><span class="line"></span><br><span class="line">        [<span class="number">1</span>,<span class="number">1</span>,<span class="string">'yes'</span>],</span><br><span class="line">        [<span class="number">1</span>,<span class="number">1</span>,<span class="string">'yes'</span>],</span><br><span class="line">        [<span class="number">1</span>,<span class="number">0</span>,<span class="string">'no'</span>],</span><br><span class="line">        [<span class="number">0</span>,<span class="number">1</span>,<span class="string">'no'</span>],</span><br><span class="line">        [<span class="number">0</span>,<span class="number">1</span>,<span class="string">'no'</span>]</span><br><span class="line">    ]</span><br><span class="line">    labels = [<span class="string">'no surfacing'</span>,<span class="string">'flippers'</span>]</span><br><span class="line">    <span class="keyword">return</span> dataSet,labels</span><br></pre></td></tr></table></figure>
+
+<h3 id="计算信息熵"><a href="#计算信息熵" class="headerlink" title="计算信息熵"></a>计算信息熵</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">calcShannon</span><span class="params">(dataSet)</span>:</span> <span class="comment">#计算香农熵（信息熵）</span></span><br><span class="line">    num     = len(dataSet)</span><br><span class="line">    labels  = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> feat <span class="keyword">in</span> dataSet:</span><br><span class="line">        currentLabel = feat[<span class="number">-1</span>] <span class="comment">#得到标签</span></span><br><span class="line">        <span class="keyword">if</span> currentLabel <span class="keyword">not</span> <span class="keyword">in</span> labels.keys():</span><br><span class="line">            labels[currentLabel] = <span class="number">0</span></span><br><span class="line">        labels[currentLabel] += <span class="number">1</span></span><br><span class="line">    shannon = <span class="number">0.0</span></span><br><span class="line">    <span class="keyword">for</span> key <span class="keyword">in</span> labels:</span><br><span class="line">        prob     = float(labels[key]) / num</span><br><span class="line">        shannon -= prob * (math.log(prob,<span class="number">2</span>))</span><br><span class="line">    <span class="keyword">return</span> shannon</span><br></pre></td></tr></table></figure>
+
+<h3 id="分割数据"><a href="#分割数据" class="headerlink" title="分割数据"></a>分割数据</h3><p>其目的是比如西瓜的色泽属性，将色泽为青绿的分为一个数据集，乌黑的分为另一个数据集，浅白的分为其他数据集</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">spiltData</span><span class="params">(dataset,axis,value)</span>:</span> <span class="comment">#将同一属性的同一数值划分到同一数据集</span></span><br><span class="line">   retData = []</span><br><span class="line">   <span class="keyword">for</span> feat <span class="keyword">in</span> dataset:</span><br><span class="line">       <span class="keyword">if</span> feat[axis] == value:</span><br><span class="line">           redData   = feat[:axis]</span><br><span class="line">           redData.extend(feat[axis + <span class="number">1</span>:])</span><br><span class="line">           retData.append(redData)</span><br><span class="line">   <span class="keyword">return</span> retData</span><br></pre></td></tr></table></figure>
+
+<h3 id="选取最大的信息增益"><a href="#选取最大的信息增益" class="headerlink" title="选取最大的信息增益"></a>选取最大的信息增益</h3><p>我们有公式：</p>
+<p>信息增益：</p>
+<p>Gain(D,a) = Ent(D) - ∑ (|Dv| / |D| ) * Ent(Dv)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">chooseBest</span><span class="params">(dataSet)</span>:</span></span><br><span class="line">    num        = len(dataSet[<span class="number">0</span>]) - <span class="number">1</span>  <span class="comment">#得到除了标签之外的属性长度</span></span><br><span class="line">    base       = calcShannon(dataSet) <span class="comment">#计算原始信息熵</span></span><br><span class="line">    bestGain   = <span class="number">0.0</span>                  <span class="comment">#初始化最好的信息熵</span></span><br><span class="line">    bestFeature = <span class="number">-1</span>                  <span class="comment">#初始化最好的信息熵为哪个属性的坐标</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">        featList   = [example[i] <span class="keyword">for</span> example <span class="keyword">in</span> dataSet]  <span class="comment"># 将相同属性的值转化为同一列表，即将一列的属性转到同一个列表中</span></span><br><span class="line">        uniVals    = set(featList)                        <span class="comment"># set 将去掉相同的数值 set(1,2,1,4,3,2) = 1,2,3,4</span></span><br><span class="line">        newShannon = <span class="number">0.0</span>                                  <span class="comment">#初始化每一个属性的香农熵</span></span><br><span class="line">        <span class="comment"># 关于下面一开始我有一个不理解的地方，就是感觉将其同一属性分为不同的数据集计算信息熵有点多余</span></span><br><span class="line">        <span class="comment"># 不如，一开始就用同一属性的全部数据集计算信息熵</span></span><br><span class="line">        <span class="comment"># 其实，上述是对信息熵的不完全理解导致的</span></span><br><span class="line">        <span class="comment"># 信息熵是 p * log(p,2) 而 p 正是同一属性中同一值所占据的比例</span></span><br><span class="line">        <span class="comment"># 如果没有划分不同的数据集的话就无法计算这个比例</span></span><br><span class="line">        <span class="keyword">for</span> value <span class="keyword">in</span> uniVals:</span><br><span class="line">            subDataSet  = spiltData(dataSet,i,value)             <span class="comment">#对于同一属性按照相同值划分数据集，比如对于属性大小 很大为一个数据集 不大为另一个数据集</span></span><br><span class="line">            prob        = len(subDataSet) / float(len(dataSet))  <span class="comment">#得到同一数据集占同一属性数据集的比例</span></span><br><span class="line">            newShannon += prob * calcShannon(subDataSet)                <span class="comment">#计算同一值的数据集的信息熵</span></span><br><span class="line">        infoGain = base - newShannon                      <span class="comment">#这是因为信息熵本来前面就有 负号，而上面是加号所以这边填上负号</span></span><br><span class="line">        <span class="keyword">if</span>(infoGain &gt; bestGain):</span><br><span class="line">            bestGain    = infoGain</span><br><span class="line">            bestFeature = i</span><br><span class="line">    <span class="keyword">return</span> bestFeature</span><br></pre></td></tr></table></figure>
+
+<h3 id="返回出现次数最多的分类名称"><a href="#返回出现次数最多的分类名称" class="headerlink" title="返回出现次数最多的分类名称"></a>返回出现次数最多的分类名称</h3><p>选择出现次数最高的标签，如[1,2,1,1] 就返回 1</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">major</span><span class="params">(classList)</span>:</span>                       <span class="comment">#</span></span><br><span class="line">    classCount = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> vote <span class="keyword">in</span> classList:</span><br><span class="line">        <span class="keyword">if</span> vote <span class="keyword">not</span> <span class="keyword">in</span> classCount.keys():</span><br><span class="line">            classCount[vote]  = <span class="number">0</span></span><br><span class="line">        classCount[vote] += <span class="number">1</span></span><br><span class="line">    sortClassCount = sorted(classCount.items(),key = operator.itemgetter(<span class="number">1</span>),reverse=<span class="literal">True</span>)</span><br><span class="line">    <span class="keyword">return</span> sortClassCount[<span class="number">0</span>][<span class="number">0</span>]</span><br></pre></td></tr></table></figure>
+
+<h3 id="构建决策树"><a href="#构建决策树" class="headerlink" title="构建决策树"></a>构建决策树</h3><p>关于下面递归的使用，你可以详细的参考我的另一篇文章。</p>
+<p><a href="/2018/06/11/python13/">递归</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">createTree</span><span class="params">(dataSet,labels)</span>:</span></span><br><span class="line">   classList = [example[<span class="number">-1</span>] <span class="keyword">for</span> example <span class="keyword">in</span> dataSet]    <span class="comment">#得到标签</span></span><br><span class="line">   <span class="keyword">if</span> classList.count(classList[<span class="number">0</span>]) == len(classList): <span class="comment">#</span></span><br><span class="line">       <span class="keyword">return</span> classList[<span class="number">0</span>]</span><br><span class="line">   <span class="keyword">if</span> len(dataSet[<span class="number">0</span>]) == <span class="number">1</span>:                            <span class="comment">#如果所有的标签都变遍历完了，就说明所有的都已经 tree 创建好了</span></span><br><span class="line">       <span class="keyword">return</span> major(classList)</span><br><span class="line">   bestFeat = chooseBest(dataSet)  <span class="comment">#得到最佳信息熵的下标</span></span><br><span class="line">   bestFeatLabel = labels[bestFeat] <span class="comment">#得到最佳信息熵的标志</span></span><br><span class="line">   myTree = &#123;bestFeatLabel:&#123;&#125;&#125;      <span class="comment">#初始化 tree 并且将最佳标志加上</span></span><br><span class="line">   <span class="keyword">del</span>(labels[bestFeat])            <span class="comment">#删除标签上的最佳标志</span></span><br><span class="line">   featVal = [example[bestFeat] <span class="keyword">for</span> example <span class="keyword">in</span> dataSet] <span class="comment">#将最佳属性的值放在 featVal</span></span><br><span class="line">   uniVals = set(featVal)</span><br><span class="line">   <span class="keyword">for</span> value <span class="keyword">in</span> uniVals:</span><br><span class="line">       subLabels = labels[:]        <span class="comment">#复制已经去除最佳标签的数组</span></span><br><span class="line">       myTree[bestFeatLabel][value] = createTree(spiltData(dataSet,bestFeat,value),subLabels) <span class="comment">#对分支标签加上属性值</span></span><br><span class="line">   <span class="keyword">return</span> myTree</span><br></pre></td></tr></table></figure>
+
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">data,labels= createData()</span><br><span class="line">myTree = createTree(data,labels)</span><br><span class="line">print(myTree)</span><br></pre></td></tr></table></figure>
+
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">'no surfacing'</span>: &#123;<span class="number">0</span>: <span class="string">'no'</span>, <span class="number">1</span>: &#123;<span class="string">'flippers'</span>: &#123;<span class="number">0</span>: <span class="string">'no'</span>, <span class="number">1</span>: <span class="string">'yes'</span>&#125;&#125;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/%E5%86%B3%E7%AD%96%E6%A0%91/" rel="tag"># 决策树</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/09/math1/" rel="prev" title="信息熵到底是什么">
+      <i class="fa fa-chevron-left"></i> 信息熵到底是什么
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/10/hexo0/" rel="next" title="hexo  | TaskCanceledException异常">
+      hexo  | TaskCanceledException异常 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息熵"><span class="nav-number">1.</span> <span class="nav-text">信息熵</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#划分选择"><span class="nav-number">1.1.</span> <span class="nav-text">划分选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算二维信息熵"><span class="nav-number">1.2.</span> <span class="nav-text">计算二维信息熵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复杂例子的信息增益的计算"><span class="nav-number">1.3.</span> <span class="nav-text">复杂例子的信息增益的计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对于信息增益的注意点"><span class="nav-number">1.4.</span> <span class="nav-text">对于信息增益的注意点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码示例"><span class="nav-number">2.</span> <span class="nav-text">代码示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建数据"><span class="nav-number">2.1.</span> <span class="nav-text">创建数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算信息熵"><span class="nav-number">2.2.</span> <span class="nav-text">计算信息熵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分割数据"><span class="nav-number">2.3.</span> <span class="nav-text">分割数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选取最大的信息增益"><span class="nav-number">2.4.</span> <span class="nav-text">选取最大的信息增益</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#返回出现次数最多的分类名称"><span class="nav-number">2.5.</span> <span class="nav-text">返回出现次数最多的分类名称</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建决策树"><span class="nav-number">2.6.</span> <span class="nav-text">构建决策树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行"><span class="nav-number">2.7.</span> <span class="nav-text">运行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结果"><span class="nav-number">2.8.</span> <span class="nav-text">结果</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

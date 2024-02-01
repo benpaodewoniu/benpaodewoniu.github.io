@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这个项目的介绍是：  我们是一群来自IPFS中文社区的技术极客，怀着对IPFS技术的热诚，走到了一起，组成GPFS团队。我们是一个去中心化自治组织，致力于IPFS技术在全球真正的实现落地。我们将持续优化GPFS网络协议，积极推进生态建设。Web3.0的大门已经开启，精彩值得期待，我们欢迎更多志同道合的技术极客加入。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gps | 一个模仿 bzz 或者 ipfs 的仿盘">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/05/30/gps0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这个项目的介绍是：  我们是一群来自IPFS中文社区的技术极客，怀着对IPFS技术的热诚，走到了一起，组成GPFS团队。我们是一个去中心化自治组织，致力于IPFS技术在全球真正的实现落地。我们将持续优化GPFS网络协议，积极推进生态建设。Web3.0的大门已经开启，精彩值得期待，我们欢迎更多志同道合的技术极客加入。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-05-29T16:52:33.000Z">
+<meta property="article:modified_time" content="2022-04-23T15:48:46.417Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="GPFS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/05/30/gps0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>gps | 一个模仿 bzz 或者 ipfs 的仿盘 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/05/30/gps0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gps | 一个模仿 bzz 或者 ipfs 的仿盘
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-30 00:52:33" itemprop="dateCreated datePublished" datetime="2021-05-30T00:52:33+08:00">2021-05-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-23 23:48:46" itemprop="dateModified" datetime="2022-04-23T23:48:46+08:00">2022-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/" itemprop="url" rel="index"><span itemprop="name">dapp</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/GPFS/" itemprop="url" rel="index"><span itemprop="name">GPFS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/05/30/gps0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/05/30/gps0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这个项目的介绍是：</p>
+<blockquote>
+<p>我们是一群来自IPFS中文社区的技术极客，怀着对IPFS技术的热诚，走到了一起，组成GPFS团队。我们是一个去中心化自治组织，致力于IPFS技术在全球真正的实现落地。我们将持续优化GPFS网络协议，积极推进生态建设。Web3.0的大门已经开启，精彩值得期待，我们欢迎更多志同道合的技术极客加入。</p>
+</blockquote>
+<a id="more"></a>
+
+<p>真假见仁见智，这里只讨论技术。</p>
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://github.com/gpfs-group/gpfs-litepaper">GPFS Project Litepaper GPFS白皮书</a></li>
+<li><a href="https://scan.gpfs.xyz/index.html">浏览器</a></li>
+<li><a href="https://github.com/gpfs-group/gpfs-mining">挖矿软件</a></li>
+<li><a href="https://github.com/gpfs-group/airdrop">空投</a></li>
+<li><a href="https://t.me/gpfs_cn">电报</a></li>
+</ul>
+<br/>
+
+<h1 id="基础资料"><a href="#基础资料" class="headerlink" title="基础资料"></a>基础资料</h1><br/>
+
+<ul>
+<li>代币合约地址为：0x5e772acf0f20b0315391021e0884cb1f1aa4545c</li>
+<li>bsc 网络</li>
+</ul>
+<br/>
+
+<h1 id="空投"><a href="#空投" class="headerlink" title="空投"></a>空投</h1><br/>
+
+<p>这个空投非常有意思。</p>
+<p><code>github</code> 上写着</p>
+<blockquote>
+<p>GPS代币合约自创建起，自动向10万个币安智能链（BSC）地址空投1000万个GPS，每个地址100个。先领先得，领完为止。领取GPS空投的方法很简单，只需使用任意支持BSC的钱包，添加GPS代币合约地址即可看到空投的GPS代币。</p>
+</blockquote>
+<p>我们在意的是，为什么它能空投 10 万个地址，但是，我再区块链浏览器上却看不到，另外，我随便登录一个号，确实是有的，这点我还没想明白。</p>
+<p>另外，这 <code>100</code> 个好像没啥用，需要转出来，额，没懂啊。</p>
+<p>ps: 2021-6-30 原来这是在合约上做了一个判断。具体可以看</p>
+<ul>
+<li><a href="https://ethfans.org/posts/make-adding-contract-address-in-return-to-airdrop">ERC-20 代币钱包添加合约地址即空投实现</a></li>
+</ul>
+<p>ps: 2021-7-15</p>
+<p>这段时间稍微看了一下合约，我发现非常有意思。原来，该空投的原理并不是上面博文原理。</p>
+<ul>
+<li><a href="https://github.com/gpfs-group/gps_contract/blob/main/gps.sol">合约地址</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">function balanceOf(address tokenOwner) public view override returns (uint balance) &#123;</span><br><span class="line">    if (totalAirdrop &lt; maxAirdrop &amp;&amp; !tookAirdrop[tokenOwner]) &#123;</span><br><span class="line">         return balances[tokenOwner] + airdropAmount;</span><br><span class="line">    &#125;</span><br><span class="line">    return balances[tokenOwner];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function transfer(address to, uint tokens) public  override returns (bool success) &#123;</span><br><span class="line">    require(to !&#x3D; address(0));</span><br><span class="line">    if (totalAirdrop &lt; maxAirdrop &amp;&amp; !tookAirdrop[msg.sender]) &#123;</span><br><span class="line">        tookAirdrop[msg.sender] &#x3D; true;</span><br><span class="line">        balances[msg.sender] &#x3D; safeAdd(balances[msg.sender], airdropAmount);</span><br><span class="line">        totalAirdrop &#x3D;  safeAdd(totalAirdrop, airdropAmount);</span><br><span class="line">    &#125;</span><br><span class="line">    balances[msg.sender] &#x3D; safeSub(balances[msg.sender], tokens);</span><br><span class="line">    balances[to] &#x3D; safeAdd(balances[to], tokens);</span><br><span class="line">    emit Transfer(msg.sender, to, tokens);</span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里面的逻辑很有意思，可以自己看！</p>
+<br/>
+
+<h1 id="挖矿"><a href="#挖矿" class="headerlink" title="挖矿"></a>挖矿</h1><br/>
+
+<p>主网 6 月 1 号上线。</p>
+<h2 id="一机多号"><a href="#一机多号" class="headerlink" title="一机多号"></a>一机多号</h2><p>目前我测试的情况是这样的</p>
+<ul>
+<li>一台机器多个号是不稳定的，但是，会有离线重连机制</li>
+</ul>
+<p>ps: <code>2021-6-30</code> 官方之前更新了 0.8.1 版本，掉钱大幅度改善。</p>
+<h3 id="win10"><a href="#win10" class="headerlink" title="win10"></a>win10</h3><p>拿一个目录为例子。</p>
+<p>官网的配置文件这样写</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">set IPFS_PATH=你想要的工作目录</span><br><span class="line">gpfs.exe daemon  --init --miner-address=你的BSC钱包地址</span><br><span class="line">pause</span><br></pre></td></tr></table></figure>
+
+<p>然后这是一个 <code>bat</code> 文件。</p>
+<p>假设，你的文件目录是 <code>D:/1</code> 这个目录，并且，把工作目录放在 <code>data</code> 里面，也就是说</p>
+<pre><code>set IPFS_PATH=D:/1/data</code></pre><p>然后，双击 <code>bat</code> 文件。会在 <code>data</code> 里面生成一些文件。</p>
+<p>目录为</p>
+<ul>
+<li>data</li>
+<li>run.data</li>
+<li>gpfs.exe</li>
+</ul>
+<p>其中配置文件是放在 <code>config</code> 里面的。</p>
+<p>假设，你又新建了一个目录，然后放置了 <code>bat</code> 文件，其中，内容为</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">set IPFS_PATH=D:/2/data</span><br><span class="line">gpfs.exe daemon  --init --miner-address=另一个钱包地址</span><br><span class="line">pause</span><br></pre></td></tr></table></figure>
+
+<p>假设直接双击，会导致运行失败，因为，默认端口是 <code>4001</code> 和 <code>8080</code>，我们需要修改这两个端口，打开 <code>data</code> 下面的 <code>config</code>，看到</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">"API":"ip4/127.0.0.1/tcp/5001",</span><br><span class="line">"Gateway":"/ip4/127.0.0.1/tcp/8080"</span><br></pre></td></tr></table></figure>
+
+<p>修改这两个端口就好了。</p>
+<p>另外，可以制作一个批量脚本运行工具。</p>
+<h4 id="批量运行脚本"><a href="#批量运行脚本" class="headerlink" title="批量运行脚本"></a>批量运行脚本</h4><p>比如，<code>start.bat</code></p>
+<p>里面放上</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">start D:/1/run.bat</span><br><span class="line">start D:/2/run.bat</span><br></pre></td></tr></table></figure>
+
+<p>重新开启的时候，直接点击这个 <code>bat</code> 就好了。</p>
+<h3 id="ubuntu"><a href="#ubuntu" class="headerlink" title="ubuntu"></a>ubuntu</h3><p>首先我们要制作和 <code>win10</code> 一样的开启脚本。</p>
+<p>假设你的目录是 <code>/root/gps/1</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export IPFS_PATH=/root/gps/1/data</span><br><span class="line">nohup ./gpfs daemon --init --miner-address=你的BSC钱包地址 &amp;</span><br></pre></td></tr></table></figure>
+
+<p>然后保存为 <code>run.sh</code></p>
+<p>执行的话，直接用 <code>sh run.sh</code> 就好了。另外，改端口的方法和 <code>win10</code> 一样。</p>
+<p>另外，<code>linux</code> 需要修改 <code>UDP</code> 缓存大小，<code>win10</code> 不用。</p>
+<pre><code>sysctl -w net.core.rmem_max=5000000</code></pre><h4 id="批量运行脚本-1"><a href="#批量运行脚本-1" class="headerlink" title="批量运行脚本"></a>批量运行脚本</h4><p>批量开启。</p>
+<p>比如，我们的生成文件夹是从 <code>0</code> 开始，我们可以弄一个 <code>start.sh</code>。</p>
+<p>然后内容是</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sh ./0/run.sh</span><br><span class="line">sh ./1/run.sh</span><br></pre></td></tr></table></figure>
+
+<p>懂代码的自己看目录关系吧。</p>
+<p>批量关闭。</p>
+<p>新建一个 <code>stop.sh</code> 内容为</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef | grep gpfs | awk -F " " '&#123;print $2&#125;' | xargs kill -9</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><br/>
+
+<ul>
+<li>gps.xlsx</li>
+</ul>
+<p>第一列是地址</p>
+<h2 id="查询该地址是否有-GPS-空投"><a href="#查询该地址是否有-GPS-空投" class="headerlink" title="查询该地址是否有 GPS 空投"></a>查询该地址是否有 GPS 空投</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> xlrd</span><br><span class="line"><span class="keyword">from</span> web3 <span class="keyword">import</span> Web3</span><br><span class="line"></span><br><span class="line">w3 = Web3(Web3.HTTPProvider(<span class="string">'https://bsc-dataseed1.binance.org'</span>))</span><br><span class="line"></span><br><span class="line">abi = json.loads(</span><br><span class="line">    <span class="string">'[&#123;"constant": true,"inputs": [&#123;"name": "who", "type": "address"&#125;],"name": "balanceOf","outputs": [&#123;"name": "", "type": "uint256"&#125;],"payable": false,"stateMutability": "view","type": "function"&#125;]'</span>)</span><br><span class="line"></span><br><span class="line">GPS_ADDRESS = w3.toChecksumAddress(<span class="string">'0x5e772acf0f20b0315391021e0884cb1f1aa4545c'</span>)</span><br><span class="line">GPS_CONTRACT = w3.eth.contract(address=GPS_ADDRESS, abi=abi)</span><br><span class="line"></span><br><span class="line">file_name = <span class="string">"gps.xlsx"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_addresses</span><span class="params">()</span>:</span></span><br><span class="line">    xls = xlrd.open_workbook(file_name)</span><br><span class="line">    addresses = xls.sheets()[<span class="number">0</span>].col_values(<span class="number">0</span>)</span><br><span class="line">    print(<span class="string">"一共有 "</span> + str(len(addresses)) + <span class="string">" 地址"</span>)</span><br><span class="line">    <span class="keyword">return</span> addresses</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_gps</span><span class="params">(address)</span>:</span></span><br><span class="line">    address = Web3.toChecksumAddress(address)</span><br><span class="line">    <span class="keyword">return</span> GPS_CONTRACT.functions.balanceOf(address).call()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    addresses = get_addresses()</span><br><span class="line">    <span class="keyword">for</span> address <span class="keyword">in</span> addresses:</span><br><span class="line">        print(get_gps(address))</span><br></pre></td></tr></table></figure>
+
+<h2 id="监控-GPS-状态"><a href="#监控-GPS-状态" class="headerlink" title="监控 GPS 状态"></a>监控 GPS 状态</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> xlrd</span><br><span class="line"></span><br><span class="line">file_name = <span class="string">"gps.xlsx"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">init_address</span><span class="params">()</span>:</span></span><br><span class="line">    xls = xlrd.open_workbook(file_name)</span><br><span class="line">    addresses = xls.sheets()[<span class="number">0</span>].col_values(<span class="number">0</span>)</span><br><span class="line">    print(<span class="string">"一共有 "</span> + str(len(addresses)) + <span class="string">" 地址"</span>)</span><br><span class="line">    <span class="keyword">return</span> addresses</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_state</span><span class="params">(address)</span>:</span></span><br><span class="line">    info = requests.get(</span><br><span class="line">        <span class="string">f"https://api.gpfs.xyz/v1/miners?page=1&amp;limit=20&amp;address=<span class="subst">&#123;address&#125;</span>"</span>)</span><br><span class="line">    state = json.loads(info.text)[<span class="string">'data'</span>][<span class="string">'miners'</span>][<span class="number">0</span>][<span class="string">'state'</span>]</span><br><span class="line">    reward = json.loads(info.text)[<span class="string">'data'</span>][<span class="string">'miners'</span>][<span class="number">0</span>][<span class="string">'reward'</span>]</span><br><span class="line">    balance = json.loads(info.text)[<span class="string">'data'</span>][<span class="string">'miners'</span>][<span class="number">0</span>][<span class="string">'balance'</span>]</span><br><span class="line">    <span class="keyword">return</span> state, reward, balance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    all_reward = <span class="number">0</span></span><br><span class="line">    addresses = init_address()</span><br><span class="line">    <span class="keyword">for</span> address <span class="keyword">in</span> addresses:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            state, reward, balance = get_state(address)</span><br><span class="line">            all_reward += float(reward)</span><br><span class="line">            print(<span class="string">"&#123;0&#125; 的 balance 是 &#123;1&#125; reward 是 &#123;2&#125; 状态是 &#123;3&#125;"</span>.format(address, balance, reward, state))</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            print(<span class="string">"reward 总数是&#123;0&#125;"</span>.format(all_reward))</span><br><span class="line">            exit()</span><br></pre></td></tr></table></figure>
+
+<h2 id="批量生成脚本"><a href="#批量生成脚本" class="headerlink" title="批量生成脚本"></a>批量生成脚本</h2><p>ps: 2021-6-19</p>
+<p>今天刚发现了一个小技巧，可以通过路径来使用同一个 <code>gpfs</code> ，这样以后如何更新软件只需要替换一次就行了。</p>
+<p><code>win10</code> 中，在环境变量中添加 <code>gpfs.exe</code> 的 <code>path</code> 就好了。</p>
+<p><code>ubuntu</code> 中，把 <code>gpfs</code> 放在 <code>/usr/local/bin</code> 中，给予 <code>777</code> 权限就好了。</p>
+<h3 id="win10-1"><a href="#win10-1" class="headerlink" title="win10"></a>win10</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> xlrd</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">all_dir = <span class="string">"新目录的绝对路径"</span></span><br><span class="line">file_name = <span class="string">"./gps.xlsx"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">init_address</span><span class="params">()</span>:</span></span><br><span class="line">    data = []</span><br><span class="line">    xls = xlrd.open_workbook(file_name)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(xls.sheets()[<span class="number">0</span>].col_values(<span class="number">0</span>))):</span><br><span class="line">        data.append(xls.sheets()[<span class="number">0</span>].col_values(<span class="number">0</span>)[i])</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">win10</span><span class="params">()</span>:</span></span><br><span class="line">    api_port = <span class="number">6000</span></span><br><span class="line">    gatesway_port = <span class="number">9090</span></span><br><span class="line"></span><br><span class="line">    data = init_address()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(data)):</span><br><span class="line">        print(<span class="string">"地址"</span> + str(i) + data[i] + <span class="string">" 开始生成"</span>)</span><br><span class="line">        os.mkdir(all_dir + str(i))</span><br><span class="line">        <span class="keyword">with</span>(open(all_dir + str(i) + <span class="string">"/run.bat"</span>, <span class="string">"w+"</span>)) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(<span class="string">"set IPFS_PATH="</span> + all_dir + str(i) + <span class="string">"data\n"</span>)</span><br><span class="line">            f.write(<span class="string">"gpfs.exe daemon  --init --miner-address="</span> + data[i] + <span class="string">"\n"</span>)</span><br><span class="line">            f.write(<span class="string">"pause"</span>)</span><br><span class="line">        os.system(all_dir + str(i) + <span class="string">"run.bat"</span>)</span><br><span class="line"></span><br><span class="line">        file_data = <span class="string">''</span></span><br><span class="line">        <span class="keyword">with</span>(open(all_dir + str(i) + <span class="string">'/data/config'</span>, <span class="string">'r'</span>)) <span class="keyword">as</span> f:</span><br><span class="line">            lines = f.readlines()</span><br><span class="line">            <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">                <span class="keyword">if</span> line.find(<span class="string">'    "API": "/ip4/127.0.0.1/tcp/5001",'</span>) == <span class="number">0</span>:</span><br><span class="line">                    line = <span class="string">'    "API": "/ip4/127.0.0.1/tcp/'</span> + str(api_port) + <span class="string">'",\n'</span></span><br><span class="line">                <span class="keyword">elif</span> line.find(<span class="string">'    "Gateway": "/ip4/127.0.0.1/tcp/8080"'</span>) == <span class="number">0</span>:</span><br><span class="line">                    line = <span class="string">'    "Gateway": "/ip4/127.0.0.1/tcp/'</span> + str(gatesway_port) + <span class="string">'"\n'</span></span><br><span class="line">                file_data += line</span><br><span class="line">        <span class="keyword">with</span>(open(all_dir + str(i) + <span class="string">'/data/config'</span>, <span class="string">'w'</span>)) <span class="keyword">as</span> f:</span><br><span class="line">            f.writelines(file_data)</span><br><span class="line">        print(<span class="string">"地址"</span> + str(i) + data[i] + <span class="string">" 生成结束"</span>)</span><br><span class="line">        api_port += <span class="number">1</span></span><br><span class="line">        gatesway_port += <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    win10()</span><br></pre></td></tr></table></figure>
+
+<h3 id="ubuntu-1"><a href="#ubuntu-1" class="headerlink" title="ubuntu"></a>ubuntu</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> shutil</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">all_dir = <span class="string">"绝对路径"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">data = [<span class="string">""</span>,<span class="string">""</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ubuntu</span><span class="params">()</span>:</span></span><br><span class="line">    api_port = <span class="number">6000</span></span><br><span class="line">    gatesway_port = <span class="number">9090</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(data)):</span><br><span class="line">        print(<span class="string">"地址"</span> + str(i) + data[i] + <span class="string">" 开始生成"</span>)</span><br><span class="line">        os.mkdir(all_dir + str(i))</span><br><span class="line">        <span class="keyword">with</span>(open(all_dir + str(i) + <span class="string">"/run.sh"</span>, <span class="string">"w+"</span>)) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(<span class="string">"export IPFS_PATH="</span> + all_dir + str(i) + <span class="string">"/data\n"</span>)</span><br><span class="line">            f.write(<span class="string">"nohup gpfs daemon --init --miner-address="</span> + data[i] + <span class="string">" &amp;"</span>)</span><br><span class="line">        os.system(<span class="string">"sh "</span> + all_dir + str(i) + <span class="string">"/run.sh"</span>)</span><br><span class="line">        time.sleep(<span class="number">5</span>)</span><br><span class="line">        file_data = <span class="string">''</span></span><br><span class="line">        <span class="keyword">with</span>(open(all_dir + str(i) + <span class="string">'/data/config'</span>, <span class="string">'r'</span>)) <span class="keyword">as</span> f:</span><br><span class="line">            lines = f.readlines()</span><br><span class="line">            <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">                <span class="keyword">if</span> line.find(<span class="string">'    "API": "/ip4/127.0.0.1/tcp/5001",'</span>) == <span class="number">0</span>:</span><br><span class="line">                    line = <span class="string">'    "API": "/ip4/127.0.0.1/tcp/'</span> + str(api_port) + <span class="string">'",\n'</span></span><br><span class="line">                <span class="keyword">elif</span> line.find(<span class="string">'    "Gateway": "/ip4/127.0.0.1/tcp/8080"'</span>) == <span class="number">0</span>:</span><br><span class="line">                    line = <span class="string">'    "Gateway": "/ip4/127.0.0.1/tcp/'</span> + str(gatesway_port) + <span class="string">'"\n'</span></span><br><span class="line">                file_data += line</span><br><span class="line">        <span class="keyword">with</span>(open(all_dir + str(i) + <span class="string">'/data/config'</span>, <span class="string">'w'</span>)) <span class="keyword">as</span> f:</span><br><span class="line">            f.writelines(file_data)</span><br><span class="line">        print(<span class="string">"地址"</span> + str(i) + data[i] + <span class="string">" 生成结束"</span>)</span><br><span class="line">        api_port += <span class="number">1</span></span><br><span class="line">        gatesway_port += <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ubuntu()</span><br></pre></td></tr></table></figure>
+
+<h2 id="自动开启和关闭"><a href="#自动开启和关闭" class="headerlink" title="自动开启和关闭"></a>自动开启和关闭</h2><p>我发现 <code>gpfs</code> 特别占用资源，如果长时间运行下去，可能内存等占有量越来越多，所以，想着写一个自动定时任务。</p>
+<p>现在有两个思路。</p>
+<ul>
+<li>因为 <code>10</code> 分钟出一次票，所以，可以在出票的时候自动开启</li>
+<li><code>24</code> 小时重启一次</li>
+</ul>
+<br/>
+
+<h1 id="生态网站"><a href="#生态网站" class="headerlink" title="生态网站"></a>生态网站</h1><br/>
+
+<ul>
+<li><a href="http://47.242.31.152:8082/">GPFS 小工具</a><ul>
+<li>关于这个项目的代码「免费代码」我已经开源</li>
+<li><a href="https://github.com/benpaodewoniu/gpfstools">开源地址</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/GPFS/" rel="tag"># GPFS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/30/tomcatcoin0/" rel="prev" title="tomcatcoin | 典型的骗局项目">
+      <i class="fa fa-chevron-left"></i> tomcatcoin | 典型的骗局项目
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/04/ipfs0/" rel="next" title="ipfs | 简介和入门">
+      ipfs | 简介和入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基础资料"><span class="nav-number">2.</span> <span class="nav-text">基础资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#空投"><span class="nav-number">3.</span> <span class="nav-text">空投</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#挖矿"><span class="nav-number">4.</span> <span class="nav-text">挖矿</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一机多号"><span class="nav-number">4.1.</span> <span class="nav-text">一机多号</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#win10"><span class="nav-number">4.1.1.</span> <span class="nav-text">win10</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#批量运行脚本"><span class="nav-number">4.1.1.1.</span> <span class="nav-text">批量运行脚本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ubuntu"><span class="nav-number">4.1.2.</span> <span class="nav-text">ubuntu</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#批量运行脚本-1"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">批量运行脚本</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码"><span class="nav-number">5.</span> <span class="nav-text">代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#查询该地址是否有-GPS-空投"><span class="nav-number">5.1.</span> <span class="nav-text">查询该地址是否有 GPS 空投</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控-GPS-状态"><span class="nav-number">5.2.</span> <span class="nav-text">监控 GPS 状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#批量生成脚本"><span class="nav-number">5.3.</span> <span class="nav-text">批量生成脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#win10-1"><span class="nav-number">5.3.1.</span> <span class="nav-text">win10</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ubuntu-1"><span class="nav-number">5.3.2.</span> <span class="nav-text">ubuntu</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自动开启和关闭"><span class="nav-number">5.4.</span> <span class="nav-text">自动开启和关闭</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#生态网站"><span class="nav-number">6.</span> <span class="nav-text">生态网站</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

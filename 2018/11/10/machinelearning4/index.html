@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="OK，这一章我们的内容也是和题目一样，虽然大部分在说定义，但是却十分重要。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="模型评估和选择">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/11/10/machinelearning4/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="OK，这一章我们的内容也是和题目一样，虽然大部分在说定义，但是却十分重要。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/4_0.JPG">
+<meta property="article:published_time" content="2018-11-10T03:18:36.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:30:11.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="周志华">
+<meta property="article:tag" content="西瓜书">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/machinelearning/4_0.JPG">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/11/10/machinelearning4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>模型评估和选择 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/11/10/machinelearning4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          模型评估和选择
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-10 11:18:36" itemprop="dateCreated datePublished" datetime="2018-11-10T11:18:36+08:00">2018-11-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:30:11" itemprop="dateModified" datetime="2020-05-12T10:30:11+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/11/10/machinelearning4/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/11/10/machinelearning4/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>OK，这一章我们的内容也是和题目一样，虽然大部分在说定义，但是却十分重要。</p>
+<a id="more"></a>
+
+<h2 id="经验误差"><a href="#经验误差" class="headerlink" title="经验误差"></a>经验误差</h2><p>学习器在训练集上的误差称为“训练误差”或“经验误差”</p>
+<p>在新样本上的误差称为“泛化误差”。</p>
+<p>过拟合是无法避免的，我们能做的的只是“缓解”，或者说减小其风险。</p>
+<h2 id="评估方法"><a href="#评估方法" class="headerlink" title="评估方法"></a>评估方法</h2><p>我们首先要知道的是，我们所得到的模型最后是给未知样本使用的。但是，在现实中我们只有训练数据，而没有未来数据。</p>
+<p>所以，我们会将测试数据进行分割，变成训练数据和测试数据。</p>
+<p>关于如何挑选测试数据，有以下的原则：</p>
+<pre><code>测试集和训练集要互斥
+测试集，训练集要尽可能保持数据分布的一致性。
+    比如：有一个数据集 T，它有 500 个正例，300个反例，所以应该给训练集分 400个正例，250 个反例，给测试集 100 个正例 50 个反例
+    即尽可能保证训练集和测试集的类别比例差不多</code></pre><p>但是如何挑选测试集和训练集呢？以下给出三种方法</p>
+<h2 id="挑选训练集和测试集方法"><a href="#挑选训练集和测试集方法" class="headerlink" title="挑选训练集和测试集方法"></a>挑选训练集和测试集方法</h2><h3 id="留出法-hold-out"><a href="#留出法-hold-out" class="headerlink" title="留出法(hold out)"></a>留出法(hold out)</h3><p>留出法是直接将数据集 D 划分成两个互斥的集合，训练集 S，测试集 T。</p>
+<p>一般训练集 S 占据 2/5 ~ 4/5</p>
+<p>但是，有一个关键问题在于，我们想训练的数据模型应该尽可能囊括所有的数据集，即，数据量越多，你训练的模型就会越好。</p>
+<p>但是，留出法却将一部分数据不参与训练，导致训练出的模型具有局部性质。</p>
+<h3 id="交叉验证法"><a href="#交叉验证法" class="headerlink" title="交叉验证法"></a>交叉验证法</h3><p>这个是将数据集 D 划分成 K 个大小相似的子集。</p>
+<p>然后每一次选用 K-1 的子集作为训练集，剩下的那个子集作为测试集，循环 K 次。</p>
+<p>最终评估的结果是 K 折交叉验证结果的均值。</p>
+<p>当然，特殊一点的是留一法(leave one out,LOO)，即测试集只有 1 个样本。</p>
+<p>因为留一法几乎囊括了所有的训练数据，所以，它训练出的模型具有代表性，但是遇到数据量大的，就很吃力。</p>
+<h3 id="自助法"><a href="#自助法" class="headerlink" title="自助法"></a>自助法</h3><p>这是一个很有意思的方法。</p>
+<p>具体如下：</p>
+<p>给定 m 个样本的数据集 D，我们对其采样产生数据集 D’.</p>
+<p>每次随机从 D 中选取一个样本放在 D’ 中，然后将样本放回 D 中，以保证下一次还有可能选到，这个过程重复 m 次，所得的 D’ 就是训练数据集。</p>
+<p>经过数学计算，初始数据集 D 约有 36.8% 的样本不会出现在 D’ 中。</p>
+<p>然后用 D - D’ 作为测试集。</p>
+<p>一般来说，自助法在数据集较小，难以有效划分数据集和测试集时比较有效。如果初始数据集量足够，则推荐使用留出法或者交叉验证法。</p>
+<h2 id="调参"><a href="#调参" class="headerlink" title="调参"></a>调参</h2><p>机器学习的大部分工作都在无聊的调参上，实在是让人想吐。</p>
+<p>但是我们如何要验证参数的好坏呢？测试集是为了验证模型的好坏，这个是不能动的。</p>
+<p>所以，我们只能从训练集上再划分一块，即定义为验证集。</p>
+<p>我们会基于验证集上的性能来进行模型的选择和调参。</p>
+<h2 id="查准率和查全率"><a href="#查准率和查全率" class="headerlink" title="查准率和查全率"></a>查准率和查全率</h2><p>我们可以用准确率，错误率来评价一个模型的好坏。</p>
+<p>但是，这样分类并不能满足生活中所有的要求。</p>
+<p>比如，我想知道预测的例子中正确的占比是多少？预测的例子中挑选的正确例子占所有正确例子的比例是多少？</p>
+<p>再回答这个问题前，我想先介绍几个概念。</p>
+<pre><code>真正例    true positive     TP
+假正例    false positive    FP
+真反例    true negative    TN
+价反例    false negative    FN
+                预测结果
+真实情况    T                F
+    T        TP                FN
+    F        FP                TN
+其中 TP + TN + FN + FP = 样例总数</code></pre><h3 id="查准率-准确率"><a href="#查准率-准确率" class="headerlink" title="查准率(准确率)"></a>查准率(准确率)</h3><p>查准率(precision)，比如对于搜索引擎来说是检索出来的有多少时用户感兴趣的。</p>
+<pre><code>P = TP / (TP + FP)
+用户真正感兴趣的数量 / 预测出用户感兴趣的数量</code></pre><h3 id="查全率-召回率"><a href="#查全率-召回率" class="headerlink" title="查全率(召回率)"></a>查全率(召回率)</h3><p>查全率(recall)，比如对于搜索引擎来说，用户感兴趣的有多少被查出。</p>
+<pre><code>R = TP / (TP + FN)
+用户真正感兴趣的量 / 真实情况下的正例</code></pre><p>通常查准率和查全率是一对冤家，即查准率高那么查全率就低，这个用逻辑也能思考出来，就不过多陈述了。。。</p>
+<h3 id="P-R-曲线"><a href="#P-R-曲线" class="headerlink" title="P-R 曲线"></a>P-R 曲线</h3><p>我们有个 P 和 R 的定义，那么我们就可以做出它们的关系曲线。</p>
+<p>我们根据模型来预测样例，并对他们的结果进行排序，最前面的是最可能的，最后面的是最不可能的。</p>
+<p>然后按照这个顺序，把每个样本作为正例进行预测，算出 P R 然后做曲线。</p>
+<p>如下图所示：</p>
+<p><img src="/images/machinelearning/4_0.JPG" alt=""></p>
+<p>如果某一个模型的 S(P-R) 大，那么就说明这个模型性能好。S 是指面积。</p>
+<p>但是我们知道用积分求面积的话，通常不会很容易，所以我们引入一个变量 F1。</p>
+<h3 id="F1"><a href="#F1" class="headerlink" title="F1"></a>F1</h3><pre><code>F1 = (2 * P * R) / (P + R)
+    = (2 * TP) / (样例总数 + TP - TN)</code></pre><p>对于更一般的式子如下：</p>
+<pre><code>F(β) = [(1 + β^2) * P * R] / [(β^2 * P) + R]
+β &gt; 1 查全率有更大的影响
+β &lt; 1 查准率有更大的影响
+β = 1 则为标准的 F1</code></pre><p>对于衡量一个模型的好坏，我们通常取多次测试，然后取平均值。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/%E5%91%A8%E5%BF%97%E5%8D%8E/" rel="tag"># 周志华</a>
+              <a href="/tags/%E8%A5%BF%E7%93%9C%E4%B9%A6/" rel="tag"># 西瓜书</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/11/10/movie13/" rel="prev" title="《毒液：致命守护者》">
+      <i class="fa fa-chevron-left"></i> 《毒液：致命守护者》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/11/11/calculus0/" rel="next" title="积分微分的本质">
+      积分微分的本质 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#经验误差"><span class="nav-number">1.</span> <span class="nav-text">经验误差</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评估方法"><span class="nav-number">2.</span> <span class="nav-text">评估方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#挑选训练集和测试集方法"><span class="nav-number">3.</span> <span class="nav-text">挑选训练集和测试集方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#留出法-hold-out"><span class="nav-number">3.1.</span> <span class="nav-text">留出法(hold out)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#交叉验证法"><span class="nav-number">3.2.</span> <span class="nav-text">交叉验证法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自助法"><span class="nav-number">3.3.</span> <span class="nav-text">自助法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调参"><span class="nav-number">4.</span> <span class="nav-text">调参</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查准率和查全率"><span class="nav-number">5.</span> <span class="nav-text">查准率和查全率</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查准率-准确率"><span class="nav-number">5.1.</span> <span class="nav-text">查准率(准确率)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查全率-召回率"><span class="nav-number">5.2.</span> <span class="nav-text">查全率(召回率)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#P-R-曲线"><span class="nav-number">5.3.</span> <span class="nav-text">P-R 曲线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#F1"><span class="nav-number">5.4.</span> <span class="nav-text">F1</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这是 pytorch 中和 CNN 有关的方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="torch | 和 CNN 有关的方法">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/02/19/CNN2/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这是 pytorch 中和 CNN 有关的方法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/torch/12_1.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/torch/12_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/CNN/0_0.gif">
+<meta property="article:published_time" content="2021-02-19T06:46:31.000Z">
+<meta property="article:modified_time" content="2021-02-19T07:09:55.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="pytorch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/torch/12_1.gif">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/02/19/CNN2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>torch | 和 CNN 有关的方法 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/02/19/CNN2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          torch | 和 CNN 有关的方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-19 14:46:31 / 修改时间：15:09:55" itemprop="dateCreated datePublished" datetime="2021-02-19T14:46:31+08:00">2021-02-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/pytorch/" itemprop="url" rel="index"><span itemprop="name">pytorch</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/pytorch/CNN/" itemprop="url" rel="index"><span itemprop="name">CNN</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/pytorch/CNN/%E6%96%B9%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">方法</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/02/19/CNN2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/19/CNN2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这是 <code>pytorch</code> 中和 <code>CNN</code> 有关的方法。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="卷积"><a href="#卷积" class="headerlink" title="卷积"></a>卷积</h1><br/>
+
+<h2 id="nn-Conv2d"><a href="#nn-Conv2d" class="headerlink" title="nn.Conv2d"></a>nn.Conv2d</h2><p>在这里还是建议看官方文档。</p>
+<blockquote>
+<p>torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode=’zeros’)</p>
+</blockquote>
+<p>官网文档上有很多很有帮助的公式，在这里就不贴了。</p>
+<h3 id="Parameters"><a href="#Parameters" class="headerlink" title="Parameters"></a>Parameters</h3><ul>
+<li><code>in_channels</code> (int) – 输入图像通道数</li>
+<li><code>out_channels</code> (int) – 卷积产生的通道数</li>
+<li><code>kernel_size</code> (int or tuple) – 卷积核尺寸，可以设为1个int型数或者一个(int, int)型的元组。例如(2,3)是高2宽3卷积核</li>
+<li><code>stride</code> (int or tuple, optional) – 卷积步长，默认为1。可以设为1个int型数或者一个(int, int)型的元组。</li>
+<li><code>padding</code> (int or tuple, optional) – 填充操作，控制padding_mode的数目。</li>
+<li><code>padding_mode</code> (string, optional) – padding模式，默认为Zero-padding 。</li>
+<li><code>dilation</code> (int or tuple, optional) – 扩张操作：控制kernel点（卷积核点）的间距，默认值:1。</li>
+<li><code>groups</code> (int, optional) – group参数的作用是控制分组卷积，默认不分组，为1组。</li>
+<li><code>bias</code> (bool, optional) – 为真，则在输出中添加一个可学习的偏差。默认：True。</li>
+</ul>
+<h4 id="padding-mode"><a href="#padding-mode" class="headerlink" title="padding mode"></a>padding mode</h4><ul>
+<li>zeros</li>
+<li>reflect</li>
+<li>replicate</li>
+<li>circular</li>
+</ul>
+<p>关于这个，你可以参考我下面两个博文，但是， <code>nn.Conv2d</code> 里面的填充方式，和下面写的 <code>torch | 填充方式</code>，好像有区别，但是，我没验证。</p>
+<ul>
+<li><a href="/2020/12/05/torch13/">torch | 填充方式</a></li>
+<li><a href="/2019/01/29/tensorflow19/">tf 中的’SAME’和’VALID’填充有什么区别？</a></li>
+</ul>
+<h4 id="dilation"><a href="#dilation" class="headerlink" title="dilation"></a>dilation</h4><p>扩张卷积（也叫空洞卷积）</p>
+<p><code>dilation</code> 操作动图演示如下：</p>
+<ul>
+<li>Dilated Convolution with a 3 x 3 kernel and dilation rate 2 扩张卷积核为3×3，扩张率为2</li>
+</ul>
+<p><img src="/images/torch/12_1.gif" alt=""></p>
+<h4 id="参数groups——分组卷积"><a href="#参数groups——分组卷积" class="headerlink" title="参数groups——分组卷积"></a>参数groups——分组卷积</h4><p><code>Group Convolution</code>顾名思义，则是对输入<code>feature map</code>进行分组，然后每组分别卷积。</p>
+<p>假设输入<code>feature map</code>的尺寸仍为<code>C ∗ H ∗ W</code>，输出<code>feature map</code>的数量为<code>N</code>个，如果设定要分成<code>G</code>个<code>groups</code>，则每组的输入<code>feature map</code>数量为 $\frac{C}{G}$ ​，每组的输出<code>feature map</code>数量为 $ \frac{N}{G} $。每个卷积核的尺寸为 $ \frac{C}{G} * K * K $，卷积核的总数仍为<code>N</code> ,每组的卷积核数量为 $ \frac{N}{G} $,卷积核只与其同组的输入<code>map</code>进行卷积，卷积核的总参数量为 $ N * \frac{C}{G} * K * K $，可见，总参数量减少为原来的 $ \frac{1}{G} $，其连接方式如下图右所示，<code>group1</code>输出<code>map</code>数为<code>2</code>，有<code>2</code>个卷积核，每个卷积核的<code>channel</code>数为<code>4</code>，与<code>group1</code>的输入<code>map</code>的<code>channel</code>数相同，卷积核只与同组的输入<code>map</code>卷积，而不与其他组的输入<code>map</code>卷积。</p>
+<p><img src="/images/torch/12_2.png" alt=""></p>
+<h3 id="代码例子"><a href="#代码例子" class="headerlink" title="代码例子"></a>代码例子</h3><h4 id="案例一"><a href="#案例一" class="headerlink" title="案例一"></a>案例一</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">conv = nn.Conv2d(<span class="number">1</span>, <span class="number">1</span>, kernel_size=(<span class="number">1</span>, <span class="number">1</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">1</span>, <span class="number">2</span>), bias=<span class="literal">False</span>)</span><br><span class="line">init.constant(conv.weight, <span class="number">2</span>)</span><br><span class="line">print(conv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(conv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">4.</span>, <span class="number">4.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>]]]], grad_fn=&lt;MkldnnConvolutionBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="案例二"><a href="#案例二" class="headerlink" title="案例二"></a>案例二</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">conv = nn.Conv2d(<span class="number">1</span>, <span class="number">1</span>, kernel_size=(<span class="number">1</span>, <span class="number">1</span>), stride=(<span class="number">1</span>, <span class="number">1</span>), padding=(<span class="number">2</span>, <span class="number">1</span>), bias=<span class="literal">False</span>)</span><br><span class="line">init.constant(conv.weight, <span class="number">2</span>)</span><br><span class="line">print(conv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(conv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">2.</span>, <span class="number">2.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">4.</span>, <span class="number">4.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>]]]], grad_fn=&lt;MkldnnConvolutionBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="案例三"><a href="#案例三" class="headerlink" title="案例三"></a>案例三</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">conv = nn.Conv2d(<span class="number">1</span>, <span class="number">1</span>, kernel_size=(<span class="number">1</span>, <span class="number">1</span>), stride=(<span class="number">1</span>, <span class="number">2</span>), padding=(<span class="number">2</span>, <span class="number">1</span>), bias=<span class="literal">False</span>)</span><br><span class="line">init.constant(conv.weight, <span class="number">2</span>)</span><br><span class="line">print(conv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(conv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">tensor(<span class="comment">[<span class="comment">[<span class="comment">[<span class="comment">[2.]</span>]</span>]</span>]</span>, requires_grad=True)</span><br><span class="line">tensor(<span class="comment">[<span class="comment">[<span class="comment">[<span class="comment">[1., 1.]</span>,</span></span></span></span><br><span class="line"><span class="comment"><span class="comment"><span class="comment">          <span class="comment">[2., 2.]</span>]</span>]</span>]</span>)</span><br><span class="line">tensor(<span class="comment">[<span class="comment">[<span class="comment">[<span class="comment">[0., 0.]</span>,</span></span></span></span><br><span class="line"><span class="comment"><span class="comment"><span class="comment">          <span class="comment">[0., 0.]</span>,</span></span></span></span><br><span class="line"><span class="comment"><span class="comment"><span class="comment">          <span class="comment">[0., 2.]</span>,</span></span></span></span><br><span class="line"><span class="comment"><span class="comment"><span class="comment">          <span class="comment">[0., 4.]</span>,</span></span></span></span><br><span class="line"><span class="comment"><span class="comment"><span class="comment">          <span class="comment">[0., 0.]</span>,</span></span></span></span><br><span class="line"><span class="comment"><span class="comment"><span class="comment">          <span class="comment">[0., 0.]</span>]</span>]</span>]</span>, grad_fn=&lt;MkldnnConvolutionBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="nn-ConvTranspose2d"><a href="#nn-ConvTranspose2d" class="headerlink" title="nn.ConvTranspose2d"></a>nn.ConvTranspose2d</h2><p><code>pytorch</code> 的 <code>nn.ConvTranspose2d</code> 和 <code>nn.Conv2d</code> 的 <code>padding</code> 是相反的，一个是向内扩充，一个是向外扩充。</p>
+<h3 id="案例一-1"><a href="#案例一-1" class="headerlink" title="案例一"></a>案例一</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">1</span>, <span class="number">1</span>),</span><br><span class="line">                           stride=<span class="number">1</span>,</span><br><span class="line">                           padding=<span class="number">0</span>,</span><br><span class="line">                           output_padding=(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                           bias=<span class="literal">False</span>)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>], [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">4.</span>, <span class="number">4.</span>, <span class="number">4.</span>],</span><br><span class="line">          [<span class="number">6.</span>, <span class="number">6.</span>, <span class="number">6.</span>]]]], grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>解析</p>
+<p>首先，原数据是</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">1</span> , <span class="number">1</span></span><br><span class="line"><span class="symbol">2 </span>, <span class="number">2</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">3 </span>, <span class="number">3</span> , <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>然后 <code>stride = 1</code> 表示，这个矩阵不需要扩充。</p>
+<p>计算出来结果后</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">2 </span>, <span class="number">2</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">4 </span>, <span class="number">4</span> , <span class="number">4</span></span><br><span class="line"><span class="symbol">6 </span>, <span class="number">6</span> , <span class="number">6</span></span><br></pre></td></tr></table></figure>
+
+<p><code>padding = 0</code>，表示不向内扩充，最后数据最后变成</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">2 </span>, <span class="number">2</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">4 </span>, <span class="number">4</span> , <span class="number">4</span></span><br><span class="line"><span class="symbol">6 </span>, <span class="number">6</span> , <span class="number">6</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="案例二-1"><a href="#案例二-1" class="headerlink" title="案例二"></a>案例二</h3><p>代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">1</span>, <span class="number">1</span>),</span><br><span class="line">                           stride=<span class="number">1</span>,</span><br><span class="line">                           padding=<span class="number">1</span>,</span><br><span class="line">                           output_padding=(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                           bias=<span class="literal">False</span>)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>], [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tensor(<span class="string">[[[[2.]]]]</span>, requires_grad=True)</span><br><span class="line">tensor(<span class="string">[[[[1., 1., 1.],</span></span><br><span class="line"><span class="string">          [2., 2., 2.],</span></span><br><span class="line"><span class="string">          [3., 3., 3.]]]]</span>)</span><br><span class="line">tensor(<span class="string">[[[[4.]]]]</span>, grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>原数据为</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">1</span> , <span class="number">1</span></span><br><span class="line"><span class="symbol">2 </span>, <span class="number">2</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">3 </span>, <span class="number">3</span> , <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>经过和 <code>weight</code> 相乘，变成</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">2 </span>, <span class="number">2</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">4 </span>, <span class="number">4</span> , <span class="number">4</span></span><br><span class="line"><span class="symbol">6 </span>, <span class="number">6</span> , <span class="number">6</span></span><br></pre></td></tr></table></figure>
+
+<p><code>padding</code> 向内压缩 <code>1</code>，最后变成</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="案例三-1"><a href="#案例三-1" class="headerlink" title="案例三"></a>案例三</h3><p>代码如下</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">1</span>, <span class="number">1</span>),</span><br><span class="line">                           stride=<span class="number">2</span>,</span><br><span class="line">                           padding=<span class="number">0</span>,</span><br><span class="line">                           output_padding=(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                           bias=False)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>], [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">2.</span>, <span class="number">0.</span>, <span class="number">2.</span>, <span class="number">0.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">4.</span>, <span class="number">0.</span>, <span class="number">4.</span>, <span class="number">0.</span>, <span class="number">4.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">6.</span>, <span class="number">0.</span>, <span class="number">6.</span>, <span class="number">0.</span>, <span class="number">6.</span>]]]], grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>解析，其中原数据为</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">1</span> , <span class="number">1</span></span><br><span class="line"><span class="symbol">2 </span>, <span class="number">2</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">3 </span>, <span class="number">3</span> , <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>因为 <code>stride = 2</code>，所以，数据会进行扩充，变成</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">0</span> , <span class="number">1</span> , <span class="number">0</span> , <span class="number">1</span></span><br><span class="line"><span class="symbol">0 </span>, <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span></span><br><span class="line"><span class="symbol">2 </span>, <span class="number">0</span> , <span class="number">2</span> , <span class="number">0</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">0 </span>, <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span></span><br><span class="line"><span class="symbol">3 </span>, <span class="number">0</span> , <span class="number">3</span> , <span class="number">0</span> , <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>后面。。。</p>
+<h3 id="案例四"><a href="#案例四" class="headerlink" title="案例四"></a>案例四</h3><p>代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">1</span>, <span class="number">1</span>),</span><br><span class="line">                           stride=<span class="number">2</span>,</span><br><span class="line">                           padding=<span class="number">1</span>,</span><br><span class="line">                           output_padding=(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                           bias=<span class="literal">False</span>)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>], [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">4.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>]]]], grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>解析，其中原数据为</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">1</span> , <span class="number">1</span></span><br><span class="line"><span class="symbol">2 </span>, <span class="number">2</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">3 </span>, <span class="number">3</span> , <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>因为 <code>stride = 2</code>，所以，数据会进行扩充，变成</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">0</span> , <span class="number">1</span> , <span class="number">0</span> , <span class="number">1</span></span><br><span class="line"><span class="symbol">0 </span>, <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span></span><br><span class="line"><span class="symbol">2 </span>, <span class="number">0</span> , <span class="number">2</span> , <span class="number">0</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">0 </span>, <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span></span><br><span class="line"><span class="symbol">3 </span>, <span class="number">0</span> , <span class="number">3</span> , <span class="number">0</span> , <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>接着，和 <code>weight</code> 做计算，变成</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">2 </span>, <span class="number">0</span> , <span class="number">2</span> , <span class="number">0</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">0 </span>, <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span></span><br><span class="line"><span class="symbol">4 </span>, <span class="number">0</span> , <span class="number">4</span> , <span class="number">0</span> , <span class="number">4</span></span><br><span class="line"><span class="symbol">0 </span>, <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span> , <span class="number">0</span></span><br><span class="line"><span class="symbol">6 </span>, <span class="number">0</span> , <span class="number">6</span> , <span class="number">0</span> , <span class="number">6</span></span><br></pre></td></tr></table></figure>
+
+<p>又因为 <code>padding = 1</code> ,所以，内压缩 <code>1</code>「上下左右各删除1行或者1列」，最终数据变成为</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span>, <span class="number">0</span> , <span class="number">0</span></span><br><span class="line"><span class="symbol">0 </span>, <span class="number">4</span> , <span class="number">0</span></span><br><span class="line"><span class="symbol">0 </span>, <span class="number">0</span> , <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="案例五"><a href="#案例五" class="headerlink" title="案例五"></a>案例五</h3><p>根据案例四我们来讲一下 <code>output_padding</code>。</p>
+<p>先说结论，out_padding 会向输出数据的右侧和下侧添加数据，直接看代码。</p>
+<h4 id="加下列"><a href="#加下列" class="headerlink" title="加下列"></a>加下列</h4><figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">1</span>, <span class="number">1</span>),</span><br><span class="line">                           stride=<span class="number">2</span>,</span><br><span class="line">                           padding=<span class="number">1</span>,</span><br><span class="line">                           output_padding=(<span class="number">0</span>, <span class="number">1</span>),</span><br><span class="line">                           bias=False)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>], [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">4.</span>, <span class="number">0.</span>, <span class="number">4.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>]]]], grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="加右列"><a href="#加右列" class="headerlink" title="加右列"></a>加右列</h4><figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">1</span>, <span class="number">1</span>),</span><br><span class="line">                           stride=<span class="number">2</span>,</span><br><span class="line">                           padding=<span class="number">1</span>,</span><br><span class="line">                           output_padding=(<span class="number">1</span>, <span class="number">0</span>),</span><br><span class="line">                           bias=False)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>], [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">4.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">          [<span class="number">0.</span>, <span class="number">6.</span>, <span class="number">0.</span>]]]], grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="案例六"><a href="#案例六" class="headerlink" title="案例六"></a>案例六</h3><p>当，卷积核不是常数，而是矩阵的时候。</p>
+<p>代码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">2</span>, <span class="number">3</span>),</span><br><span class="line">                           stride=<span class="number">2</span>,</span><br><span class="line">                           padding=<span class="number">0</span>,</span><br><span class="line">                           output_padding=(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                           bias=<span class="literal">False</span>)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">4.</span>, <span class="number">2.</span>, <span class="number">4.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">4.</span>, <span class="number">2.</span>, <span class="number">4.</span>, <span class="number">2.</span>, <span class="number">2.</span>]]]],</span><br><span class="line">       grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>首先看一份动图</p>
+<p><img src="/images/CNN/0_0.gif" alt=""></p>
+<p>在这个动图里，我们要注意两点</p>
+<ul>
+<li>卷积核的作用是把输入的值通过卷积核变大</li>
+</ul>
+<p>比如，我输入为 <code>2</code>，卷积核为</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span>, <span class="number">2</span></span><br><span class="line"><span class="number">2</span>, <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>那么，会拿着输入 <code>2</code> 乘以卷积核得到</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">4</span>, <span class="number">4</span></span><br><span class="line"><span class="number">4</span>, <span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>卷积核出来的值，会有一个相加的过程</li>
+</ul>
+<p>比如，输入</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span>, <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>卷积核为</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">2 </span>, <span class="number">2</span></span><br><span class="line"><span class="symbol">2 </span>, <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>整个计算流程是</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="number">2</span> * [ <span class="number">2</span> , <span class="number">2</span>] = [<span class="number">4</span> , <span class="number">4</span>]   另外一侧 <span class="number">1</span> * [<span class="number">2</span> , <span class="number">2</span>] = [<span class="number">2</span> , <span class="number">2</span>]</span><br><span class="line">    [ <span class="number">2</span> , <span class="number">2</span>]   [<span class="number">4</span> , <span class="number">4</span>]               [<span class="number">2</span> , <span class="number">2</span>]   [<span class="number">2</span> , <span class="number">2</span>]</span><br></pre></td></tr></table></figure>
+
+<p>然后计算出的结果，我们会有一个相加的过程，也就是如动图所示，所以，最后的结果是</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">4 </span>, <span class="number">6</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">4 </span>, <span class="number">6</span> , <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>了解了上面的全部信息后，我们再来计算一下上面的代码过程。</p>
+<p>原始数据为</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">1</span> , <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>经过 <code>stride = 2</code> 的扩充后，变成了</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">0</span> , <span class="number">1</span> , <span class="number">0</span> , <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，卷积核计算再相加，就会变成</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2.</span>, <span class="number">2.</span>, <span class="number">4.</span>, <span class="number">2.</span>, <span class="number">4.</span>, <span class="number">2.</span>, <span class="number">2.</span></span><br><span class="line"><span class="number">2.</span>, <span class="number">2.</span>, <span class="number">4.</span>, <span class="number">2.</span>, <span class="number">4.</span>, <span class="number">2.</span>, <span class="number">2.</span></span><br></pre></td></tr></table></figure>
+
+<p>你可以自己计算一下。</p>
+<h3 id="案例七"><a href="#案例七" class="headerlink" title="案例七"></a>案例七</h3><p>我们不对图进行扩充</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">2</span>, <span class="number">3</span>),</span><br><span class="line">                           stride=<span class="number">1</span>,</span><br><span class="line">                           padding=<span class="number">0</span>,</span><br><span class="line">                           output_padding=(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                           bias=<span class="literal">False</span>)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>最后输出为</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">2.</span>, <span class="number">4.</span>, <span class="number">6.</span>, <span class="number">4.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">4.</span>, <span class="number">6.</span>, <span class="number">4.</span>, <span class="number">2.</span>]]]], grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>这个可以自己计算一下。</p>
+<h3 id="案例八"><a href="#案例八" class="headerlink" title="案例八"></a>案例八</h3><p>现在有一个终极问题，是 <code>padding</code> 是卷积生成之前，还是卷积生成之后，先说结论，是卷积生成之后，直接看代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dconv = nn.ConvTranspose2d(in_channels=<span class="number">1</span>, out_channels=<span class="number">1</span>,</span><br><span class="line">                           kernel_size=(<span class="number">2</span>, <span class="number">3</span>),</span><br><span class="line">                           stride=<span class="number">1</span>,</span><br><span class="line">                           padding=<span class="number">1</span>,</span><br><span class="line">                           output_padding=(<span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                           bias=<span class="literal">False</span>)</span><br><span class="line">init.constant_(dconv.weight, <span class="number">2</span>)</span><br><span class="line">print(dconv.weight)</span><br><span class="line"></span><br><span class="line">input = torch.tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>], [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">print(input)</span><br><span class="line">print(dconv(input))</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tensor([[[[<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>]]]], requires_grad=True)</span><br><span class="line">tensor([[[[<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>],</span><br><span class="line">          [<span class="number">2.</span>, <span class="number">2.</span>, <span class="number">2.</span>],</span><br><span class="line">          [<span class="number">3.</span>, <span class="number">3.</span>, <span class="number">3.</span>]]]])</span><br><span class="line">tensor([[[[<span class="number">12.</span>, <span class="number">18.</span>, <span class="number">12.</span>],</span><br><span class="line">          [<span class="number">20.</span>, <span class="number">30.</span>, <span class="number">20.</span>]]]], grad_fn=&lt;SlowConvTranspose2DBackward&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>我来解释一下所有的计算过程。</p>
+<p>首先原数据是</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>, <span class="number">1</span> , <span class="number">1</span></span><br><span class="line"><span class="symbol">2 </span>, <span class="number">2</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">3 </span>, <span class="number">3</span> , <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>没有进行填充，然后和 <code>weight</code> 进行计算，根据动图上的计算表示，最后计算结果为「事实上，下面的计算结果，我并没有真的算出来，但是，大差不差，你们可以计算一下」</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">2 </span>, <span class="number">4</span> , <span class="number">6</span> , <span class="number">4</span> , <span class="number">2</span></span><br><span class="line"><span class="symbol">6 </span>, <span class="number">12</span> , <span class="number">18</span> , <span class="number">12</span> , <span class="number">6</span></span><br><span class="line"><span class="symbol">10 </span>, <span class="number">20</span> , <span class="number">30</span> , <span class="number">20</span> , <span class="number">10</span></span><br><span class="line"><span class="symbol">8 </span>, <span class="number">16</span> , <span class="number">24</span> , <span class="number">16</span> , <span class="number">8</span></span><br></pre></td></tr></table></figure>
+
+<p>然后 <code>padding=1</code>，我们减去上下左右，变成</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">12 </span>, <span class="number">18</span> , <span class="number">12</span></span><br><span class="line"><span class="symbol">20 </span>, <span class="number">30</span> , <span class="number">20</span></span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="池化"><a href="#池化" class="headerlink" title="池化"></a>池化</h1><br/>
+
+<br/>
+
+<h1 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h1><br/>
+
+<h2 id="nn-BatchNorm2d"><a href="#nn-BatchNorm2d" class="headerlink" title="nn.BatchNorm2d"></a>nn.BatchNorm2d</h2>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pytorch/" rel="tag"># pytorch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/18/movie44/" rel="prev" title="电影 | 《钱学森》">
+      <i class="fa fa-chevron-left"></i> 电影 | 《钱学森》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/19/deeplearning9/" rel="next" title="BN 层有什么用？">
+      BN 层有什么用？ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#卷积"><span class="nav-number">1.</span> <span class="nav-text">卷积</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#nn-Conv2d"><span class="nav-number">1.1.</span> <span class="nav-text">nn.Conv2d</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Parameters"><span class="nav-number">1.1.1.</span> <span class="nav-text">Parameters</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#padding-mode"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">padding mode</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dilation"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">dilation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参数groups——分组卷积"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">参数groups——分组卷积</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码例子"><span class="nav-number">1.1.2.</span> <span class="nav-text">代码例子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#案例一"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">案例一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#案例二"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">案例二</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例三"><span class="nav-number">1.1.3.</span> <span class="nav-text">案例三</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nn-ConvTranspose2d"><span class="nav-number">1.2.</span> <span class="nav-text">nn.ConvTranspose2d</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#案例一-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">案例一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例二-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">案例二</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例三-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">案例三</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例四"><span class="nav-number">1.2.4.</span> <span class="nav-text">案例四</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例五"><span class="nav-number">1.2.5.</span> <span class="nav-text">案例五</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#加下列"><span class="nav-number">1.2.5.1.</span> <span class="nav-text">加下列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加右列"><span class="nav-number">1.2.5.2.</span> <span class="nav-text">加右列</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例六"><span class="nav-number">1.2.6.</span> <span class="nav-text">案例六</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例七"><span class="nav-number">1.2.7.</span> <span class="nav-text">案例七</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例八"><span class="nav-number">1.2.8.</span> <span class="nav-text">案例八</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#池化"><span class="nav-number">2.</span> <span class="nav-text">池化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#优化"><span class="nav-number">3.</span> <span class="nav-text">优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#nn-BatchNorm2d"><span class="nav-number">3.1.</span> <span class="nav-text">nn.BatchNorm2d</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

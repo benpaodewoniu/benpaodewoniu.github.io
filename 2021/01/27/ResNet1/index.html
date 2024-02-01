@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这里主要讲残差的基础入门，也就是残差块。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ResNet | 认识残差网络">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/01/27/ResNet1/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里主要讲残差的基础入门，也就是残差块。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/resnet/1_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/resnet/1_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/resnet/1_2.png">
+<meta property="article:published_time" content="2021-01-26T18:15:05.000Z">
+<meta property="article:modified_time" content="2021-02-17T14:43:37.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="ResNet">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/resnet/1_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/01/27/ResNet1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>ResNet | 认识残差网络 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/01/27/ResNet1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ResNet | 认识残差网络
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-27 02:15:05" itemprop="dateCreated datePublished" datetime="2021-01-27T02:15:05+08:00">2021-01-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-17 22:43:37" itemprop="dateModified" datetime="2021-02-17T22:43:37+08:00">2021-02-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">网络结构</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84/ResNet/" itemprop="url" rel="index"><span itemprop="name">ResNet</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/pytorch/" itemprop="url" rel="index"><span itemprop="name">pytorch</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84/ResNet/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/pytorch/ResNet/" itemprop="url" rel="index"><span itemprop="name">ResNet</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/27/ResNet1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/27/ResNet1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里主要讲残差的基础入门，也就是残差块。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://www.cnblogs.com/wuliytTaotao/p/9560205.html">残差网络</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/42706477">详解残差网络</a></li>
+</ul>
+<br/>
+
+<h1 id="什么是残差（residual）？"><a href="#什么是残差（residual）？" class="headerlink" title="什么是残差（residual）？"></a>什么是残差（residual）？</h1><p>残差在数理统计中是指实际观察值与估计值（拟合值）之间的差。如果回归模型正确的话， 我们可以将残差看作误差的观测值。</p>
+<p>更准确地，假设我们想要找一个 <code>𝑥</code>，使得 <code>𝑓(𝑥)=𝑏</code> ，给定一个 <code>𝑥</code> 的估计值 $ x_0 $ ，残差（residual）就是 <code>𝑏−𝑓(𝑥0)</code>，同时，误差就是 $ 𝑥−𝑥_0 $。</p>
+<p>即使 <code>𝑥</code> 不知道，我们仍然可以计算残差，只是不能计算误差罢了。</p>
+<br/>
+
+<h1 id="什么是残差网络（Residual-Networks，ResNets）？"><a href="#什么是残差网络（Residual-Networks，ResNets）？" class="headerlink" title="什么是残差网络（Residual Networks，ResNets）？"></a>什么是残差网络（Residual Networks，ResNets）？</h1><br/>
+
+<p>在了解残差网络之前，先了解下面这个问题。</p>
+<p>Q1：神经网络越深越好吗？（<code>Deeper is better</code>？）</p>
+<p>A1：如图所示，在训练集上，传统神经网络越深效果不一定越好。而 <a href="https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf">Deep Residual Learning for Image Recognition</a> 这篇论文认为，理论上，可以训练一个 <code>shallower</code> 网络，然后在这个训练好的 <code>shallower</code> 网络上堆几层 <code>identity mapping</code>（<code>恒等映射</code>） 的层，即输出等于输入的层，构建出一个 <code>deeper</code> 网络。这两个网络（<code>shallower</code> 和 <code>deeper</code>）得到的结果应该是一模一样的，因为堆上去的层都是 <code>identity mapping</code>。这样可以得出一个结论：理论上，在训练集上，<code>Deeper</code> 不应该比 <code>shallower</code> 差，即越深的网络不会比浅层的网络效果差。但为什么会出现图 这样的情况呢，随着层数的增多，训练集上的效果变差？这被称为退化问题（<code>degradation problem</code>），原因是随着网络越来越深，训练变得原来越难，网络的优化变得越来越难。理论上，越深的网络，效果应该更好；但实际上，由于训练难度，过深的网络会产生退化问题，效果反而不如相对较浅的网络。而残差网络就可以解决这个问题的，残差网络越深，训练集上的效果会越好。（测试集上的效果可能涉及过拟合问题。过拟合问题指的是测试集上的效果和训练集上的效果之间有差距。）</p>
+<p><img src="/images/resnet/1_0.png" alt=""></p>
+<ul>
+<li>plain network指的是没有使用 shortcut connection 的网络</li>
+</ul>
+<p>残差网络通过加入 <code>shortcut connections</code>，变得更加容易被优化。包含一个 <code>shortcut connection</code> 的几层网络被称为一个残差块（<code>residual block</code>），如下图所示。（<code>shortcut connection</code>，即图右侧从<code>𝑥</code> 到 <code>⨁</code> 的箭头）</p>
+<p><img src="/images/resnet/1_1.png" alt=""></p>
+<p>而右侧的弧线，通常为</p>
+<p><img src="/images/resnet/1_2.png" alt=""></p>
+<p>里面的 <code>weight layer</code> 可以根据需求自己规定，这里使用 <code>conv</code> 也就是卷积作为 <code>weight layer</code>。</p>
+<br/>
+
+<h1 id="残差块（residual-block）"><a href="#残差块（residual-block）" class="headerlink" title="残差块（residual block）"></a>残差块（residual block）</h1><br/>
+
+<p>如上图所示，<code>𝑥</code> 表示输入，<code>𝐹(𝑥)</code> 表示残差块在第二层激活函数之前的输出，即 $ 𝐹(𝑥)=𝑊_2𝜎(𝑊_1𝑥) $，其中 $ 𝑊_1 $ 和 $ 𝑊_2 $ 表示第一层和第二层的权重，<code>𝜎</code> 表示 <code>ReLU</code> 激活函数。（这里省略了 <code>bias</code>）最后残差块的输出是 <code>𝜎(𝐹(𝑥)+𝑥)</code>。</p>
+<p>当没有 <code>shortcut connection</code>（即上图右侧从 <code>𝑥</code> 到 <code>⨁</code> 的箭头）时，残差块就是一个普通的 <code>2</code> 层网络。残差块中的网络可以是全连接层，也可以是卷积层。设第二层网络在激活函数之前的输出为 <code>𝐻(𝑥)</code>。如果在该 2 层网络中，最优的输出就是输入 <code>𝑥</code>，那么对于没有 <code>shortcut connection</code> 的网络，就需要将其优化成 <code>𝐻(𝑥)=𝑥</code>,对于有 <code>shortcut connection</code> 的网络，即残差块，如果最优输出是 <code>𝑥</code>，则只需要将 <code>𝐹(𝑥)=𝐻(𝑥)−𝑥</code> 优化为 <code>0</code> 即可。后者的优化会比前者简单。这也是残差这一叫法的由来。</p>
+<p>上面说的有点弯弯绕绕，还是直接举例子吧。</p>
+<p>ps： 当时我这个是为了处理一维信号，所以，可以根据需求来更改</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义残差块ResBlock</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ResBlock</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, inchannel, outchannel, stride=<span class="number">1</span>)</span>:</span></span><br><span class="line">        super(ResBlock, self).__init__()</span><br><span class="line">        <span class="comment"># 这里定义了残差块内连续的2个卷积层</span></span><br><span class="line">        self.left = nn.Sequential(</span><br><span class="line">            nn.Conv2d(inchannel, outchannel, kernel_size=(<span class="number">1</span>, <span class="number">3</span>), stride=stride, padding=(<span class="number">0</span>, <span class="number">1</span>), bias=<span class="literal">False</span>),</span><br><span class="line">            nn.BatchNorm2d(outchannel),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.Conv2d(outchannel, outchannel, kernel_size=(<span class="number">1</span>, <span class="number">3</span>), stride=<span class="number">1</span>, padding=(<span class="number">0</span>, <span class="number">1</span>), bias=<span class="literal">False</span>),</span><br><span class="line">            nn.BatchNorm2d(outchannel)</span><br><span class="line">        )</span><br><span class="line">        self.shortcut = nn.Sequential()</span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> inchannel != outchannel:</span><br><span class="line">            <span class="comment"># shortcut，这里为了跟2个卷积层的结果结构一致，要做处理</span></span><br><span class="line">            self.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(inchannel, outchannel, kernel_size=<span class="number">1</span>, stride=stride, bias=<span class="literal">False</span>),</span><br><span class="line">                nn.BatchNorm2d(outchannel)</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        out = self.left(x)</span><br><span class="line">        <span class="comment"># 将2个卷积层的输出跟处理过的x相加，实现ResNet的基本结构</span></span><br><span class="line">        out = out + self.shortcut(x)</span><br><span class="line">        out = F.relu(out)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<p>上面是一个残差块。</p>
+<p><code>left</code> 表示正常的卷积网络。</p>
+<p>关于 <code>cnn</code> 的网络计算公式为</p>
+<ul>
+<li><a href="/2021/02/02/CNN1/">CNN | 关于 CNN 的计算公式</a></li>
+</ul>
+<p>这里看一下计算过程，假如说输入的为 <code>(1，1000)</code> 的信号，则第一层 <code>conv</code> 输出的信号为</p>
+<p>根据公式第一层卷积为</p>
+<p>$$ 输出尺寸 = \frac {1000 - 3 + 2 * 1 }{1} + 1 = 1000 $$</p>
+<p>第二层的卷积同样是</p>
+<p>$$ 输出尺寸 = \frac {1000 - 3 + 2 * 1 }{1} + 1 = 1000 $$</p>
+<p>所以，输出后其数据构造还是 <code>(1,1000)</code></p>
+<p>而往往前面真实的数据为</p>
+<p><code>(N,C,1,1000)</code></p>
+<ul>
+<li>N 为 batch_size</li>
+<li>C 为 channel</li>
+</ul>
+<p><code>shortcut</code> 表示图中右边的弧线，其会把最开始输入的 <code>x</code> 变成和 <code>left</code> 输出的信号变成一样的，即 <code>x</code> 也会变成 <code>(N,C,1,1000)</code></p>
+<p>假如说， <code>left</code> 的输出为 <code>N,C,1,1000</code> <code>shortcut</code> 的输出为 <code>N,C,1,1000</code> ，那么，两者相加是多少？</p>
+<p>是</p>
+<pre><code>N,C,1,1000</code></pre><p>最终，我们是讲 <code>1，1000</code> 中的值，进行 <code>N ，C</code> 匹配想加。</p>
+<p>所以，两个相加得到的值可能会超过 <code>1</code> ，所以，两者想加完之后，会进行一个 <code>relu</code></p>
+<p>其实残差只是一个思想，把前几层的数值添加到后几层中，使得网络结构可以更深。</p>
+<p>所以，我们可以对残差块进行一个修改。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义残差块ResBlock</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ResBlock</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, inchannel, outchannel, stride=<span class="number">1</span>)</span>:</span></span><br><span class="line">        super(ResBlock, self).__init__()</span><br><span class="line">        <span class="comment"># 这里定义了残差块内连续的2个卷积层</span></span><br><span class="line">        self.left = nn.Sequential(</span><br><span class="line">            nn.Conv2d(inchannel, outchannel, kernel_size=(<span class="number">1</span>, <span class="number">3</span>), stride=stride, padding=(<span class="number">0</span>, <span class="number">1</span>), bias=<span class="literal">False</span>),</span><br><span class="line">            nn.BatchNorm2d(outchannel),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.Conv2d(outchannel, outchannel, kernel_size=(<span class="number">1</span>, <span class="number">3</span>), stride=<span class="number">1</span>, padding=(<span class="number">0</span>, <span class="number">1</span>), bias=<span class="literal">False</span>),</span><br><span class="line">            nn.BatchNorm2d(outchannel)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        shortcut = self.left(x)</span><br><span class="line">        <span class="comment"># 将2个卷积层的输出跟处理过的x相加，实现ResNet的基本结构</span></span><br><span class="line">        out = out + shortcut</span><br><span class="line">        out = F.relu(out)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<p>这里是直接将 <code>x</code> 添加到输出层了。</p>
+<p>现在的残差块相加都是 <code>(N,C,1,1000)</code> 但是，我觉得，我们也可以这样相加</p>
+<pre><code>(N,C,1,1000) + (N,C,1,1000) = (N,2C,1,1000)</code></pre><p>而且，我觉得这样更加合理。相关的代码在这里不写了。</p>
+<p>另外，我们需要注意的是</p>
+<p>假设尺寸变化，那么相加需要满足图像大小相同才能添加。</p>
+<p>假设，最后得出的图像不同，那该如何写代码？</p>
+<p>在这里，建议参考，我下面的博客，以后，我也会专门对照这个代码写一下 <code>resnet</code> 的代码</p>
+<ul>
+<li><a href="/2021/01/26/UNet2/">UNet | Unet 经典网络模型</a></li>
+</ul>
+<p>上面的博文主要看特征融合那一栏。</p>
+<p>里面的思想有</p>
+<ul>
+<li><code>(N,C,1,1000) + (N,C,1,1000) = (N,2C,1,1000)</code></li>
+<li>解决尺寸不匹配问题</li>
+</ul>
+<br/>
+
+<h1 id="残差网络"><a href="#残差网络" class="headerlink" title="残差网络"></a>残差网络</h1><br/>
+
+<p>残差网络主要是讲残差块组合在一起。</p>
+<p>只见看一下代码吧。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义残差块ResBlock</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ResBlock</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, inchannel, outchannel, stride=<span class="number">1</span>)</span>:</span></span><br><span class="line">        super(ResBlock, self).__init__()</span><br><span class="line">        <span class="comment"># 这里定义了残差块内连续的2个卷积层</span></span><br><span class="line">        self.left = nn.Sequential(</span><br><span class="line">            nn.Conv2d(inchannel, outchannel, kernel_size=(<span class="number">1</span>, <span class="number">3</span>), stride=stride, padding=(<span class="number">0</span>, <span class="number">1</span>), bias=<span class="literal">False</span>),</span><br><span class="line">            nn.BatchNorm2d(outchannel),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.Conv2d(outchannel, outchannel, kernel_size=(<span class="number">1</span>, <span class="number">3</span>), stride=<span class="number">1</span>, padding=(<span class="number">0</span>, <span class="number">1</span>), bias=<span class="literal">False</span>),</span><br><span class="line">            nn.BatchNorm2d(outchannel)</span><br><span class="line">        )</span><br><span class="line">        self.shortcut = nn.Sequential()</span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> inchannel != outchannel:</span><br><span class="line">            <span class="comment"># shortcut，这里为了跟2个卷积层的结果结构一致，要做处理</span></span><br><span class="line">            self.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(inchannel, outchannel, kernel_size=<span class="number">1</span>, stride=stride, bias=<span class="literal">False</span>),</span><br><span class="line">                nn.BatchNorm2d(outchannel)</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        out = self.left(x)</span><br><span class="line">        <span class="comment"># 将2个卷积层的输出跟处理过的x相加，实现ResNet的基本结构</span></span><br><span class="line">        out = out + self.shortcut(x)</span><br><span class="line">        out = F.relu(out)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> out</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ResNet</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ResBlock, num_classes=<span class="number">1000</span>)</span>:</span></span><br><span class="line">        super(ResNet, self).__init__()</span><br><span class="line">        self.inchannel = <span class="number">64</span></span><br><span class="line">        self.conv1 = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">1</span>, <span class="number">64</span>, kernel_size=(<span class="number">1</span>, <span class="number">3</span>), stride=<span class="number">1</span>, padding=(<span class="number">0</span>, <span class="number">1</span>), bias=<span class="literal">False</span>),</span><br><span class="line">            nn.BatchNorm2d(<span class="number">64</span>),</span><br><span class="line">            nn.ReLU()</span><br><span class="line">        )</span><br><span class="line">        self.layer1 = self.make_layer(ResBlock, <span class="number">64</span>, <span class="number">2</span>, stride=<span class="number">1</span>)</span><br><span class="line">        self.layer2 = self.make_layer(ResBlock, <span class="number">128</span>, <span class="number">2</span>, stride=<span class="number">2</span>)</span><br><span class="line">        self.layer3 = self.make_layer(ResBlock, <span class="number">256</span>, <span class="number">2</span>, stride=<span class="number">2</span>)</span><br><span class="line">        self.layer4 = self.make_layer(ResBlock, <span class="number">512</span>, <span class="number">2</span>, stride=<span class="number">2</span>)</span><br><span class="line">        self.fc = nn.Linear(<span class="number">15872</span>, num_classes)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 这个函数主要是用来，重复同一个残差块</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">make_layer</span><span class="params">(self, block, channels, num_blocks, stride)</span>:</span></span><br><span class="line">        strides = [stride] + [<span class="number">1</span>] * (num_blocks - <span class="number">1</span>)</span><br><span class="line">        layers = []</span><br><span class="line">        <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</span><br><span class="line">            layers.append(block(self.inchannel, channels, stride))</span><br><span class="line">            self.inchannel = channels</span><br><span class="line">        <span class="keyword">return</span> nn.Sequential(*layers)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        <span class="comment"># 在这里，整个ResNet18的结构就很清晰了</span></span><br><span class="line">        out = self.conv1(x)</span><br><span class="line">        out = self.layer1(out)</span><br><span class="line">        out = self.layer2(out)</span><br><span class="line">        out = self.layer3(out)</span><br><span class="line">        out = self.layer4(out)</span><br><span class="line">        out = F.avg_pool2d(out, kernel_size=(<span class="number">1</span>, <span class="number">4</span>))</span><br><span class="line">        out = out.view(out.size(<span class="number">0</span>), <span class="number">-1</span>)</span><br><span class="line">        out = self.fc(out).reshape((out.shape[<span class="number">0</span>], <span class="number">1</span>, <span class="number">1</span>, <span class="number">1000</span>))</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<p>这里面代码都非常好理解，在这里，主要是对 <code>make_layer</code> 这个函数做解释。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个函数主要是用来，重复同一个残差块</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_layer</span><span class="params">(self, block, channels, num_blocks, stride)</span>:</span></span><br><span class="line">    strides = [stride] + [<span class="number">1</span>] * (num_blocks - <span class="number">1</span>)</span><br><span class="line">    layers = []</span><br><span class="line">    <span class="keyword">for</span> stride <span class="keyword">in</span> strides:</span><br><span class="line">        layers.append(block(self.inchannel, channels, stride))</span><br><span class="line">        self.inchannel = channels</span><br><span class="line">    <span class="keyword">return</span> nn.Sequential(*layers)</span><br></pre></td></tr></table></figure>
+
+<p><code>make_layer</code> 指的是最终 <code>resnet</code> 是几层网络，比如，有 <code>resnet-18</code>,<code>resnet-32</code>,<code>resnet-50</code> 等。</p>
+<p>像这个网络结构就是 <code>resnet-18</code>。</p>
+<p>关于为什么是 <code>restnet-18</code> 请参考我下面的博文。</p>
+<ul>
+<li><a href="/2021/01/29/ResNet2/">ResNet | ResNet-18</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ResNet/" rel="tag"># ResNet</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/26/UNet2/" rel="prev" title="UNet | Unet 网络讲解">
+      <i class="fa fa-chevron-left"></i> UNet | Unet 网络讲解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/29/ResNet2/" rel="next" title="ResNet | ResNet-18">
+      ResNet | ResNet-18 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是残差（residual）？"><span class="nav-number">2.</span> <span class="nav-text">什么是残差（residual）？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是残差网络（Residual-Networks，ResNets）？"><span class="nav-number">3.</span> <span class="nav-text">什么是残差网络（Residual Networks，ResNets）？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#残差块（residual-block）"><span class="nav-number">4.</span> <span class="nav-text">残差块（residual block）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#残差网络"><span class="nav-number">5.</span> <span class="nav-text">残差网络</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

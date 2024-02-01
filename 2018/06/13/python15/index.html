@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这里是 scrapy 框架的讲解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python scrapy 框架">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/06/13/python15/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里是 scrapy 框架的讲解。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/15.jpg">
+<meta property="article:published_time" content="2018-06-13T03:42:31.000Z">
+<meta property="article:modified_time" content="2020-03-21T09:52:23.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="tutorial">
+<meta property="article:tag" content="爬虫">
+<meta property="article:tag" content="scrapy">
+<meta property="article:tag" content="frame">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/python/15.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/06/13/python15/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python scrapy 框架 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/06/13/python15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python scrapy 框架
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-06-13 11:42:31" itemprop="dateCreated datePublished" datetime="2018-06-13T11:42:31+08:00">2018-06-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-21 17:52:23" itemprop="dateModified" datetime="2020-03-21T17:52:23+08:00">2020-03-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/" itemprop="url" rel="index"><span itemprop="name">模块</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/scrapy/" itemprop="url" rel="index"><span itemprop="name">scrapy</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/06/13/python15/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/06/13/python15/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里是 scrapy 框架的讲解。</p>
+<a id="more"></a>
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">创建相关的虚拟环境后，用豆瓣源</span><br><span class="line"></span><br><span class="line">	pip install -i https://pypi.douban.com/simple/ scrapy</span><br><span class="line"></span><br><span class="line">	但是在安装过程中twisted可能会出错</span><br><span class="line"></span><br><span class="line">	所以要到官方网站</span><br><span class="line"></span><br><span class="line">		https://www.lfd.uci.edu/~gohlke/pythonlibs/<span class="comment">#twisted</span></span><br><span class="line"></span><br><span class="line">	下载适合自己的版本的twisted.whl</span><br><span class="line"></span><br><span class="line">	安装完之后，放在任意一个路径即可</span><br><span class="line"></span><br><span class="line">	进入虚拟环境，执行</span><br><span class="line"></span><br><span class="line">		pip install D:\Twisted<span class="number">-17.9</span><span class="number">.0</span>-cp36-cp36m-win_amd64.whl</span><br><span class="line"></span><br><span class="line">	自主安装twisted</span><br><span class="line"></span><br><span class="line">	在执行pip install -i https://pypi.douban.com/simple/ scrapy</span><br><span class="line"></span><br><span class="line">	成功后 输入scrapy -h 检验是否安装成功</span><br><span class="line"></span><br><span class="line">其实scrapy是一个框架，但不是引进去，需要用下载的scrapy单独创建一个scrapy项目，后续代码需要在这个项目中写</span><br><span class="line"></span><br><span class="line">选取一个路径，将项目创建到这个路径下</span><br><span class="line"></span><br><span class="line">	首先在正常模式下，进入要创建的项目路径内</span><br><span class="line"></span><br><span class="line">	启动相关虚拟机</span><br><span class="line"></span><br><span class="line">	输入命令 scrapy startproject Article</span><br><span class="line"></span><br><span class="line">	项目创建成功</span><br><span class="line"></span><br><span class="line">scrapy项目下的文件夹用途</span><br><span class="line"></span><br><span class="line">	spiders文件夹里面是存放具体的某个爬虫</span><br><span class="line"></span><br><span class="line">	但是里面的文件是空的，所以可以创建一个要爬的域名项目</span><br><span class="line"></span><br><span class="line">	进入到创建好的项目下面 cd... （否则后期创建文件会放在其他目录下面）</span><br><span class="line"></span><br><span class="line">	输入命令scrapy genspider 项目名（域名） 域名路径</span><br><span class="line"></span><br><span class="line">	会创建一个项目名.py文件</span><br><span class="line"></span><br><span class="line">创建完文件后，需要配置虚拟环境的解释器，否则会用默认的全局解释器</span><br><span class="line"></span><br><span class="line">	具体如下 </span><br><span class="line"></span><br><span class="line">		file-setting-输入interp-找到project interpreter -在右框中选择虚拟环境中的python.exe文件，在相关虚拟环境下的scrapys目录下</span><br><span class="line"></span><br><span class="line">以上配置完成，可以直接写代码了</span><br><span class="line"></span><br><span class="line">启动scrapy,爬取</span><br><span class="line"></span><br><span class="line">	输入命令 scrapy crawl 项目名（都要在虚拟环境的相关目录下进行）</span><br><span class="line"></span><br><span class="line">		这个项目名也就是爬虫名</span><br><span class="line"></span><br><span class="line">			即为spiders文件夹下，你所创建的一个爬虫类中，name属性的值</span><br><span class="line"></span><br><span class="line">		win可能会缺少win32api文件，只需要在pip install pypiwin32在豆瓣源下下载即可</span><br><span class="line"></span><br><span class="line">	当然启动项目这条命令可以配置到相关文件中，省去输入这条步骤</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scrapy.http <span class="keyword">import</span> Request</span><br><span class="line"></span><br><span class="line">	用于请求参数</span><br></pre></td></tr></table></figure>
+
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p><img src="/images/python/15.jpg" alt=""></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">调用</span><br><span class="line"></span><br><span class="line">	scrapy crawl 爬虫名</span><br><span class="line"></span><br><span class="line">从互联网中爬取数据，数据中有response</span><br><span class="line"></span><br><span class="line">然后爬虫类中 parse 方法，分析数据</span><br><span class="line"></span><br><span class="line">	再将其用 item 容器保存</span><br><span class="line"></span><br><span class="line">再做后续处理，比如存储等等</span><br></pre></td></tr></table></figure>
+
+<h2 id="选择器"><a href="#选择器" class="headerlink" title="选择器"></a>选择器</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">selector 是一个选择器，有四个基本方法</span><br><span class="line"></span><br><span class="line">xpath():传入一个xpath表达式，返回该表达式所对应的节点列表</span><br><span class="line"></span><br><span class="line">css()：传入css表达式，返回该表达式所对应的节点列表</span><br><span class="line"></span><br><span class="line">extract():序列化该节点为unicode字符串并返回list</span><br><span class="line"></span><br><span class="line">re():根据传入的正则表达式对数据进行提取，并返回unicode字符串列表</span><br></pre></td></tr></table></figure>
+
+<h2 id="XPath"><a href="#XPath" class="headerlink" title="XPath"></a>XPath</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">response.xpath()</span><br><span class="line"></span><br><span class="line">排序从<span class="number">1</span>开始</span><br><span class="line"></span><br><span class="line">一般直接用F12探查的路径都是有误差的，如果是具体路径最好用查看源代码</span><br><span class="line"></span><br><span class="line">但一般浏览器都有提供xpath的方法</span><br><span class="line"></span><br><span class="line">/ 是选取子元素</span><br><span class="line"></span><br><span class="line">// 选取后代元素</span><br><span class="line"></span><br><span class="line">article 选取所有article元素的所有子节点</span><br><span class="line"></span><br><span class="line">/article 选取根元素article</span><br><span class="line"></span><br><span class="line">article/a 选取所有属于article的子元素的a元素</span><br><span class="line"></span><br><span class="line">//div 选取所有div子元素（不论出现在任何地方）</span><br><span class="line"></span><br><span class="line">article//div 选取所有属于article元素的后代div元素</span><br><span class="line"></span><br><span class="line">//@<span class="class"><span class="keyword">class</span> 选取所有名为<span class="title">class</span>的属性</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">/<span class="title">article</span>/<span class="title">div</span>[1] 选取属于<span class="title">article</span>子元素的第一个<span class="title">div</span>元素</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">/<span class="title">article</span>/<span class="title">div</span>[<span class="title">last</span><span class="params">()</span>] 选取属于<span class="title">article</span>子元素的最后一个<span class="title">div</span>元素</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">/<span class="title">article</span>/<span class="title">div</span>[<span class="title">last</span><span class="params">()</span>-1]</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">//<span class="title">div</span>[@<span class="title">lang</span>] 选取所有拥有<span class="title">lang</span>属性的<span class="title">div</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line">//div[@lang='eng']</span><br><span class="line"></span><br><span class="line">/div/* 选取属于div元素的所有子节点</span><br><span class="line"></span><br><span class="line">//* 所有元素</span><br><span class="line"></span><br><span class="line">//div[@*] 选取所有带属性的title元素</span><br><span class="line"></span><br><span class="line">/div/a|//div/p 选取所有div元素的a和p元素</span><br><span class="line"></span><br><span class="line">//span|//ul 选取文档中的span和div</span><br><span class="line"></span><br><span class="line">article/div/p|//span 选取所有属于article的div的p元素和所有的span</span><br><span class="line"></span><br><span class="line">如果只想获取内容，而不想要标签只需要在后面加入/text()</span><br><span class="line"></span><br><span class="line">prise = <span class="string">"//*[@id='113180votetotal']/text()"</span></span><br><span class="line"></span><br><span class="line">prise1 = response.xpath(prise).extract()[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">提取出的内容str要想获取关键内容</span><br><span class="line"></span><br><span class="line">只需要调用extract()方法,事实上在没调用这个方法前，得出的结构还可以用xpath继续调用</span><br><span class="line"></span><br><span class="line">	str.extract()</span><br><span class="line"></span><br><span class="line">	str = <span class="string">"//*[@id='post-113180']/div[1]/h1/text()"</span></span><br><span class="line"></span><br><span class="line">        h1 = response.xpath(str).extract()</span><br><span class="line"></span><br><span class="line">如果某一个元素的一个属性含有多个名字，所以直接调用某一个名字可能出错</span><br><span class="line"></span><br><span class="line">可以使用如下命令</span><br><span class="line"></span><br><span class="line">	//span[contains(@class,'vote')]</span><br><span class="line"></span><br><span class="line">	&lt;div class='a b'&gt;test&lt;/div&gt;</span><br><span class="line"></span><br><span class="line">		xpath(<span class="string">'//div[contains(@class,"a") and contains(@class,"b")]'</span>) <span class="comment">#它会取class同时有a和b</span></span><br><span class="line"></span><br><span class="line">获取某一属性</span><br><span class="line">	</span><br><span class="line">	 post_url = response.xpath(<span class="string">"//div[@id = 'archive']//div[@class = 'post-meta']//p//a[@class = 'archive-title']/@href"</span>)</span><br><span class="line">	</span><br><span class="line">	上面的不需要在里面加text()函数</span><br></pre></td></tr></table></figure>
+
+<h2 id="编写"><a href="#编写" class="headerlink" title="编写"></a>编写</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">建立项目后</span><br><span class="line"></span><br><span class="line">定义 Item 容器</span><br><span class="line"></span><br><span class="line">	用于保存爬取到的数据的容器，其使用方法和python的字典类似，并提供了额外保护机制来避免拼写错误导致的未定义字段错误</span><br><span class="line">	</span><br><span class="line">	建模</span><br><span class="line"></span><br><span class="line">编写爬虫</span><br><span class="line"></span><br><span class="line">	编写爬虫类 Spider，在spiders文件夹下的你创建的文件中。</span><br><span class="line"></span><br><span class="line">	Spider是用户编写用于爬网站的类</span><br><span class="line"></span><br><span class="line">	其中包含一个用于下载的初始URL，然后是如何跟进网页中的链接以及如何分析页面中的内容，还有提取生成item的方法	</span><br><span class="line"></span><br><span class="line">存储内容</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/tutorial/" rel="tag"># tutorial</a>
+              <a href="/tags/%E7%88%AC%E8%99%AB/" rel="tag"># 爬虫</a>
+              <a href="/tags/scrapy/" rel="tag"># scrapy</a>
+              <a href="/tags/frame/" rel="tag"># frame</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/13/python14/" rel="prev" title="python 库">
+      <i class="fa fa-chevron-left"></i> python 库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/13/basis1/" rel="next" title="编码简介">
+      编码简介 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流程"><span class="nav-number">3.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择器"><span class="nav-number">4.</span> <span class="nav-text">选择器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XPath"><span class="nav-number">5.</span> <span class="nav-text">XPath</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写"><span class="nav-number">6.</span> <span class="nav-text">编写</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

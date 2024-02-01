@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="现在密码学的公私钥的应用方向之一。  加密通信">
+<meta property="og:type" content="article">
+<meta property="og:title" content="密码学 | 加密通信「转载」">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/30/cryptography3/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="现在密码学的公私钥的应用方向之一。  加密通信">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/cryptography/3_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/cryptography/3_1.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/cryptography/3_2.jpg">
+<meta property="article:published_time" content="2020-04-30T11:19:39.000Z">
+<meta property="article:modified_time" content="2021-02-27T06:21:10.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="密码学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/cryptography/3_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/30/cryptography3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>密码学 | 加密通信「转载」 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/30/cryptography3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          密码学 | 加密通信「转载」
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-30 19:19:39" itemprop="dateCreated datePublished" datetime="2020-04-30T19:19:39+08:00">2020-04-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-27 14:21:10" itemprop="dateModified" datetime="2021-02-27T14:21:10+08:00">2021-02-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%AF%86%E7%A0%81%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">密码学</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%AF%86%E7%A0%81%E5%AD%A6/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/30/cryptography3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/30/cryptography3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>现在密码学的公私钥的应用方向之一。</p>
+<ul>
+<li>加密通信</li>
+</ul>
+<a id="more"></a>
+
+<p>每个人都有自己私密的信息，如何进行私密的沟通是人类一直以来的需求。古装片里面，动不动就会有你我入密室详谈这样的情节，密室保证的就是私密性。那我们这节内容，瞄准的就是如何在网络上进行私密的沟通，或者说的正式点，就是来聊加密通信问题。早期人们的解决方案其实跟密室是一个道理，就是通过私有网络，也就是从物理上隔绝其他人。但是私有网络衰落，互联网兴起后，客观条件就不同了，互联网是一个公开场合，数据在通信过程中默认是能够被别人获取到的，那么这个时候保证私密的策略就从“不让你看见”变成“看见你也看不懂”了。具体做法就是：首先把信息加密成密文，到达接收方之后，再把密文解密成信息了，这个过程就是加密通信。</p>
+<br/>
+
+<h1 id="对称加密和非对称加密"><a href="#对称加密和非对称加密" class="headerlink" title="对称加密和非对称加密"></a>对称加密和非对称加密</h1><br/>
+
+<p>先说加密通信的一种最简单的方式，就是对称加密。这个是人类用了几千年的方式，凯撒密码就属于这种。所谓对称，意思就是发送方和接收方使用的是同一个钥匙，或者英文叫 key 。但是互联网上的加密通信，也使用了另外一种形式，也就是非对称加密，或者叫公开密钥加密。</p>
+<p>说说类似于凯撒密码的对称加密的基本工作原理。发送方会按照一定规则，把信息变成密文，密文说白了就是谁也看不懂的东西。等密文到了接收方手里，接收者需要按照同样的规则，也就是同一个 key ，把密文翻译成信息。加密通信过程就完成了。</p>
+<p><img src="/images/cryptography/3_0.jpg" alt=""></p>
+<p>但是对称加密的问题就在于如何安全的传递 key 本身。没有 key ，就不能建立安全的通信通道，没有安全的通信通道，就无法安全的把 key 传递给接收方，所以这就是一个鸡生蛋蛋生鸡的问题了。于是，互联网上做加密通信就用到了非对称加密。非对称加密，也叫做公开密钥加密，特点是发送方和接收方使用的不是同一个 key 。这种方式略微有点反直觉了吧，具体原理稍候会讲到。</p>
+<p><img src="/images/cryptography/3_1.jpg" alt=""></p>
+<p>总之，加密通信可以采用的方式有两种，一种是对称加密，一种是非对称或者叫公开密钥加密。对称加密的特点是发送方和接收方采用相同的 key ，非对称加密发送方和接收方采用的是不同的 key 。</p>
+<br/>
+
+<h1 id="公开密钥加密基本原理"><a href="#公开密钥加密基本原理" class="headerlink" title="公开密钥加密基本原理"></a>公开密钥加密基本原理</h1><br/>
+
+<p>下面来详细说说用公开密钥加密的基本原理。主要是要理解公钥和私钥的关系。</p>
+<p>首先，可以在自己的机器上安装类似 ssh-keygen 这样的软件来生成公钥和私钥。注意，每次生成的时候，就会同时生成一对，一个是公钥，也就是 Public Key ，另外一个是私钥，也就是 Private Key 。公钥是可以公开的，分享给任何人的都没问题，私钥一定要保密。公钥和私钥之所以是一对，是因为二者有天然的数学联系，但是同时要保证给定公钥不能够算出私钥，不然就相当于加密方法被破解了。密码学领域不存在完全不能破解的密码，但是如果一个密码需要很久很久，例如一万年才能破解，就认为这个密码是安全的了。同时多扯一句，公钥和私钥的联系一般就是通过一些无解的数学问题来确定的，这类问题只能正向运算，不能反向运算。比如 8616460799 这个数是两个数相乘得到的，但是要从结果反推出这两个数，是基本不可能的。实际中 RSA 和 ECC 算法，都是基于这一类的数学问题。</p>
+<p>好，有了公钥和私钥这一对儿有天然联系的秘钥。那么加密通信过程是怎么样的呢？首先，如果 Alice 想让 Bob 给她发信息，注意这里 Bob 是发送方，而 Alice 是接收方。首先 Alice 要把自己的公钥传递给 Bob ，然后 Bob 用 Alice 的公钥去加密信息，Alice 收到密文之后可以用私钥进行解密。这就是非对称加密的基本逻辑了，公钥用于加密，私钥用于解密。这个过程好比就是 Alice 想安全的从 Bob 那里获得一些机密信息，所以 Alice 首先给 Bob 邮寄过去了一个带锁的箱子，注意这个锁就相当于公钥，是用来加密的。Bob 把信息放到箱子里锁好，然后邮寄给 Alice ，这样 Alice 就可以用这把锁的钥匙，也就是私钥，去开启箱子了。</p>
+<p><img src="/images/cryptography/3_2.jpg" alt=""></p>
+<p>当然，上面所说的过程还只是单向通信，要实现双向通信，就需要双方把各自的公钥传递给对方了。</p>
+<br/>
+
+<h1 id="公开密钥加密的更多技术细节"><a href="#公开密钥加密的更多技术细节" class="headerlink" title="公开密钥加密的更多技术细节"></a>公开密钥加密的更多技术细节</h1><br/>
+
+<p>公开密钥加密的基本思路是比较简单的，就是用公钥去加密，用私钥去解密。不过，最后我们再稍微深入一点，聊聊相关的一些技术细节。</p>
+<p>如果公钥就是用来加密信息的，那为啥不叫 lock 也就是锁，而要叫 key ，钥匙呢？所以说既然公钥也是钥匙，那么它就是一定也有解密功能。公钥加密技术其实有两个重大应用，</p>
+<ul>
+<li><p>一个就是我们本文所述的加密通信。</p>
+</li>
+<li><p>第二个，就是数字签名。</p>
+</li>
+</ul>
+<p>加密通信是用来保证机密性的，而数字签名是用来认证的。数字签名不是咱们本节的重点，它的基本原理是用私钥去加密，而用公钥去解密。也就是我用私钥签名一份文件，而全世界的人都可以用我的公钥去解密数字签名，如果解密成功，就可以认定，这个文件的确是我签署的。所以说，加密通信条件下，私钥可以叫做“解密 key”，而在数字签名条件下，公钥可以叫做“验证 key”。这样，我们就理解了为啥公钥也是 key 了。</p>
+<p>另外一个问题是，公开密钥加密都有哪些实际应用呢？首先就是加密通信，银行政府传递数据也是用这个思路的，所以加密通信还真是关系重大。如果你是程序员，可能会经常用 ssh 登录服务器，这个背后也是用公开密钥加密技术来实现安全通信的。另外网站现在都流行使用 HTTPS 协议，也就是安全的 HTTP ，来达成浏览器跟服务器之间的加密通信，这个背后也是公开密钥加密技术。另外，比特币等加密货币，背后也都是公开密钥加密技术。</p>
+<p>最后一个问题会引发我们进一步的学习，那就是如何解决公钥加密过程中的一些具体问题，例如，如何安全的把公钥发送给对方，保证公钥没有被篡改过。实际上这个问题还真的是非常困难的，所以会涉及到发证机构（ CA ）这样的概念。后面我们专门有一节介绍 CA 。</p>
+<p>更多的技术细节，咱们还是需要去进行更为深入的学习才行。这里就不展开了。</p>
+<p>看到这里，我相信很多人对为什么私钥可以解密密文感到奇怪，这是正常的现象，请继续看下去，保证你会有更大的收获。</p>
+<p>你也可以直接跳到下面的博文观看。</p>
+<ul>
+<li><a href="/2020/05/01/cryptography6/">密码学 | RSA 算法–基本原理篇「转载」</a></li>
+<li><a href="/2020/05/01/cryptography7/">密码学 | RSA 算法–粗略数学推导篇 「转载」</a></li>
+<li><a href="/2020/05/01/cryptography9/">密码学 | 椭圆曲线密码学简介「转载」</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/" rel="tag"># 密码学</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/30/cryptography2/" rel="prev" title="密码学 | 公开密钥加密「转载」">
+      <i class="fa fa-chevron-left"></i> 密码学 | 公开密钥加密「转载」
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/01/life3/" rel="next" title="我的人生 | 不能尿尿的公羊">
+      我的人生 | 不能尿尿的公羊 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#对称加密和非对称加密"><span class="nav-number">1.</span> <span class="nav-text">对称加密和非对称加密</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#公开密钥加密基本原理"><span class="nav-number">2.</span> <span class="nav-text">公开密钥加密基本原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#公开密钥加密的更多技术细节"><span class="nav-number">3.</span> <span class="nav-text">公开密钥加密的更多技术细节</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

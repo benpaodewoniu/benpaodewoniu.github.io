@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="首先，我坚决拥护党和国家的政策，墙的存在是现代社会中必须存在的事物。但是，有的时候科研和程序员对于外面信息的获取还是刚需的。 为了让有志青年尽早的获取最新的信息，所以，搞了这个搭建教程。希望大家不忘初心，为了民族伟大复兴而努力。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件 | shadowsocks 服务器搭建">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/24/software6/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="首先，我坚决拥护党和国家的政策，墙的存在是现代社会中必须存在的事物。但是，有的时候科研和程序员对于外面信息的获取还是刚需的。 为了让有志青年尽早的获取最新的信息，所以，搞了这个搭建教程。希望大家不忘初心，为了民族伟大复兴而努力。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/software/6_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/software/6_1.png">
+<meta property="article:published_time" content="2020-04-24T12:53:59.000Z">
+<meta property="article:modified_time" content="2023-02-19T15:38:01.204Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="software">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/software/6_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/24/software6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>软件 | shadowsocks 服务器搭建 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/24/software6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          软件 | shadowsocks 服务器搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 20:53:59" itemprop="dateCreated datePublished" datetime="2020-04-24T20:53:59+08:00">2020-04-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-02-19 23:38:01" itemprop="dateModified" datetime="2023-02-19T23:38:01+08:00">2023-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/" itemprop="url" rel="index"><span itemprop="name">项目经历</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BA%94%E7%94%A8/" itemprop="url" rel="index"><span itemprop="name">应用</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%B0%8F%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">小型</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BA%94%E7%94%A8/%E7%94%B5%E8%84%91%E8%BD%AF%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">电脑软件</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%B0%8F%E5%9E%8B/StaticIP/" itemprop="url" rel="index"><span itemprop="name">StaticIP</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A5%87%E6%B7%AB%E5%B7%A7%E6%8A%80/" itemprop="url" rel="index"><span itemprop="name">奇淫巧技</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A5%87%E6%B7%AB%E5%B7%A7%E6%8A%80/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/24/software6/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/24/software6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>首先，我坚决拥护党和国家的政策，墙的存在是现代社会中必须存在的事物。但是，有的时候科研和程序员对于外面信息的获取还是刚需的。</p>
+<p>为了让有志青年尽早的获取最新的信息，所以，搞了这个搭建教程。希望大家不忘初心，为了民族伟大复兴而努力。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="AWS-2023-2-19"><a href="#AWS-2023-2-19" class="headerlink" title="AWS 2023-2-19"></a>AWS 2023-2-19</h1><br/>
+
+<p>在使用 AWS 的 shadowsocks 的时候，有一个端口莫名其妙的用不了了，不知道是被封了还是其它原因，细节没有探究，转向 v2ray 协议了。请参考</p>
+<ul>
+<li><a href="/2023/02/19/cunning29/">cunning | v2ray 客户端配置</a></li>
+</ul>
+<br/>
+
+<h1 id="AWS-2023-2-18"><a href="#AWS-2023-2-18" class="headerlink" title="AWS 2023-2-18"></a>AWS 2023-2-18</h1><br/>
+
+<ul>
+<li><a href="/2022/10/23/v2ray0/">v2ray ｜ 利用 v2ray 做大量低成本 IP</a></li>
+</ul>
+<p><code>AWS</code> 只需要把程序安装开启，然后开启入站规则就好了，不需要设置防火墙。</p>
+<p>当然，<code>AWS</code> 需要 <code>root</code> 权限，请参考</p>
+<ul>
+<li><a href="/2022/01/06/aws1/">aws | EC2 的使用</a></li>
+</ul>
+<br/>
+
+<h1 id="购买阿里云"><a href="#购买阿里云" class="headerlink" title="购买阿里云"></a>购买阿里云</h1><br/>
+
+<p>我们必须购买一个境外服务器，在这里我选择了香港服务器。</p>
+<p>我的配置是最低的，但是，我搭建完使用的时候，发现看 1080p 的 YouTube 非常流畅。</p>
+<p>我的配置如下</p>
+<ul>
+<li>ubuntu 16.04</li>
+<li>1Mbit 带宽</li>
+<li>有外部 IP</li>
+</ul>
+<p>因为没有任何优惠，而且，情况又比较紧急，所以，购买了，大概「79.15」。如果，你是双十一购买的话，或许 3 年才 299 元，真的是非常实惠了。。。</p>
+<p>不过，这次也不是我交钱。</p>
+<p>有一点要注意的是，国内的服务器需要备案，但是，国外的服务器购买完之后就可以直接用。</p>
+<br/>
+
+<h1 id="2022年10月27日"><a href="#2022年10月27日" class="headerlink" title="2022年10月27日"></a>2022年10月27日</h1><br/>
+
+<p>最近发现了 <code>v2ray</code> 的一键式脚本，非常之舒服，并且，还能在阿里云上使用。</p>
+<p>我在 <code>v2ray</code> 的基础上，借助 <code>nginx</code> 的端口转发功能，开发了一套低成本静态 <code>IP</code> 转发流程，如果你感兴趣，可以查看</p>
+<ul>
+<li><a href="/2022/10/23/v2ray0/">v2ray ｜ 利用 v2ray 做大量低成本 IP</a></li>
+</ul>
+<p>看完这套流程，下面的内容几乎不用看了，而且是一键式傻瓜安装，还是非常 <code>nice</code> 的。</p>
+<p>ps: 2022-10-28 抵制阿里云，从我做起，我现在已经全面拥抱 <code>AWS</code> 了。</p>
+<p>千万别用阿里云，非常难受，非常难受，非常难受。</p>
+<br/>
+
+<h1 id="2022年3月20日"><a href="#2022年3月20日" class="headerlink" title="2022年3月20日"></a>2022年3月20日</h1><br/>
+
+<p>阿里云现在几乎秒封下面的方法，网上虽然有其他手段，但是，都是以换端口为目的，很鸡肋，可以参考</p>
+<ul>
+<li><p><a href="https://gfw.report/blog/ss_tutorial/zh/">如何部署一台抗封锁的Shadowsocks-libev服务器</a></p>
+</li>
+<li><p>AWS 进行 2021年4月21日更新的部署，可以</p>
+<ul>
+<li>测试时间 2022/6/4</li>
+</ul>
+</li>
+<li><p>七牛云 进行 2021年4月21日更新的部署，可以</p>
+</li>
+</ul>
+<p>上面两个都要设置对应端口的出站规则。</p>
+<br/>
+
+<h1 id="2021年4月21日更新"><a href="#2021年4月21日更新" class="headerlink" title="2021年4月21日更新"></a>2021年4月21日更新</h1><br/>
+
+<ul>
+<li><a href="https://gfw.report/blog/ss_tutorial/zh/">如何部署一台抗封锁的Shadowsocks-libev服务器</a></li>
+</ul>
+<h2 id="安装Snap应用商店"><a href="#安装Snap应用商店" class="headerlink" title="安装Snap应用商店"></a>安装Snap应用商店</h2><p>通过 <code>Snap</code> 应用商店安装 <code>Shadowsocks-libev</code> 是官方推荐的方式。</p>
+<ul>
+<li>如果你的服务器运行<code>Ubuntu 16.04 LTS</code>及以上的版本，<code>Snap</code>已经默认安装好了。<ul>
+<li>我用了阿里云和七牛云的 <code>18.04</code> 版本，是没有安装 <code>snap</code> 的，所以，你需要执行下面的命令进行安装</li>
+<li><code>apt install snapd</code> 「一般云服务器都会安装失败，这是镜像原因，更换清华源镜像就好了」</li>
+</ul>
+</li>
+<li>如果你的服务器运行了其他的<code>Linux</code>发行版，你只需跟着对应的发行版安装<code>Snap core</code>。</li>
+</ul>
+<p>现在来检测一下你的服务器已经安装了需要的<code>snapd</code>和<code>Snap core</code>:</p>
+<pre><code>sudo snap install core</code></pre><p>我在阿里云安装的时候，出错，是因为镜像的原因，所以，我更新了阿里云的镜像，请参考。</p>
+<ul>
+<li><a href="/2019/01/19/ubuntu1/">ubuntu 更换镜像源</a></li>
+</ul>
+<p>更新镜像，要用启动这个源，不是把配置文件换了就可以了，请参考上面的博文。</p>
+<p>也就是，修改完配置后，使用</p>
+<pre><code>sudo apt-get update &amp;&amp; sudo apt update</code></pre><p>当然，这里还可以执行一下，更新程序命令</p>
+<pre><code>sudo apt-get upgrade</code></pre><h2 id="安装Shadowsocks-libev"><a href="#安装Shadowsocks-libev" class="headerlink" title="安装Shadowsocks-libev"></a>安装Shadowsocks-libev</h2><p>现在我们安装最新的 <code>Shadowsocks-libev</code>:</p>
+<pre><code>sudo snap install shadowsocks-libev --edge</code></pre><h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>下面是我们推荐的 <code>Shadowsocks-libev</code> 服务器配置：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">"server"</span>:[<span class="string">"::0"</span>,<span class="string">"0.0.0.0"</span>],</span><br><span class="line">    <span class="string">"server_port"</span>:<span class="number">8388</span>,</span><br><span class="line">    <span class="string">"encryption_method"</span>:<span class="string">"chacha20-ietf-poly1305"</span>,</span><br><span class="line">    <span class="string">"password"</span>:<span class="string">"ExamplePassword"</span>,</span><br><span class="line">    <span class="string">"mode"</span>:<span class="string">"tcp_only"</span>,</span><br><span class="line">    <span class="string">"fast_open"</span>:false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意，你需要把里面的<code>ExamplePassword</code>替换成一个更强的密码。 强密码有助缓解最新发现的针对<code>Shadowsocks</code>服务器的<code>Partitioning Oracle</code>攻击。 你可以用以下命令在终端生成一个强密码：</p>
+<pre><code>openssl rand -base64 16。</code></pre><p>你还可以考虑将<code>server_port</code>的值从<code>8388</code>改为<code>1024</code>到<code>65535</code>之间的任意整数。</p>
+<p>现在打开通过<code>Snap</code>安装的<code>Shadowsocks-libev</code>默认的配置文件：</p>
+<pre><code>sudo nano /var/snap/shadowsocks-libev/common/etc/shadowsocks-libev/config.json</code></pre><p>将上方替换过密码的配置信息复制粘贴到配置文件后， 按<code>Ctrl + x</code>退出。 退出时，文本编辑器将问你”<code>Save modified buffer?</code>“，请输入<code>y</code>然后按回车键。</p>
+<p>可以看到，通过<code>Snap</code>安装的<code>Shadowsocks-libev</code>默认的配置文件路径太长了，不便于记忆。同时默认配置路径又没有在官方文档中标出。</p>
+<h3 id="防火墙"><a href="#防火墙" class="headerlink" title="防火墙"></a>防火墙</h3><p>我们使用    <code>ufw</code> 来管理 <code>Shadowsocks</code> 服务器的防火墙。</p>
+<p>在基于<code>Debian</code>的服务器上，可以通过如下命令安装<code>ufw</code>：</p>
+<pre><code>sudo apt update &amp;&amp; sudo apt install -y ufw</code></pre><p>然后开放有关<code>ssh</code>和<code>Shadowsocks-libev</code>的端口。 请注意，以下命令假设你在<code>/var/snap/shadowsocks-libev/common/etc/shadowsocks-libev/config.json</code>中的<code>server_port</code>的值为<code>8388</code>。</p>
+<p>如果你的<code>server_port</code>用了其他的值，请对以下命令作相应的修改：</p>
+<pre><code>sudo ufw allow ssh
+sudo ufw allow 8388/tcp</code></pre><p>现在我们启动<code>ufw</code>:</p>
+<pre><code>sudo ufw enable</code></pre><p>启动时如果弹出<code>Command may disrupt existing ssh connections. Proceed with operation (y|n)?</code>，请输入<code>y</code>并按回车键。</p>
+<p>最后，请用<code>sudo ufw status</code>检查一下你的配置是否和下面的一样：</p>
+<pre><code>Status: active
+
+To                         Action      From
+--                         ------      ----
+SSH                        ALLOW       Anywhere
+8388/tcp                   ALLOW       Anywhere
+SSH (v6)                   ALLOW       Anywhere (v6)
+8388/tcp (v6)              ALLOW       Anywhere (v6)</code></pre><h3 id="运行Shadowsocks-libev"><a href="#运行Shadowsocks-libev" class="headerlink" title="运行Shadowsocks-libev"></a>运行Shadowsocks-libev</h3><p>现在我们启动<code>Shadowsocks-libev</code>：</p>
+<pre><code>sudo systemctl start snap.shadowsocks-libev.ss-server-daemon.service</code></pre><p>记得设置<code>Shadowsocks-libev</code>开机自启动：</p>
+<pre><code>sudo systemctl enable snap.shadowsocks-libev.ss-server-daemon.service</code></pre><h3 id="维护"><a href="#维护" class="headerlink" title="维护"></a>维护</h3><p>检查运行状态和日志</p>
+<p>以下命令可以查看<code>Shadowsocks-libev</code>的运行状态：</p>
+<pre><code>sudo systemctl status snap.shadowsocks-libev.ss-server-daemon.service</code></pre><p>如果你看到绿色的<code>Active: active (running)</code>，那么你的<code>Shadowsocks-libev</code>服务器就在正常的运行； 如果你看到红色的<code>Active: failed</code>，请用跳至如下命令<code>journalctl -u snap.shadowsocks-libev.ss-server-daemon.service</code>的尾部查看问题出在哪里了。</p>
+<h3 id="重新加载配置文件"><a href="#重新加载配置文件" class="headerlink" title="重新加载配置文件"></a>重新加载配置文件</h3><p>每当你修改过配置文件后，请用如下命令重启<code>Shadowsocks-libev</code>以加载修改后的文件：</p>
+<pre><code>sudo systemctl restart snap.shadowsocks-libev.ss-server-daemon.service</code></pre><p>另外，对于阿里云来说，你除了需要开启防火墙，还需要配置安全组。请自行查阅相关的资料。</p>
+<p>另外，还有一系列伪装的技巧。</p>
+<ul>
+<li>构建一个 <code>web</code> 网站，让访问流量好像是在访问 <code>web</code></li>
+</ul>
+<p>在上面的参考资料中，还有很多很有价值的回答，请自行查看。</p>
+<p>ps: 假设上面的步骤都没有问题，你本地换了之后，还是不能使用服务器 <code>ip</code> 的话，可能是服务商需要设置安全组。</p>
+<p>我使用的平台，包括七牛云、阿里云都需要设置。具体的搜索引擎解决吧。</p>
+<br/>
+
+<h1 id="2021年4月21日下面的教程不具备指导意义了，请参考上面"><a href="#2021年4月21日下面的教程不具备指导意义了，请参考上面" class="headerlink" title="2021年4月21日下面的教程不具备指导意义了，请参考上面"></a>2021年4月21日下面的教程不具备指导意义了，请参考上面</h1><br/>
+
+
+<ul>
+<li>请看上面！！！！</li>
+<li>请看上面！！！！</li>
+<li>请看上面！！！！</li>
+</ul>
+<p>当然，如果被封了，可以参考下面来换个端口。</p>
+<br/>
+
+<h1 id="卸载阿里云盾（安骑士）服务"><a href="#卸载阿里云盾（安骑士）服务" class="headerlink" title="卸载阿里云盾（安骑士）服务"></a>卸载阿里云盾（安骑士）服务</h1><br/>
+
+<p>由于阿里会检测服务器是否存在ss，如果保留安骑士，阿里云会给你发邮件警告。</p>
+<p>如果你是首次购买服务器，请在购买时直接反选安骑士服务。</p>
+<p>如果已经安装了安骑士，那么我们需要使用以下命令移除：</p>
+<pre><code>wget http://update.aegis.aliyun.com/download/uninstall.sh
+chmod +x uninstall.sh
+./uninstall.sh
+
+wget http://update.aegis.aliyun.com/download/quartz_uninstall.sh
+chmod +x quartz_uninstall.sh
+./quartz_uninstall.sh
+
+pkill aliyun-service
+rm -rf /etc/init.d/agentwatch /usr/sbin/aliyun-service /usr/local/aegis*
+rm uninstall.sh
+rm quartz_uninstall.sh</code></pre><br/>
+
+<h1 id="配置过程"><a href="#配置过程" class="headerlink" title="配置过程"></a>配置过程</h1><br/>
+
+<p>我们的系统中，初始安装了 py2.7 和 py3.5 ，我们用的是 2.7.</p>
+<p>ShadowSocks的安装包在GitHub上有很多版本，我这里选择的是通过Python的包管理工具pip直接自动安装。</p>
+<pre><code>curl &quot;https://bootstrap.pypa.io/get-pip.py&quot; -o &quot;get-pip.py&quot;  //下载pip安装包
+python get-pip.py //安装pip
+pip install shadowsocks //安装shadowsocks</code></pre><p>这3个命令执行完，服务端实际已经安装完毕了，没错，安装就是这么简单，搭代理没想的那么麻烦，下面还差的就是配置了。</p>
+<pre><code>vim /etc/shadowsocks.json</code></pre><p>我们就编写这个文件。</p>
+<pre><code>{
+&quot;server&quot;:&quot;12.2.2.2&quot;,//如果是阿里云专有网络，切记配的是私有IP不是公有IP，此处是大坑
+&quot;server_port&quot;: 16637,//服务端监听端口号 
+&quot;password&quot;:&quot;abc&quot;,//客户端访问密码
+&quot;timeout&quot;: 600,//超时时间
+&quot;method&quot;: &quot;aes-256-cfb&quot;//加密方式，有多种可选，具体不赘述，默认256加密已经够用
+}</code></pre><p>上面的配置就已经足够了，网上还有其他的配置，但是，配置了多余的，有可能会出错。</p>
+<p>如果，你对其他的参数实在是感兴趣，可以看一下下面的链接。</p>
+<ul>
+<li><a href="https://www.textarea.com/ExpectoPatronum/shiyong-shadowsocks-kexue-shangwang-265/">使用shadowsocks科学上网</a></li>
+</ul>
+<p>这个时候基本上 <code>shadowsocks</code> 已经配置好了。但是，对于阿里云我们还需要做两个步骤。</p>
+<ul>
+<li>关闭服务器端口防火墙</li>
+<li>打开服务器端口的安全组</li>
+</ul>
+<h2 id="关闭服务器端口防火墙"><a href="#关闭服务器端口防火墙" class="headerlink" title="关闭服务器端口防火墙"></a>关闭服务器端口防火墙</h2><pre><code>iptables -A INPUT -p tcp --dport 16637 -j ACCEPT //设置防火墙规则，允许端口进入
+iptables -F   //flush规则，使规则生效
+ssserver -c /etc/shadowsocks.json --log-file /home/log -d start  //启动shadowsocks,输出日志可在/home/log中查看
+netstat -apn | grep 16637  //确认1080监听端口已启动，如果没有，查看/home/log日志文件，确认错误原因，一般原因是shadowsocks.json配置错误，对照错误信息修改即可</code></pre><h2 id="打开服务器的安全组"><a href="#打开服务器的安全组" class="headerlink" title="打开服务器的安全组"></a>打开服务器的安全组</h2><p>阿里云还有一个外部的安全组规则。</p>
+<p>登录阿里云控制台，在云服务器ECS-&gt;实例-&gt;管理-&gt;本实例安全组-&gt;安全组列表-&gt;配置规则-&gt;添加安全组规则中，允许1080端口进和出，阿里云界面交互很棒的，一看就会操作。</p>
+<p>里面有一个入方向和出方向。</p>
+<p><img src="/images/software/6_0.png" alt=""></p>
+<p>登录大陆地区的服务器，执行 <code>telnet 你的公网ip地址  16637</code>，如果现实connected即代表服务端已搭建成功，否则请检查防火墙和阿里云安全组是否已开放1080端口</p>
+<p>这个时候我们就能愉快的进行学习了。</p>
+<br/>
+
+<h1 id="下载客户端"><a href="#下载客户端" class="headerlink" title="下载客户端"></a>下载客户端</h1><br/>
+
+<p>你可以通过下面的链接下载客户端。</p>
+<ul>
+<li><a href="https://shadowsocks.org/en/download/clients.html">客户端下载</a></li>
+</ul>
+<p>这里说一下选择哪个平台，怎么安装</p>
+<p><img src="/images/software/6_1.png" alt=""></p>
+<p>根据平台下载对应的版本。</p>
+<ul>
+<li>win<ul>
+<li>直接安装就好了</li>
+<li>我在 <code>win7</code> 中下载图上的链接，最后失败了，但是， <code>win10</code> 是可以的。</li>
+<li><code>win7</code> 我的 <code>outline</code> 也用不了</li>
+</ul>
+</li>
+<li>MacBook<ul>
+<li>把解压出来的文件直接复制到 「应用程序」文件夹就好了</li>
+</ul>
+</li>
+</ul>
+<p>配置信息如下：</p>
+<ul>
+<li>服务器地址配置你的阿里云公网 <code>ip</code></li>
+<li>服务器端口配置 <code>16637</code> ，也就是 <code>shadowsocks.json</code> 里配置的 <code>server_port</code> 对应值</li>
+<li>密码配置 <code>shadowsocks.json</code> 里对应的 <code>password</code> 值</li>
+<li>加密方式配置和 <code>shadowsocks.json</code> 里的 <code>method</code> 对应值一样即可</li>
+<li>代理端口使用默认值即可，但是请记住代理端口，该端口需要在浏览器配置代理时使用</li>
+<li>全局代理会让浏览器走代理服务器，但是，不会让你写的程序走代理，如果让你写的程序走代理的话，需要自己配置</li>
+</ul>
+<br/>
+
+<h1 id="被封了怎么办"><a href="#被封了怎么办" class="headerlink" title="被封了怎么办"></a>被封了怎么办</h1><br/>
+
+<p>如果不幸被封了，那么，要不要慌，只需要换一个端口就好了。</p>
+<p>修改下面的信息</p>
+<ul>
+<li><code>/etc/shadowsocks.json</code> 里面的 <code>server_port</code></li>
+<li>防火墙开启这个端口</li>
+<li>安全组规则也添加这个端口「可以添加一个范围的端口，这样就不需要老师弄这个安全组规则了」</li>
+</ul>
+<p>然后执行</p>
+<pre><code>ssserver -c /etc/shadowsocks.json --log-file /home/log -d restart</code></pre><br/>
+
+<h1 id="再次升级"><a href="#再次升级" class="headerlink" title="再次升级"></a>再次升级</h1><br/>
+
+<p>在更换了几次端口号之后，我的服务器被阿里给封了，远程也登不上，所以，我了解到了一个新的技术。 <code>V2ray</code>.</p>
+<p>但是，我还没开始尝试，我现在先把链接放一下。</p>
+<ul>
+<li><a href="https://www.imdupeng.cn/server/guid-diff-vpn-ss-ssr-and-v2ray.html">Vpn/ss/ssr与V2Ray的介绍与区别</a></li>
+<li><a href="http://www.chinagfw.org/2016/08/shadowsocks_31.html">GFW BLOG</a></li>
+<li><a href="https://medium.com/@vonsis/%E8%BF%91%E6%9C%9F%E4%BB%A5%E6%9D%A5%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91-%E7%BF%BB%E5%A2%99-%E4%BA%8B%E5%AE%9C%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%BB%E7%BB%93-8928d55bce73">个人翻墙事宜的一些总结与经验分享</a></li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://crifan.github.io/scientific_network_summary/website/">科学上网相关知识总结</a></li>
+<li><a href="http://syhong.net/2018/07/19/shadowSocks/">阿里云ShadowSocks代理搭建</a></li>
+<li><a href="https://shadowsocks.org/en/download/clients.html">客户端下载</a></li>
+<li><a href="https://blog.sbot.io/articles/36/%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%90%AD%E5%BB%BAShadowsocks-Server%E5%8F%8A%E4%BD%BF%E7%94%A8SwitchyOmega%E5%88%87%E6%8D%A2%E4%BB%A3%E7%90%86%E8%AE%BE%E7%BD%AE%E5%AE%9E%E6%88%98%E6%95%99%E7%A8%8B">阿里云服务器搭建Shadowsocks Server及使用SwitchyOmega切换代理设置实战教程</a></li>
+<li><a href="https://yq.aliyun.com/articles/225815">阿里云服务器怎么开启或关闭8080端口？</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/software/" rel="tag"># software</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/blockchain5/" rel="prev" title="区块链 | 《密码朋克宣言》">
+      <i class="fa fa-chevron-left"></i> 区块链 | 《密码朋克宣言》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/24/docker13/" rel="next" title="nvidia-docker | 简介和扫盲">
+      nvidia-docker | 简介和扫盲 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AWS-2023-2-19"><span class="nav-number">1.</span> <span class="nav-text">AWS 2023-2-19</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AWS-2023-2-18"><span class="nav-number">2.</span> <span class="nav-text">AWS 2023-2-18</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#购买阿里云"><span class="nav-number">3.</span> <span class="nav-text">购买阿里云</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2022年10月27日"><span class="nav-number">4.</span> <span class="nav-text">2022年10月27日</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2022年3月20日"><span class="nav-number">5.</span> <span class="nav-text">2022年3月20日</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2021年4月21日更新"><span class="nav-number">6.</span> <span class="nav-text">2021年4月21日更新</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Snap应用商店"><span class="nav-number">6.1.</span> <span class="nav-text">安装Snap应用商店</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Shadowsocks-libev"><span class="nav-number">6.2.</span> <span class="nav-text">安装Shadowsocks-libev</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置"><span class="nav-number">6.2.1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#防火墙"><span class="nav-number">6.2.2.</span> <span class="nav-text">防火墙</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行Shadowsocks-libev"><span class="nav-number">6.2.3.</span> <span class="nav-text">运行Shadowsocks-libev</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#维护"><span class="nav-number">6.2.4.</span> <span class="nav-text">维护</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重新加载配置文件"><span class="nav-number">6.2.5.</span> <span class="nav-text">重新加载配置文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2021年4月21日下面的教程不具备指导意义了，请参考上面"><span class="nav-number">7.</span> <span class="nav-text">2021年4月21日下面的教程不具备指导意义了，请参考上面</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#卸载阿里云盾（安骑士）服务"><span class="nav-number">8.</span> <span class="nav-text">卸载阿里云盾（安骑士）服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置过程"><span class="nav-number">9.</span> <span class="nav-text">配置过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭服务器端口防火墙"><span class="nav-number">9.1.</span> <span class="nav-text">关闭服务器端口防火墙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打开服务器的安全组"><span class="nav-number">9.2.</span> <span class="nav-text">打开服务器的安全组</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#下载客户端"><span class="nav-number">10.</span> <span class="nav-text">下载客户端</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#被封了怎么办"><span class="nav-number">11.</span> <span class="nav-text">被封了怎么办</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#再次升级"><span class="nav-number">12.</span> <span class="nav-text">再次升级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">13.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

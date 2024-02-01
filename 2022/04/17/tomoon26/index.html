@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="关于 binance api 对接的一些细节。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tomoon ｜ binance 用法">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2022/04/17/tomoon26/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="关于 binance api 对接的一些细节。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tomoon/26_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tomoon/26_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tomoon/26_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tomoon/26_3.png">
+<meta property="article:published_time" content="2022-04-17T04:49:38.000Z">
+<meta property="article:modified_time" content="2023-06-05T11:02:16.684Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="tomoon">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/tomoon/26_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2022/04/17/tomoon26/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>tomoon ｜ binance 用法 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2022/04/17/tomoon26/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tomoon ｜ binance 用法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-17 12:49:38" itemprop="dateCreated datePublished" datetime="2022-04-17T12:49:38+08:00">2022-04-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-06-05 19:02:16" itemprop="dateModified" datetime="2023-06-05T19:02:16+08:00">2023-06-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/" itemprop="url" rel="index"><span itemprop="name">项目经历</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">大型</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/" itemprop="url" rel="index"><span itemprop="name">quantify</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/gateway/" itemprop="url" rel="index"><span itemprop="name">gateway</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/gateway/binance/" itemprop="url" rel="index"><span itemprop="name">binance</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/04/17/tomoon26/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/04/17/tomoon26/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关于 <code>binance api</code> 对接的一些细节。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="现货"><a href="#现货" class="headerlink" title="现货"></a>现货</h1><br/>
+
+<h2 id="WSS-推送"><a href="#WSS-推送" class="headerlink" title="WSS 推送"></a>WSS 推送</h2><h3 id="trade-推送"><a href="#trade-推送" class="headerlink" title="trade 推送"></a>trade 推送</h3><p><code>trade</code> 推送分为</p>
+<ul>
+<li><code>@trade</code><ul>
+<li>逐笔交易</li>
+</ul>
+</li>
+<li><code>@aggTrade</code><ul>
+<li>归集交易</li>
+</ul>
+</li>
+</ul>
+<p>无论是逐笔还是归集，里面都有两个参数</p>
+<ul>
+<li><code>E</code><ul>
+<li>事件时间</li>
+</ul>
+</li>
+<li><code>T</code><ul>
+<li>成交时间</li>
+</ul>
+</li>
+</ul>
+<p><code>E</code> 的意思是这笔数据的推送时间。<code>T</code> 是交易的成交时间。</p>
+<p>所以 <code>E</code> 的时间一定是在 <code>T</code> 之后的。而且对于归集交易而言，由于要归集相同的数据，想当然认为，<code>T</code> 和 <code>E</code> 之间相差的更大，经过实际测试，这两个值之间不会超过 <code>6ms</code>。</p>
+<h2 id="查询所有订单和查询当前挂单"><a href="#查询所有订单和查询当前挂单" class="headerlink" title="查询所有订单和查询当前挂单"></a>查询所有订单和查询当前挂单</h2><p>GET /api/v3/allOrders (HMAC SHA256)，也是包括当前的挂单的。</p>
+<p>区别是GET /api/v3/openOrders，只获取交易对的所有当前挂单</p>
+<p>cummulativeQuoteQty / executedQty 是最准确的成交价格</p>
+<p>至于 cummulativeQuoteQty 问了客服也没有说明白</p>
+<br/>
+
+<h1 id="合约"><a href="#合约" class="headerlink" title="合约"></a>合约</h1><br/>
+
+<h2 id="全仓和逐仓"><a href="#全仓和逐仓" class="headerlink" title="全仓和逐仓"></a>全仓和逐仓</h2><p>全仓所有仓位共享保证金</p>
+<p>逐仓与全仓仓位不共享</p>
+<p>逐仓交易的余额不会影响全仓</p>
+<ul>
+<li><p>全仓模式的意思是账户里所有可用余额都可以充当担保资产，以避免被强制平仓。 这个模式的好处是：只要杠杆适中，爆仓可能性很低，所以经常被用于套期保值。 </p>
+</li>
+<li><p>逐仓模式的意思是分配给某仓位的担保资产被限制在一定数额。 如果仓位的担保资产不足以支撑浮亏，此仓位将被强制平仓</p>
+</li>
+<li><p><a href="https://www.binance.com/zh-CN/blog/all/%E9%80%90%E4%BB%93%E6%9D%A0%E6%9D%86%E5%92%8C%E5%85%A8%E4%BB%93%E6%9D%A0%E6%9D%86%E7%9A%84%E5%8C%BA%E5%88%AB-421499824684900602">逐仓杠杆和全仓杠杆的区别</a></p>
+</li>
+</ul>
+<h2 id="账户"><a href="#账户" class="headerlink" title="账户"></a>账户</h2><ul>
+<li>总余额 = 全仓余额 + 逐仓余额</li>
+<li>全仓余额</li>
+</ul>
+<h2 id="吃单"><a href="#吃单" class="headerlink" title="吃单"></a>吃单</h2><p>合约开单分为 <code>taker</code> 和 <code>maker</code>。</p>
+<p>其中 <code>taker</code> 是主动吃单，<code>maker</code> 是挂单。</p>
+<p>以开多为例，<code>taker</code> 吃的是卖单的第一档位，在深度足够的情况下，平仓的价格是根据 买单的第一档位。</p>
+<p><code>maker</code> 挂的是买单的第一档位，平仓的价格是根据买单的第一档位。</p>
+<h2 id="盈亏"><a href="#盈亏" class="headerlink" title="盈亏"></a>盈亏</h2><p><code>binance</code> 合约返回了一个叫做未实现盈亏，这个未实现盈亏对照的是标记价格。</p>
+<p>除了强平，无论是开仓还是平仓，最终的盈亏都取决于最终成交的价格。</p>
+<p>强平的价格参考的是标记价格。</p>
+<h3 id="计算"><a href="#计算" class="headerlink" title="计算"></a>计算</h3><p>在合约中，必须完全理解，盈亏是怎么算出来的，不然，在高频下，如果理解错了，将带来不可估量的损失。</p>
+<p>下面开仓全部都是 <code>2</code> 倍。其实，几倍根本无所谓，几倍主要是资金量的关系，和最终盈亏没啥关系，具体原因可以参考下面的 「倍数的理解」</p>
+<h4 id="开多赚钱案例"><a href="#开多赚钱案例" class="headerlink" title="开多赚钱案例"></a>开多赚钱案例</h4><p><img src="/images/tomoon/26_0.png" alt=""></p>
+<h5 id="开仓"><a href="#开仓" class="headerlink" title="开仓"></a>开仓</h5><p>上面的 <code>BCH</code> 以数量 <code>0.1</code> 价格 <code>277.07</code> 进行开仓。</p>
+<p>手续费为</p>
+<pre><code>(0.1 * 277.07) * 0.0002 = 0.0055414U</code></pre><h5 id="平仓"><a href="#平仓" class="headerlink" title="平仓"></a>平仓</h5><p>平仓的时候，<code>BCH</code> 的数量还是 <code>0.1</code> 但是，价格是 <code>277.1</code></p>
+<pre><code>盈亏： (277.1 - 277.07) / 277.07 * 0.1 * 277.07 = 0.03
+手续费: 主动平仓，主动成交 (0.1 * 277.1) * 0.0004 = 0.011084U</code></pre><p>另外，从上面的例子来看，手续费是单独从用户剩余的余额中收的。</p>
+<p>注意，这个案例中，挂单是买一开多，平仓的价格也是买一。</p>
+<h4 id="开多亏钱的案例"><a href="#开多亏钱的案例" class="headerlink" title="开多亏钱的案例"></a>开多亏钱的案例</h4><p><img src="/images/tomoon/26_2.png" alt=""></p>
+<h5 id="开仓-1"><a href="#开仓-1" class="headerlink" title="开仓"></a>开仓</h5><p>上面的 <code>BCH</code> 以数量 <code>0.1</code> 价格 <code>282.79</code> 进行开仓，主动吃单。</p>
+<h5 id="平仓-1"><a href="#平仓-1" class="headerlink" title="平仓"></a>平仓</h5><p>平仓的时候，<code>BCH</code> 的数量还是 <code>0.1</code> 但是，价格是 <code>282.75</code></p>
+<pre><code>盈亏: (282.75 - 282.79) / 282.75 * 0.1 * 282.75 = -0.004</code></pre><h4 id="开空亏钱的案例"><a href="#开空亏钱的案例" class="headerlink" title="开空亏钱的案例"></a>开空亏钱的案例</h4><p><img src="/images/tomoon/26_1.png" alt=""></p>
+<h5 id="开仓-2"><a href="#开仓-2" class="headerlink" title="开仓"></a>开仓</h5><p>上面的 <code>BCH</code> 以数量 <code>0.1</code> 价格 <code>277.62</code> 进行开仓。</p>
+<p>手续费为</p>
+<pre><code>(0.1 * 277.62) * 0.0002 = 0.0055524</code></pre><h5 id="平仓-2"><a href="#平仓-2" class="headerlink" title="平仓"></a>平仓</h5><p>平仓的时候，BCH 的数量还是 0.1 但是，价格是 277.66</p>
+<pre><code>盈亏： (277.62 - 277.66) / 277.66 * 0.1 * 277.66 = 0.004
+手续费: 主动平仓，主动成交 (0.1 * 277.66) * 0.0004 = 0.0111064</code></pre><h5 id="平仓-3"><a href="#平仓-3" class="headerlink" title="平仓"></a>平仓</h5><h2 id="倍数的理解"><a href="#倍数的理解" class="headerlink" title="倍数的理解"></a>倍数的理解</h2><p><code>binance</code> 的倍数指的是保证金能够乘以多少倍。</p>
+<p>这里假设没有手续费，全仓模式。</p>
+<p>我们的账户中有 <code>10U</code>，然后我们开 <code>2</code> 倍杠杠。在 <code>5</code> 美金价格做多 <code>10U</code>。</p>
+<p>在上面的操作后。</p>
+<p>我们账户中还有 <code>5U</code>，虽然，我们使用了 10U 做多，但是，我们开了 <code>2</code> 倍杠杠，实际上只用了 <code>5U</code>，所以，我们的保证金是 <code>5U</code>。</p>
+<p>假设，我们平仓的时候，价格在 <code>8U</code>。</p>
+<p>那么实际盈利为</p>
+<pre><code>（8 - 5）/5 * 10 = 6U</code></pre><p>假设平仓价格在 4U 的时候，实际亏损为</p>
+<pre><code>(4 - 5) / 5 * 10 = - 2U</code></pre><p>如果标价价格到了 <code>2.5U</code> 的时候</p>
+<pre><code>（2.5 - 5）/5 * 10 = 5U</code></pre><p>实际上已经达到保证金数量了，那么，这一仓位就爆仓了。</p>
+<p>上面举的例子，多少有点不对，但是，这里只是说一下爆仓的概念，真正的计算还是要参考上面的「盈亏」。</p>
+<h2 id="滑点"><a href="#滑点" class="headerlink" title="滑点"></a>滑点</h2><p>滑点和深度有关系，假如说你想做多，但是卖单，第一单的 <code>U</code> 总值为 <code>10U</code>，第二单的 <code>U</code> 总值为 <code>20U</code>，你想买 <code>40U</code> 开多。</p>
+<p>这就意味着，你至少需要吃掉前两笔，相当于你原计划 <code>7U</code> 价格的时候做多，最后综合下来，你在 <code>8U</code> 的时候做多了。</p>
+<p>这无形中就拉高了你的平仓成本。这里，我们假设买单的价格是 <code>5U</code>，并且，买一单的总值为 <code>100U</code>。</p>
+<p>原计划，你 <code>7U</code> 开仓，这个时候如果你立刻平仓，你的亏损是</p>
+<pre><code>（5 - 7） / 7 * 40 = 11.42</code></pre><p>但是，实际上，综合下来，你的亏损是</p>
+<pre><code>（5 - 8） / 8 * 40 = 15</code></pre><p>假设，买一单的总值比 <code>40</code> 小，那么你的亏损还将扩大。</p>
+<p>所以，开仓的时候滑点非常重要。</p>
+<h2 id="下单"><a href="#下单" class="headerlink" title="下单"></a>下单</h2><p><code>binance</code> 的 <code>USWAP</code> 中，不能根据 <code>USDT</code> 来下单，只能下单 <code>coin</code> 数量。</p>
+<h3 id="止损单"><a href="#止损单" class="headerlink" title="止损单"></a>止损单</h3><p><code>binance</code> 的止损单不太符合我的传统思考。</p>
+<p>止盈止损订单的触发规则如下： </p>
+<ul>
+<li><code>STOP</code></li>
+<li><code>STOP_MARKET</code></li>
+</ul>
+<p>止损单: 买入: 最新合约价格/标记价格高于等于触发价<code>stopPrice</code></p>
+<p>卖出: 最新合约价格/标记价格低于等于触发价<code>stopPrice</code></p>
+<p>对于买单来说，如果您设置的 <code>stopPrice</code> 已经高于合约价格了，就会直接触发了，会直接触发的止损订单是不允许直接下的，需要先下一个未被触发的止损订单，等待市场价格高于您设置的 <code>stopPrice</code> ，进行触发。</p>
+<p>也就是，如果你想挂一个 <code>10U</code> 的单子，但是想要 <code>9U</code> 的时候止损，进行买多操作，是做不到的。【假设买一是 <code>10</code>】</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">side:</span><span class="string">'BUY'</span>,</span><br><span class="line"><span class="string">type:</span><span class="string">'STOP'</span>,</span><br><span class="line"><span class="string">price:</span><span class="number">10</span>,</span><br><span class="line"><span class="string">stopPrice:</span><span class="number">9</span></span><br></pre></td></tr></table></figure>
+
+<p>上面会直接触发错误。</p>
+<pre><code>2021 ORDER_WOULD_IMMEDIATELY_TRIGGER</code></pre><p>那么，如何做到想挂一个 <code>10U</code> 的单子，但是想要 <code>9U</code> 的时候止损？</p>
+<blockquote>
+<p>止盈止损订单是订单类型，可以用来开仓，也可以用来平仓。如果用来平仓。您有一笔做多的仓位，需要用卖单来平仓，止损卖单，触发价格设置的比市场价格低，等市场价格低于您设置的触发价格后才会触发，相当于更低的价格平掉您的多仓进行了止损。</p>
+</blockquote>
+<p>首先，下单通过 <code>LIMIT</code> 方式进行挂单。</p>
+<p>比如，我通过 <code>10U</code> 进行了挂单，开多，同时要下一个止损的卖单，参数如下:</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">side:</span><span class="string">'SELL'</span>,</span><br><span class="line"><span class="string">type:</span><span class="string">'STOP_MARKET'</span>,</span><br><span class="line"><span class="string">stopPrice:</span><span class="number">9</span></span><br></pre></td></tr></table></figure>
+
+<p>这样就可以了。</p>
+<h3 id="批量下单"><a href="#批量下单" class="headerlink" title="批量下单"></a>批量下单</h3><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">"type"</span>:<span class="string">"LIMIT"</span>,<span class="string">"timeInForce"</span>:<span class="string">"GTC"</span>,</span><br><span class="line"><span class="string">"symbol"</span>:<span class="string">"BTCUSDT"</span>,<span class="string">"side"</span>:<span class="string">"BUY"</span>,<span class="string">"price"</span>:<span class="string">"10001"</span>,<span class="string">"quantity"</span>:<span class="string">"0.001"</span>&#125;,&#123;<span class="string">"type"</span>:<span class="string">"LIMIT"</span>,<span class="string">"timeInForce"</span>:<span class="string">"GTC"</span>,</span><br><span class="line"><span class="string">"symbol"</span>:<span class="string">"BTCUSDT"</span>,<span class="string">"side"</span>:<span class="string">"BUY"</span>,<span class="string">"price"</span>:<span class="string">"10001"</span>,<span class="string">"quantity"</span>:<span class="string">"0.001"</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>批量下单的合约止盈止损单子</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">'batchOrders'</span>: <span class="string">'</span></span><br><span class="line"><span class="string">	&#123;"</span>symbol<span class="string">": "</span>CFXUSDT<span class="string">", "</span>side<span class="string">": "</span>SELL<span class="string">", "</span><span class="built_in">type</span><span class="string">": "</span>STOP_MARKET<span class="string">", "</span>quantity<span class="string">": "</span><span class="number">200.0</span><span class="string">", "</span>stopPrice<span class="string">": 0.23, "</span>positionSide<span class="string">": "</span>SHORT<span class="string">"&#125;,</span></span><br><span class="line"><span class="string">	&#123;"</span>symbol<span class="string">": "</span>DOGEBUSD<span class="string">", "</span>side<span class="string">": "</span>BUY<span class="string">", "</span><span class="built_in">type</span><span class="string">": "</span>STOP_MARKET<span class="string">", "</span>quantity<span class="string">": "</span><span class="number">200.0</span><span class="string">", "</span>stopPrice<span class="string">": 0.0915, "</span>positionSide<span class="string">": "</span>LONG<span class="string">"&#125;'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ps: <code>price</code>、<code>quantity</code> 等，都是字符串类型</p>
+<p>变成</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;url&#125;&#125;/fapi/v<span class="number">1</span>/batchOrders?batchOrders=<span class="symbol">%5</span>B<span class="symbol">%7</span>B<span class="symbol">%22</span><span class="keyword">type</span><span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%22</span>LIMIT<span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%22</span>timeInForce<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%22</span>GTC<span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%0</span>A<span class="symbol">%22</span>symbol<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%22</span>BTCUSDT<span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%22</span>side<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%22</span>BUY<span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%22</span>price<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%2210001</span><span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%22</span>quantity<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%220</span>.<span class="number">001</span><span class="symbol">%22</span><span class="symbol">%7</span>D<span class="symbol">%2</span>C<span class="symbol">%7</span>B<span class="symbol">%22</span><span class="keyword">type</span><span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%22</span>LIMIT<span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%22</span>timeInForce<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%22</span>GTC<span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%0</span>A<span class="symbol">%22</span>symbol<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%22</span>BTCUSDT<span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%22</span>side<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%22</span>BUY<span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%22</span>price<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%2210001</span><span class="symbol">%22</span><span class="symbol">%2</span>C<span class="symbol">%22</span>quantity<span class="symbol">%22</span><span class="symbol">%3</span>A<span class="symbol">%220</span>.<span class="number">001</span><span class="symbol">%22</span><span class="symbol">%7</span>D<span class="symbol">%5</span>D&amp;timestamp=&#123;&#123;timestamp&#125;&#125;&amp;signature=&#123;&#123;signature&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/tomoon/26_3.png" alt=""></p>
+<p>相关代码如下:</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> hmac</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="keyword">import</span> <span class="type">time</span></span><br><span class="line"><span class="keyword">import</span> urllib.parse</span><br><span class="line"><span class="keyword">import</span> <span class="type">json</span></span><br><span class="line"></span><br><span class="line">api_key = ""</span><br><span class="line">secret_key = ""</span><br><span class="line">base_url = "https://testnet.binancefuture.com"</span><br><span class="line">endpoint_path = <span class="string">'/fapi/v1/batchOrders'</span></span><br><span class="line"></span><br><span class="line">order1 = &#123;</span><br><span class="line">    "symbol": "BTCUSDT",</span><br><span class="line">    "side": "BUY",</span><br><span class="line">    "positionSide": "LONG",</span><br><span class="line">    "newClientOrderId": "order1",</span><br><span class="line">    "type": "LIMIT",</span><br><span class="line">    "price": "10010",</span><br><span class="line">    "quantity": "0.001",</span><br><span class="line">    "timeInForce": "GTC"</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">order2 = &#123;</span><br><span class="line">    "symbol": "BTCUSDT",</span><br><span class="line">    "side": "BUY",</span><br><span class="line">    "positionSide": "LONG",</span><br><span class="line">    "newClientOrderId": "order2",</span><br><span class="line">    "type": "LIMIT",</span><br><span class="line">    "price": "10000",</span><br><span class="line">    "quantity": "0.001",</span><br><span class="line">    "timeInForce": "GTC"</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">batchOrders = <span class="string">'['</span> + <span class="type">json</span>.dumps(order1) + <span class="string">','</span> + <span class="type">json</span>.dumps(order2) + <span class="string">']'</span></span><br><span class="line">params = &#123;</span><br><span class="line">    "batchOrders": batchOrders,</span><br><span class="line">    "timestamp": round(<span class="type">time</span>.time() * <span class="number">1000</span>),</span><br><span class="line">    "recvWindow": <span class="number">60000</span></span><br><span class="line">&#125;</span><br><span class="line">querystring = urllib.parse.urlencode(params)</span><br><span class="line">print(querystring, "\n")</span><br><span class="line"></span><br><span class="line">signature = hmac.<span class="built_in">new</span>(secret_key.encode(<span class="string">'utf-8'</span>), msg=querystring.encode(<span class="string">'utf-8'</span>), digestmod=hashlib.sha256).hexdigest()</span><br><span class="line">url = base_url + endpoint_path + "?" + querystring + "&amp;signature=" + signature</span><br><span class="line">print(url, "\n")</span><br><span class="line"></span><br><span class="line">payload = &#123;&#125;</span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'Content-Type'</span>: <span class="string">'application/x-www-form-urlencoded'</span>,</span><br><span class="line">    <span class="string">'X-MBX-APIKEY'</span>: api_key</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">response = requests.request("POST", url, headers=headers, data=payload)</span><br><span class="line"></span><br><span class="line">result = response.json()</span><br><span class="line"></span><br><span class="line">print(result)</span><br></pre></td></tr></table></figure>
+
+<h2 id="手续费"><a href="#手续费" class="headerlink" title="手续费"></a>手续费</h2><p>一般账户。</p>
+<p>主动吃单，<code>万4</code>手续费。</p>
+<p>挂单被吃，<code>万2</code>手续费。</p>
+<pre><code>手续费 = 成交价格 x 成交数量 x 手续费率 </code></pre><p>开仓、平仓各收取一次手续费</p>
+<p>可以使用 <code>BUSD</code> 进行交易，详情请看</p>
+<ul>
+<li><a href="https://www.binance.com/zh-CN/fee/futureFee">手续费</a></li>
+</ul>
+<p>另外，<code>BNB</code> 打 <code>9</code> 折。</p>
+<h2 id="仓位"><a href="#仓位" class="headerlink" title="仓位"></a>仓位</h2><p>这里有一个值得注意的是，通过调取借口返回的一个属性，<code>unRealizedProfit</code> 持仓未实现盈利，并不是真的盈利，而是指数价格的盈利，真正的盈利，请看上面的盈利计算。</p>
+<h2 id="平仓-4"><a href="#平仓-4" class="headerlink" title="平仓"></a>平仓</h2><p>平仓的 <code>api</code> 依然是</p>
+<pre><code>/fapi/v1/order</code></pre><p>这里通过 <code>U本位</code>举例子。</p>
+<p>币安并不提供专门的平仓 <code>api</code> 接口，而是通过下一个相反的单子进行平仓。</p>
+<p>比如，我有一个 <code>BTCUSDT</code> 的多单，如果想平仓，只需要下一个 <code>BTCUSDT</code> 的空单就好了。</p>
+<p>参数如下</p>
+<pre><code>symbol=BTCUSDT&amp;side=SELL&amp;reduceOnly=true&amp;type=MARKET&amp;quantity=0.1</code></pre><ul>
+<li><code>side</code>：和单子相反的方向</li>
+<li><code>reduceOnly</code>：等于 <code>true</code> 的时候，表明即便是 <code>quantity</code> 超过单子的平仓量也不会开一个相反的单子。如果，没有这个参数，那么，当 <code>quantity</code> 超过平仓量的时候，会出现新的单子</li>
+<li><code>type</code>：平仓类型，这里是市价</li>
+<li><code>quantify</code>：要平仓的数量</li>
+</ul>
+<p>如果您是<code>单向模式</code>，可以在下单的时候设置</p>
+<pre><code>reduceOnly=true</code></pre><p>来表示这笔订单是平仓单。</p>
+<blockquote>
+<p>客服回答: 单向模式下，用市价平仓可以用市价单MARKET比如如下参数是BTCUSDT平多(sell是开空或者平多，设定reduceOnly=true就一定是平多)symbol=BTCUSDT&amp;type=MARKET&amp;side=SELL&amp;quantity=1&amp;reduceOnly=true&amp;timestamp=167666666666</p>
+</blockquote>
+<p>另外，<code>api</code> 中有一个参数是 <code>closePosition</code> ，这个参数只能是止盈止损市价单使用，还不支持其他订单类型</p>
+<p>如果没有持仓，去平仓的话，会报 <code>2022</code> 错误。</p>
+<p>如果您当前是<code>双向模式</code>，可以用两个参数指定仓位的操作方向，</p>
+<ul>
+<li>side</li>
+<li>positionSide<ul>
+<li>side=BUY&amp;positionSide=SHORT 是平空</li>
+<li>side=SELL&amp;positionSide=LONG 是平多</li>
+</ul>
+</li>
+</ul>
+<h3 id="在不爆仓的情况下，平仓是根据什么价格"><a href="#在不爆仓的情况下，平仓是根据什么价格" class="headerlink" title="在不爆仓的情况下，平仓是根据什么价格"></a>在不爆仓的情况下，平仓是根据什么价格</h3><p>在深度足够的情况下</p>
+<p>平多仓位，平仓根据买一的价格。</p>
+<p>平空仓位，平仓根据卖一的价格。</p>
+<h2 id="U永续的连续K线和K线的区别"><a href="#U永续的连续K线和K线的区别" class="headerlink" title="U永续的连续K线和K线的区别"></a>U永续的连续K线和K线的区别</h2><ul>
+<li><code>K线</code>数据<ul>
+<li><code>/fapi/v1/klines</code></li>
+</ul>
+</li>
+<li>连续合约K线数据<ul>
+<li><code>/fapi/v1/continuousKlines</code></li>
+</ul>
+</li>
+</ul>
+<p>对于永续合约来说，这两个没区别，主要是针对交割。</p>
+<h2 id="双向持仓"><a href="#双向持仓" class="headerlink" title="双向持仓"></a>双向持仓</h2><p>双向持仓的意思是账户中可以同时下多空单子。</p>
+<h3 id="下单-1"><a href="#下单-1" class="headerlink" title="下单"></a>下单</h3><p>双向模式的开平仓订单规则如下：</p>
+<ul>
+<li>side=BUY&amp;positionSide=LONG是开多</li>
+<li>side=SELL&amp;positionSide=SHORT是开空</li>
+</ul>
+<h3 id="平仓-5"><a href="#平仓-5" class="headerlink" title="平仓"></a>平仓</h3><ul>
+<li>side=SELL&amp;positionSide=LONG是平多</li>
+<li>side=BUY&amp;positionSide=SHORT是平空</li>
+</ul>
+<p>双向持仓下，是不需要带 <code>reduceOnly</code> 的，本身就自带 <code>reduceOnly</code> 效果</p>
+<p>比如，平多，使用市价平仓，参数如下</p>
+<ul>
+<li>side=SELL&amp;positionSide=LONG&amp;type=MARKET&amp;quantity=xxx</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/tomoon/" rel="tag"># tomoon</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/17/life8/" rel="prev" title="life | 量化的知行合一">
+      <i class="fa fa-chevron-left"></i> life | 量化的知行合一
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/23/galaxy0/" rel="next" title="galaxy | 批量脚本 claim NFT">
+      galaxy | 批量脚本 claim NFT <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#现货"><span class="nav-number">1.</span> <span class="nav-text">现货</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#WSS-推送"><span class="nav-number">1.1.</span> <span class="nav-text">WSS 推送</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#trade-推送"><span class="nav-number">1.1.1.</span> <span class="nav-text">trade 推送</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询所有订单和查询当前挂单"><span class="nav-number">1.2.</span> <span class="nav-text">查询所有订单和查询当前挂单</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#合约"><span class="nav-number">2.</span> <span class="nav-text">合约</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#全仓和逐仓"><span class="nav-number">2.1.</span> <span class="nav-text">全仓和逐仓</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#账户"><span class="nav-number">2.2.</span> <span class="nav-text">账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#吃单"><span class="nav-number">2.3.</span> <span class="nav-text">吃单</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#盈亏"><span class="nav-number">2.4.</span> <span class="nav-text">盈亏</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#计算"><span class="nav-number">2.4.1.</span> <span class="nav-text">计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#开多赚钱案例"><span class="nav-number">2.4.1.1.</span> <span class="nav-text">开多赚钱案例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#开仓"><span class="nav-number">2.4.1.1.1.</span> <span class="nav-text">开仓</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#平仓"><span class="nav-number">2.4.1.1.2.</span> <span class="nav-text">平仓</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开多亏钱的案例"><span class="nav-number">2.4.1.2.</span> <span class="nav-text">开多亏钱的案例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#开仓-1"><span class="nav-number">2.4.1.2.1.</span> <span class="nav-text">开仓</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#平仓-1"><span class="nav-number">2.4.1.2.2.</span> <span class="nav-text">平仓</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开空亏钱的案例"><span class="nav-number">2.4.1.3.</span> <span class="nav-text">开空亏钱的案例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#开仓-2"><span class="nav-number">2.4.1.3.1.</span> <span class="nav-text">开仓</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#平仓-2"><span class="nav-number">2.4.1.3.2.</span> <span class="nav-text">平仓</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#平仓-3"><span class="nav-number">2.4.1.3.3.</span> <span class="nav-text">平仓</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#倍数的理解"><span class="nav-number">2.5.</span> <span class="nav-text">倍数的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#滑点"><span class="nav-number">2.6.</span> <span class="nav-text">滑点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下单"><span class="nav-number">2.7.</span> <span class="nav-text">下单</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#止损单"><span class="nav-number">2.7.1.</span> <span class="nav-text">止损单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#批量下单"><span class="nav-number">2.7.2.</span> <span class="nav-text">批量下单</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#手续费"><span class="nav-number">2.8.</span> <span class="nav-text">手续费</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#仓位"><span class="nav-number">2.9.</span> <span class="nav-text">仓位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#平仓-4"><span class="nav-number">2.10.</span> <span class="nav-text">平仓</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在不爆仓的情况下，平仓是根据什么价格"><span class="nav-number">2.10.1.</span> <span class="nav-text">在不爆仓的情况下，平仓是根据什么价格</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#U永续的连续K线和K线的区别"><span class="nav-number">2.11.</span> <span class="nav-text">U永续的连续K线和K线的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双向持仓"><span class="nav-number">2.12.</span> <span class="nav-text">双向持仓</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下单-1"><span class="nav-number">2.12.1.</span> <span class="nav-text">下单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#平仓-5"><span class="nav-number">2.12.2.</span> <span class="nav-text">平仓</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

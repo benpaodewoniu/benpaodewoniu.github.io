@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="由于 web3.py 在速度上无法满足我的需求，所以决定自己封装一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eth ｜ RPC 的自我封装">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2022/05/30/eth44/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="由于 web3.py 在速度上无法满足我的需求，所以决定自己封装一下。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-29T17:05:47.000Z">
+<meta property="article:modified_time" content="2023-12-10T10:35:06.717Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="eth">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2022/05/30/eth44/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>eth ｜ RPC 的自我封装 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2022/05/30/eth44/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          eth ｜ RPC 的自我封装
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-30 01:05:47" itemprop="dateCreated datePublished" datetime="2022-05-30T01:05:47+08:00">2022-05-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-12-10 18:35:06" itemprop="dateModified" datetime="2023-12-10T18:35:06+08:00">2023-12-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/" itemprop="url" rel="index"><span itemprop="name">平台 && 公链 && 项目 && 方向</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/evm/" itemprop="url" rel="index"><span itemprop="name">evm</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/evm/RPC/" itemprop="url" rel="index"><span itemprop="name">RPC</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/05/30/eth44/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/05/30/eth44/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>由于 web3.py 在速度上无法满足我的需求，所以决定自己封装一下。</p>
+<a id="more"></a>
+
+<ul>
+<li><a href="https://eth.wiki/json-rpc/API">JSON RPC API</a></li>
+<li><a href="https://ethereum.stackexchange.com/questions/3514/how-to-call-a-contract-method-using-the-eth-call-json-rpc-api">How to call a contract method using the eth_call JSON-RPC API</a></li>
+<li><a href="http://blog.hubwiz.com/2018/08/21/ethereum-python-json-rpc/">Python用以太坊JSON-RPC请求对智能合约进行部署和交易</a></li>
+</ul>
+<p>使用 curl 通过 rpc 进行访问</p>
+<pre><code>curl https://bsc-dataseed.binance.org/ -X POST --data &apos;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBlockByNumber&quot;,&quot;params&quot;:[&quot;latest&quot;, false],&quot;id&quot;:56}&apos; -x 127.0.0.1:1087</code></pre><p>注意看上面的引号。</p>
+<br/>
+
+<h1 id="使用-python-进行协程封装"><a href="#使用-python-进行协程封装" class="headerlink" title="使用 python 进行协程封装"></a>使用 python 进行协程封装</h1><br/>
+
+<p>由于 web3.py 的部分底层并不是协程，所以，想要发挥全部的方法，只能通过多线程。但是，多线程一个是不优雅，另一个就是耗费的资源过多，这里用协程自己封装一套 SDK。</p>
+<p>这里仅仅举两个例子。后面看情况，要不要开源相关的轮子。</p>
+<h2 id="get-block-info"><a href="#get-block-info" class="headerlink" title="get_block_info"></a>get_block_info</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">import asyncio</span><br><span class="line"></span><br><span class="line">import aiohttp</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> Config.config import proxies, is_proxy</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class EvmRequest:</span><br><span class="line">    evm_url = <span class="string">"https://bsc-dataseed.binance.org/"</span></span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line">    async def get_block_info(self, block_type):</span><br><span class="line">        <span class="builtin-name">print</span>(1)</span><br><span class="line">        <span class="keyword">if</span> is_proxy:</span><br><span class="line">           <span class="built_in"> proxy </span>= proxies</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">           <span class="built_in"> proxy </span>= <span class="string">""</span></span><br><span class="line">        data = &#123;</span><br><span class="line">            <span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,</span><br><span class="line">            <span class="string">"method"</span>: <span class="string">"eth_getBlockByNumber"</span>,</span><br><span class="line">            <span class="string">"params"</span>: [block_type, <span class="literal">False</span>],</span><br><span class="line">            <span class="string">"id"</span>: 1</span><br><span class="line">        &#125;</span><br><span class="line">        async with aiohttp.request(<span class="attribute">method</span>=<span class="string">"POST"</span>, <span class="attribute">url</span>=self.evm_url, <span class="attribute">json</span>=data, <span class="attribute">proxy</span>=proxy) as r:</span><br><span class="line">            reponse = await r.text(<span class="attribute">encoding</span>=<span class="string">"utf-8"</span>)</span><br><span class="line">            return reponse</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">evm_request = EvmRequest()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def init():</span><br><span class="line">    asyncio.<span class="builtin-name">run</span>(<span class="builtin-name">run</span>())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">async def <span class="builtin-name">run</span>():</span><br><span class="line">    functions = []</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line">    functions.append(evm_request.get_block_info(<span class="string">"latest"</span>))</span><br><span class="line"></span><br><span class="line">    results = await asyncio.gather(<span class="number">*f</span>unctions)</span><br><span class="line">    <span class="builtin-name">print</span>(results)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    init()</span><br></pre></td></tr></table></figure>
+
+<p>注意看 <code>post</code> 的传递数值的方式是 <code>json</code>。</p>
+<h2 id="RPC-和自己的合约做交互"><a href="#RPC-和自己的合约做交互" class="headerlink" title="RPC 和自己的合约做交互"></a>RPC 和自己的合约做交互</h2><h3 id="不耗费-gas-的-eth-call"><a href="#不耗费-gas-的-eth-call" class="headerlink" title="不耗费 gas 的 eth_call"></a>不耗费 gas 的 eth_call</h3><p>生成 <code>data</code> 的其他方式请参考</p>
+<ul>
+<li><a href="/2022/06/08/solidity40/">solidity | python 编码 abi data</a></li>
+</ul>
+<p>使用 <code>ganache</code> 部署一个简单合约。</p>
+<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SPDX-License-Identifier: MIT</span></span><br><span class="line"><span class="keyword">pragma</span> solidity ^<span class="number">0.8</span><span class="number">.0</span>;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">function</span> add(<span class="built_in">uint</span> a,<span class="built_in">uint</span> b) <span class="keyword">public</span> <span class="keyword">pure</span> returns(<span class="built_in">uint</span>)&#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里假设合约地址是: <code>0x5CF5F2dAFDF7998D9085ffafF5beB1B2b6e4c13c</code></p>
+<p>交互脚本为</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import sha3</span><br><span class="line">import web3</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line">w3 = web3.Web3()</span><br><span class="line">URL = <span class="string">'http://localhost:8545'</span></span><br><span class="line">session = requests.Session()</span><br><span class="line"></span><br><span class="line">myAddress = <span class="string">'0xF464A67CA59606f0fFE159092FF2F474d69FD675'</span>  #<span class="built_in"> address </span>funded <span class="keyword">in</span> genesis file</span><br><span class="line"></span><br><span class="line">abi = <span class="string">""</span><span class="string">"[&#123;"</span>inputs<span class="string">":[&#123;"</span>internalType<span class="string">":"</span>uint256<span class="string">","</span>name<span class="string">":"</span>a<span class="string">","</span>type<span class="string">":"</span>uint256<span class="string">"&#125;,&#123;"</span>internalType<span class="string">":"</span>uint256<span class="string">","</span>name<span class="string">":"</span>b<span class="string">","</span>type<span class="string">":"</span>uint256<span class="string">"&#125;],"</span>name<span class="string">":"</span>add<span class="string">","</span>outputs<span class="string">":[&#123;"</span>internalType<span class="string">":"</span>uint256<span class="string">","</span>name<span class="string">":"</span><span class="string">","</span>type<span class="string">":"</span>uint256<span class="string">"&#125;],"</span>stateMutability<span class="string">":"</span>pure<span class="string">","</span>type<span class="string">":"</span>function<span class="string">"&#125;]"</span><span class="string">""</span></span><br><span class="line"></span><br><span class="line">value1, value2 = 10, 32</span><br><span class="line">result = sha3.keccak_256()</span><br><span class="line">result.update(b<span class="string">"add(uint256,uint256)"</span>)</span><br><span class="line">methodId = a = result.hexdigest()[0:8]</span><br><span class="line">param1 = (value1).to_bytes(32, <span class="attribute">byteorder</span>=<span class="string">'big'</span>).hex()</span><br><span class="line">param2 = (value2).to_bytes(32, <span class="attribute">byteorder</span>=<span class="string">'big'</span>).hex()</span><br><span class="line">data = <span class="string">"0x"</span> + methodId + param1 + param2</span><br><span class="line"></span><br><span class="line">json_data = &#123;<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,</span><br><span class="line">             <span class="string">"method"</span>: <span class="string">"eth_call"</span>,</span><br><span class="line">             <span class="string">"params"</span>: [&#123;<span class="string">'from'</span>: myAddress,</span><br><span class="line">                         <span class="string">'to'</span>: <span class="string">"0x5CF5F2dAFDF7998D9085ffafF5beB1B2b6e4c13c"</span>,</span><br><span class="line">                         <span class="string">'data'</span>: data&#125;, <span class="string">"latest"</span>],  # must be an array [value1, value2, <span class="built_in">..</span>., valueN]</span><br><span class="line">             <span class="string">"id"</span>: 1&#125;</span><br><span class="line"></span><br><span class="line">s = session.post(URL,</span><br><span class="line">                 <span class="attribute">json</span>=json_data,</span><br><span class="line">                 headers=&#123;<span class="string">'Content-type'</span>: <span class="string">'application/json'</span>&#125;)</span><br><span class="line"><span class="builtin-name">print</span>(int(json.loads(s.text).<span class="builtin-name">get</span>(<span class="string">"result"</span>), 16))</span><br></pre></td></tr></table></figure>
+
+<p>ps: 2022-09-16</p>
+<p>这里要提示一下，通过 json-rpc 调用返回的数据，需要自己进行解析，举一个简单的例子。</p>
+<p>下面是我调用某一个合约返回的数据。</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000cfcc03efdd344811f5a90000000000000000000000000000000000000000000000bff77b8447ab536e2400000000000000000000000000000000000000000000016ff8d994f69a7293c900000000000000000000000000000000000000000000000156abcf0f93ab3e4f</span></span><br></pre></td></tr></table></figure>
+
+<p>进行拆开</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0</span>x</span><br><span class="line"><span class="number">0000000000000000000000000000000000000000000000000000000000000020</span></span><br><span class="line"><span class="number">0000000000000000000000000000000000000000000000000000000000000002</span></span><br><span class="line"><span class="number">00000000000000000000000000000000000000000000</span>cfcc03efdd344811f5a9</span><br><span class="line"><span class="number">0000000000000000000000000000000000000000000000</span>bff77b8447ab536e24</span><br><span class="line"><span class="number">00000000000000000000000000000000000000000000016f</span>f8d994f69a7293c9</span><br><span class="line"><span class="number">00000000000000000000000000000000000000000000000156</span>abcf0f93ab3e4f</span><br></pre></td></tr></table></figure>
+
+<p>然后根据你的合约情况进行相应的解析。</p>
+<h3 id="耗费-gas-的合约交互"><a href="#耗费-gas-的合约交互" class="headerlink" title="耗费 gas 的合约交互"></a>耗费 gas 的合约交互</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> sha3</span><br><span class="line"><span class="keyword">import</span> web3</span><br><span class="line"><span class="keyword">from</span> eth_abi <span class="keyword">import</span> encode</span><br><span class="line"><span class="keyword">from</span> eth_account <span class="keyword">import</span> Account</span><br><span class="line"><span class="keyword">from</span> web3 <span class="keyword">import</span> Web3</span><br><span class="line"></span><br><span class="line">w3 = web3.Web3()</span><br><span class="line">URL = <span class="string">'http://localhost:8545'</span></span><br><span class="line">session = requests.Session()</span><br><span class="line"></span><br><span class="line">myAddress = <span class="string">''</span>  <span class="comment"># address funded in genesis file</span></span><br><span class="line"></span><br><span class="line">abi = <span class="string">"""[]"""</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_submit_order_data</span><span class="params">()</span>:</span></span><br><span class="line">    encode_data_info = [...]</span><br><span class="line">    encode_data = encode([<span class="string">'address[]'</span>, <span class="string">'address[]'</span>, <span class="string">'address'</span>, <span class="string">'uint256'</span>], encode_data_info).hex()</span><br><span class="line">    encryption = sha3.keccak_256()</span><br><span class="line">    encryption.update(<span class="string">b"swapCoin(address[],address[],address,uint256)"</span>)</span><br><span class="line">    method_hex = encryption.hexdigest()[<span class="number">0</span>:<span class="number">8</span>]</span><br><span class="line">    method_encryption = method_hex</span><br><span class="line"></span><br><span class="line">    transaction = &#123;</span><br><span class="line">        <span class="string">"from"</span>: <span class="string">"..."</span>,  <span class="comment"># 发送交易的钱包地址</span></span><br><span class="line">        <span class="string">'to'</span>: <span class="string">"..."</span>,  <span class="comment"># 合约地址</span></span><br><span class="line">        <span class="string">"gas"</span>: <span class="string">"0x300000"</span>,  <span class="comment"># Gas 限制</span></span><br><span class="line">        <span class="string">"gasPrice"</span>: Web3.toWei(<span class="number">3</span>, <span class="string">'gwei'</span>),  <span class="comment"># Gas 价格</span></span><br><span class="line">        <span class="string">'nonce'</span>: <span class="number">2000</span>,  <span class="comment"># 交易 nonce</span></span><br><span class="line">        <span class="string">"data"</span>: <span class="string">"0x"</span> + method_encryption + encode_data  <span class="comment"># 合约方法和参数的十六进制数据</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> Account.sign_transaction(transaction, <span class="string">"rhino_order.sign_secret"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">submit_order</span><span class="params">()</span>:</span></span><br><span class="line">    contract_data = get_submit_order_data()</span><br><span class="line">    data = &#123;</span><br><span class="line">        <span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,</span><br><span class="line">        <span class="string">"method"</span>: <span class="string">"eth_sendRawTransaction"</span>,</span><br><span class="line">        <span class="string">"params"</span>: [</span><br><span class="line">            contract_data.rawTransaction.hex()</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">"id"</span>: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    s = session.post(URL,</span><br><span class="line">                     json=data,</span><br><span class="line">                     headers=&#123;<span class="string">'Content-type'</span>: <span class="string">'application/json'</span>&#125;)</span><br><span class="line">    print(int(json.loads(s.text).get(<span class="string">"result"</span>), <span class="number">16</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    submit_order()</span><br></pre></td></tr></table></figure>
+
+<p>上述代码只是用来展示用，其主要是与 <a href="/2023/11/14/tomoon63/">tomoon | cex2dex 合约再次优化</a> 进行交互。</p>
+<h3 id="struct-进行交互"><a href="#struct-进行交互" class="headerlink" title="struct 进行交互"></a>struct 进行交互</h3><p><code>solidity</code> 的代码如下</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^0.8.4;</span><br><span class="line"></span><br><span class="line"><span class="built_in">..</span>.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">contract MultiSwap &#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">..</span>.</span><br><span class="line"></span><br><span class="line">    struct coinAmount&#123;</span><br><span class="line">        uint amountIn;</span><br><span class="line">        uint amountOut;</span><br><span class="line">       <span class="built_in"> address </span>receiveAddress;</span><br><span class="line">        address[] routers;</span><br><span class="line">        address[] tokenContracts;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">..</span>.</span><br><span class="line"></span><br><span class="line">    function swapExactSupportingFeeCoin(coinAmount memory coin) external onlySign(msg.sender) &#123;</span><br><span class="line">        <span class="built_in">..</span>.</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>交互如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> sha3</span><br><span class="line"><span class="keyword">import</span> web3</span><br><span class="line"><span class="keyword">from</span> eth_abi <span class="keyword">import</span> encode</span><br><span class="line"><span class="keyword">from</span> eth_account <span class="keyword">import</span> Account</span><br><span class="line"><span class="keyword">from</span> web3 <span class="keyword">import</span> Web3</span><br><span class="line"></span><br><span class="line">w3 = web3.Web3()</span><br><span class="line">URL = <span class="string">'http://localhost:8545'</span></span><br><span class="line">session = requests.Session()</span><br><span class="line"></span><br><span class="line">myAddress = <span class="string">''</span>  <span class="comment"># address funded in genesis file</span></span><br><span class="line"></span><br><span class="line">abi = <span class="string">"""[]"""</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_submit_order_data</span><span class="params">()</span>:</span></span><br><span class="line">    encode_data_info = [...]</span><br><span class="line">    encode_data = encode([<span class="string">'uint256'</span>, <span class="string">'uint256'</span>, <span class="string">'address'</span>, <span class="string">'address[]'</span>, <span class="string">'address[]'</span>], encode_data_info).hex()</span><br><span class="line">    encryption = sha3.keccak_256()</span><br><span class="line">    encryption.update(<span class="string">b"swapExactSupportingFeeCoin((uint256,uint256,address,address[],address[]))"</span>) <span class="comment"># 特别注意这是一个 tuple</span></span><br><span class="line">    method_hex = encryption.hexdigest()[<span class="number">0</span>:<span class="number">8</span>]</span><br><span class="line">    method_encryption = method_hex</span><br><span class="line"></span><br><span class="line">    transaction = &#123;</span><br><span class="line">        <span class="string">"from"</span>: <span class="string">"..."</span>,  <span class="comment"># 发送交易的钱包地址</span></span><br><span class="line">        <span class="string">'to'</span>: <span class="string">"..."</span>,  <span class="comment"># 合约地址</span></span><br><span class="line">        <span class="string">"gas"</span>: <span class="string">"0x300000"</span>,  <span class="comment"># Gas 限制</span></span><br><span class="line">        <span class="string">"gasPrice"</span>: Web3.toWei(<span class="number">3</span>, <span class="string">'gwei'</span>),  <span class="comment"># Gas 价格</span></span><br><span class="line">        <span class="string">'nonce'</span>: <span class="number">2000</span>,  <span class="comment"># 交易 nonce</span></span><br><span class="line">        <span class="string">"data"</span>: <span class="string">"0x"</span> + method_encryption + encode_data  <span class="comment"># 合约方法和参数的十六进制数据</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> Account.sign_transaction(transaction, <span class="string">"rhino_order.sign_secret"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">submit_order</span><span class="params">()</span>:</span></span><br><span class="line">    contract_data = get_submit_order_data()</span><br><span class="line">    data = &#123;</span><br><span class="line">        <span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,</span><br><span class="line">        <span class="string">"method"</span>: <span class="string">"eth_sendRawTransaction"</span>,</span><br><span class="line">        <span class="string">"params"</span>: [</span><br><span class="line">            contract_data.rawTransaction.hex()</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">"id"</span>: <span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    s = session.post(URL,</span><br><span class="line">                     json=data,</span><br><span class="line">                     headers=&#123;<span class="string">'Content-type'</span>: <span class="string">'application/json'</span>&#125;)</span><br><span class="line">    print(int(json.loads(s.text).get(<span class="string">"result"</span>), <span class="number">16</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    submit_order()</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/eth/" rel="tag"># eth</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/05/29/eth43/" rel="prev" title="eth | subscribe">
+      <i class="fa fa-chevron-left"></i> eth | subscribe
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/05/solidity39/" rel="next" title="solidity | 通过合约抓取 token 价格">
+      solidity | 通过合约抓取 token 价格 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用-python-进行协程封装"><span class="nav-number">1.</span> <span class="nav-text">使用 python 进行协程封装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#get-block-info"><span class="nav-number">1.1.</span> <span class="nav-text">get_block_info</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RPC-和自己的合约做交互"><span class="nav-number">1.2.</span> <span class="nav-text">RPC 和自己的合约做交互</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#不耗费-gas-的-eth-call"><span class="nav-number">1.2.1.</span> <span class="nav-text">不耗费 gas 的 eth_call</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#耗费-gas-的合约交互"><span class="nav-number">1.2.2.</span> <span class="nav-text">耗费 gas 的合约交互</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#struct-进行交互"><span class="nav-number">1.2.3.</span> <span class="nav-text">struct 进行交互</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

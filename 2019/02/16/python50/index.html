@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这里是 skimage 的教程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python scikit-image skimage">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/02/16/python50/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里是 skimage 的教程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_5.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_7.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_8.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_9.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_10.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_11.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_12.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_13.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/50_14.png">
+<meta property="article:published_time" content="2019-02-16T07:35:53.000Z">
+<meta property="article:modified_time" content="2020-03-21T10:02:09.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="python 第三方库">
+<meta property="article:tag" content="matplotlib">
+<meta property="article:tag" content="skimage">
+<meta property="article:tag" content="scikit-image">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/python/50_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/02/16/python50/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python scikit-image skimage | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/02/16/python50/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python scikit-image skimage
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-16 15:35:53" itemprop="dateCreated datePublished" datetime="2019-02-16T15:35:53+08:00">2019-02-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-21 18:02:09" itemprop="dateModified" datetime="2020-03-21T18:02:09+08:00">2020-03-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/" itemprop="url" rel="index"><span itemprop="name">模块</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/scikit-image/" itemprop="url" rel="index"><span itemprop="name">scikit-image</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/02/16/python50/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/02/16/python50/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里是 skimage 的教程。</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://blog.csdn.net/u012300744/article/details/80083282">python图像处理之scikit-image基本用法</a></p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>python有很多的数字图像处理相关的包，像</p>
+<pre><code>PIL
+Pillow
+OpenCV
+scikit-image
+等等</code></pre><p>其中PIL和Pillow只提供最基础的数字图像处理，功能有限；</p>
+<p>opencv实际上是一个c++库，只是提供了python接口，</p>
+<p>scikit-image是基于scipy的一款图像处理包，它将图片作为numpy数组进行处理，正好与matlab一样，因此，我们最终选择scikit-image进行数字图像处理。</p>
+<h2 id="python库安装"><a href="#python库安装" class="headerlink" title="python库安装"></a>python库安装</h2><p>我用的是 conda</p>
+<pre><code>conda install scikit-image</code></pre><p>scikit-image是基于numpy，因此需要安装numpy和scipy，同时需要安装matplotlib进行图片的实现等。</p>
+<p>可以通过如下程序简单测试下相关库是否安装成功</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> scipy <span class="keyword">as</span> sp</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io</span><br><span class="line">img = io.imread(<span class="string">"./cat.png"</span>)</span><br><span class="line">print(img.shape)</span><br><span class="line">plt.imshow(img)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>若显示正常，则可以认为相关的库安装成功</p>
+<h2 id="skimage库子模块介绍"><a href="#skimage库子模块介绍" class="headerlink" title="skimage库子模块介绍"></a>skimage库子模块介绍</h2><p>skimage库的全称scikit-image Scikit， 是对scipy.ndimage进行了扩展，提供了更多的图片处理功能。skimage包含很多的子模块，各个子模块具有不同的功能，如下</p>
+<p><img src="/images/python/50_0.png" alt=""></p>
+<p>当要使用对应的模块中功能函数时，需要通过import导入对应的子模块即可, 若要导入多个子模块时，子模块之间用逗号隔开，如下：</p>
+<pre><code>from skimage import io, data, feature</code></pre><h2 id="skimage操作"><a href="#skimage操作" class="headerlink" title="skimage操作"></a>skimage操作</h2><h3 id="图像读取-保存与显示"><a href="#图像读取-保存与显示" class="headerlink" title="图像读取, 保存与显示"></a>图像读取, 保存与显示</h3><p>skimage中io子模块提供了相关的功能，同时也提供了一些data模块，其中包含一些示例图片用于练习</p>
+<p>导入io子模块的python语句如下:</p>
+<pre><code>from skimage import io</code></pre><h3 id="从外部读取图片并显示"><a href="#从外部读取图片并显示" class="headerlink" title="从外部读取图片并显示"></a>从外部读取图片并显示</h3><p>使用 skimage.io.imread(fname) 读取fname指定的图片，</p>
+<p>skimage.io.imshow(arr)， 表示显示arr数组表示的图片</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io</span><br><span class="line">img = io.imread(<span class="string">'./cat.png'</span>)</span><br><span class="line">io.imshow(img)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_1.png" alt=""></p>
+<p>读取单张灰度图片时，使用 skimage.io.imread(fname, as_grey=True) 函数，第一个参数fname表示要显示的图片路径，第二个参数as_grey，是bool类型，默认值False。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io</span><br><span class="line">img = io.imread(<span class="string">'./cat.png'</span>, as_grey=<span class="literal">True</span>)</span><br><span class="line">io.imshow(img)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_2.png" alt=""></p>
+<h2 id="skimage自带图片"><a href="#skimage自带图片" class="headerlink" title="skimage自带图片"></a>skimage自带图片</h2><p><img src="/images/python/50_3.png" alt=""></p>
+<p>例如</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line">img = data.hubble_deep_field()</span><br><span class="line">io.imshow(img)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_4.png" alt=""></p>
+<p>图片名就是对应的函数名，如camera图片对应的函数名为 data.camera()。</p>
+<p>注：这些图片存储在skimage的安装目录下，可以通过data_dir把路径打印出来。</p>
+<pre><code>from skimage import data_dir
+print (data_dir)</code></pre><p>输出为：</p>
+<pre><code>/usr/local/lib/python3.6/dist-packages/skimage/data</code></pre><h2 id="保存图片"><a href="#保存图片" class="headerlink" title="保存图片"></a>保存图片</h2><p>使用 io.imsave(fname, arr) 函数进行保存,</p>
+<pre><code>参数fname: 表示保存的路径和名称
+参数arr：表示需要保存的数组变量</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line"></span><br><span class="line">img = data.checkerboard()</span><br><span class="line">io.imshow(img)</span><br><span class="line">io.imsave(<span class="string">'checkerboard_copy.jpg'</span>, img)</span><br></pre></td></tr></table></figure>
+
+<p>这样，在当前的工作目录下就增加了一个checkerboard_copy.jpg文件。</p>
+<p>注：保存图片同时也起到了转换格式的作用，若读取的是png格式图片，当保存为jpg时，则图片从png格式转换为jpg格式图片。</p>
+<h2 id="获取图片信息"><a href="#获取图片信息" class="headerlink" title="获取图片信息"></a>获取图片信息</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line"></span><br><span class="line">img = data.chelsea()</span><br><span class="line">io.imshow(img)</span><br><span class="line">io.show()</span><br><span class="line"></span><br><span class="line">print(type(img))    <span class="comment"># 类型</span></span><br><span class="line">print(img.shape)    <span class="comment"># 形状</span></span><br><span class="line">print(img.shape[<span class="number">0</span>]) <span class="comment"># 图片宽度</span></span><br><span class="line">print(img.shape[<span class="number">1</span>]) <span class="comment"># 图片高度</span></span><br><span class="line">print(img.shape[<span class="number">2</span>]) <span class="comment"># 图片通道数</span></span><br><span class="line">print(img.size)     <span class="comment"># 显示总像素个数</span></span><br><span class="line">print(img.max())    <span class="comment"># 最大像素值</span></span><br><span class="line">print(img.min())    <span class="comment"># 最小像素值</span></span><br><span class="line">print(img.mean())   <span class="comment"># 像素平均值</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="图像像素访问与裁剪"><a href="#图像像素访问与裁剪" class="headerlink" title="图像像素访问与裁剪"></a>图像像素访问与裁剪</h2><p>图片读入程序后，以numpy数组方式存储，因此对numpy数组的操作，都可以用于图片数组，对数组元素的访问，实际上就是对图片像素点的访问。</p>
+<h3 id="像素读取"><a href="#像素读取" class="headerlink" title="像素读取"></a>像素读取</h3><p>对 彩色图片 的像素点访问方式如下</p>
+<pre><code>img[i, j, c]
+    i 表示图片的行数
+    j 表示图片的列数
+    c 表示图片的通道数(RGB三通道分别对应0, 1, 2)。</code></pre><p>坐标从左上角开始</p>
+<p>对 灰度图片 的像素点访问方式如下</p>
+<pre><code>gray[i, j]</code></pre><p>例如， 对data中宇航员图片的B通道中的第20行10列的像素值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line"></span><br><span class="line">img = data.astronaut()</span><br><span class="line">pixel = img[<span class="number">20</span>, <span class="number">10</span>, <span class="number">2</span>]</span><br><span class="line">print(pixel)</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<pre><code>69</code></pre><p>例如，显示红色单通道图片的程序如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line"></span><br><span class="line">img = data.astronaut()</span><br><span class="line">R = img[:, :, <span class="number">0</span>]</span><br><span class="line">io.imshow(R)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_5.png" alt=""></p>
+<h3 id="像素修改"><a href="#像素修改" class="headerlink" title="像素修改"></a>像素修改</h3><p>例如，对宇航员图片随机添加椒盐噪声</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">img = data.astronaut()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 随机生成5000个椒盐点</span></span><br><span class="line">rows, cols, dims = img.shape</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5000</span>):</span><br><span class="line">    x = np.random.randint(<span class="number">0</span>, rows)</span><br><span class="line">    y = np.random.randint(<span class="number">0</span>, cols)</span><br><span class="line">    img[x, y, :] = <span class="number">255</span></span><br><span class="line"></span><br><span class="line">io.imshow(img)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_6.png" alt=""></p>
+<p>此处，使用numpy中的random来产生随机数， randint(0, cols)表示随机生成一个整数， 范围在0到cols之间。</p>
+<h3 id="图片裁剪"><a href="#图片裁剪" class="headerlink" title="图片裁剪"></a>图片裁剪</h3><p>由于图片是以numpy数组进行存储，因此对于数组的裁剪，就是对图片的裁剪</p>
+<p>例如，对宇航员图片进行裁剪</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line"></span><br><span class="line">img = data.astronaut()</span><br><span class="line">partial_img = img[<span class="number">50</span>:<span class="number">150</span>, <span class="number">170</span>:<span class="number">270</span>, :]</span><br><span class="line">io.imshow(partial_img)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_7.png" alt=""></p>
+<p>对多个像素点进行操作时， 使用数组切片方式进行访问， 切片方式访问的是指定间隔内下标对应的像素点。以下是一些例子</p>
+<pre><code>img[i,:] = im[j,:]      # 将第 j 行的数值赋值给第 i 行
+img[:,i] = 100          # 将第 i 列的所有数值设为 100
+img[:100,:50].sum()     # 计算前 100 行、前 50 列所有数值的和
+img[50:100,50:100]      # 50~100 行，50~100 列（不包括第 100 行和第 100 列）
+img[i].mean()           # 第 i 行所有数值的平均值
+img[:,-1]               # 最后一列
+img[-2,:] (or im[-2])   # 倒数第二行</code></pre><p>以下是两个对图片的像素值进行访问和修改的例子</p>
+<p>例1： 将宇航员图片进行二值化，像素值大于128的变为1, 否在变为0</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data, color</span><br><span class="line"></span><br><span class="line">img = data.astronaut()</span><br><span class="line"></span><br><span class="line">img_gray = color.rgb2gray(img)</span><br><span class="line">rows, cols = img_gray.shape</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(rows):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(cols):</span><br><span class="line">        <span class="keyword">if</span> (img_gray[i, j] &lt;= <span class="number">0.5</span>):</span><br><span class="line">            img_gray[i, j] = <span class="number">0</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            img_gray[i, j] = <span class="number">1</span></span><br><span class="line">io.imshow(img_gray)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_8.png" alt=""></p>
+<p>例2： 使用color模块的rgb2gray()函数，将彩色三通道图片转换为灰度图片，转换结果为float64类型的数组，范围在[0,1]之间</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line"></span><br><span class="line">img = data.astronaut()</span><br><span class="line"></span><br><span class="line">img_idx_modified = img[:, :, <span class="number">0</span>] &gt; <span class="number">170</span></span><br><span class="line">print(img_idx_modified)</span><br><span class="line">img[img_idx_modified] = [<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">io.imshow(img)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_9.png" alt=""></p>
+<p>这个例子先对R通道的所有像素值进行判断，如果大于170，则将这个地方的像素值变为[0,255,0], 即G通道值为255，R和B通道值为0。</p>
+<h2 id="图像数据类型以及颜色空间转换"><a href="#图像数据类型以及颜色空间转换" class="headerlink" title="图像数据类型以及颜色空间转换"></a>图像数据类型以及颜色空间转换</h2><h3 id="图像数据类型"><a href="#图像数据类型" class="headerlink" title="图像数据类型"></a>图像数据类型</h3><p>在skimage中，一张图片以numpy数组形式存储，数组的数据类型有很多中，相互之间可以转换，数据类型以及取值范围如下表所示</p>
+<p><img src="/images/python/50_10.png" alt=""></p>
+<p>一张图片的像素值范围是[0,255], 因此默认类型是unit8, 可用如下代码查看数据类型：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data</span><br><span class="line">img = data.astronaut()</span><br><span class="line">print(img.dtype.name)</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<pre><code>uint8</code></pre><p>在上面的表中，特别注意的是float类型，它的范围是[-1,1]或[0,1]之间。一张彩色图片转换为灰度图后，它的类型就由unit8变成了float</p>
+<h4 id="uint8转为float"><a href="#uint8转为float" class="headerlink" title="uint8转为float"></a>uint8转为float</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> data, img_as_float</span><br><span class="line"></span><br><span class="line">img = data.astronaut()</span><br><span class="line">print(img.dtype.name)</span><br><span class="line"></span><br><span class="line">dst = img_as_float(img)</span><br><span class="line">print(dst.dtype.name)</span><br></pre></td></tr></table></figure>
+
+<p>输出为</p>
+<pre><code>uint8
+float64</code></pre><h4 id="float转为uint8"><a href="#float转为uint8" class="headerlink" title="float转为uint8"></a>float转为uint8</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> img_as_ubyte</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">img = np.array([<span class="number">0</span>, <span class="number">0.5</span>, <span class="number">1</span>], dtype=float)</span><br><span class="line">print(img.dtype.name)</span><br><span class="line"></span><br><span class="line">dst = img_as_ubyte(img)</span><br><span class="line">print(dst.dtype.name)</span><br></pre></td></tr></table></figure>
+
+<p>输出为：</p>
+<pre><code>float64
+uint8</code></pre><p>float转为uint8,可能会造成数据损失，因此会有警告</p>
+<p>除了如上两种转换以外，还有其他的一些类型转换，如下表:</p>
+<p><img src="/images/python/50_11.png" alt=""></p>
+<h3 id="颜色空间及转换"><a href="#颜色空间及转换" class="headerlink" title="颜色空间及转换"></a>颜色空间及转换</h3><p>除了直接转换可以改变数据类型外，还可以通过图像的颜色空间转换来改变数据类型。</p>
+<p>常用的颜色空间有灰度空间、rgb空间、hsv空间和cmyk空间。颜色空间转换以后，图片类型都变成了float型。</p>
+<p>所有的颜色空间转换函数，都放在skimage的color模块内</p>
+<h4 id="RGB转为灰度图"><a href="#RGB转为灰度图" class="headerlink" title="RGB转为灰度图"></a>RGB转为灰度图</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io,data,color</span><br><span class="line">img=data.camera()</span><br><span class="line">gray=color.rgb2gray(img)</span><br><span class="line">io.imshow(gray)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_12.png" alt=""></p>
+<p>其它的转换，用法都是一样的，列举常用的如下：</p>
+<pre><code>skimage.color.rgb2grey(rgb)
+skimage.color.rgb2hsv(rgb)
+skimage.color.rgb2lab(rgb)
+skimage.color.gray2rgb(image)
+skimage.color.hsv2rgb(hsv)
+skimage.color.lab2rgb(lab)</code></pre><p>实际上，上面的所有转换函数，都可以用一个函数来代替</p>
+<pre><code>skimage.color.convert_colorspace(arr, fromspace, tospace)</code></pre><p>表示将arr从fromspace颜色空间转换到tospace颜色空间。</p>
+<h4 id="RGB转为HSV"><a href="#RGB转为HSV" class="headerlink" title="RGB转为HSV"></a>RGB转为HSV</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io, data, color</span><br><span class="line"></span><br><span class="line">img = data.coffee()</span><br><span class="line">hsv = color.convert_colorspace(img, <span class="string">'RGB'</span>, <span class="string">'HSV'</span>)</span><br><span class="line">io.imshow(hsv)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_13.png" alt=""></p>
+<p>在color模块的颜色空间转换函数中，还有一个比较有用的函数是</p>
+<p>skimage.color.label2rgb(arr), 可以根据标签值对图片进行着色。以后的图片分类后着色就可以用这个函数。</p>
+<h4 id="将coffee图片分成三类，然后用默认颜色对三类进行着色"><a href="#将coffee图片分成三类，然后用默认颜色对三类进行着色" class="headerlink" title="将coffee图片分成三类，然后用默认颜色对三类进行着色"></a>将coffee图片分成三类，然后用默认颜色对三类进行着色</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> skimage <span class="keyword">import</span> io,data,color</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">img=data.coffee()</span><br><span class="line">gray=color.rgb2gray(img)</span><br><span class="line">rows,cols=gray.shape</span><br><span class="line"></span><br><span class="line">labels=np.zeros([rows,cols])</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(rows):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(cols):</span><br><span class="line">        <span class="keyword">if</span>(gray[i,j]&lt;<span class="number">0.4</span>):</span><br><span class="line">            labels[i,j]=<span class="number">0</span></span><br><span class="line">        <span class="keyword">elif</span>(gray[i,j]&lt;<span class="number">0.75</span>):</span><br><span class="line">            labels[i,j]=<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            labels[i,j]=<span class="number">2</span></span><br><span class="line">dst=color.label2rgb(labels)</span><br><span class="line"></span><br><span class="line">io.imshow(dst)</span><br><span class="line">io.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/50_14.png" alt=""></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/python-%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/" rel="tag"># python 第三方库</a>
+              <a href="/tags/matplotlib/" rel="tag"># matplotlib</a>
+              <a href="/tags/skimage/" rel="tag"># skimage</a>
+              <a href="/tags/scikit-image/" rel="tag"># scikit-image</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/15/movie17/" rel="prev" title="《僵尸先生》">
+      <i class="fa fa-chevron-left"></i> 《僵尸先生》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/18/paper3/" rel="next" title="如何下载国外科研书籍">
+      如何下载国外科研书籍 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python库安装"><span class="nav-number">3.</span> <span class="nav-text">python库安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#skimage库子模块介绍"><span class="nav-number">4.</span> <span class="nav-text">skimage库子模块介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#skimage操作"><span class="nav-number">5.</span> <span class="nav-text">skimage操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#图像读取-保存与显示"><span class="nav-number">5.1.</span> <span class="nav-text">图像读取, 保存与显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从外部读取图片并显示"><span class="nav-number">5.2.</span> <span class="nav-text">从外部读取图片并显示</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#skimage自带图片"><span class="nav-number">6.</span> <span class="nav-text">skimage自带图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#保存图片"><span class="nav-number">7.</span> <span class="nav-text">保存图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取图片信息"><span class="nav-number">8.</span> <span class="nav-text">获取图片信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图像像素访问与裁剪"><span class="nav-number">9.</span> <span class="nav-text">图像像素访问与裁剪</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#像素读取"><span class="nav-number">9.1.</span> <span class="nav-text">像素读取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#像素修改"><span class="nav-number">9.2.</span> <span class="nav-text">像素修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图片裁剪"><span class="nav-number">9.3.</span> <span class="nav-text">图片裁剪</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图像数据类型以及颜色空间转换"><span class="nav-number">10.</span> <span class="nav-text">图像数据类型以及颜色空间转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#图像数据类型"><span class="nav-number">10.1.</span> <span class="nav-text">图像数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#uint8转为float"><span class="nav-number">10.1.1.</span> <span class="nav-text">uint8转为float</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#float转为uint8"><span class="nav-number">10.1.2.</span> <span class="nav-text">float转为uint8</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#颜色空间及转换"><span class="nav-number">10.2.</span> <span class="nav-text">颜色空间及转换</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RGB转为灰度图"><span class="nav-number">10.2.1.</span> <span class="nav-text">RGB转为灰度图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RGB转为HSV"><span class="nav-number">10.2.2.</span> <span class="nav-text">RGB转为HSV</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将coffee图片分成三类，然后用默认颜色对三类进行着色"><span class="nav-number">10.2.3.</span> <span class="nav-text">将coffee图片分成三类，然后用默认颜色对三类进行着色</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="我们主要是讲解两个内容，一个是声明变量的两种形式，另一个是变量的初始化，也就是 sess.run(init) 中的 init。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorflow 的变量以及初始化">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/03/25/tensorflow22/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="我们主要是讲解两个内容，一个是声明变量的两种形式，另一个是变量的初始化，也就是 sess.run(init) 中的 init。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-03-25T02:37:35.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:46:17.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="tensorflow">
+<meta property="article:tag" content="变量">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/03/25/tensorflow22/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>tensorflow 的变量以及初始化 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/03/25/tensorflow22/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tensorflow 的变量以及初始化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-25 10:37:35" itemprop="dateCreated datePublished" datetime="2019-03-25T10:37:35+08:00">2019-03-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:46:17" itemprop="dateModified" datetime="2020-05-12T10:46:17+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/tensorflow/" itemprop="url" rel="index"><span itemprop="name">tensorflow</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/03/25/tensorflow22/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/03/25/tensorflow22/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>我们主要是讲解两个内容，一个是声明变量的两种形式，另一个是变量的初始化，也就是 sess.run(init) 中的 init。</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://blog.csdn.net/qq_33915826/article/details/79793171">tf.get_variable()和tf.Variable()的区别</a><br><a href="http://wiki.jikexueyuan.com/project/tensorflow-zh/how_tos/variable_scope.html">共享变量</a><br><a href="https://blog.csdn.net/zSean/article/details/75091509">Tensorflow中的变量初始化函数</a><br><a href="https://blog.csdn.net/dcrmg/article/details/80034075">tensorflow中的参数初始化方法</a><br><a href="https://zhuanlan.zhihu.com/p/37922147">Tensorflow学习笔记: 变量及共享变量</a></p>
+<h2 id="变量的声明"><a href="#变量的声明" class="headerlink" title="变量的声明"></a>变量的声明</h2><p>TensorFlow中定义变量的时候有两种操作。</p>
+<p>tf.get_variable()和tf.Variable()。</p>
+<p>TensorFlow中变量主要用来表示机器学习模型中的参数，变量通过 tf.Variable 类进行操作。tf.Variable 表示张量，通过运行 op 可以改变它的值。与 tf.Tensor 对象不同，tf.Variable 存在于单个 session.run 调用的上下文之外。</p>
+<p>在内部，tf.Variable 存储持久张量。具体 op 允许您读取和修改此张量的值。这些修改在多个 tf.Session 之间是可见的，因此对于一个 tf.Variable，多个工作器可以看到相同的值。</p>
+<h3 id="tf-Variable-创建变量"><a href="#tf-Variable-创建变量" class="headerlink" title="tf.Variable 创建变量"></a>tf.Variable 创建变量</h3><p>tf.Variable的初始化函数如下所示</p>
+<pre><code>__init__(
+    initial_value=None,
+    trainable=True,
+    collections=None,
+    validate_shape=True,
+    caching_device=None,
+    name=None,
+    variable_def=None,
+    dtype=None,
+    expected_shape=None,
+    import_scope=None,
+    constraint=None
+)</code></pre><p>其中参数</p>
+<pre><code>initial_value 表示初始化值，用Tensor表示
+trainable 表示变量是否被训练，如果被训练，将加入到tf.GraphKeys.TRAINABLE_VARIABLES集合中，TensorFlow将计算其梯度的变量
+collections 表示一个graph collections keys的集合，这个创建的变量将被添加到这些集合中，默认集合是[GraphKeys.GLOBAL_VARIABLES].
+name: 变量的命名，默认是&apos;Variable&apos;
+dtype 表示类型</code></pre><p>例如我们创建一个变量，并且查看其name和shape</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">w1 = tf.Variable(tf.random_normal([<span class="number">784</span>,<span class="number">200</span>], stddev = <span class="number">0.35</span>), name=<span class="string">"weights"</span>)</span><br><span class="line">b1 = tf.Variable(tf.zeros([<span class="number">200</span>]),name=<span class="string">"biases"</span>)</span><br><span class="line"></span><br><span class="line">w2 = tf.Variable(tf.random_normal([<span class="number">784</span>,<span class="number">200</span>], stddev = <span class="number">0.35</span>), name=<span class="string">"weights"</span>) <span class="comment"># 名称相同</span></span><br><span class="line">b2 = tf.Variable(tf.zeros([<span class="number">200</span>]),name=<span class="string">"biases"</span>) <span class="comment"># 名称相同</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> w1.name, w1.shape</span><br><span class="line"><span class="keyword">print</span> b1.name, b1.shape</span><br><span class="line"><span class="keyword">print</span> w2.name, w2.shape</span><br><span class="line"><span class="keyword">print</span> b2.name, b2.shape</span><br><span class="line"></span><br><span class="line">************************************输出**************************************</span><br><span class="line">weights:<span class="number">0</span> (<span class="number">784</span>, <span class="number">200</span>)</span><br><span class="line">biases:<span class="number">0</span> (<span class="number">200</span>,)</span><br><span class="line">weights_1:<span class="number">0</span> (<span class="number">784</span>, <span class="number">200</span>)</span><br><span class="line">biases_1:<span class="number">0</span> (<span class="number">200</span>,)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到在命名的时候，如果指定的name重复，那么w2就会被命名为”name_1:0” 这样累加下去。</p>
+<h3 id="变量集合-collections"><a href="#变量集合-collections" class="headerlink" title="变量集合 collections"></a>变量集合 collections</h3><p>默认情况下，每个tf.Variable都放置在以下两个集合中：<em>tf.GraphKeys.GLOBAL_VARIABLES- 可以在多个设备共享的变量，</em>tf.GraphKeys.TRAINABLE_VARIABLES- TensorFlow 将计算其梯度的变量。</p>
+<h4 id="查看集合变量列表"><a href="#查看集合变量列表" class="headerlink" title="查看集合变量列表"></a>查看集合变量列表</h4><p>要查看放置在某个集合中的所有变量的列表，可以采用如下方式</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">w1 = tf.Variable(tf.random_normal([<span class="number">784</span>,<span class="number">200</span>], stddev = <span class="number">0.35</span>), name=<span class="string">"weights"</span>)</span><br><span class="line">b1 = tf.Variable(tf.zeros([<span class="number">200</span>]),name=<span class="string">"biases"</span>)</span><br><span class="line"></span><br><span class="line">w2 = tf.Variable(tf.random_normal([<span class="number">784</span>,<span class="number">200</span>], stddev = <span class="number">0.35</span>), name=<span class="string">"weights"</span>) <span class="comment"># 名称相同</span></span><br><span class="line">b2 = tf.Variable(tf.zeros([<span class="number">200</span>]),name=<span class="string">"biases"</span>) <span class="comment"># 名称相同</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)</span><br><span class="line"></span><br><span class="line">************************************输出**************************************</span><br><span class="line">[&lt;tf.Variable <span class="string">'weights:0'</span> shape=(<span class="number">784</span>, <span class="number">200</span>) dtype=float32_ref&gt;, &lt;tf.Variable <span class="string">'biases:0'</span> shape=(<span class="number">200</span>,) dtype=float32_ref&gt;, &lt;tf.Variable <span class="string">'weights_1:0'</span> shape=(<span class="number">784</span>, <span class="number">200</span>) dtype=float32_ref&gt;, &lt;tf.Variable <span class="string">'biases_1:0'</span> shape=(<span class="number">200</span>,) dtype=float32_ref&gt;]</span><br></pre></td></tr></table></figure>
+
+<p>可以看到输出结果是所有变量的列表</p>
+<h4 id="创建变量集合"><a href="#创建变量集合" class="headerlink" title="创建变量集合"></a>创建变量集合</h4><p>如果您不希望变量被训练，可以将其添加到 tf.GraphKeys.LOCAL_VARIABLES 集合中。例如，以下代码段展示了如何将名为 my_local 的变量添加到此集合中：</p>
+<pre><code>my_local = tf.get_variable(&quot;my_local&quot;, shape=(),
+collections=[tf.GraphKeys.LOCAL_VARIABLES])</code></pre><p>或者，您可以指定 trainable=False 为 tf.get_variable 的参数：</p>
+<pre><code>my_non_trainable = tf.get_variable(&quot;my_non_trainable&quot;,
+                                   shape=(),
+                                   trainable=False)</code></pre><p>我们测试效果如下所示，可以看到b2的trainable=False，那么输出collection没有b2</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">w1 = tf.Variable(tf.random_normal([<span class="number">784</span>,<span class="number">200</span>], stddev = <span class="number">0.35</span>), name=<span class="string">"weights"</span>)</span><br><span class="line">b1 = tf.Variable(tf.zeros([<span class="number">200</span>]),name=<span class="string">"biases"</span>)</span><br><span class="line"></span><br><span class="line">w2 = tf.Variable(tf.random_normal([<span class="number">784</span>,<span class="number">200</span>], stddev = <span class="number">0.35</span>), name=<span class="string">"weights"</span>) <span class="comment"># 名称相同</span></span><br><span class="line">b2 = tf.Variable(tf.zeros([<span class="number">200</span>]),name=<span class="string">"biases"</span>, trainable=<span class="literal">False</span>) <span class="comment"># 名称相同</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)</span><br><span class="line"></span><br><span class="line">************************************输出**************************************</span><br><span class="line">[&lt;tf.Variable <span class="string">'weights:0'</span> shape=(<span class="number">784</span>, <span class="number">200</span>) dtype=float32_ref&gt;, &lt;tf.Variable <span class="string">'biases:0'</span> shape=(<span class="number">200</span>,) dtype=float32_ref&gt;, &lt;tf.Variable <span class="string">'weights_1:0'</span> shape=(<span class="number">784</span>, <span class="number">200</span>) dtype=float32_ref&gt;]</span><br></pre></td></tr></table></figure>
+
+<p>您也可以使用自己的集合。集合名称可为任何字符串，且您无需显式创建集合。创建变量（或任何其他对象）后，要将其添加到集合，请调用 tf.add_to_collection。例如，以下代码将名为 my_local 的现有变量添加到名为 my_collection_name 的集合中：</p>
+<p>tf.add_to_collection(“my_collection_name”, my_local)</p>
+<h3 id="共享变量"><a href="#共享变量" class="headerlink" title="共享变量"></a>共享变量</h3><p>我们查看下面的代码，表示一个卷积神经网络，其中包括conv1_weights, conv1_biases, conv2_weights, conv2_biases四个参数，也就是4个变量</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_image_filter</span><span class="params">(input_images)</span>:</span></span><br><span class="line">    conv1_weights = tf.Variable(tf.random_normal([<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>]),</span><br><span class="line">        name=<span class="string">"conv1_weights"</span>)</span><br><span class="line">    conv1_biases = tf.Variable(tf.zeros([<span class="number">32</span>]), name=<span class="string">"conv1_biases"</span>)</span><br><span class="line">    conv1 = tf.nn.conv2d(input_images, conv1_weights,</span><br><span class="line">        strides=[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], padding=<span class="string">'SAME'</span>)</span><br><span class="line">    relu1 = tf.nn.relu(conv1 + conv1_biases)</span><br><span class="line"></span><br><span class="line">    conv2_weights = tf.Variable(tf.random_normal([<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>]),</span><br><span class="line">        name=<span class="string">"conv2_weights"</span>)</span><br><span class="line">    conv2_biases = tf.Variable(tf.zeros([<span class="number">32</span>]), name=<span class="string">"conv2_biases"</span>)</span><br><span class="line">    conv2 = tf.nn.conv2d(relu1, conv2_weights,</span><br><span class="line">        strides=[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], padding=<span class="string">'SAME'</span>)</span><br><span class="line">    <span class="keyword">return</span> tf.nn.relu(conv2 + conv2_biases)</span><br></pre></td></tr></table></figure>
+
+<p>假设我们利用这个函数对两张图片进行相同的操作，也就是调用两次，那么每次都会创建4个变量，假设我们在函数内对变量进行了优化求解，那么每次都会重新创建变量，这样就无法复用参数，导致训练过程无效</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 第一次执行方法创建4个变量</span></span><br><span class="line">result1 = my_image_filter(image1)</span><br><span class="line"><span class="comment"># 第二次执行再创建4个变量</span></span><br><span class="line">result2 = my_image_filter(image2)</span><br><span class="line"></span><br><span class="line">ValueError: Variable weight already exists, disallowed. Did you mean to set reuse=True or reuse=tf.AUTO_REUSE in VarScope? Originally defined at:</span><br></pre></td></tr></table></figure>
+
+<p>TensowFlow通过变量范围(variable scope)和tf.get_variable方法解决了共享变量(参数)的问题。</p>
+<h4 id="tf-variable-scope和tf-get-variable"><a href="#tf-variable-scope和tf-get-variable" class="headerlink" title="tf.variable_scope和tf.get_variable"></a>tf.variable_scope和tf.get_variable</h4><p>tf.Variable()方法每次被调用都会创建新的变量，这样就无法解决共享变量的问题，而tf.get_variable结合作用域即可表明我们是想创建新的变量，还是共享变量，变量作用域允许在调用隐式创建和使用变量的函数时控制变量重用。作用域还允许您以分层和可理解的方式命名变量。tf.get_variable()的机制跟tf.Variable()有很大不同，如果指定的变量名已经存在（即先前已经用同一个变量名通过get_variable()函数实例化了变量），那么get_variable()只会返回之前的变量，否则才创造新的变量。我们举例进行说明。</p>
+<p>例如上面的例子中有两个卷积层，我们先来编写一个函数创建一个卷积/relu层，这个函数使命的变量名称是’weights’和’biases’</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">conv_relu</span><span class="params">(input, kernel_shape, bias_shape)</span>:</span></span><br><span class="line">    <span class="comment"># Create variable named "weights".</span></span><br><span class="line">    weights = tf.get_variable(<span class="string">"weights"</span>, kernel_shape,</span><br><span class="line">        initializer=tf.random_normal_initializer())</span><br><span class="line">    <span class="comment"># Create variable named "biases".</span></span><br><span class="line">    biases = tf.get_variable(<span class="string">"biases"</span>, bias_shape,</span><br><span class="line">        initializer=tf.constant_initializer(<span class="number">0.0</span>))</span><br><span class="line">    conv = tf.nn.conv2d(input, weights,</span><br><span class="line">        strides=[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], padding=<span class="string">'SAME'</span>)</span><br><span class="line">    <span class="keyword">return</span> tf.nn.relu(conv + biases)</span><br></pre></td></tr></table></figure>
+
+<p>在真实模型中需要多个卷积层，我们通过变量域来区分不同层的变量，不同的变量域下的变量名车为：scope_name/variable_name, 如下所示，第一个卷积层的变量名称是’conv1/weights’, ‘conv1/biases’, 第二个卷积层的变量名称是 ‘conv2/weights’, ‘conv2/biases’。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_image_filter</span><span class="params">(input_images)</span>:</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">"conv1"</span>):</span><br><span class="line">        <span class="comment"># Variables created here will be named "conv1/weights", "conv1/biases".</span></span><br><span class="line">        relu1 = conv_relu(input_images, [<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>], [<span class="number">32</span>])</span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">"conv2"</span>):</span><br><span class="line">        <span class="comment"># Variables created here will be named "conv2/weights", "conv2/biases".</span></span><br><span class="line">        <span class="keyword">return</span> conv_relu(relu1, [<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>], [<span class="number">32</span>])</span><br></pre></td></tr></table></figure>
+
+<p>但即便这样，如果多次调用该函数，也会抛出异常，</p>
+<pre><code>result1 = my_image_filter(image1)
+result2 = my_image_filter(image2)
+# Raises ValueError(... conv1/weights already exists ...)</code></pre><p>因为用get_variable()创建两个相同名字的变量是会报错的，默认上它只是检查变量名，防止重复，如果要变量共享，就需要指定在哪个域名内可以共享变量。</p>
+<p>如下面的代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(b)</span>:</span></span><br><span class="line">    a = tf.get_variable(name=<span class="string">'test'</span>,shape=[<span class="number">2</span>,<span class="number">2</span>],initializer=tf.truncated_normal_initializer(stddev=<span class="number">0.02</span>))</span><br><span class="line">    a = tf.matmul(b,a)</span><br><span class="line">    <span class="keyword">return</span> a</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'test'</span>) <span class="keyword">as</span> scope:</span><br><span class="line">    b = tf.constant([[<span class="number">1.0</span>, <span class="number">1.0</span>], [<span class="number">2.0</span>, <span class="number">2.0</span>]])</span><br><span class="line">    d = tf.constant([[<span class="number">1.0</span>, <span class="number">1.0</span>], [<span class="number">2.0</span>, <span class="number">2.0</span>]])</span><br><span class="line">    c = test(b)</span><br><span class="line">    scope.reuse_variables()</span><br><span class="line">    d = test(d)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line">    sess.run(init)</span><br><span class="line">    print(sess.run(c))</span><br><span class="line">    print(sess.run(d))</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># 上面两个输出是一样的</span></span><br></pre></td></tr></table></figure>
+
+<p>开启共享变量有两种方式</p>
+<h5 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h5><p>采用scope.reuse_variables()触发重用变量，如下所示</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"model"</span>) <span class="keyword">as</span> scope:</span><br><span class="line">  output1 = my_image_filter(input1)</span><br><span class="line">  scope.reuse_variables()</span><br><span class="line">  output2 = my_image_filter(input2)</span><br></pre></td></tr></table></figure>
+
+<h5 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"model"</span>):</span><br><span class="line">  output1 = my_image_filter(input1)</span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"model"</span>, reuse=<span class="literal">True</span>):</span><br><span class="line">  output2 = my_image_filter(input2)</span><br></pre></td></tr></table></figure>
+
+<h5 id="几个简单的例子"><a href="#几个简单的例子" class="headerlink" title="几个简单的例子"></a>几个简单的例子</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(b)</span>:</span></span><br><span class="line">    a = tf.get_variable(name=<span class="string">'test'</span>,shape=[<span class="number">2</span>,<span class="number">2</span>],initializer=tf.truncated_normal_initializer(stddev=<span class="number">0.02</span>))</span><br><span class="line">    a = tf.matmul(b,a)</span><br><span class="line">    <span class="keyword">return</span> a</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'test'</span>):</span><br><span class="line">    b = tf.constant([[<span class="number">1.0</span>, <span class="number">1.0</span>], [<span class="number">2.0</span>, <span class="number">2.0</span>]])</span><br><span class="line">    c = test(b)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'test1'</span>):</span><br><span class="line">    d = tf.constant([[<span class="number">1.0</span>, <span class="number">1.0</span>], [<span class="number">2.0</span>, <span class="number">2.0</span>]])</span><br><span class="line">    d = test(d)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line">    sess.run(init)</span><br><span class="line">    print(sess.run(c))</span><br><span class="line">    print(sess.run(d))</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># [[-0.01371786 -0.02131779]</span></span><br><span class="line">	<span class="comment"># [-0.02743572 -0.04263557]]</span></span><br><span class="line">	<span class="comment">#[[0.02182615 0.01196657]</span></span><br><span class="line">	<span class="comment"># [0.04365229 0.02393314]]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(b)</span>:</span></span><br><span class="line">    a = tf.get_variable(name=<span class="string">'test'</span>,shape=[<span class="number">2</span>,<span class="number">2</span>],initializer=tf.truncated_normal_initializer(stddev=<span class="number">0.02</span>))</span><br><span class="line">    a = tf.matmul(b,a)</span><br><span class="line">    <span class="keyword">return</span> a</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'test'</span>):</span><br><span class="line">    b = tf.constant([[<span class="number">1.0</span>, <span class="number">1.0</span>], [<span class="number">2.0</span>, <span class="number">2.0</span>]])</span><br><span class="line">    c = test(b)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'test'</span>,reuse=<span class="literal">True</span>):</span><br><span class="line">    d = tf.constant([[<span class="number">1.0</span>, <span class="number">1.0</span>], [<span class="number">2.0</span>, <span class="number">2.0</span>]])</span><br><span class="line">    d = test(d)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line">    sess.run(init)</span><br><span class="line">    print(sess.run(c))</span><br><span class="line">    print(sess.run(d))</span><br><span class="line">	<span class="comment"># [[-0.02963482 -0.01020483]</span></span><br><span class="line">	<span class="comment"># [-0.05926965 -0.02040966]]</span></span><br><span class="line">	<span class="comment"># [[-0.02963482 -0.01020483]</span></span><br><span class="line">	<span class="comment"># [-0.05926965 -0.02040966]]</span></span><br><span class="line">	<span class="comment"># 两个输出是相同的</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(b)</span>:</span></span><br><span class="line">    a = tf.get_variable(name=<span class="string">'test'</span>,shape=[<span class="number">2</span>,<span class="number">2</span>],initializer=tf.truncated_normal_initializer(stddev=<span class="number">0.02</span>))</span><br><span class="line">    a = tf.matmul(b,a)</span><br><span class="line">    <span class="keyword">return</span> a</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'test'</span>):</span><br><span class="line">    b = tf.constant([[<span class="number">1.0</span>, <span class="number">1.0</span>], [<span class="number">2.0</span>, <span class="number">2.0</span>]])</span><br><span class="line">    c = test(b)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'test'</span>,reuse=<span class="literal">False</span>):</span><br><span class="line">    d = tf.constant([[<span class="number">1.0</span>, <span class="number">1.0</span>], [<span class="number">2.0</span>, <span class="number">2.0</span>]])</span><br><span class="line">    d = test(d)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line">    sess.run(init)</span><br><span class="line">    print(sess.run(c))</span><br><span class="line">    print(sess.run(d))</span><br><span class="line">	<span class="comment"># 这个会出错</span></span><br><span class="line">	<span class="comment"># ValueError: Variable test/test already exists, disallowed. Did you mean to set reuse=True or reuse=tf.AUTO_REUSE in VarScope?</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="理解variable-scope"><a href="#理解variable-scope" class="headerlink" title="理解variable_scope"></a>理解variable_scope</h4><p>理解变量域的工作机理非常重要，我们对其进行梳理，当我们调用tf.get_variable(name, shape, dtype, initializer)时，这背后到底做了什么</p>
+<p>首先，TensorFlow 会判断是否要共享变量，也就是判断 tf.get_variable_scope().reuse 的值，如果结果为 False（即你没有在变量域内调用scope.reuse_variables()），那么 TensorFlow 认为你是要初始化一个新的变量，紧接着它会判断这个命名的变量是否存在。如果存在，会抛出 ValueError 异常，否则，就根据 initializer 初始化变量：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"foo"</span>):</span><br><span class="line">    v = tf.get_variable(<span class="string">"v"</span>, [<span class="number">1</span>])</span><br><span class="line"><span class="keyword">assert</span> v.name == <span class="string">"foo/v:0"</span></span><br></pre></td></tr></table></figure>
+
+<p>而如果 tf.get_variable_scope().reuse == True，那么 TensorFlow 会执行相反的动作，就是到程序里面寻找变量名为 scope name + name 的变量，如果变量不存在，会抛出 ValueError 异常，否则，就返回找到的变量：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"foo"</span>):</span><br><span class="line">    v = tf.get_variable(<span class="string">"v"</span>, [<span class="number">1</span>])</span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"foo"</span>, reuse=<span class="literal">True</span>):</span><br><span class="line">    v1 = tf.get_variable(<span class="string">"v"</span>, [<span class="number">1</span>])</span><br><span class="line"><span class="keyword">assert</span> v1 <span class="keyword">is</span> v</span><br></pre></td></tr></table></figure>
+
+<p>变量域可以多层重叠，例如，下面的变量上有两层的变量域，那么变量名是’foo/var/v:0’</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"foo"</span>):</span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">"bar"</span>):</span><br><span class="line">        v = tf.get_variable(<span class="string">"v"</span>, [<span class="number">1</span>])</span><br><span class="line"><span class="keyword">assert</span> v.name == <span class="string">"foo/bar/v:0"</span></span><br></pre></td></tr></table></figure>
+
+<p>在同一个变量域中，如果需要调用同名变量，那么需要重用变量即可，例如v1和v两个变量时相同的，因为变量名都是’foo/v’</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"foo"</span>):</span><br><span class="line">    v = tf.get_variable(<span class="string">"v"</span>, [<span class="number">1</span>])</span><br><span class="line">    tf.get_variable_scope().reuse_variables()</span><br><span class="line">    v1 = tf.get_variable(<span class="string">"v"</span>, [<span class="number">1</span>])</span><br><span class="line"><span class="keyword">assert</span> v1 <span class="keyword">is</span> v</span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>tf.get_variable()默认上它只检查变量名，如果变量名重复，那么就会报错；tf.Variable()每次被调用都创建相应的变量，即便变量名重复，也会创建新的变量，因此无法共享变量名。</p>
+<p>如果scope中开启共享变量，那么调用tf.get_variable()就会查找相同变量名的变量，如果有，就直接返回该变量，如果没有，就创建一个新的变量；</p>
+<p>如果scope没有开启共享变量(默认模式)，那么 调用tf.get_variable()发现已有相同变量名的变量，就会报错，如果没有，就创建一个新的变量。</p>
+<p>要重用变量，需要在scope中开启共享变量，有两种方法，推荐第一种</p>
+<h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><p>使用tf.Variable时，如果检测到命名冲突，系统会自己处理。使用tf.get_variable()时，系统不会处理冲突，而会报错。</p>
+<p>tf.Variable()每次都在创建新的对象，与name没有关系。而tf.get_variable()对于已经创建的同样name的变量对象，就直接把那个变量对象返回（类似于：共享变量），tf.get_variable() 会检查当前命名空间下是否存在同样name的变量，可以方便共享变量。</p>
+<p>tf.get_variable()：对于在上下文管理器中已经生成一个v的变量，若想通过tf.get_variable函数获取其变量，则可以通过reuse参数的设定为True来获取。</p>
+<p>还有一点，tf.get_variable()必须写name，否则报错（but instead was %s.” % (name, shape)) </p>
+<p>ValueError: Shape of a new variable (Tensor(“truncated_normal:0”, shape=(2, 3), dtype=float32)) must be fully defined, but instead was <unknown>.），tf.Variable()不要求。</p>
+<h2 id="多种方式的初始化"><a href="#多种方式的初始化" class="headerlink" title="多种方式的初始化"></a>多种方式的初始化</h2><h3 id="tf-constant-initializer-value"><a href="#tf-constant-initializer-value" class="headerlink" title="tf.constant_initializer(value)"></a>tf.constant_initializer(value)</h3><p>初始化为常量</p>
+<p>tf中使用tf.constant_initializer(value)类生成一个初始值为常量value的tensor对象。</p>
+<p>constant_initializer类的构造函数定义：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, value=<span class="number">0</span>, dtype=dtypes.float32, verify_shape=False)</span>:</span></span><br><span class="line">    self.value = value</span><br><span class="line">    self.dtype = dtypes.as_dtype(dtype)</span><br><span class="line">    self._verify_shape = verify_shape</span><br><span class="line"></span><br><span class="line">	<span class="comment"># value：指定的常量</span></span><br><span class="line">	<span class="comment"># dtype： 数据类型</span></span><br><span class="line">	<span class="comment"># verify_shape： 是否可以调整tensor的形状，默认可以调整</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">value = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>]</span><br><span class="line">init = tf.constant_initializer(value)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">  x = tf.get_variable(<span class="string">'x'</span>, shape=[<span class="number">8</span>], initializer=init)</span><br><span class="line">  x.initializer.run()</span><br><span class="line">  print(x.eval())</span><br><span class="line"><span class="comment">#output:</span></span><br><span class="line"><span class="comment">#[ 0.  1.  2.  3.  4.  5.  6.  7.]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="tf-zeros-initializer-tf-ones-initializer"><a href="#tf-zeros-initializer-tf-ones-initializer" class="headerlink" title="tf.zeros_initializer() tf.ones_initializer()"></a>tf.zeros_initializer() tf.ones_initializer()</h3><p>可以简写为tf.Zeros()或者可简写为tf.Ones()</p>
+<p>神经网络中经常使用常量初始化方法来初始化偏置项。</p>
+<p>当初始化一个维数很多的常量时，一个一个指定每个维数上的值很不方便，tf提供了 tf.zeros_initializer() 和 tf.ones_initializer() 类，分别用来初始化全0和全1的tensor对象</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">init_zeros=tf.zeros_initializer()</span><br><span class="line">init_ones = tf.ones_initializer</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">  x = tf.get_variable(<span class="string">'x'</span>, shape=[<span class="number">8</span>], initializer=init_zeros)</span><br><span class="line">  y = tf.get_variable(<span class="string">'y'</span>, shape=[<span class="number">8</span>], initializer=init_ones)</span><br><span class="line">  x.initializer.run()</span><br><span class="line">  y.initializer.run()</span><br><span class="line">  print(x.eval())</span><br><span class="line">  print(y.eval())</span><br><span class="line"><span class="comment">#output:</span></span><br><span class="line"><span class="comment"># [ 0.  0.  0.  0.  0.  0.  0.  0.]</span></span><br><span class="line"><span class="comment"># [ 1.  1.  1.  1.  1.  1.  1.  1.]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="tf-random-normal-initializer-mean-stddev-tf-truncated-normal-initializer"><a href="#tf-random-normal-initializer-mean-stddev-tf-truncated-normal-initializer" class="headerlink" title="tf.random_normal_initializer(mean,stddev) tf.truncated_normal_initializer()"></a>tf.random_normal_initializer(mean,stddev) tf.truncated_normal_initializer()</h3><p>功能是将变量初始化为满足正太分布的随机值，主要参数（正太分布的均值和标准差），用所给的均值和标准差初始化均匀分布</p>
+<p>初始化参数为正太分布在神经网络中应用的最多，可以初始化为标准正太分布和截断正太分布。</p>
+<p>tf中使用 tf.random_normal_initializer() 类来生成一组符合标准正太分布的tensor。</p>
+<p>tf中使用 tf.truncated_normal_initializer() 类来生成一组符合截断正太分布的tensor。</p>
+<p>tf.random_normal_initializer 类和 tf.truncated_normal_initializer 的构造函数定义：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mean=<span class="number">0.0</span>, stddev=<span class="number">1.0</span>, seed=None, dtype=dtypes.float32)</span>:</span></span><br><span class="line">    self.mean = mean</span><br><span class="line">    self.stddev = stddev</span><br><span class="line">    self.seed = seed</span><br><span class="line">    self.dtype = _assert_float_dtype(dtypes.as_dtype(dtype))</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># mean： 正太分布的均值，默认值0</span></span><br><span class="line">	<span class="comment"># stddev： 正太分布的标准差，默认值1</span></span><br><span class="line">	<span class="comment"># seed： 随机数种子，指定seed的值可以每次都生成同样的数据</span></span><br><span class="line">	<span class="comment"># dtype： 数据类型</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">init_random = tf.random_normal_initializer(mean=<span class="number">0.0</span>, stddev=<span class="number">1.0</span>, seed=<span class="literal">None</span>, dtype=tf.float32)</span><br><span class="line">init_truncated = tf.truncated_normal_initializer(mean=<span class="number">0.0</span>, stddev=<span class="number">1.0</span>, seed=<span class="literal">None</span>, dtype=tf.float32)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">  x = tf.get_variable(<span class="string">'x'</span>, shape=[<span class="number">10</span>], initializer=init_random)</span><br><span class="line">  y = tf.get_variable(<span class="string">'y'</span>, shape=[<span class="number">10</span>], initializer=init_truncated)</span><br><span class="line">  x.initializer.run()</span><br><span class="line">  y.initializer.run()</span><br><span class="line">  print(x.eval())</span><br><span class="line">  print(y.eval())</span><br><span class="line"> </span><br><span class="line"><span class="comment">#output:</span></span><br><span class="line"><span class="comment"># [-0.40236568 -0.35864913 -0.94253045 -0.40153521  0.1552504   1.16989613</span></span><br><span class="line"><span class="comment">#   0.43091929 -0.31410623  0.70080078 -0.9620409 ]</span></span><br><span class="line"><span class="comment"># [ 0.18356581 -0.06860946 -0.55245203  1.08850253 -1.13627422 -0.1006074</span></span><br><span class="line"><span class="comment">#   0.65564936  0.03948414  0.86558545 -0.4964745 ]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="tf-random-uniform-initializer-a-b-seed-dtype"><a href="#tf-random-uniform-initializer-a-b-seed-dtype" class="headerlink" title="tf.random_uniform_initializer(a,b,seed,dtype)"></a>tf.random_uniform_initializer(a,b,seed,dtype)</h3><p>初始化为均匀分布,从a到b均匀初始化，将变量初始化为满足平均分布的随机值，主要参数（最大值，最小值）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, minval=<span class="number">0</span>, maxval=None, seed=None, dtype=dtypes.float32)</span>:</span></span><br><span class="line">    self.minval = minval</span><br><span class="line">    self.maxval = maxval</span><br><span class="line">    self.seed = seed</span><br><span class="line">    self.dtype = dtypes.as_dtype(dtype)</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># minval: 最小值</span></span><br><span class="line">	<span class="comment"># maxval： 最大值</span></span><br><span class="line">	<span class="comment"># seed：随机数种子</span></span><br><span class="line">	<span class="comment"># dtype： 数据类型</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">init_uniform = tf.random_uniform_initializer(minval=<span class="number">0</span>, maxval=<span class="number">10</span>, seed=<span class="literal">None</span>, dtype=tf.float32)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">  x = tf.get_variable(<span class="string">'x'</span>, shape=[<span class="number">10</span>], initializer=init_uniform)</span><br><span class="line">  x.initializer.run()</span><br><span class="line">  print(x.eval())</span><br><span class="line">  </span><br><span class="line"><span class="comment"># output:</span></span><br><span class="line"><span class="comment"># [ 6.93343639  9.41196823  5.54009819  1.38017178  1.78720832  5.38881063</span></span><br><span class="line"><span class="comment">#   3.39674473  8.12443542  0.62157512  8.36026382]</span></span><br></pre></td></tr></table></figure>
+
+<p>从输出可以看到，均匀分布生成的随机数并不是从小到大或者从大到小均匀分布的，这里均匀分布的意义是每次从一组服从均匀分布的数里边随机抽取一个数。</p>
+<h3 id="tf-uniform-unit-scaling-initializer-factor-seed-dtypr"><a href="#tf-uniform-unit-scaling-initializer-factor-seed-dtypr" class="headerlink" title="tf.uniform_unit_scaling_initializer(factor,seed,dtypr)"></a>tf.uniform_unit_scaling_initializer(factor,seed,dtypr)</h3><p>将变量初始化为满足平均分布但不影响输出数量级的随机值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, factor=<span class="number">1.0</span>, seed=None, dtype=dtypes.float32)</span>:</span></span><br><span class="line">    self.factor = factor</span><br><span class="line">    self.seed = seed</span><br><span class="line">    self.dtype = _assert_float_dtype(dtypes.as_dtype(dtype))</span><br></pre></td></tr></table></figure>
+
+<p>同样都是生成均匀分布，tf.uniform_unit_scaling_initializer 跟 tf.random_uniform_initializer 不同的地方是前者不需要指定最大最小值，是通过公式计算出来的：</p>
+<pre><code>max_val = math.sqrt(3 / input_size) * factor
+min_val = -max_val</code></pre><p>input_size是生成数据的维度，factor是系数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">init_uniform_unit = tf.uniform_unit_scaling_initializer(factor=<span class="number">1.0</span>, seed=<span class="literal">None</span>, dtype=tf.float32)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">  x = tf.get_variable(<span class="string">'x'</span>, shape=[<span class="number">10</span>], initializer=init_uniform_unit)</span><br><span class="line">  x.initializer.run()</span><br><span class="line">  print(x.eval())</span><br><span class="line"> </span><br><span class="line"><span class="comment"># output:</span></span><br><span class="line"><span class="comment"># [-1.65964031  0.59797513 -0.97036457 -0.68957627  1.69274557  1.2614969</span></span><br><span class="line"><span class="comment">#   1.55491126  0.12639415  0.54466736 -1.56159735]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化为变尺度正太、均匀分布"><a href="#初始化为变尺度正太、均匀分布" class="headerlink" title="初始化为变尺度正太、均匀分布"></a>初始化为变尺度正太、均匀分布</h3><p>tf中tf.variance_scaling_initializer()类可以生成截断正太分布和均匀分布的tensor，增加了更多的控制参数。构造函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, scale=<span class="number">1.0</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">               mode=<span class="string">"fan_in"</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">               distribution=<span class="string">"normal"</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">               seed=None,</span></span></span><br><span class="line"><span class="function"><span class="params">               dtype=dtypes.float32)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> scale &lt;= <span class="number">0.</span>:</span><br><span class="line">      <span class="keyword">raise</span> ValueError(<span class="string">"`scale` must be positive float."</span>)</span><br><span class="line">    <span class="keyword">if</span> mode <span class="keyword">not</span> <span class="keyword">in</span> &#123;<span class="string">"fan_in"</span>, <span class="string">"fan_out"</span>, <span class="string">"fan_avg"</span>&#125;:</span><br><span class="line">      <span class="keyword">raise</span> ValueError(<span class="string">"Invalid `mode` argument:"</span>, mode)</span><br><span class="line">    distribution = distribution.lower()</span><br><span class="line">    <span class="keyword">if</span> distribution <span class="keyword">not</span> <span class="keyword">in</span> &#123;<span class="string">"normal"</span>, <span class="string">"uniform"</span>&#125;:</span><br><span class="line">      <span class="keyword">raise</span> ValueError(<span class="string">"Invalid `distribution` argument:"</span>, distribution)</span><br><span class="line">    self.scale = scale</span><br><span class="line">    self.mode = mode</span><br><span class="line">    self.distribution = distribution</span><br><span class="line">    self.seed = seed</span><br><span class="line">    self.dtype = _assert_float_dtype(dtypes.as_dtype(dtype))</span><br><span class="line"></span><br><span class="line">		<span class="comment"># scale: 缩放尺度</span></span><br><span class="line">		<span class="comment"># mode： 有3个值可选，分别是 “fan_in”, “fan_out” 和 “fan_avg”，用于控制计算标准差 stddev的值</span></span><br><span class="line">		<span class="comment"># distribution： 2个值可选，”normal”或“uniform”，定义生成的tensor的分布是截断正太分布还是均匀分布</span></span><br></pre></td></tr></table></figure>
+
+<p>distribution选‘normal’的时候，生成的是截断正太分布，标准差 stddev = sqrt(scale / n), n的取值根据mode的不同设置而不同：</p>
+<pre><code>mode = &quot;fan_in&quot;， n为输入单元的结点数；         
+mode = &quot;fan_out&quot;，n为输出单元的结点数；
+mode = &quot;fan_avg&quot;,n为输入和输出单元结点数的平均值;</code></pre><p>distribution选 ‘uniform’，生成均匀分布的随机数tensor，最大值 max_value和 最小值 min_value 的计算公式：</p>
+<pre><code>max_value = sqrt(3 * scale / n)
+min_value = -max_value</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">init_variance_scaling_normal = tf.variance_scaling_initializer(scale=<span class="number">1.0</span>,mode=<span class="string">"fan_in"</span>,</span><br><span class="line">                                                        distribution=<span class="string">"normal"</span>,seed=<span class="literal">None</span>,dtype=tf.float32)</span><br><span class="line">init_variance_scaling_uniform = tf.variance_scaling_initializer(scale=<span class="number">1.0</span>,mode=<span class="string">"fan_in"</span>,</span><br><span class="line">                                                        distribution=<span class="string">"uniform"</span>,seed=<span class="literal">None</span>,dtype=tf.float32)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">  x = tf.get_variable(<span class="string">'x'</span>, shape=[<span class="number">10</span>], initializer=init_variance_scaling_normal)</span><br><span class="line">  y = tf.get_variable(<span class="string">'y'</span>, shape=[<span class="number">10</span>], initializer=init_variance_scaling_uniform)</span><br><span class="line">  x.initializer.run()</span><br><span class="line">  y.initializer.run()</span><br><span class="line">  print(x.eval())</span><br><span class="line">  print(y.eval())</span><br><span class="line"><span class="comment"># output:</span></span><br><span class="line"><span class="comment"># [ 0.55602223  0.36556259  0.39404872 -0.11241052  0.42891756 -0.22287074</span></span><br><span class="line"><span class="comment">#   0.15629818  0.56271428 -0.15364751 -0.03651841]</span></span><br><span class="line"><span class="comment"># [ 0.22965753 -0.1339919  -0.21013224  0.112804   -0.49030468  0.21375734</span></span><br><span class="line"><span class="comment">#   0.24524075 -0.48397955  0.02254289 -0.07996771]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他初始化方式"><a href="#其他初始化方式" class="headerlink" title="其他初始化方式"></a>其他初始化方式</h3><pre><code>tf.orthogonal_initializer() 初始化为正交矩阵的随机数，形状最少需要是二维的
+tf.glorot_uniform_initializer() 初始化为与输入输出节点数相关的均匀分布随机数
+tf.glorot_normal_initializer（） 初始化为与输入输出节点数相关的截断正太分布随机数</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">init_orthogonal = tf.orthogonal_initializer(gain=<span class="number">1.0</span>, seed=<span class="literal">None</span>, dtype=tf.float32)</span><br><span class="line">init_glorot_uniform = tf.glorot_uniform_initializer()</span><br><span class="line">init_glorot_normal = tf.glorot_normal_initializer()</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">  x = tf.get_variable(<span class="string">'x'</span>, shape=[<span class="number">4</span>,<span class="number">4</span>], initializer=init_orthogonal)</span><br><span class="line">  y = tf.get_variable(<span class="string">'y'</span>, shape=[<span class="number">10</span>], initializer=init_glorot_uniform)</span><br><span class="line">  z = tf.get_variable(<span class="string">'z'</span>, shape=[<span class="number">10</span>], initializer=init_glorot_normal)</span><br><span class="line">  x.initializer.run()</span><br><span class="line">  y.initializer.run()</span><br><span class="line">  z.initializer.run()</span><br><span class="line">  print(x.eval())</span><br><span class="line">  print(y.eval())</span><br><span class="line">  print(z.eval())</span><br><span class="line"> </span><br><span class="line"><span class="comment"># output:</span></span><br><span class="line"><span class="comment"># [[ 0.41819954  0.38149482  0.82090431  0.07541249]</span></span><br><span class="line"><span class="comment">#  [ 0.41401231  0.21400851 -0.38360971  0.79726893]</span></span><br><span class="line"><span class="comment">#  [ 0.73776144 -0.62585676 -0.06246936 -0.24517137]</span></span><br><span class="line"><span class="comment">#  [ 0.33077344  0.64572859 -0.41839844 -0.54641217]]</span></span><br><span class="line"><span class="comment"># [-0.11182356  0.01995623 -0.0083192  -0.09200105  0.49967837  0.17083591</span></span><br><span class="line"><span class="comment">#   0.37086374  0.09727859  0.51015782 -0.43838671]</span></span><br><span class="line"><span class="comment"># [-0.50223351  0.18181904  0.43594137  0.3390047   0.61405027  0.02597036</span></span><br><span class="line"><span class="comment">#   0.31719241  0.04096413  0.10962497 -0.13165198]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="全局初始化"><a href="#全局初始化" class="headerlink" title="全局初始化"></a>全局初始化</h3><p>在使用Tensorflow框架进行两层卷积神经网络实现的时候，使用tf.global_Variables_initializer()进行初始化时一定要加.run()方法，Tensorflow与我们正常的编程思想略有不同：Tensorflow中的语句不会立即执行，而是等到开启会话Session的时候，才会执行session.run()的语句；其次是版本的问题，tf.global_Variables_initializer().run()是最新版本的全局初使化语句，较旧版本的写法为：tf.initilize_all_variables().run().</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+              <a href="/tags/%E5%8F%98%E9%87%8F/" rel="tag"># 变量</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/18/python56/" rel="prev" title="PyMySQL 操作数据库">
+      <i class="fa fa-chevron-left"></i> PyMySQL 操作数据库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/25/tensorflow23/" rel="next" title="模型的保存和提取">
+      模型的保存和提取 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量的声明"><span class="nav-number">2.</span> <span class="nav-text">变量的声明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tf-Variable-创建变量"><span class="nav-number">2.1.</span> <span class="nav-text">tf.Variable 创建变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量集合-collections"><span class="nav-number">2.2.</span> <span class="nav-text">变量集合 collections</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#查看集合变量列表"><span class="nav-number">2.2.1.</span> <span class="nav-text">查看集合变量列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建变量集合"><span class="nav-number">2.2.2.</span> <span class="nav-text">创建变量集合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#共享变量"><span class="nav-number">2.3.</span> <span class="nav-text">共享变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#tf-variable-scope和tf-get-variable"><span class="nav-number">2.3.1.</span> <span class="nav-text">tf.variable_scope和tf.get_variable</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#方法1"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方法2"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">方法2</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#几个简单的例子"><span class="nav-number">2.3.1.3.</span> <span class="nav-text">几个简单的例子</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#理解variable-scope"><span class="nav-number">2.3.2.</span> <span class="nav-text">理解variable_scope</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">2.4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#区别"><span class="nav-number">2.5.</span> <span class="nav-text">区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多种方式的初始化"><span class="nav-number">3.</span> <span class="nav-text">多种方式的初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tf-constant-initializer-value"><span class="nav-number">3.1.</span> <span class="nav-text">tf.constant_initializer(value)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tf-zeros-initializer-tf-ones-initializer"><span class="nav-number">3.2.</span> <span class="nav-text">tf.zeros_initializer() tf.ones_initializer()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tf-random-normal-initializer-mean-stddev-tf-truncated-normal-initializer"><span class="nav-number">3.3.</span> <span class="nav-text">tf.random_normal_initializer(mean,stddev) tf.truncated_normal_initializer()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tf-random-uniform-initializer-a-b-seed-dtype"><span class="nav-number">3.4.</span> <span class="nav-text">tf.random_uniform_initializer(a,b,seed,dtype)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tf-uniform-unit-scaling-initializer-factor-seed-dtypr"><span class="nav-number">3.5.</span> <span class="nav-text">tf.uniform_unit_scaling_initializer(factor,seed,dtypr)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化为变尺度正太、均匀分布"><span class="nav-number">3.6.</span> <span class="nav-text">初始化为变尺度正太、均匀分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他初始化方式"><span class="nav-number">3.7.</span> <span class="nav-text">其他初始化方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全局初始化"><span class="nav-number">3.8.</span> <span class="nav-text">全局初始化</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

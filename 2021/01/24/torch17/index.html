@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="预训练模型是和迁移学习一起的，也是这几年很热的一个课题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="torch | 预训练模型是什么">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/01/24/torch17/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="预训练模型是和迁移学习一起的，也是这几年很热的一个课题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/torch/17_0.jpg">
+<meta property="article:published_time" content="2021-01-24T04:24:39.000Z">
+<meta property="article:modified_time" content="2021-01-25T17:03:09.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="pytorch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/torch/17_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/01/24/torch17/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>torch | 预训练模型是什么 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/01/24/torch17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          torch | 预训练模型是什么
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-24 12:24:39" itemprop="dateCreated datePublished" datetime="2021-01-24T12:24:39+08:00">2021-01-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-26 01:03:09" itemprop="dateModified" datetime="2021-01-26T01:03:09+08:00">2021-01-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/" itemprop="url" rel="index"><span itemprop="name">设计思想</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">迁移学习</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/24/torch17/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/24/torch17/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>预训练模型是和迁移学习一起的，也是这几年很热的一个课题。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/27657264">一文看懂迁移学习：怎样用预训练模型搞定深度神经网络？</a></li>
+</ul>
+<br/>
+
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><br/>
+
+<p>跟传统的监督式机器学习算法相比，深度神经网络目前最大的劣势是什么？</p>
+<p>贵。</p>
+<p>尤其是当我们在尝试处理现实生活中诸如图像识别、声音辨识等实际问题的时候。一旦你的模型中包含一些隐藏层时，增添多一层隐藏层将会花费巨大的计算资源。</p>
+<p>庆幸的是，有一种叫做“迁移学习”的方式，可以使我们在他人训练过的模型基础上进行小改动便可投入使用。在这篇文章中，我将会讲述如何使用预训练模型来加速解决问题的过程。</p>
+<br/>
+
+<h1 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h1><br/>
+
+<ul>
+<li>什么是迁移学习？</li>
+<li>什么是预训练模型？</li>
+<li>为什么我们使用预训练模型？-结合生活实例</li>
+<li>我们可以怎样运用预训练模型？<ul>
+<li>提取特征(extract features)</li>
+<li>优化模型(fine tune the model)</li>
+</ul>
+</li>
+<li>优化模型的方式</li>
+<li>在数字识别中使用预训练模型<ul>
+<li>只针对输出密集层(output dense layer)的重新训练</li>
+<li>冻结初始几层网络的权重因子</li>
+</ul>
+</li>
+</ul>
+<h2 id="什么是迁移学习？"><a href="#什么是迁移学习？" class="headerlink" title="什么是迁移学习？"></a>什么是迁移学习？</h2><p>为了对迁移学习产生一个直观的认识，不妨拿老师与学生之间的关系做类比。</p>
+<p>一位老师通常在ta所教授的领域有着多年丰富的经验，在这些积累的基础上，老师们能够在课堂上教授给学生们该领域最简明扼要的内容。这个过程可以看做是老手与新手之间的“信息转移”。</p>
+<p>这个过程在神经网络中也适用。</p>
+<p>我们知道，神经网络需要用数据来训练，它从数据中获得信息，进而把它们转换成相应的权重。这些权重能够被提取出来，迁移到其他的神经网络中，我们“迁移”了这些学来的特征，就不需要从零开始训练一个神经网络了 。</p>
+<p>通过权重的传递来进行迁移学习和人类在世代交替中通过语言传播知识，是一个道理。</p>
+<h2 id="什么是预训练模型？"><a href="#什么是预训练模型？" class="headerlink" title="什么是预训练模型？"></a>什么是预训练模型？</h2><p>简单来说，预训练模型(<code>pre-trained model</code>)是前人为了解决类似问题所创造出来的模型。你在解决问题的时候，不用从零开始训练一个新模型，可以从在类似问题中训练过的模型入手。</p>
+<p>比如说，如果你想做一辆自动驾驶汽车，可以花数年时间从零开始构建一个性能优良的图像识别算法，也可以从<code>Google</code>在<code>ImageNet</code>数据集上训练得到的<code>inception model</code>(一个预训练模型)起步，来识别图像。</p>
+<p>一个预训练模型可能对于你的应用中并不是<code>100%</code>的准确对口，但是它可以为你节省大量功夫。</p>
+<p>接下来，我会举个例子来说明。</p>
+<h2 id="为什么我们要用预训练模型？"><a href="#为什么我们要用预训练模型？" class="headerlink" title="为什么我们要用预训练模型？"></a>为什么我们要用预训练模型？</h2><p>上周我一直在尝试解决<code>Crowdanalytix platform</code>上的一个问题：从手机图片中分辨场景。</p>
+<p>这是一个图像分类的问题，训练数据集中有<code>4591</code>张图片，测试集中有<code>1200</code>张图片。我们的任务是将图片相应地分到<code>16</code>个类别中。在对图片进行一些预处理后，我首先采用一个简单的<code>MLP(Multi-later Perceptron)</code>模型，自定义结构.</p>
+<p>在对输入图片<code>(224*224*3)</code>平整化后，为了简化上述结构，我用了三个各含有<code>500</code>个神经元的隐藏层。在输出层中，共有<code>16</code>个神经元对应着十六个类别。</p>
+<p>我只能将训练的准确率控制在<code>6.8%</code>，这是个很不理想的结果。我尝试对隐藏层、隐层中神经元的数量以及<code>drop out</code>速率进行调整，但准确度都没有太大的提升。而如果增加隐藏层和其中神经元的数量，每个周期的运行时间则会增加<code>20s</code>以上。(我的开发环境是<code>12GB VRAM</code>，<code>Titan X GPU</code>)</p>
+<p>除非指数级地增加训练时长，<code>MLP</code>模型无法提供给我更好的结果。因此，我转而采用<code>CNN</code>(卷积神经网络)「自定义结构」，看看他们在这个数据集上的表现，以及是否能够提高训练的准确度。</p>
+<p>我使用了<code>3</code>个卷积的模块，每个模块由以下部分组成：</p>
+<ul>
+<li><code>32</code>个<code>5*5</code>的<code>filter</code></li>
+<li>线性整流函数(<code>ReLU</code>)作为激活函数</li>
+<li><code>4*4</code>的最大值池化层</li>
+</ul>
+<p>最后一个卷积模块输出的结果经过平整化后会被传递到一个拥有<code>64</code>的神经元的隐藏层上，随后通过一个<code>drop out rate = 0.5</code>处理后传递到输出层。</p>
+<p>准确率<code>15.75%</code>，尽管与MLP模型相比有所提升，但每个周期的运行时间也增加了。</p>
+<p>而更重要的是，数据集中最大类别所含图片数量约占总数<code>17.6%</code>左右。</p>
+<p>只要把所有的图片都归到最大的类别，我们就能够得到比<code>MLP</code>、<code>CNN</code>训练出来的模型更好的结果。</p>
+<p>此外，增加更多的卷积模块也会大大增加训练时长。</p>
+<p>于是，我转而去采用预训练模型，这样我不需要重新训练我的整个结构，只需要针对其中的几层进行训练即可。</p>
+<p>因此，我采用了在<code>ImageNe</code>数据集上预先训练好的<code>VGG16</code>模型，这个模型可以在<code>Keras</code>库中找到。</p>
+<ul>
+<li><a href="/2020/07/11/vgg0/">vgg | 入门</a></li>
+</ul>
+<p>在<code>VGG16</code>结构的基础上，我只将<code>softmax</code>层的<code>1000</code>个输出改为<code>16</code>个，从而适应我们这个问题的情景，随后重新训练了<code>dense layer</code>。</p>
+<p>跟<code>MLP</code>和<code>CNN</code>相比，这个结构的准确率能够达到<code>70%</code>。同时，使用<code>VGG16</code>最大的好处是大大减少了训练时间，只需要针对<code>dense layer</code>进行训练，所需时间基本可以忽略。</p>
+<h2 id="怎样使用预训练模型？"><a href="#怎样使用预训练模型？" class="headerlink" title="怎样使用预训练模型？"></a>怎样使用预训练模型？</h2><p>当在训练经网络的时候我们的目标是什么？我们希望网络能够在多次正向反向迭代的过程中，找到合适的权重。</p>
+<p>通过使用之前在大数据集上经过训练的预训练模型，我们可以直接使用相应的结构和权重，将它们应用到我们正在面对的问题上。这被称作是“迁移学习”，即将预训练的模型“迁移”到我们正在应对的特定问题中。</p>
+<p>在选择预训练模型的时候你需要非常仔细，如果你的问题与预训练模型训练情景下有很大的出入，那么模型所得到的预测结果将会非常不准确。</p>
+<p>举例来说，如果把一个原本用于语音识别的模型用来做用户识别，那结果肯定是不理想的。</p>
+<p>幸运的是，<code>Keras</code>库中有许多这类预训练的结构。</p>
+<p><code>ImageNet</code>数据集已经被广泛用作训练集，因为它规模足够大(包括<code>120</code>万张图片)，有助于训练普适模型。ImageNet的训练目标，是将所有的图片正确地划分到<code>1000</code>个分类条目下。这<code>1000</code>个分类基本上都来源于我们的日常生活，比如说猫猫狗狗的种类，各种家庭用品，日常通勤工具等等。</p>
+<p>在迁移学习中，这些预训练的网络对于<code>ImageNet</code>数据集外的图片也表现出了很好的泛化性能。</p>
+<p>既然预训练模型已经训练得很好，我们就不会在短时间内去修改过多的权重，在迁移学习中用到它的时候，往往只是进行微调(<code>fine tune</code>)。</p>
+<h2 id="微调模型的方法"><a href="#微调模型的方法" class="headerlink" title="微调模型的方法"></a>微调模型的方法</h2><ul>
+<li>特征提取</li>
+</ul>
+<p>我们可以将预训练模型当做特征提取装置来使用。具体的做法是，将输出层去掉，然后将剩下的整个网络当做一个固定的特征提取机，从而应用到新的数据集中。</p>
+<ul>
+<li>采用预训练模型的结构</li>
+</ul>
+<p>我们还可以采用预训练模型的结构，但先将所有的权重随机化，然后依据自己的数据集进行训练。</p>
+<ul>
+<li>训练特定层，冻结其他层</li>
+</ul>
+<p>另一种使用预训练模型的方法是对它进行部分的训练。具体的做法是，将模型起始的一些层的权重保持不变，重新训练后面的层，得到新的权重。在这个过程中，我们可以多次进行尝试，从而能够依据结果找到<code>frozen layers</code>和<code>retrain layers</code>之间的最佳搭配。</p>
+<p>如何使用与训练模型，是由数据集大小和新旧数据集(预训练的数据集和我们要解决的数据集)之间数据的相似度来决定的。</p>
+<p>在修改模型的过程中，我们通过会采用比一般训练模型更低的学习速率。</p>
+<p>下图表展示了在各种情况下应该如何使用预训练模型：</p>
+<p><img src="/images/torch/17_0.jpg" alt=""></p>
+<h3 id="场景一：数据集小，数据相似度高-与pre-trained-model的训练数据相比而言"><a href="#场景一：数据集小，数据相似度高-与pre-trained-model的训练数据相比而言" class="headerlink" title="场景一：数据集小，数据相似度高(与pre-trained model的训练数据相比而言)"></a>场景一：数据集小，数据相似度高(与pre-trained model的训练数据相比而言)</h3><p>在这种情况下，因为数据与预训练模型的训练数据相似度很高，因此我们不需要重新训练模型。我们只需要将输出层改制成符合问题情境下的结构就好。</p>
+<p>我们使用预处理模型作为模式提取器。</p>
+<p>比如说我们使用在<code>ImageNet</code>上训练的模型来辨认一组新照片中的小猫小狗。在这里，需要被辨认的图片与<code>ImageNet</code>库中的图片类似，但是我们的输出结果中只需要两项——猫或者狗。</p>
+<p>在这个例子中，我们需要做的就是把<code>dense layer</code>和最终<code>softmax layer</code>的输出从<code>1000</code>个类别改为<code>2</code>个类别。</p>
+<h3 id="场景二：数据集小，数据相似度不高"><a href="#场景二：数据集小，数据相似度不高" class="headerlink" title="场景二：数据集小，数据相似度不高"></a>场景二：数据集小，数据相似度不高</h3><p>在这种情况下，我们可以冻结预训练模型中的前k个层中的权重，然后重新训练后面的<code>n-k</code>个层，当然最后一层也需要根据相应的输出格式来进行修改。</p>
+<p>因为数据的相似度不高，重新训练的过程就变得非常关键。而新数据集大小的不足，则是通过冻结预训练模型的前k层进行弥补。</p>
+<h3 id="场景三：数据集大，数据相似度不高"><a href="#场景三：数据集大，数据相似度不高" class="headerlink" title="场景三：数据集大，数据相似度不高"></a>场景三：数据集大，数据相似度不高</h3><p>在这种情况下，因为我们有一个很大的数据集，所以神经网络的训练过程将会比较有效率。然而，因为实际数据与预训练模型的训练数据之间存在很大差异，采用预训练模型将不会是一种高效的方式。</p>
+<p>因此最好的方法还是将预处理模型中的权重全都初始化后在新数据集的基础上重头开始训练。</p>
+<h3 id="场景四：数据集大，数据相似度高"><a href="#场景四：数据集大，数据相似度高" class="headerlink" title="场景四：数据集大，数据相似度高"></a>场景四：数据集大，数据相似度高</h3><p>这就是最理想的情况，采用预训练模型会变得非常高效。最好的运用方式是保持模型原有的结构和初始权重不变，随后在新数据集的基础上重新训练。</p>
+<h2 id="在手写数字识别中使用预训练模型"><a href="#在手写数字识别中使用预训练模型" class="headerlink" title="在手写数字识别中使用预训练模型"></a>在手写数字识别中使用预训练模型</h2><p>现在，让我们尝试来用预训练模型去解决一个简单的问题。</p>
+<p>我曾经使用vgg16作为预训练的模型结构，并把它应用到手写数字识别上。</p>
+<p>让我们先来看看这个问题对应着之前四种场景中的哪一种。我们的训练集(<code>MNIST</code>)有大约<code>60,000</code>张左右的手写数字图片，这样的数据集显然是偏小的。所以这个问题应该属于场景一或场景二。</p>
+<p>我们可以尝试把两种对应的方法都用一下，看看最终的效果。</p>
+<h3 id="只重新训练输出层-amp-dense-layer"><a href="#只重新训练输出层-amp-dense-layer" class="headerlink" title="只重新训练输出层 &amp; dense layer"></a>只重新训练输出层 &amp; <code>dense layer</code></h3><p>这里我们采用<code>vgg16</code>作为特征提取器。随后这些特征，会被传递到依据我们数据集训练的<code>dense layer</code>上。输出层同样由与我们问题相对应的<code>softmax</code>层函数所取代。</p>
+<p>在<code>vgg16</code>中，输出层是一个拥有<code>1000</code>个类别的<code>softmax</code>层。我们把这层去掉，换上一层只有<code>10</code>个类别的<code>softmax</code>层。我们只训练这些层，然后就进行数字识别的尝试。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># importing required libraries</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">from</span> scipy.misc <span class="keyword">import</span> imread</span><br><span class="line">get_ipython().magic(<span class="string">'matplotlib inline'</span>)</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> keras</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Dense</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> VGG16</span><br><span class="line"><span class="keyword">from</span> keras.preprocessing <span class="keyword">import</span> image</span><br><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> preprocess_input</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> decode_predictions</span><br><span class="line">train=pd.read_csv(<span class="string">"R/Data/Train/train.csv"</span>)</span><br><span class="line">test=pd.read_csv(<span class="string">"R/Data/test.csv"</span>)</span><br><span class="line">train_path=<span class="string">"R/Data/Train/Images/train/"</span></span><br><span class="line">test_path=<span class="string">"R/Data/Train/Images/test/"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scipy.misc <span class="keyword">import</span> imresize</span><br><span class="line"><span class="comment"># preparing the train dataset</span></span><br><span class="line"></span><br><span class="line">train_img=[]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(train)):</span><br><span class="line"></span><br><span class="line">    temp_img=image.load_img(train_path+train[<span class="string">'filename'</span>][i],target_size=(<span class="number">224</span>,<span class="number">224</span>))</span><br><span class="line"></span><br><span class="line">    temp_img=image.img_to_array(temp_img)</span><br><span class="line"></span><br><span class="line">    train_img.append(temp_img)</span><br><span class="line"></span><br><span class="line"><span class="comment">#converting train images to array and applying mean subtraction processing</span></span><br><span class="line"></span><br><span class="line">train_img=np.array(train_img) </span><br><span class="line">train_img=preprocess_input(train_img)</span><br><span class="line"><span class="comment"># applying the same procedure with the test dataset</span></span><br><span class="line"></span><br><span class="line">test_img=[]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(test)):</span><br><span class="line"></span><br><span class="line">    temp_img=image.load_img(test_path+test[<span class="string">'filename'</span>][i],target_size=(<span class="number">224</span>,<span class="number">224</span>))</span><br><span class="line"></span><br><span class="line">    temp_img=image.img_to_array(temp_img)</span><br><span class="line"></span><br><span class="line">    test_img.append(temp_img)</span><br><span class="line"></span><br><span class="line">test_img=np.array(test_img) </span><br><span class="line">test_img=preprocess_input(test_img)</span><br><span class="line"></span><br><span class="line"><span class="comment"># loading VGG16 model weights</span></span><br><span class="line">model = VGG16(weights=<span class="string">'imagenet'</span>, include_top=<span class="literal">False</span>)</span><br><span class="line"><span class="comment"># Extracting features from the train dataset using the VGG16 pre-trained model</span></span><br><span class="line"></span><br><span class="line">features_train=model.predict(train_img)</span><br><span class="line"><span class="comment"># Extracting features from the train dataset using the VGG16 pre-trained model</span></span><br><span class="line"></span><br><span class="line">features_test=model.predict(test_img)</span><br><span class="line"></span><br><span class="line"><span class="comment"># flattening the layers to conform to MLP input</span></span><br><span class="line"></span><br><span class="line">train_x=features_train.reshape(<span class="number">49000</span>,<span class="number">25088</span>)</span><br><span class="line"><span class="comment"># converting target variable to array</span></span><br><span class="line"></span><br><span class="line">train_y=np.asarray(train[<span class="string">'label'</span>])</span><br><span class="line"><span class="comment"># performing one-hot encoding for the target variable</span></span><br><span class="line"></span><br><span class="line">train_y=pd.get_dummies(train_y)</span><br><span class="line">train_y=np.array(train_y)</span><br><span class="line"><span class="comment"># creating training and validation set</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line">X_train, X_valid, Y_train, Y_valid=train_test_split(train_x,train_y,test_size=<span class="number">0.3</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment"># creating a mlp model</span></span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Dense, Activation</span><br><span class="line">model=Sequential()</span><br><span class="line"></span><br><span class="line">model.add(Dense(<span class="number">1000</span>, input_dim=<span class="number">25088</span>, activation=<span class="string">'relu'</span>,kernel_initializer=<span class="string">'uniform'</span>))</span><br><span class="line">keras.layers.core.Dropout(<span class="number">0.3</span>, noise_shape=<span class="literal">None</span>, seed=<span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">model.add(Dense(<span class="number">500</span>,input_dim=<span class="number">1000</span>,activation=<span class="string">'sigmoid'</span>))</span><br><span class="line">keras.layers.core.Dropout(<span class="number">0.4</span>, noise_shape=<span class="literal">None</span>, seed=<span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">model.add(Dense(<span class="number">150</span>,input_dim=<span class="number">500</span>,activation=<span class="string">'sigmoid'</span>))</span><br><span class="line">keras.layers.core.Dropout(<span class="number">0.2</span>, noise_shape=<span class="literal">None</span>, seed=<span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">model.add(Dense(units=<span class="number">10</span>))</span><br><span class="line">model.add(Activation(<span class="string">'softmax'</span>))</span><br><span class="line"></span><br><span class="line">model.compile(loss=<span class="string">'categorical_crossentropy'</span>, optimizer=<span class="string">"adam"</span>, metrics=[<span class="string">'accuracy'</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># fitting the model </span></span><br><span class="line"></span><br><span class="line">model.fit(X_train, Y_train, epochs=<span class="number">20</span>, batch_size=<span class="number">128</span>,validation_data=(X_valid,Y_valid))</span><br></pre></td></tr></table></figure>
+
+<h3 id="冻结最初几层网络的权重"><a href="#冻结最初几层网络的权重" class="headerlink" title="冻结最初几层网络的权重"></a>冻结最初几层网络的权重</h3><p>这里我们将会把<code>vgg16</code>网络的前<code>8</code>层进行冻结，然后对后面的网络重新进行训练。这么做是因为最初的几层网络捕获的是曲线、边缘这种普遍的特征，这跟我们的问题是相关的。我们想要保证这些权重不变，让网络在学习过程中重点关注这个数据集特有的一些特征，从而对后面的网络进行调整。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">from</span> scipy.misc <span class="keyword">import</span> imread</span><br><span class="line">get_ipython().magic(<span class="string">'matplotlib inline'</span>)</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> keras</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Dense</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> VGG16</span><br><span class="line"><span class="keyword">from</span> keras.preprocessing <span class="keyword">import</span> image</span><br><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> preprocess_input</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> decode_predictions</span><br><span class="line"><span class="keyword">from</span> keras.utils.np_utils <span class="keyword">import</span> to_categorical</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> LabelEncoder</span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">from</span> keras.optimizers <span class="keyword">import</span> SGD</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Input, Dense, Convolution2D, MaxPooling2D, AveragePooling2D, ZeroPadding2D, Dropout, Flatten, merge, Reshape, Activation</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> log_loss</span><br><span class="line"></span><br><span class="line">train=pd.read_csv(<span class="string">"R/Data/Train/train.csv"</span>)</span><br><span class="line">test=pd.read_csv(<span class="string">"R/Data/test.csv"</span>)</span><br><span class="line">train_path=<span class="string">"R/Data/Train/Images/train/"</span></span><br><span class="line">test_path=<span class="string">"R/Data/Train/Images/test/"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scipy.misc <span class="keyword">import</span> imresize</span><br><span class="line"></span><br><span class="line">train_img=[]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(train)):</span><br><span class="line"></span><br><span class="line">    temp_img=image.load_img(train_path+train[<span class="string">'filename'</span>][i],target_size=(<span class="number">224</span>,<span class="number">224</span>))</span><br><span class="line"></span><br><span class="line">    temp_img=image.img_to_array(temp_img)</span><br><span class="line"></span><br><span class="line">    train_img.append(temp_img)</span><br><span class="line"></span><br><span class="line">train_img=np.array(train_img) </span><br><span class="line">train_img=preprocess_input(train_img)</span><br><span class="line"></span><br><span class="line">test_img=[]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(test)):</span><br><span class="line"></span><br><span class="line">temp_img=image.load_img(test_path+test[<span class="string">'filename'</span>][i],target_size=(<span class="number">224</span>,<span class="number">224</span>))</span><br><span class="line"></span><br><span class="line">    temp_img=image.img_to_array(temp_img)</span><br><span class="line"></span><br><span class="line">    test_img.append(temp_img)</span><br><span class="line"></span><br><span class="line">test_img=np.array(test_img) </span><br><span class="line">test_img=preprocess_input(test_img)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Model</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">vgg16_model</span><span class="params">(img_rows, img_cols, channel=<span class="number">1</span>, num_classes=None)</span>:</span></span><br><span class="line"></span><br><span class="line">    model = VGG16(weights=<span class="string">'imagenet'</span>, include_top=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    model.layers.pop()</span><br><span class="line"></span><br><span class="line">    model.outputs = [model.layers[<span class="number">-1</span>].output]</span><br><span class="line"></span><br><span class="line">    model.layers[<span class="number">-1</span>].outbound_nodes = []</span><br><span class="line"></span><br><span class="line">          x=Dense(num_classes, activation=<span class="string">'softmax'</span>)(model.output)</span><br><span class="line"></span><br><span class="line">    model=Model(model.input,x)</span><br><span class="line"></span><br><span class="line"><span class="comment">#To set the first 8 layers to non-trainable (weights will not be updated)</span></span><br><span class="line"></span><br><span class="line">          <span class="keyword">for</span> layer <span class="keyword">in</span> model.layers[:<span class="number">8</span>]:</span><br><span class="line"></span><br><span class="line">       layer.trainable = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Learning rate is changed to 0.001</span></span><br><span class="line">    sgd = SGD(lr=<span class="number">1e-3</span>, decay=<span class="number">1e-6</span>, momentum=<span class="number">0.9</span>, nesterov=<span class="literal">True</span>)</span><br><span class="line">    model.compile(optimizer=sgd, loss=<span class="string">'categorical_crossentropy'</span>, metrics=[<span class="string">'accuracy'</span>])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line">train_y=np.asarray(train[<span class="string">'label'</span>])</span><br><span class="line"></span><br><span class="line">le = LabelEncoder()</span><br><span class="line"></span><br><span class="line">train_y = le.fit_transform(train_y)</span><br><span class="line"></span><br><span class="line">train_y=to_categorical(train_y)</span><br><span class="line"></span><br><span class="line">train_y=np.array(train_y)</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line">X_train, X_valid, Y_train, Y_valid=train_test_split(train_img,train_y,test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Example to fine-tune on 3000 samples from Cifar10</span></span><br><span class="line"></span><br><span class="line">img_rows, img_cols = <span class="number">224</span>, <span class="number">224</span> <span class="comment"># Resolution of inputs</span></span><br><span class="line">channel = <span class="number">3</span></span><br><span class="line">num_classes = <span class="number">10</span> </span><br><span class="line">batch_size = <span class="number">16</span> </span><br><span class="line">nb_epoch = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Load our model</span></span><br><span class="line">model = vgg16_model(img_rows, img_cols, channel, num_classes)</span><br><span class="line"></span><br><span class="line">model.summary()</span><br><span class="line"><span class="comment"># Start Fine-tuning</span></span><br><span class="line">model.fit(X_train, Y_train,batch_size=batch_size,epochs=nb_epoch,shuffle=<span class="literal">True</span>,verbose=<span class="number">1</span>,validation_data=(X_valid, Y_valid))</span><br><span class="line"></span><br><span class="line"><span class="comment"># Make predictions</span></span><br><span class="line">predictions_valid = model.predict(X_valid, batch_size=batch_size, verbose=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Cross-entropy loss score</span></span><br><span class="line">score = log_loss(Y_valid, predictions_valid)</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/pytorch/" rel="tag"># pytorch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/23/python131/" rel="prev" title="python | 使用多进程处理大规模文件">
+      <i class="fa fa-chevron-left"></i> python | 使用多进程处理大规模文件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/24/dvc0/" rel="next" title="dvc | 如 github 一样管理模型和数据集">
+      dvc | 如 github 一样管理模型和数据集 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#目录"><span class="nav-number">3.</span> <span class="nav-text">目录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是迁移学习？"><span class="nav-number">3.1.</span> <span class="nav-text">什么是迁移学习？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是预训练模型？"><span class="nav-number">3.2.</span> <span class="nav-text">什么是预训练模型？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么我们要用预训练模型？"><span class="nav-number">3.3.</span> <span class="nav-text">为什么我们要用预训练模型？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#怎样使用预训练模型？"><span class="nav-number">3.4.</span> <span class="nav-text">怎样使用预训练模型？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微调模型的方法"><span class="nav-number">3.5.</span> <span class="nav-text">微调模型的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#场景一：数据集小，数据相似度高-与pre-trained-model的训练数据相比而言"><span class="nav-number">3.5.1.</span> <span class="nav-text">场景一：数据集小，数据相似度高(与pre-trained model的训练数据相比而言)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#场景二：数据集小，数据相似度不高"><span class="nav-number">3.5.2.</span> <span class="nav-text">场景二：数据集小，数据相似度不高</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#场景三：数据集大，数据相似度不高"><span class="nav-number">3.5.3.</span> <span class="nav-text">场景三：数据集大，数据相似度不高</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#场景四：数据集大，数据相似度高"><span class="nav-number">3.5.4.</span> <span class="nav-text">场景四：数据集大，数据相似度高</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在手写数字识别中使用预训练模型"><span class="nav-number">3.6.</span> <span class="nav-text">在手写数字识别中使用预训练模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#只重新训练输出层-amp-dense-layer"><span class="nav-number">3.6.1.</span> <span class="nav-text">只重新训练输出层 &amp; dense layer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#冻结最初几层网络的权重"><span class="nav-number">3.6.2.</span> <span class="nav-text">冻结最初几层网络的权重</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

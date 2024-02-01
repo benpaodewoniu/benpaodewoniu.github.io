@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="CSRF是黑客攻击的常见手段，而Django却有应对的机制。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django中的CSRF与AJAX">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/09/09/django21/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="CSRF是黑客攻击的常见手段，而Django却有应对的机制。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/django/21_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/django/21_1.png">
+<meta property="article:published_time" content="2019-09-09T01:29:26.000Z">
+<meta property="article:modified_time" content="2021-06-10T07:49:33.592Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="Django">
+<meta property="article:tag" content="CSRF">
+<meta property="article:tag" content="中间件">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/django/21_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/09/09/django21/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>Django中的CSRF与AJAX | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/09/09/django21/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Django中的CSRF与AJAX
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-09 09:29:26" itemprop="dateCreated datePublished" datetime="2019-09-09T09:29:26+08:00">2019-09-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-10 15:49:33" itemprop="dateModified" datetime="2021-06-10T15:49:33+08:00">2021-06-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A1%86%E6%9E%B6/django/" itemprop="url" rel="index"><span itemprop="name">django</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A1%86%E6%9E%B6/django/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/09/09/django21/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/09/09/django21/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>CSRF是黑客攻击的常见手段，而Django却有应对的机制。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="原文链接"><a href="#原文链接" class="headerlink" title="原文链接"></a>原文链接</h1><br/>
+
+<p><a href="http://www.liujiangblog.com/course/django/179">CSRF与AJAX</a></p>
+<p><a href="https://www.cnblogs.com/renpingsheng/p/9756051.html">详解Django的CSRF认证</a></p>
+<p>如果你要想了解什么是CSRF的话，可以看看我下面的文章：</p>
+<p><a href="/2019/09/09/hacker1/">什么是CSRF</a></p>
+<br/>
+
+<h1 id="csrf原理"><a href="#csrf原理" class="headerlink" title="csrf原理"></a>csrf原理</h1><br/>
+
+<p>csrf要求发送post,put或delete请求的时候，是先以get方式发送请求，服务端响应时会分配一个随机字符串给客户端，客户端第二次发送post,put或delete请求时携带上次分配的随机字符串到服务端进行校验</p>
+<br/>
+
+<h1 id="Django中的CSRF中间件"><a href="#Django中的CSRF中间件" class="headerlink" title="Django中的CSRF中间件"></a>Django中的CSRF中间件</h1><br/>
+
+<p>首先，我们知道Django中间件作用于整个项目。</p>
+<p>在一个项目中，如果想对全局所有视图函数或视图类起作用时，就可以在中间件中实现，比如想实现用户登录判断，基于用户的权限管理（RBAC）等都可以在Django中间件中来进行操作</p>
+<p>Django内置了很多中间件,其中之一就是CSRF中间件</p>
+<pre><code>MIDDLEWARE_CLASSES = [
+    &apos;django.middleware.security.SecurityMiddleware&apos;,
+    &apos;django.contrib.sessions.middleware.SessionMiddleware&apos;,
+    &apos;django.middleware.common.CommonMiddleware&apos;,
+    &apos;django.middleware.csrf.CsrfViewMiddleware&apos;,
+    &apos;django.contrib.auth.middleware.AuthenticationMiddleware&apos;,
+    &apos;django.contrib.auth.middleware.SessionAuthenticationMiddleware&apos;,
+    &apos;django.contrib.messages.middleware.MessageMiddleware&apos;,
+    &apos;django.middleware.clickjacking.XFrameOptionsMiddleware&apos;,
+]</code></pre><p>上面第四个就是Django内置的CSRF中间件</p>
+<br/>
+
+<h1 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h1><br/>
+
+<p>默认情况下，使用django-admin startproject xxx命令创建工程时，CSRF防御机制就已经开启了。</p>
+<p>如果没有开启，请在MIDDLEWARE设置中添加’django.middleware.csrf.CsrfViewMiddleware’。</p>
+<p>上面的那个选项是在项目中的 setting.py 文件内</p>
+<p><img src="/images/django/21_0.png" alt=""></p>
+<blockquote>
+<p>对于GET请求，一般来说没有这个问题，CSRF通常是针对POST方法的！</p>
+</blockquote>
+<p>在含有POST表单的模板中，需要在其<form>表单元素内部添加csrf_token标签。</p>
+<p>如下所示：</p>
+<p><img src="/images/django/21_1.png" alt=""></p>
+<pre><code>&lt;form id=&quot;comment_form&quot; action=&quot;#&quot;&gt;&lt;/form&gt;
+{% csrf_token %}   就是这个
+&lt;p&gt;姓名: &lt;input type=&quot;text&quot; name=&quot;useranme&quot; id=&quot;username&quot;&gt;&lt;/p&gt;
+&lt;p&gt;内容: &lt;textarea name=&quot;content&quot; id=&quot;content&quot; rows=&quot;5&quot; cols=&quot;30&quot;&gt;&lt;/textarea&gt;&lt;/p&gt;
+&lt;p&gt;&lt;input type=&quot;button&quot;, id=&quot;send&quot; value=&quot;提交&quot;&gt;&lt;/p&gt; </code></pre><p>这样，当表单数据通过POST方法，发送到后台服务器的时候，除了正常的表单数据外，还会携带一个CSRF令牌随机字符串，用于进行csrf验证。其实没有多么麻烦和复杂，对么？如果表单中没有携带这个csrf令牌，你将会获得一枚403奖章。</p>
+<p>额外提示：对于初学者，要明白一件事情，就是我们上面讲的都是Django项目自己内部的事务，不涉及与外界的关系。例如，你不能把上面那个表单发往百度，百度会懵逼的，你这发的啥？其次，那样也不安全，可能引起CSRF信息泄露而导致自己的站点出现漏洞。</p>
+<br/>
+
+<h1 id="AJAX"><a href="#AJAX" class="headerlink" title="AJAX"></a>AJAX</h1><br/>
+
+<p>我们知道，在前端的世界，有一种叫做AJAX的东西，也就是“Asynchronous Javascript And XML”（异步 JavaScript 和 XML），经常被用来在不刷新页面的情况下，提交和请求数据。如果我们的Django服务器接收的是一个通过AJAX发送过来的POST请求的话，那么将很麻烦。</p>
+<p>为什么？因为AJAX中，没有办法像form表单中那样携带</p>
+<pre><code>{% csrf_token %}</code></pre><p>令牌。</p>
+<p>那怎么办呢？</p>
+<p>好办！在你的前端模版的JavaScript代码处，添加下面的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">// using jQuery</span><br><span class="line">function getCookie(name) &#123;</span><br><span class="line">    var cookieValue = null;</span><br><span class="line">    <span class="keyword">if</span> (document.cookie &amp;&amp; document.cookie !== <span class="string">''</span>) &#123;</span><br><span class="line">        var cookies = document.cookie.split(<span class="string">';'</span>);</span><br><span class="line">        <span class="keyword">for</span> (var i = <span class="number">0</span>; i &lt; cookies.length; i++) &#123;</span><br><span class="line">            var cookie = jQuery.trim(cookies[i]);</span><br><span class="line">            // Does this cookie string begin with the name we want?</span><br><span class="line">            <span class="keyword">if</span> (cookie.substring(<span class="number">0</span>, name.length + <span class="number">1</span>) === (name + <span class="string">'='</span>)) &#123;</span><br><span class="line">                cookieValue = decodeURIComponent(cookie.substring(name.length + <span class="number">1</span>));</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> cookieValue;</span><br><span class="line">&#125;</span><br><span class="line">var csrftoken = getCookie(<span class="string">'csrftoken'</span>);</span><br><span class="line"></span><br><span class="line">function csrfSafeMethod(method) &#123;</span><br><span class="line">    // 这些HTTP方法不要求CSRF包含</span><br><span class="line">    <span class="keyword">return</span> (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));</span><br><span class="line">&#125;</span><br><span class="line">$.ajaxSetup(&#123;</span><br><span class="line">    beforeSend: function(xhr, settings) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!csrfSafeMethod(settings.type) &amp;&amp; !this.crossDomain) &#123;</span><br><span class="line">            xhr.setRequestHeader(<span class="string">"X-CSRFToken"</span>, csrftoken);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>上面代码的作用就是让你的ajax的POST方法带上CSRF需要的令牌，它依赖Jquery库，必须提前加载Jquery。这是Django官方提供的解决方案哦，^-^。</p>
+<br/>
+
+<h1 id="Django中间件的执行过程"><a href="#Django中间件的执行过程" class="headerlink" title="Django中间件的执行过程"></a>Django中间件的执行过程</h1><br/>
+
+<p><a href="/2019/09/09/django23/">django的中间件</a></p>
+<br/>
+
+<h1 id="Django-CSRF中间件的源码解析"><a href="#Django-CSRF中间件的源码解析" class="headerlink" title="Django CSRF中间件的源码解析"></a>Django CSRF中间件的源码解析</h1><br/>
+
+<p>Django CSRF中间件的源码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CsrfViewMiddleware</span><span class="params">(MiddlewareMixin)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_accept</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        request.csrf_processing_done = <span class="literal">True</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_reject</span><span class="params">(self, request, reason)</span>:</span></span><br><span class="line">        logger.warning(</span><br><span class="line">            <span class="string">'Forbidden (%s): %s'</span>, reason, request.path,</span><br><span class="line">            extra=&#123;</span><br><span class="line">                <span class="string">'status_code'</span>: <span class="number">403</span>,</span><br><span class="line">                <span class="string">'request'</span>: request,</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">return</span> _get_failure_view()(request, reason=reason)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_get_token</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> settings.CSRF_USE_SESSIONS:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                <span class="keyword">return</span> request.session.get(CSRF_SESSION_KEY)</span><br><span class="line">            <span class="keyword">except</span> AttributeError:</span><br><span class="line">                <span class="keyword">raise</span> ImproperlyConfigured(</span><br><span class="line">                    <span class="string">'CSRF_USE_SESSIONS is enabled, but request.session is not '</span></span><br><span class="line">                    <span class="string">'set. SessionMiddleware must appear before CsrfViewMiddleware '</span></span><br><span class="line">                    <span class="string">'in MIDDLEWARE%s.'</span> % (<span class="string">'_CLASSES'</span> <span class="keyword">if</span> settings.MIDDLEWARE <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">''</span>)</span><br><span class="line">                )</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                cookie_token = request.COOKIES[settings.CSRF_COOKIE_NAME]</span><br><span class="line">            <span class="keyword">except</span> KeyError:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">            csrf_token = _sanitize_token(cookie_token)</span><br><span class="line">            <span class="keyword">if</span> csrf_token != cookie_token:</span><br><span class="line">                <span class="comment"># Cookie token needed to be replaced;</span></span><br><span class="line">                <span class="comment"># the cookie needs to be reset.</span></span><br><span class="line">                request.csrf_cookie_needs_reset = <span class="literal">True</span></span><br><span class="line">            <span class="keyword">return</span> csrf_token</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_set_token</span><span class="params">(self, request, response)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> settings.CSRF_USE_SESSIONS:</span><br><span class="line">            request.session[CSRF_SESSION_KEY] = request.META[<span class="string">'CSRF_COOKIE'</span>]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            response.set_cookie(</span><br><span class="line">                settings.CSRF_COOKIE_NAME,</span><br><span class="line">                request.META[<span class="string">'CSRF_COOKIE'</span>],</span><br><span class="line">                max_age=settings.CSRF_COOKIE_AGE,</span><br><span class="line">                domain=settings.CSRF_COOKIE_DOMAIN,</span><br><span class="line">                path=settings.CSRF_COOKIE_PATH,</span><br><span class="line">                secure=settings.CSRF_COOKIE_SECURE,</span><br><span class="line">                httponly=settings.CSRF_COOKIE_HTTPONLY,</span><br><span class="line">            )</span><br><span class="line">            patch_vary_headers(response, (<span class="string">'Cookie'</span>,))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        csrf_token = self._get_token(request)</span><br><span class="line">        <span class="keyword">if</span> csrf_token <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="comment"># Use same token next time.</span></span><br><span class="line">            request.META[<span class="string">'CSRF_COOKIE'</span>] = csrf_token</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_view</span><span class="params">(self, request, callback, callback_args, callback_kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> getattr(request, <span class="string">'csrf_processing_done'</span>, <span class="literal">False</span>):</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> getattr(callback, <span class="string">'csrf_exempt'</span>, <span class="literal">False</span>):</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> request.method <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'GET'</span>, <span class="string">'HEAD'</span>, <span class="string">'OPTIONS'</span>, <span class="string">'TRACE'</span>):</span><br><span class="line">            <span class="keyword">if</span> getattr(request, <span class="string">'_dont_enforce_csrf_checks'</span>, <span class="literal">False</span>):</span><br><span class="line">                <span class="keyword">return</span> self._accept(request)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> request.is_secure():</span><br><span class="line">                referer = force_text(</span><br><span class="line">                    request.META.get(<span class="string">'HTTP_REFERER'</span>),</span><br><span class="line">                    strings_only=<span class="literal">True</span>,</span><br><span class="line">                    errors=<span class="string">'replace'</span></span><br><span class="line">                )</span><br><span class="line">                <span class="keyword">if</span> referer <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                    <span class="keyword">return</span> self._reject(request, REASON_NO_REFERER)</span><br><span class="line"></span><br><span class="line">                referer = urlparse(referer)</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> <span class="string">''</span> <span class="keyword">in</span> (referer.scheme, referer.netloc):</span><br><span class="line">                    <span class="keyword">return</span> self._reject(request, REASON_MALFORMED_REFERER)</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> referer.scheme != <span class="string">'https'</span>:</span><br><span class="line">                    <span class="keyword">return</span> self._reject(request, REASON_INSECURE_REFERER)</span><br><span class="line"></span><br><span class="line">                good_referer = (</span><br><span class="line">                    settings.SESSION_COOKIE_DOMAIN</span><br><span class="line">                    <span class="keyword">if</span> settings.CSRF_USE_SESSIONS</span><br><span class="line">                    <span class="keyword">else</span> settings.CSRF_COOKIE_DOMAIN</span><br><span class="line">                )</span><br><span class="line">                <span class="keyword">if</span> good_referer <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">                    server_port = request.get_port()</span><br><span class="line">                    <span class="keyword">if</span> server_port <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'443'</span>, <span class="string">'80'</span>):</span><br><span class="line">                        good_referer = <span class="string">'%s:%s'</span> % (good_referer, server_port)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    good_referer = request.get_host()</span><br><span class="line"></span><br><span class="line">                good_hosts = list(settings.CSRF_TRUSTED_ORIGINS)</span><br><span class="line">                good_hosts.append(good_referer)</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> any(is_same_domain(referer.netloc, host) <span class="keyword">for</span> host <span class="keyword">in</span> good_hosts):</span><br><span class="line">                    reason = REASON_BAD_REFERER % referer.geturl()</span><br><span class="line">                    <span class="keyword">return</span> self._reject(request, reason)</span><br><span class="line"></span><br><span class="line">            csrf_token = request.META.get(<span class="string">'CSRF_COOKIE'</span>)</span><br><span class="line">            <span class="keyword">if</span> csrf_token <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                <span class="keyword">return</span> self._reject(request, REASON_NO_CSRF_COOKIE)</span><br><span class="line"></span><br><span class="line">            request_csrf_token = <span class="string">""</span></span><br><span class="line">            <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    request_csrf_token = request.POST.get(<span class="string">'csrfmiddlewaretoken'</span>, <span class="string">''</span>)</span><br><span class="line">                <span class="keyword">except</span> IOError:</span><br><span class="line">                    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> request_csrf_token == <span class="string">""</span>:</span><br><span class="line">                request_csrf_token = request.META.get(settings.CSRF_HEADER_NAME, <span class="string">''</span>)</span><br><span class="line"></span><br><span class="line">            request_csrf_token = _sanitize_token(request_csrf_token)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> _compare_salted_tokens(request_csrf_token, csrf_token):</span><br><span class="line">                <span class="keyword">return</span> self._reject(request, REASON_BAD_TOKEN)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> self._accept(request)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_response</span><span class="params">(self, request, response)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> getattr(request, <span class="string">'csrf_cookie_needs_reset'</span>, <span class="literal">False</span>):</span><br><span class="line">            <span class="keyword">if</span> getattr(response, <span class="string">'csrf_cookie_set'</span>, <span class="literal">False</span>):</span><br><span class="line">                <span class="keyword">return</span> response</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> request.META.get(<span class="string">"CSRF_COOKIE_USED"</span>, <span class="literal">False</span>):</span><br><span class="line">            <span class="keyword">return</span> response</span><br><span class="line"></span><br><span class="line">        self._set_token(request, response)</span><br><span class="line">        response.csrf_cookie_set = <span class="literal">True</span></span><br><span class="line">        <span class="keyword">return</span> response</span><br></pre></td></tr></table></figure>
+
+<p>从上面的源码中可以看到，CsrfViewMiddleware中间件中定义了process_request，process_view和process_response三个方法</p>
+<h2 id="先来看process-request方法"><a href="#先来看process-request方法" class="headerlink" title="先来看process_request方法"></a>先来看process_request方法</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_token</span><span class="params">(self, request)</span>:</span>  </span><br><span class="line">    <span class="keyword">if</span> settings.CSRF_USE_SESSIONS:  </span><br><span class="line">        <span class="keyword">try</span>:  </span><br><span class="line">            <span class="keyword">return</span> request.session.get(CSRF_SESSION_KEY)  </span><br><span class="line">        <span class="keyword">except</span> AttributeError:  </span><br><span class="line">            <span class="keyword">raise</span> ImproperlyConfigured(  </span><br><span class="line">                <span class="string">'CSRF_USE_SESSIONS is enabled, but request.session is not '</span>  </span><br><span class="line"> <span class="string">'set. SessionMiddleware must appear before CsrfViewMiddleware '</span> <span class="string">'in MIDDLEWARE%s.'</span> % (<span class="string">'_CLASSES'</span> <span class="keyword">if</span> settings.MIDDLEWARE <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">''</span>)  </span><br><span class="line">            )  </span><br><span class="line">    <span class="keyword">else</span>:  </span><br><span class="line">        <span class="keyword">try</span>:  </span><br><span class="line">            cookie_token = request.COOKIES[settings.CSRF_COOKIE_NAME]  </span><br><span class="line">        <span class="keyword">except</span> KeyError:  </span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span>  </span><br><span class="line">  </span><br><span class="line">  csrf_token = _sanitize_token(cookie_token)  </span><br><span class="line">        <span class="keyword">if</span> csrf_token != cookie_token:  </span><br><span class="line">            <span class="comment"># Cookie token needed to be replaced;  </span></span><br><span class="line"> <span class="comment"># the cookie needs to be reset.  request.csrf_cookie_needs_reset = True  </span></span><br><span class="line"> <span class="keyword">return</span> csrf_token</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request)</span>:</span>  </span><br><span class="line">        csrf_token = self._get_token(request)  </span><br><span class="line">        <span class="keyword">if</span> csrf_token <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:  </span><br><span class="line">            <span class="comment"># Use same token next time.  </span></span><br><span class="line">      request.META[<span class="string">'CSRF_COOKIE'</span>] = csrf_token</span><br></pre></td></tr></table></figure>
+
+<p>从Django项目配置文件夹中读取CSRF_USE_SESSIONS的值，如果获取成功，则从session中读取CSRF_SESSION_KEY的值，默认为’_csrftoken’，如果没有获取到CSRF_USE_SESSIONS的值，则从发送过来的请求中获取CSRF_COOKIE_NAME的值，如果没有定义则返回None。</p>
+<h2 id="再来看process-view方法"><a href="#再来看process-view方法" class="headerlink" title="再来看process_view方法"></a>再来看process_view方法</h2><p>在process_view方法中，先检查视图函数是否被csrf_exempt装饰器装饰，如果视图函数没有被csrf_exempt装饰器装饰，则程序继续执行，否则返回None。接着从request请求头中或者cookie中获取携带的token并进行验证，验证通过才会继续执行与URL匹配的视图函数，否则就返回403 Forbidden错误。</p>
+<p>实际项目中，会在发送POST,PUT,DELETE,PATCH请求时，在提交的form表单中添加</p>
+<pre><code>{% csrf_token %}</code></pre><p>即可，否则会出现403的错误。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Django/" rel="tag"># Django</a>
+              <a href="/tags/CSRF/" rel="tag"># CSRF</a>
+              <a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"># 中间件</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/09/09/hacker1/" rel="prev" title="什么是CSRF？">
+      <i class="fa fa-chevron-left"></i> 什么是CSRF？
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/09/django22/" rel="next" title="Django的POST总是出现403错误">
+      Django的POST总是出现403错误 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#原文链接"><span class="nav-number">1.</span> <span class="nav-text">原文链接</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#csrf原理"><span class="nav-number">2.</span> <span class="nav-text">csrf原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Django中的CSRF中间件"><span class="nav-number">3.</span> <span class="nav-text">Django中的CSRF中间件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基本使用"><span class="nav-number">4.</span> <span class="nav-text">基本使用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AJAX"><span class="nav-number">5.</span> <span class="nav-text">AJAX</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Django中间件的执行过程"><span class="nav-number">6.</span> <span class="nav-text">Django中间件的执行过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Django-CSRF中间件的源码解析"><span class="nav-number">7.</span> <span class="nav-text">Django CSRF中间件的源码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#先来看process-request方法"><span class="nav-number">7.1.</span> <span class="nav-text">先来看process_request方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#再来看process-view方法"><span class="nav-number">7.2.</span> <span class="nav-text">再来看process_view方法</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Genetic Algorithms(GA) 是遗传算法，这是一个非常有意思的算法，我将会详细分析这个算法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="遗传算法 GA 基本原理">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/10/13/es0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="Genetic Algorithms(GA) 是遗传算法，这是一个非常有意思的算法，我将会详细分析这个算法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_0.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_1.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_2.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_3.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_4.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_5.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_7.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_8.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_9.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_10.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_11.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_12.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_13.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_14.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_15.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_16.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_17.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_18.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_19.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_20.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_21.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_22.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_23.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_24.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_25.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_26.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_27.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_28.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_29.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_30.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_31.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_32.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_33.png">
+<meta property="article:published_time" content="2018-10-13T11:57:58.000Z">
+<meta property="article:modified_time" content="2020-03-16T05:08:40.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="GA">
+<meta property="article:tag" content="进化算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/5_0.JPG">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/10/13/es0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>遗传算法 GA 基本原理 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/10/13/es0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          遗传算法 GA 基本原理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-13 19:57:58" itemprop="dateCreated datePublished" datetime="2018-10-13T19:57:58+08:00">2018-10-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-16 13:08:40" itemprop="dateModified" datetime="2020-03-16T13:08:40+08:00">2020-03-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%9B%E5%8C%96%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">进化算法</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/10/13/es0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/10/13/es0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Genetic Algorithms(GA) 是遗传算法，这是一个非常有意思的算法，我将会详细分析这个算法。</p>
+<a id="more"></a>
+
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><h3 id="自然界"><a href="#自然界" class="headerlink" title="自然界"></a>自然界</h3><p><a href="https://blog.csdn.net/u010451580/article/details/51178225">遗传算法详解（GA）（个人觉得很形象，很适合初学者）</a></p>
+<p>关于具体术语我就不说了，我先用自然界的遗传入手。按照达尔文的进化论来说，适者生存。也就是说越适应环境的生物，生存几率越大。</p>
+<p>话语虽短，但是却传达了几点非常重要的信息，第一，必须先有母群和父群才能进化，也就是进化是在后代不断地迭代中产生。第二，进化就是好的性状更加适应于环境，而这个性状的遗传来自于父群和母群，第三，由于环境恶劣，导致不适应环境的性状被淘汰，而适应环境的性状被保留，并且由于适应环境的性状被保留的越多，拥有这个性状的种群数量也就越多，所以，最后优等种群成为一种常态。</p>
+<p>也就是说适者生存包括，性状遗传，环境淘汰，种群扩大这些概念。</p>
+<p>但是，我们也知道由于遗传的过程中，基因在某种情况下不会按照父群和母群遗传，而是基因突变成另外一个个体，所以，这个个体可能会变的极为优秀，也有可能会直接夭折。</p>
+<h3 id="计算机界"><a href="#计算机界" class="headerlink" title="计算机界"></a>计算机界</h3><p>20世纪70年代，由 Hollyand 教授，首先提出 GA 算法，在这个算法中提出模拟自然的遗传。</p>
+<p>还是先举自然地例子。</p>
+<p>在一片绵延的山脉中，有一群随机分布的袋鼠，它们以群居的方式居住在山脉的各个地方，这时，谷底突然弥漫出一种毒雾。</p>
+<p>毒雾从谷底向山顶蔓延，而袋鼠也有自己的生活方式，一种是会迁居到山脚，一种是不动，另一种是跳到山顶。</p>
+<p>由于拥有毒素的原因，迁居到山脚的袋鼠开始相继死亡，而越往上走的袋鼠反而会活的越多，最终，剩下的袋鼠都喜欢往上走。</p>
+<p>那有没有具体的数学例子呢？</p>
+<p>看下面的函数</p>
+<p><img src="/images/machinelearningalgorithm/5_0.JPG" alt=""></p>
+<p>将这个函数画出图像我们就能得出</p>
+<p><img src="/images/machinelearningalgorithm/5_1.JPG" alt=""></p>
+<p>首先我们知道函数的定义域是 [-1,2] 相当于物种是袋鼠，这是个限制，我们就是要找那个数能得到函数的最大值。</p>
+<p>假设我们随机初始化一部分数，这些数分布在图像的各个地方，我们通过比对的方式，将函数值小的数进行消灭，然后，我们将函数值对应大的数进行交叉（也就是一半的二进制来自于一个数，另一半的二进制来自于另一个数），通过不断地繁衍淘汰，最终我们的数是越来越向顶峰靠近。</p>
+<p>原理很简单，但是涉及到很多难点。</p>
+<pre><code>如何编码函数值？
+交叉究竟按照那种方式交叉？
+数的存活率应该怎么安排？
+变异又将按照什么方式进行？
+淘汰机制是什么？</code></pre><p>下面我将围绕着这些问题来进行深入的研究。</p>
+<h2 id="GA-的编码"><a href="#GA-的编码" class="headerlink" title="GA 的编码"></a>GA 的编码</h2><p>遗传算法使用固定长度的二进制符号串来表示群体中个体。</p>
+<p>即基因是由二进制组成。</p>
+<pre><code>01000110
+染色体长度为 8</code></pre><p>如果一个参数的取值范围是 [min,max] ，如果我们用长度为 λ ，那么我们一共可以表示 2 ^ λ 个。</p>
+<p>如果我们需要精确到某一位，也就是精度限制，假设我们的精度要求是 δ </p>
+<p>公式如下：</p>
+<p><img src="/images/machinelearningalgorithm/5_2.JPG" alt=""></p>
+<p>具体例子如下，我们要精确到 6 位小数，由于定义域是 [-1,2] ，也就是长度是 2 + 1 = 3。</p>
+<p>则在区间内我们至少分为 3 * 10 ^ 6 个等分。</p>
+<p>又因为</p>
+<p><img src="/images/machinelearningalgorithm/5_3.JPG" alt=""></p>
+<p>所以编码的二进制至少需要 22 位。</p>
+<p>OK，现在我们编码算是糊弄过去了，那么如何解码？给你一段二进制代码，如何将这段二进制解码成定义域中的数值？</p>
+<p>看如下公式：</p>
+<p><img src="/images/machinelearningalgorithm/5_4.JPG" alt=""></p>
+<p>看不懂对吧，很正常，这是中国人自以为是的技能，将简单问题复杂化，用来彰显自己学术水平牛逼。</p>
+<p>所以，还是举一个例子。</p>
+<p>将一段二进制代码映射到对应区间中，主要是经过两个步骤。</p>
+<pre><code>1. 讲一个二进制代码转化为十进制数
+2. 将这个十进制数转化为对应区间的实数</code></pre><p>如，二进制串： 1000101110110101000111 ，表示实数值为 0.637197</p>
+<p><img src="/images/machinelearningalgorithm/5_5.JPG" alt=""></p>
+<p>OK，到这里，正如原文中所说，对于基因的编码和解码我们应该不成问题了。</p>
+<h2 id="随机"><a href="#随机" class="headerlink" title="随机"></a>随机</h2><p>我们初始化的种群一定是随机的，并且要确保分布在定义域的各个地方。</p>
+<p>换句话说，群体的分布规模越大，群体中个体的多样性越多，算法陷入局部最优解的可能性就越小。</p>
+<p>那么究竟多少个群体才算是好群体？怎么分布才算是好分布？</p>
+<p>在二进制编码下，为了满足隐并行性，群体个体数只要设定为 2 ^(L/2) 其中 L 是个体串长度，但这个数通常比较大，所以一般个体数为几十到几百。</p>
+<h2 id="淘汰机制与适应度-物竞天择"><a href="#淘汰机制与适应度-物竞天择" class="headerlink" title="淘汰机制与适应度[物竞天择]"></a>淘汰机制与适应度[物竞天择]</h2><h3 id="物竞"><a href="#物竞" class="headerlink" title="物竞"></a>物竞</h3><p>就好像毒雾会杀死袋鼠，我们也应该有一种淘汰机制将不好的数据杀死，然后保留好的数据。</p>
+<p>群体进化的过程就是以群体中个体的适应度为依据，通过反复迭代过程，不断地寻求出适应度较大的个体，最终得到问题的最优解或近似最优解。</p>
+<p>所以，上述的讲解告知，适应度是一个正数或者零，但不是负数。</p>
+<p>但是我们对于一个问题的求解就是寻求这个问题的最优解，也就是通过和最优解的比对我们知道其存活率如何。</p>
+<p>换句话说，我们求一种数据的最大值，在每一次迭代的过程中，最终个体求解的数越大其存活率也就越高。</p>
+<p>但是，单一的利用原函数并不能满足我们的要求，因为原函数最终得值有负有正，所以，单纯的求解满足不了适应度非负的前提，所以，我们要做一些变换。</p>
+<p><img src="/images/machinelearningalgorithm/5_6.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_7.png" alt=""></p>
+<p>我们如何定义每个个体的适应度呢？</p>
+<p>我们事先要了解两个现象。</p>
+<p>第一，在遗传初期，通常会出现一些超长个体，若按比例选择策略，这些异常个体在种群中会占很大的比例，导致未成熟收敛。显然，因为异常个体的数量太多，导致最后整体都向他们变化，将导致局部最优解。</p>
+<p>第二，如果随着个体不断地繁衍，导致个体与个体之间都近似相似，使得整个种群的进化力度趋近于零，导致无法进化成最佳个体，从而使得优化过程趋于无目标的随机搜索过程。</p>
+<p>下面将是解决方案，但是，我没懂，因为这节课我因为有很重要的事，逃了。。。</p>
+<p><img src="/images/machinelearningalgorithm/5_8.png" alt=""></p>
+<p>改天问一下老师。。。</p>
+<h3 id="天择"><a href="#天择" class="headerlink" title="天择"></a>天择</h3><p>我们知道物种之间相互竞争，但是我们如何制定淘汰机制来选择合适的种群呢？</p>
+<p>最常用的方法就是选择算子。</p>
+<pre><code>选择算子：只个体被选中并遗传到下一代群体的概率与该个体的适应度大小成正比</code></pre><p>一般执行选择算子的手段是轮盘选择，精英选择，稳态选择。</p>
+<p><img src="/images/machinelearningalgorithm/5_9.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_10.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_11.png" alt=""></p>
+<h2 id="遗传变异"><a href="#遗传变异" class="headerlink" title="遗传变异"></a>遗传变异</h2><p>嘿嘿嘿，最让人羞羞的代码来了，如何进行交配产生下一代。QvQ</p>
+<h3 id="单点交叉算子"><a href="#单点交叉算子" class="headerlink" title="单点交叉算子"></a>单点交叉算子</h3><p><img src="/images/machinelearningalgorithm/5_12.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_13.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_14.png" alt=""></p>
+<h3 id="基本位变异算子"><a href="#基本位变异算子" class="headerlink" title="基本位变异算子"></a>基本位变异算子</h3><p>这个算法是讲变异的，富人靠科技，穷人靠变异。</p>
+<p><img src="/images/machinelearningalgorithm/5_15.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_16.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_17.png" alt=""></p>
+<h2 id="用数学的角度看-GA"><a href="#用数学的角度看-GA" class="headerlink" title="用数学的角度看 GA"></a>用数学的角度看 GA</h2><h3 id="术语讲解"><a href="#术语讲解" class="headerlink" title="术语讲解"></a>术语讲解</h3><p>个体：是由 0，1 组成的编码串</p>
+<p>模式：是由 0,1，* 组成的编码串，其中 * 是通配符，可以是 1，也可以是 0</p>
+<pre><code>*1101 代表 2 个个体 11101 01101</code></pre><p>模式阶：表示模式中已经有明确含义字符的个数</p>
+<pre><code>*01*11 的模式阶为 4
+模式阶用 O() 表示
+即： O(*01*11) = 4</code></pre><p>阶次越低表示模式的概括能力越强，个数越多，反之相反。</p>
+<p>模式的定义长度：指模式中第一个和最后一个具有明确含义字符之间的距离，记作 ξ() （OK，不是这个符号，因为那个符号我找不到了。。。罪过）</p>
+<pre><code>ξ(011*1**) = 4</code></pre><p>值得让人注意的是，他们的下标也是从 0 开始标注，所以，长度通常为正常人逻辑长度 -1</p>
+<p>模式总数：其实这就是一个简单的数学，为 3 ^ λ （3 代表 0 1 *）</p>
+<p>种群含有的模式数为： 2^λ - M * 2^λ 其中 M 为规模 λ 为长度</p>
+<p>假设地 t 次迭代时，种群 P 有 M 个个体，其中 m 个个体属于模式 s，记作 m(s,t)</p>
+<h3 id="数学推导"><a href="#数学推导" class="headerlink" title="数学推导"></a>数学推导</h3><p>适应度和被选中的概率</p>
+<p><img src="/images/machinelearningalgorithm/5_18.png" alt=""></p>
+<p>第 t 代产生了，其中有一个种群是 s ，那么第 t + 1 代中，种群 s 的数目如下公式计算：</p>
+<p><img src="/images/machinelearningalgorithm/5_19.png" alt=""></p>
+<p>由于公式难写，所以，下面的公式推导我大都采用截图，必要的时候我会给祥加说明，非我懒惰，只是实在是找不到特殊符号的编码。</p>
+<p><img src="/images/machinelearningalgorithm/5_20.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_21.png" alt=""></p>
+<p>这个公式说明下一代模式 s 的种群取决于种群 s 的平均适应度和全部个体平均适应度之比。且只有这两个的比大于 1 ，种群 s 的数目才能增加，否则数目减小。</p>
+<p>正好符合优胜略汰的道理。</p>
+<p><img src="/images/machinelearningalgorithm/5_22.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_23.png" alt=""></p>
+<p>下面仅仅是推导单点交叉。</p>
+<p><img src="/images/machinelearningalgorithm/5_24.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_25.png" alt=""></p>
+<p>我在别的地方找的一个图片，道理是相通的，所以我就不过多的陈述了</p>
+<p><img src="/images/machinelearningalgorithm/5_26.jpg" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_27.png" alt=""></p>
+<p>也就是说，模式的长度越长，越容易被破坏。</p>
+<p>变异模式下的推导</p>
+<p><img src="/images/machinelearningalgorithm/5_28.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_29.png" alt=""></p>
+<p>上述公式即为模式定理，适应度高于群体平均适应度的，长度较短，低阶的模式在遗传算法的迭代过程中将按照指数规律增长。</p>
+<h2 id="建筑块假说"><a href="#建筑块假说" class="headerlink" title="建筑块假说"></a>建筑块假说</h2><p>这个假说其实并没有太大的用，但是也可能是我理解的不深。。。</p>
+<p>我们都知道一个复杂问题的最优解，是由多个最优解参数求得的，就好像基因假说，一个完美的种群，它的所属基因也是完美的。</p>
+<p>建筑块假说将基因比作一个个的积木，想要得到最好的建筑，只需要将最好的积木项目叠加即可。</p>
+<h2 id="隐含并行性"><a href="#隐含并行性" class="headerlink" title="隐含并行性"></a>隐含并行性</h2><h3 id="模式存活的最小长度"><a href="#模式存活的最小长度" class="headerlink" title="模式存活的最小长度"></a>模式存活的最小长度</h3><p><img src="/images/machinelearningalgorithm/5_30.png" alt=""></p>
+<p>这张图有几点需要解释一下，第一，ε 是 0 和 1 之间的数，代表很小的数，第二，图片中的 l 和 λ 是一个含义。</p>
+<h3 id="个体编码串中拥有存活长度的模式数目"><a href="#个体编码串中拥有存活长度的模式数目" class="headerlink" title="个体编码串中拥有存活长度的模式数目"></a>个体编码串中拥有存活长度的模式数目</h3><p>下面我都是截图给出，讲道理，为什么会有隐含，我是看不太懂。</p>
+<p><img src="/images/machinelearningalgorithm/5_31.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_32.png" alt=""></p>
+<p><img src="/images/machinelearningalgorithm/5_33.png" alt=""></p>
+<h2 id="遗传算法的特点总结"><a href="#遗传算法的特点总结" class="headerlink" title="遗传算法的特点总结"></a>遗传算法的特点总结</h2><p>（1）遗传算法从问题解的串集开始搜索，而不是从单个解开始。这是遗传算法与传统优化算法的极大区别。传统优化算法是从单个初始值求最优解的；容易误入局部最优解。遗传算法从串集开始搜索，覆盖面大，利于全局择优。</p>
+<p>（2）遗传算法同时处理群体中的多个个体，即对搜索空间中的多个解进行评估，减少了陷入局部最优解的风险，同时算法本身易于实现并行化。</p>
+<p>（3）遗传算法基本上不用搜索空间的知识或其他辅助信息，而仅用适应度函数值来评估个体，在此基础上进行遗传操作。适应度函数不仅不受连续可微的约束，而且其定义域可以任意设定。这一特点使得遗传算法的应用范围大大扩展。</p>
+<p>（4）遗传算法不是采用确定性规则，而是采用概率的变迁规则来指导他的搜索方向。</p>
+<p>（5）具有自组织、自适应和自学习性。遗传算法利用进化过程获得的信息自行组织搜索时，适应度大的个体具有较高的生存概率，并获得更适应的基因结构。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/GA/" rel="tag"># GA</a>
+              <a href="/tags/%E8%BF%9B%E5%8C%96%E7%AE%97%E6%B3%95/" rel="tag"># 进化算法</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/10/tensorflow8/" rel="prev" title="tensorflow 正则化">
+      <i class="fa fa-chevron-left"></i> tensorflow 正则化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/14/python19/" rel="next" title="在 win10 中安装 python 的版本控制器">
+      在 win10 中安装 python 的版本控制器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本原理"><span class="nav-number">1.</span> <span class="nav-text">基本原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自然界"><span class="nav-number">1.1.</span> <span class="nav-text">自然界</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算机界"><span class="nav-number">1.2.</span> <span class="nav-text">计算机界</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GA-的编码"><span class="nav-number">2.</span> <span class="nav-text">GA 的编码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#随机"><span class="nav-number">3.</span> <span class="nav-text">随机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#淘汰机制与适应度-物竞天择"><span class="nav-number">4.</span> <span class="nav-text">淘汰机制与适应度[物竞天择]</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#物竞"><span class="nav-number">4.1.</span> <span class="nav-text">物竞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#天择"><span class="nav-number">4.2.</span> <span class="nav-text">天择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遗传变异"><span class="nav-number">5.</span> <span class="nav-text">遗传变异</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单点交叉算子"><span class="nav-number">5.1.</span> <span class="nav-text">单点交叉算子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基本位变异算子"><span class="nav-number">5.2.</span> <span class="nav-text">基本位变异算子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用数学的角度看-GA"><span class="nav-number">6.</span> <span class="nav-text">用数学的角度看 GA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#术语讲解"><span class="nav-number">6.1.</span> <span class="nav-text">术语讲解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数学推导"><span class="nav-number">6.2.</span> <span class="nav-text">数学推导</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建筑块假说"><span class="nav-number">7.</span> <span class="nav-text">建筑块假说</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#隐含并行性"><span class="nav-number">8.</span> <span class="nav-text">隐含并行性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#模式存活的最小长度"><span class="nav-number">8.1.</span> <span class="nav-text">模式存活的最小长度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#个体编码串中拥有存活长度的模式数目"><span class="nav-number">8.2.</span> <span class="nav-text">个体编码串中拥有存活长度的模式数目</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遗传算法的特点总结"><span class="nav-number">9.</span> <span class="nav-text">遗传算法的特点总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

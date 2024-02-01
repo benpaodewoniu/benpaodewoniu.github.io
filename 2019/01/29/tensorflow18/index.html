@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="如题所示。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorflow 的 nn 模块">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/01/29/tensorflow18/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="如题所示。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/18_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/18_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/18_2.png">
+<meta property="article:published_time" content="2019-01-28T23:14:12.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:46:00.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="tensorflow">
+<meta property="article:tag" content="nn模块">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/tensorflow/18_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/01/29/tensorflow18/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>tensorflow 的 nn 模块 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/01/29/tensorflow18/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tensorflow 的 nn 模块
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-29 07:14:12" itemprop="dateCreated datePublished" datetime="2019-01-29T07:14:12+08:00">2019-01-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:46:00" itemprop="dateModified" datetime="2020-05-12T10:46:00+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/tensorflow/" itemprop="url" rel="index"><span itemprop="name">tensorflow</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/01/29/tensorflow18/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/01/29/tensorflow18/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如题所示。</p>
+<a id="more"></a>
+
+<h1 id="C"><a href="#C" class="headerlink" title="C"></a>C</h1><h2 id="conv2d"><a href="#conv2d" class="headerlink" title="conv2d()"></a>conv2d()</h2><p><a href="https://blog.csdn.net/mao_xiao_feng/article/details/53444333">参考资料</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/26139876">Tensorflow初学笔记——tf.nn.conv2d的工作方法</a></p>
+<h3 id="函数定义"><a href="#函数定义" class="headerlink" title="函数定义"></a>函数定义</h3><blockquote>
+<p>tf.nn.conv2d(input, filter, strides, padding, use_cudnn_on_gpu=None, data_format=None, name=None)<br>功能：在给定4-D 输入和fliters的情况下，计算二维卷积。<br>第一个参数input：指需要做卷积的输入图像，它要求是一个Tensor，具有[batch, in_height, in_width, in_channels]这样的shape，具体含义是[训练时一个batch的图片数量, 图片高度, 图片宽度, 图像通道数]，注意这是一个4维的Tensor，要求类型为float32和float64其中之一,通道数实际上是输入图片的三维矩阵的深度，如果是普通灰度照片，通道数就是1，如果是RGB彩色照片，通道数就是3，当然这个通道数完全可以自己设计。<br>第二个参数filter：相当于CNN中的卷积核，它要求是一个Tensor，具有[filter_height, filter_width, in_channels, out_channels]这样的shape，具体含义是[卷积核的高度，卷积核的宽度，图像通道数，卷积核个数]，要求类型与参数input相同，有一个地方需要注意，第三维in_channels，就是参数input的第四维,其中长和宽指的是本次卷积计算的“抹布”的规格，输入通道数应当和input的通道数一致，输出通道数可以随意指定。<br>第三个参数strides：卷积时在图像每一维的步长，这是一个一维的向量，长度4,一般情况下的格式为[1，长上步长，宽上步长，1]，所谓步长就是指抹布（卷积核）每次在长和宽上滑动多少会停下来计算一次卷积。这个步长不一定要能够被输入图片的长和宽整除。<br>第四个参数padding：string类型的量，只能是”SAME”,”VALID”其中之一，这个值决定了不同的卷积方式<br>第五个参数：use_cudnn_on_gpu:bool类型，是否使用cudnn加速，默认为true<br>结果返回一个Tensor，这个输出，就是我们常说的feature map</p>
+</blockquote>
+<p>tensorflow中构建CNN最主要的函数之一就是conv2d(),它是实现卷积计算的核心步骤函数.</p>
+<p>首先，卷积的意思就是从图像的像素点上抽象出特征，然而这个特征抽取的过程并不是传统意义上的人工的抽取，而是通过卷积核进行自动抽取，当然这种抽取的结果对于人类来说也很难讲有什么能够解释的意义。数字图像（比如说一张照片），可以看做是一个矩阵，每一个像素点都是矩阵中的一个元素：特别的，如果照片是黑白的，那么可以看做是一个length×width×1的三维矩阵；如果是彩色的（比如RGB）那么就可以看做一个length×width×3的三维矩阵。卷积核像一小块方形的抹布，在图片上由上到下从左到右均匀抹过，并不时的停下来，当抹布停下来的时候，抹布上的点就会和其覆盖的点进行计算，得到一个值，这个值就将成为卷积计算输出矩阵的对应点的值。</p>
+<p>从直观上看，卷积的过程相当于将图片“浓缩了”，当然在浓缩的过程中，厚度是可以变的。</p>
+<p><img src="/images/tensorflow/18_0.png" alt=""></p>
+<p>上图中，黑色的板子就是输入的图片，橙色的板子就是卷积“浓缩”后的图片，绿色的小色块就是卷积核，也就是“抹布”。当然，如果抹布能做到一步一停并且采用“same”模式的话，那么浓缩后的大小就不会变。值得注意的是，卷积之后的结果厚度是用户自己指定的，至于说这个厚度有什么意义，我的理解是：厚度的每一层都类似于某一频率和振幅的正弦波，而多个不同的正弦波理论上讲是可以拟合任意复杂的波形，所以多种不同的卷积结果，理论上也能够拟合比较复杂的特征提取方案的。</p>
+<p>对于 padding 的模式讲解</p>
+<p><img src="/images/tensorflow/18_1.png" alt=""></p>
+<p>可以看到，valid模式在边缘采取的是“不及”的方法，而same则是“过”的策略，两者效果孰优孰略取决于你的数据在边缘有没有什么重要信息。</p>
+<p>那么具体的卷积方法用一个实例来解释：</p>
+<blockquote>
+<p>1.输入的数据是[100,80,100,4]的数据，经过的卷积核是[8,8,4,32],步长为[1,4,4,1]策略是valid，那么首先输入的batch=100是不会变的，深度4要变成输出的32，输入图片长度80要在长为8的卷积核下以步长4划过一次，那么抹布的右边缘所处的像素点横坐标应当依次是8,12,16,20……80一共19次计算，所以输出结果的长应当是19，同理，输出结果的宽应当是24，因此输出结果的形状应当是[100,19,24,32]<br>2.将第一步的结果输入卷积核[4,4,32,64],步长调整为[1,2,2,1]，模式依旧是valid，那么输出结果是[100,8,11,64]<br>3.将第二步的结果输入卷积核[3,3,64,128],步长调整为[1,1,1,1]，模式调整为same，那么输出结果是[100,8,11,128]</p>
+</blockquote>
+<h3 id="实际处理"><a href="#实际处理" class="headerlink" title="实际处理"></a>实际处理</h3><p>在实际的运算中，计算机实际上首先将输入的input数据规模上进行拓展，由原来的</p>
+<p>[batch,length,width,channel_in]转化为[batch,out_length,out_width,filter_length×filter_width×channel_in]的格式</p>
+<p>其中所谓输出的长宽是通过卷积核的长宽和卷积模式计算好的，一般来讲，卷积过程中卷积核的抽象区域应当有重叠而不应当有缝隙，所以大多数情况下，这样变形的结果是输入数据从规模上被扩大了。而此时，需要进行计算的卷积核矩阵也被变形成[filter_length×filter_width×channel_in，channel_out]的格式，虽然从规模上来说矩阵的大小没变，但是从维度上来说，卷积核被从4维拍扁成了两维，两个变形后的矩阵相乘，得到的结果就是[batch,out_length,out_width,channel_out]了。</p>
+<h1 id="D"><a href="#D" class="headerlink" title="D"></a>D</h1><h2 id="dropout"><a href="#dropout" class="headerlink" title="dropout"></a>dropout</h2><p>tf.nn.dropout是TensorFlow里面为了防止或减轻过拟合而使用的函数，它一般用在全连接层。</p>
+<p>Dropout就是在不同的训练过程中随机扔掉一部分神经元。也就是让某个神经元的激活值以一定的概率p，让其停止工作，这次训练过程中不更新权值，也不参加神经网络的计算。但是它的权重得保留下来（只是暂时不更新而已），因为下次样本输入时它可能又得工作了。示意图如下：</p>
+<p><img src="/images/tensorflow/18_2.png" alt=""></p>
+<h3 id="函数说明"><a href="#函数说明" class="headerlink" title="函数说明"></a>函数说明</h3><p>tf.nn.dropout(x, keep_prob, noise_shape=None, seed=None,name=None) </p>
+<p>上面方法中常用的是前两个参数：</p>
+<p>第一个参数x：指输入</p>
+<p>第二个参数keep_prob: 设置神经元被选中的概率,在初始化时keep_prob是一个占位符,  keep_prob = tf.placeholder(tf.float32) 。tensorflow在run时设置keep_prob具体的值，例如keep_prob: 0.5</p>
+<p>第五个参数name：指定该操作的名字。</p>
+<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>dropout必须设置概率keep_prob,并且keep_prob也是一个占位符,跟输入是一样的</p>
+<pre><code>keep_prob = tf.placeholder(tf.float32)</code></pre><p>train的时候才是dropout起作用的时候,test的时候不应该让dropout起作用</p>
+<pre><code>sess.run(train_step, feed_dict={xs: X_train, ys: y_train, keep_prob: 0.5})  
+train_result = sess.run(merged, feed_dict={xs: X_train, ys: y_train, keep_prob: 1})
+test_result = sess.run(merged, feed_dict={xs: X_test, ys: y_test, keep_prob: 1})      </code></pre><h4 id="在-cnn-中运用的例子"><a href="#在-cnn-中运用的例子" class="headerlink" title="在 cnn 中运用的例子"></a>在 cnn 中运用的例子</h4><pre><code>with tf.variable_scope(&apos;layer9-fc1&apos;):
+    fc1_weights = tf.get_variable(&quot;weight&quot;, [nodes, 1024],
+                                  initializer=tf.truncated_normal_initializer(stddev=0.1))
+    if regularizer != None: tf.add_to_collection(&apos;losses&apos;, regularizer(fc1_weights))
+    fc1_biases = tf.get_variable(&quot;bias&quot;, [1024], initializer=tf.constant_initializer(0.1))
+    fc1 = tf.nn.relu(tf.matmul(reshaped, fc1_weights) + fc1_biases)
+    if train: fc1 = tf.nn.dropout(fc1, 0.5)</code></pre><h1 id="S"><a href="#S" class="headerlink" title="S"></a>S</h1><h2 id="sparse-softmax-cross-entropy-with-logits"><a href="#sparse-softmax-cross-entropy-with-logits" class="headerlink" title="sparse_softmax_cross_entropy_with_logits"></a>sparse_softmax_cross_entropy_with_logits</h2><p><a href="https://blog.csdn.net/m0_37041325/article/details/77043598">参考资料</a></p>
+<p><a href="http://www.cnblogs.com/cloud-ken/p/7435660.html">sparse_softmax_cross_entropy_with_logits</a></p>
+<p><a href="https://yq.aliyun.com/articles/517378">tf.nn.sparse_softmax_cross_entropy_with_logits</a></p>
+<p><a href="https://blog.csdn.net/tz_zs/article/details/76086457">参考资料2</a></p>
+<p><a href="http://tensorfly.cn/tfdoc/api_docs/python/nn.html#softmax_cross_entropy_with_logits">参考资料3</a></p>
+<p>sparse_softmax_cross_entropy_with_logits(_sentinel=None, labels=None, logits=None, name=None)</p>
+<p>相当于合并了softmax和cross_entropy两步</p>
+<h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>此函数大致与tf_nn_softmax_cross_entropy_with_logits的计算方式相同,</p>
+<p>适用于每个类别相互独立且排斥的情况，一幅图只能属于一类，而不能同时包含一条狗和一只大象</p>
+<p>但是在对于labels的处理上有不同之处,labels从shape来说此函数要求shape为[batch_size],</p>
+<p>labels[i]是[0,num_classes)的一个索引, type为int32或int64,即labels限定了是一个一阶tensor,</p>
+<p>并且取值范围只能在分类数之内,表示一个对象只能属于一个类别</p>
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><p>_sentinel:本质上是不用的参数，不用填</p>
+<p>labels 的输入是稀疏表示的，是 [0，num_classes）中的一个数值，代表正确分类 。labels 的 shape为 [batch_size]，即 有batch个数值</p>
+<p>这个labels参数要注意，它的shape必须是<code>[d_0, d_1, ..., d_{r-1}]&#39;（而参数logits的shape是[d_0, d_1, ..., d_{r-1},num_classes]</code>其中差别自行体会） 数据类型必须是int32或者int64，且在labels中的每个值必须是在[0，num_classes),否则在这个操作运行在cpu的时候将会出现exception，运行在GPU的时候将会返回’NaN’,而不是返回loss了，这个情况我遇到过，所以在看到输出的不是loss值而是‘NaN’时就应该仔细检查一下这个函数中的labels有没有符合条件。</p>
+<p>logits：logits 是神经网络运行的结果（tensorflow神经网络中没有softmax层，而是在此方法会进行softmax运算），shape为[batch_size,num_classes],type为float32或float64</p>
+<p>logits:这里注意shape和数据类型必须是float32和float64，一般很容易搞错，而tf.nn.softmax_cross_entropy_with_logits求 数据类型可以是float16 ，<code>float32</code> or <code>float64</code>.</p>
+<p>name:操作的名字，可填可不填</p>
+<h3 id="一般的使用"><a href="#一般的使用" class="headerlink" title="一般的使用"></a>一般的使用</h3><pre><code>cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=tf.argmax(y_, 1), logits=y)
+cross_entropy_mean = tf.reduce_mean(cross_entropy)</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf  </span><br><span class="line"><span class="comment">#our NN's output  </span></span><br><span class="line">logits=tf.constant([[<span class="number">1.0</span>,<span class="number">2.0</span>,<span class="number">3.0</span>],[<span class="number">1.0</span>,<span class="number">2.0</span>,<span class="number">3.0</span>],[<span class="number">1.0</span>,<span class="number">2.0</span>,<span class="number">3.0</span>]])  </span><br><span class="line"><span class="comment">#step1:do softmax  </span></span><br><span class="line">y=tf.nn.softmax(logits)  </span><br><span class="line"><span class="comment">#true label </span></span><br><span class="line"><span class="comment">#注意这里标签必须是浮点数,不然在后面计算tf.multiply时就会因为类型不匹配tf_log的float32数据类型而出错</span></span><br><span class="line">y_=tf.constant([[<span class="number">0</span>,<span class="number">0</span>,<span class="number">1.0</span>],[<span class="number">0</span>,<span class="number">0</span>,<span class="number">1.0</span>],[<span class="number">0</span>,<span class="number">0</span>,<span class="number">1.0</span>]])<span class="comment">#这个是稀疏的标签</span></span><br><span class="line"><span class="comment">#step2:do log  </span></span><br><span class="line">tf_log=tf.log(y)</span><br><span class="line"><span class="comment">#step3:do mult  </span></span><br><span class="line">pixel_wise_mult=tf.multiply(y_,tf_log)</span><br><span class="line"><span class="comment">#step4:do cross_entropy  </span></span><br><span class="line">cross_entropy = -tf.reduce_sum(pixel_wise_mult)  </span><br><span class="line"></span><br><span class="line"><span class="comment">#do cross_entropy just two step  </span></span><br><span class="line"><span class="comment">#将标签稠密化</span></span><br><span class="line">dense_y=tf.arg_max(y_,<span class="number">1</span>)</span><br><span class="line">cross_entropy2_step1=tf.nn.sparse_softmax_cross_entropy_with_logits(labels=dense_y,logits=logits)</span><br><span class="line">cross_entropy2_step2=tf.reduce_sum(cross_entropy2_step1)<span class="comment">#dont forget tf.reduce_sum()!!  </span></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:    </span><br><span class="line">    y_value,tf_log_value,pixel_wise_mult_value,cross_entropy_value=sess.run([y,tf_log,pixel_wise_mult,cross_entropy])</span><br><span class="line">    sparse_cross_entropy2_step1_value,sparse_cross_entropy2_step2_value=sess.run([cross_entropy2_step1,cross_entropy2_step2])</span><br><span class="line">    print(<span class="string">"step1:softmax result=\n%s\n"</span>%(y_value))</span><br><span class="line">		<span class="comment"># step1:softmax result=</span></span><br><span class="line">			[[<span class="number">0.09003057</span> <span class="number">0.24472848</span> <span class="number">0.66524094</span>]</span><br><span class="line">			 [<span class="number">0.09003057</span> <span class="number">0.24472848</span> <span class="number">0.66524094</span>]</span><br><span class="line">			 [<span class="number">0.09003057</span> <span class="number">0.24472848</span> <span class="number">0.66524094</span>]]</span><br><span class="line">	print(<span class="string">"step2:tf_log_result result=\n%s\n"</span>%(tf_log_value))</span><br><span class="line">		<span class="comment"># step2:tf_log_result result=</span></span><br><span class="line">			[[<span class="number">-2.407606</span>   <span class="number">-1.4076059</span>  <span class="number">-0.407606</span>  ]</span><br><span class="line">			 [<span class="number">-2.407606</span>   <span class="number">-1.4076059</span>  <span class="number">-0.407606</span>  ]</span><br><span class="line">			 [<span class="number">-2.407606</span>   <span class="number">-1.4076059</span>  <span class="number">-0.40760598</span>]]</span><br><span class="line">    print(<span class="string">"step3:pixel_mult=\n%s\n"</span>%(pixel_wise_mult_value))</span><br><span class="line">		<span class="comment"># step3:pixel_mult=</span></span><br><span class="line">			[[<span class="number">-0.</span>         <span class="number">-0.</span>         <span class="number">-0.407606</span>  ]</span><br><span class="line">			 [<span class="number">-0.</span>         <span class="number">-0.</span>         <span class="number">-0.407606</span>  ]</span><br><span class="line">			 [<span class="number">-0.</span>         <span class="number">-0.</span>         <span class="number">-0.40760598</span>]]</span><br><span class="line">    print(<span class="string">"step4:cross_entropy result=\n%s\n"</span>%(cross_entropy_value))</span><br><span class="line">		<span class="comment"># step4:cross_entropy result=</span></span><br><span class="line">			<span class="number">1.222818</span></span><br><span class="line">    print(<span class="string">"Function(softmax_cross_entropy_with_logits) result=\n%s\n"</span>%(sparse_cross_entropy2_step1_value))</span><br><span class="line">		<span class="comment"># Function(softmax_cross_entropy_with_logits) result=</span></span><br><span class="line">			[<span class="number">0.40760595</span> <span class="number">0.40760595</span> <span class="number">0.40760595</span>]</span><br><span class="line">    print(<span class="string">"Function(tf.reduce_sum) result=\n%s\n"</span>%(sparse_cross_entropy2_step2_value))  </span><br><span class="line">		<span class="comment"># Function(tf.reduce_sum) result=</span></span><br><span class="line">			<span class="number">1.2228179</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="tf-nn-softmax-cross-entropy-with-logits"><a href="#tf-nn-softmax-cross-entropy-with-logits" class="headerlink" title="tf.nn.softmax_cross_entropy_with_logits"></a>tf.nn.softmax_cross_entropy_with_logits</h2><pre><code>softmax_cross_entropy_with_logits(
+    _sentinel=None,
+    labels=None,
+    logits=None,
+    dim=-1,
+    name=None
+)</code></pre><p>logits和labels的shape都是[batch_size, num_classes]</p>
+<h3 id="tf-nn-softmax-cross-entropy-with-logits-和-tf-nn-sparse-softmax-cross-entropy-with-logits-的异同"><a href="#tf-nn-softmax-cross-entropy-with-logits-和-tf-nn-sparse-softmax-cross-entropy-with-logits-的异同" class="headerlink" title="tf.nn.softmax_cross_entropy_with_logits 和 tf.nn.sparse_softmax_cross_entropy_with_logits 的异同"></a>tf.nn.softmax_cross_entropy_with_logits 和 tf.nn.sparse_softmax_cross_entropy_with_logits 的异同</h3><p>两方法的结果是相同的。sparse_softmax_cross_entropy_with_logits 直接用标签上计算交叉熵，而 softmax_cross_entropy_with_logits 是标签的onehot向量参与计算。softmax_cross_entropy_with_logits 的 labels 是 sparse_softmax_cross_entropy_with_logits 的 labels 的一个独热版本（one hot version）。</p>
+<p>这个函数和tf.nn.softmax_cross_entropy_with_logits函数比较明显的区别在于它的参数labels的不同，这里的参数label是非稀疏表示的，比如表示一个3分类的一个样本的标签，稀疏表示的形式为[0,0,1]这个表示这个样本为第3个分类，而非稀疏表示就表示为2（因为从0开始算，0,1,2,就能表示三类），同理[0,1,0]就表示样本属于第二个分类，而其非稀疏表示为1。</p>
+<p>tf.nn.sparse_softmax_cross_entropy_with_logits（）比tf.nn.softmax_cross_entropy_with_logits多了一步将labels稀疏化的操作。因为深度学习中，图片一般是用非稀疏的标签的，所以用tf.nn.sparse_softmax_cross_entropy_with_logits（）的频率比tf.nn.softmax_cross_entropy_with_logits高。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line">input_data = tf.Variable([[<span class="number">0.2</span>, <span class="number">0.1</span>, <span class="number">0.9</span>], [<span class="number">0.3</span>, <span class="number">0.4</span>, <span class="number">0.6</span>]], dtype=tf.float32)</span><br><span class="line">output = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=input_data, labels=[<span class="number">0</span>, <span class="number">2</span>])</span><br><span class="line">output2 = tf.nn.softmax_cross_entropy_with_logits(logits=input_data,labels=[[<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>],[<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>]])</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line">    sess.run(init)</span><br><span class="line">    print(sess.run(output))</span><br><span class="line">    print(sess.run(output2))</span><br><span class="line">		<span class="comment"># [1.365732 0.939831]</span></span><br><span class="line">		<span class="comment"># [1.365732 0.939831]</span></span><br></pre></td></tr></table></figure>
+
+<p>但是，有一点需要知道，就是输出值的数目需要和标签的 one-hot 编码位数一样，下面是举个例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line">input_data = tf.Variable([[<span class="number">0.2</span>, <span class="number">0.1</span>, <span class="number">0.9</span>,<span class="number">0.7</span>], [<span class="number">0.3</span>, <span class="number">0.4</span>, <span class="number">0.6</span>,<span class="number">0.5</span>]], dtype=tf.float32)</span><br><span class="line">output2 = tf.nn.softmax_cross_entropy_with_logits(logits=input_data,labels=[[<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>],[<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>]])</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line">    sess.run(init)</span><br><span class="line">    print(sess.run(output2))</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码可以正常输出，但是下面的就不行。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line">input_data = tf.Variable([[<span class="number">0.2</span>, <span class="number">0.1</span>, <span class="number">0.9</span>,<span class="number">0.7</span>], [<span class="number">0.3</span>, <span class="number">0.4</span>, <span class="number">0.6</span>,<span class="number">0.5</span>]], dtype=tf.float32)</span><br><span class="line">output2 = tf.nn.softmax_cross_entropy_with_logits(logits=input_data,labels=[[<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>],[<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>]])</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    init = tf.global_variables_initializer()</span><br><span class="line">    sess.run(init)</span><br><span class="line">    print(sess.run(output2))</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># ValueError: Dimensions must be equal, but are 4 and 3 for 'softmax_cross_entropy_with_logits_sg' (op: 'SoftmaxCrossEntropyWithLogits') with input shapes: [2,4], [2,3].</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="相关知识"><a href="#相关知识" class="headerlink" title="相关知识"></a>相关知识</h3><p>归一化：</p>
+<pre><code>1、把数变为（0，1）之间的小数
+主要是为了数据处理方便提出来的，把数据映射到0～1范围之内处理，更加便捷快速。
+2、把有量纲表达式变为无量纲表达式</code></pre><p>归一化是一种简化计算的方式，即将有量纲的表达式，经过变换，化为无量纲的表达式，成为纯量。 </p>
+<p>One-Hot Encoding（独热编码）</p>
+<p>One-Hot编码，又称为一位有效编码，主要是采用位状态寄存器来对个状态进行编码，每个状态都由他独立的寄存器位，并且在任意时候只有一位有效。</p>
+<p>可以这样理解，对于每一个特征，如果它有m个可能值，那么经过独热编码后，就变成了m个二元特征。并且，这些特征互斥，每次只有一个激活。因此，数据会变成稀疏的。</p>
+<p>这样做的好处主要有：</p>
+<pre><code>解决了分类器不好处理属性数据的问题
+在一定程度上也起到了扩充特征的作用</code></pre><h2 id="softmax"><a href="#softmax" class="headerlink" title="softmax"></a>softmax</h2><pre><code>tf.nn.softmax(
+    logits,
+    axis=None,
+    name=None,
+    dim=None
+)</code></pre><p>这个函数的作用相当于：</p>
+<pre><code>softmax = tf.exp(logits) / tf.reduce_sum(tf.exp(logits), axis)</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">x = tf.constant([[<span class="number">1.0</span>,<span class="number">2.0</span>],[<span class="number">5.0</span>,<span class="number">3.0</span>]])</span><br><span class="line">x_2 = tf.exp(x)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    print(sess.run(x_2))</span><br><span class="line">	</span><br><span class="line">		<span class="comment"># [[  2.7182817   7.389056 ]</span></span><br><span class="line">		<span class="comment"># [148.41316    20.085537 ]]</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+              <a href="/tags/nn%E6%A8%A1%E5%9D%97/" rel="tag"># nn模块</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/28/tensorflow17/" rel="prev" title="loss 总是 NAN">
+      <i class="fa fa-chevron-left"></i> loss 总是 NAN
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/29/tensorflow19/" rel="next" title="tf 中的’SAME’和’VALID’填充有什么区别？">
+      tf 中的’SAME’和’VALID’填充有什么区别？ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C"><span class="nav-number">1.</span> <span class="nav-text">C</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#conv2d"><span class="nav-number">1.1.</span> <span class="nav-text">conv2d()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#函数定义"><span class="nav-number">1.1.1.</span> <span class="nav-text">函数定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实际处理"><span class="nav-number">1.1.2.</span> <span class="nav-text">实际处理</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#D"><span class="nav-number">2.</span> <span class="nav-text">D</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dropout"><span class="nav-number">2.1.</span> <span class="nav-text">dropout</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#函数说明"><span class="nav-number">2.1.1.</span> <span class="nav-text">函数说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#举例"><span class="nav-number">2.1.2.</span> <span class="nav-text">举例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#在-cnn-中运用的例子"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">在 cnn 中运用的例子</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#S"><span class="nav-number">3.</span> <span class="nav-text">S</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sparse-softmax-cross-entropy-with-logits"><span class="nav-number">3.1.</span> <span class="nav-text">sparse_softmax_cross_entropy_with_logits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#说明"><span class="nav-number">3.1.1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参数"><span class="nav-number">3.1.2.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一般的使用"><span class="nav-number">3.1.3.</span> <span class="nav-text">一般的使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tf-nn-softmax-cross-entropy-with-logits"><span class="nav-number">3.2.</span> <span class="nav-text">tf.nn.softmax_cross_entropy_with_logits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tf-nn-softmax-cross-entropy-with-logits-和-tf-nn-sparse-softmax-cross-entropy-with-logits-的异同"><span class="nav-number">3.2.1.</span> <span class="nav-text">tf.nn.softmax_cross_entropy_with_logits 和 tf.nn.sparse_softmax_cross_entropy_with_logits 的异同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关知识"><span class="nav-number">3.2.2.</span> <span class="nav-text">相关知识</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#softmax"><span class="nav-number">3.3.</span> <span class="nav-text">softmax</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

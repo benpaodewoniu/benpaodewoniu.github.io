@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="因为公司的量化项目使用的是这个包，所以，在这里我将要详细的解读一下 peewee。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python | Peewee 教程">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/03/14/python77/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="因为公司的量化项目使用的是这个包，所以，在这里我将要详细的解读一下 peewee。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-14T14:24:39.000Z">
+<meta property="article:modified_time" content="2021-03-08T03:29:18.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="peewee">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/03/14/python77/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python | Peewee 教程 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/03/14/python77/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python | Peewee 教程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-14 22:24:39" itemprop="dateCreated datePublished" datetime="2020-03-14T22:24:39+08:00">2020-03-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-08 11:29:18" itemprop="dateModified" datetime="2021-03-08T11:29:18+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/" itemprop="url" rel="index"><span itemprop="name">模块</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E6%95%B0%E6%8D%AE%E5%BA%93/peewee/" itemprop="url" rel="index"><span itemprop="name">peewee</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/14/python77/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/14/python77/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>因为公司的量化项目使用的是这个包，所以，在这里我将要详细的解读一下 peewee。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<p><a href="https://geek-docs.com/python/python-tutorial/python-peewee.html">Python Peewee 教程</a><br><a href="http://ladder1984.github.io/post/peewee-note1/">基本语法</a></p>
+<br/>
+
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><br/>
+
+<p>Peewee 是一个简单而小型的 Python ORM 工具。 它支持 SQLite，MySQL 和 PostgreSQL。</p>
+<p>关于什么是 ORM 请参考我下面的博文。</p>
+<p><a href="/2020/03/12/mysql6/">mysql | ORM 详解</a></p>
+<br/>
+
+<h1 id="Peewee-映射"><a href="#Peewee-映射" class="headerlink" title="Peewee 映射"></a>Peewee 映射</h1><br/>
+
+<ul>
+<li>Model映射到数据库表</li>
+<li>Field映射到表列</li>
+<li>instance映射到表行</li>
+</ul>
+<p>Peewee 对于 MySQL 使用MySQLDatabase，对于 PostgreSQL 使用PostgresqlDatabase，对于 SQLite 使用SqliteDatabase。</p>
+<p>在本教程中，我们将使用 SQLite 数据库。</p>
+<br/>
+
+<h1 id="Peewee-字段类型"><a href="#Peewee-字段类型" class="headerlink" title="Peewee 字段类型"></a>Peewee 字段类型</h1><br/>
+
+<p>Peewee 模型中的字段类型定义模型的存储类型。 它们被转换为相应的数据库列类型。</p>
+<table>
+<thead>
+<tr>
+<th>字段类型</th>
+<th>SQLite</th>
+<th>PostgreSQL</th>
+<th>MySQL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CharField</td>
+<td>varchar</td>
+<td>varchar</td>
+<td>varchar</td>
+</tr>
+<tr>
+<td>TextField</td>
+<td>text</td>
+<td>text</td>
+<td>longtext</td>
+</tr>
+<tr>
+<td>DateTimeField</td>
+<td>datetime</td>
+<td>timestamp</td>
+<td>longtext</td>
+</tr>
+<tr>
+<td>IntegerField</td>
+<td>integer</td>
+<td>integer</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>BooleanField</td>
+<td>smallint</td>
+<td>bool</td>
+<td>bool</td>
+</tr>
+<tr>
+<td>FloatField</td>
+<td>real</td>
+<td>real</td>
+<td>real</td>
+</tr>
+<tr>
+<td>DoubleField</td>
+<td>real</td>
+<td>double</td>
+<td>double</td>
+</tr>
+<tr>
+<td>BigIntegerField</td>
+<td>integer</td>
+<td>bigint</td>
+<td>bigint</td>
+</tr>
+<tr>
+<td>DecimalField</td>
+<td>decimal</td>
+<td>numeric</td>
+<td>numeric</td>
+</tr>
+<tr>
+<td>PrimaryKeyField</td>
+<td>integer</td>
+<td>serial</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>ForeignKeyField</td>
+<td>integer</td>
+<td>integer</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>DateField</td>
+<td>date</td>
+<td>date</td>
+<td>date</td>
+</tr>
+<tr>
+<td>TimeField</td>
+<td>time</td>
+<td>time</td>
+<td>time</td>
+</tr>
+</tbody></table>
+<br/>
+
+<h1 id="Peewee-模型定义"><a href="#Peewee-模型定义" class="headerlink" title="Peewee 模型定义"></a>Peewee 模型定义</h1><br/>
+
+<p>在第一个示例中，我们创建一个简单的数据库表。</p>
+<ul>
+<li>model_definition.py</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">Note.create_table()</span><br><span class="line"></span><br><span class="line">note1 = Note.create(text=<span class="string">'Went to the cinema'</span>)</span><br><span class="line">note1.save()</span><br><span class="line"></span><br><span class="line">note2 = Note.create(text=<span class="string">'Exercised in the morning'</span>,</span><br><span class="line">        created=datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">20</span>))</span><br><span class="line">note2.save()</span><br><span class="line"></span><br><span class="line">note3 = Note.create(text=<span class="string">'Worked in the garden'</span>,</span><br><span class="line">        created=datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">22</span>))</span><br><span class="line">note3.save()</span><br><span class="line"></span><br><span class="line">note4 = Note.create(text=<span class="string">'Listened to music'</span>)</span><br><span class="line">note4.save()</span><br></pre></td></tr></table></figure>
+
+<p>该示例在 SQLite 中创建notes数据库表。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>我们启动test.db SQLite 数据库。 这将在文件系统上创建一个test.db文件。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>我们定义了一个名为Note的数据库模型。 Peewee 模型继承自peewee.Model。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">text = peewee.CharField()</span><br><span class="line">created = peewee.DateField(default=datetime.date.today)</span><br></pre></td></tr></table></figure>
+
+<p>我们指定模型字段。 我们有一个CharField和一个DateField。 CharField是用于存储字符串的字段类。 DateField是用于存储日期的字段类。 如果未指定，则采用默认值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">    database = db</span><br><span class="line">    db_table = <span class="string">'notes'</span></span><br></pre></td></tr></table></figure>
+
+<p>在Meta类中，我们定义对数据库的引用和数据库表名称。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Note.create_table()</span><br></pre></td></tr></table></figure>
+
+<p>该表是使用create_table()从模型创建的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">note1 = Note.create(text=<span class="string">'Went to the cinema'</span>)</span><br><span class="line">note1.save()</span><br></pre></td></tr></table></figure>
+
+<p>我们创建并保存一个新实例。</p>
+<br/>
+
+<h1 id="查"><a href="#查" class="headerlink" title="查"></a>查</h1><br/>
+
+<p>peewee中查询记录分为get（查询单条记录）、select(条件查询批量记录)。</p>
+<h2 id="查询单条记录"><a href="#查询单条记录" class="headerlink" title="查询单条记录"></a>查询单条记录</h2><p>注：get方法获取不存在的记录会抛出异常。</p>
+<ul>
+<li>Product.get(name=’abc’) 或者 Product.get(Product.name==’abc’)</li>
+<li>Product.select().where(Product.name==’abc’).get()</li>
+<li>Product.select().where(Product.name==’abc’).first()</li>
+</ul>
+<p>注: 1. get()支持name=‘abc’也支持Product.name==‘abc’的写法，where只Product.name==‘abc’。 2. 前两种都是get方法，查询不到会抛出异常，select方法查询不到返回None。</p>
+<h2 id="查询全部"><a href="#查询全部" class="headerlink" title="查询全部"></a>查询全部</h2><p>Product.select()等价于Django中的Product.select().all()，返回一个可迭代的SelectQuery对象。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">notes = Note.select()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> note <span class="keyword">in</span> notes:</span><br><span class="line">    print(<span class="string">'&#123;&#125; on &#123;&#125;'</span>.format(note.text, note.created))</span><br></pre></td></tr></table></figure>
+
+<h2 id="条件查询"><a href="#条件查询" class="headerlink" title="条件查询"></a>条件查询</h2><p>where()方法可以根据给定条件过滤数据。</p>
+<p>我们将两个 where 表达式与&amp;运算符结合使用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">notes = Note.select().where((Note.id &gt; <span class="number">2</span>) &amp; (Note.id &lt; <span class="number">6</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> note <span class="keyword">in</span> notes:</span><br><span class="line">    print(<span class="string">'&#123;&#125; &#123;&#125; on &#123;&#125;'</span>.format(note.id, note.text, note.created))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>或(OR)查询：|，例如：User.select().where((User.is_staff == True) | (User.is_superuser == True))</li>
+<li>且(AND)查询:&amp;，例如：Product.select().where(Product.name==’abc’,Product.owner_id==10086) 或者 Product.select().where((Product.name==’abc’) &amp; (Product.owner_id==10086))</li>
+<li>非(NOT)：~,没用过。。。</li>
+</ul>
+<h2 id="选择特定的列"><a href="#选择特定的列" class="headerlink" title="选择特定的列"></a>选择特定的列</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">notes = Note.select(Note.text, Note.created).limit(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">output = [e <span class="keyword">for</span> e <span class="keyword">in</span> notes.tuples()]</span><br><span class="line">print(output)</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="删"><a href="#删" class="headerlink" title="删"></a>删</h1><br/>
+
+<h2 id="删除表"><a href="#删除表" class="headerlink" title="删除表"></a>删除表</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">Note.drop_table()</span><br></pre></td></tr></table></figure>
+
+<h2 id="删除实例"><a href="#删除实例" class="headerlink" title="删除实例"></a>删除实例</h2><p>delete_by_id()方法删除由其 ID 标识的实例。 它返回已删除实例的数量。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">n2 = Note.delete_by_id(<span class="number">1</span>)</span><br><span class="line">print(n2)</span><br></pre></td></tr></table></figure>
+
+<h2 id="删除多个实例"><a href="#删除多个实例" class="headerlink" title="删除多个实例"></a>删除多个实例</h2><p>要删除更多实例，我们调用delete()方法。 它返回成功删除的实例数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">query = Note.delete().where(Note.id &gt; <span class="number">3</span>)</span><br><span class="line">n = query.execute()</span><br><span class="line"></span><br><span class="line">print(<span class="string">'&#123;&#125; instances deleted'</span>.format(n))</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="增"><a href="#增" class="headerlink" title="增"></a>增</h1><br/>
+
+<h2 id="create"><a href="#create" class="headerlink" title="create()"></a>create()</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">Note.create_table()</span><br><span class="line"></span><br><span class="line">note1 = Note.create(text=<span class="string">'Went to the cinema'</span>)</span><br><span class="line">note1.save()</span><br></pre></td></tr></table></figure>
+
+<h2 id="insert-many"><a href="#insert-many" class="headerlink" title="insert_many()"></a>insert_many()</h2><p>insert_many()方法允许进行批量创建。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">Note.create_table()</span><br><span class="line"></span><br><span class="line">data = [</span><br><span class="line">    &#123; <span class="string">'text'</span>: <span class="string">'Tai chi in the morning'</span>, <span class="string">'created'</span>: datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">20</span>) &#125;,</span><br><span class="line">    &#123; <span class="string">'text'</span>: <span class="string">'Visited friend'</span>, <span class="string">'created'</span>: datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">12</span>) &#125;,</span><br><span class="line">    &#123; <span class="string">'text'</span>: <span class="string">'Went to cinema'</span>, <span class="string">'created'</span>: datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">5</span>) &#125;,</span><br><span class="line">    &#123; <span class="string">'text'</span>: <span class="string">'Listened to music'</span>, <span class="string">'created'</span>: datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">28</span>) &#125;,</span><br><span class="line">    &#123; <span class="string">'text'</span>: <span class="string">'Watched TV all day'</span>, <span class="string">'created'</span>: datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">14</span>) &#125;,</span><br><span class="line">    &#123; <span class="string">'text'</span>: <span class="string">'Worked in the garden'</span>, <span class="string">'created'</span>: datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">22</span>) &#125;,</span><br><span class="line">    &#123; <span class="string">'text'</span>: <span class="string">'Walked for a hour'</span>, <span class="string">'created'</span>: datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">28</span>) &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> db.atomic():</span><br><span class="line"></span><br><span class="line">    query = Note.insert_many(data)</span><br><span class="line">    query.execute()</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="改"><a href="#改" class="headerlink" title="改"></a>改</h1><br/>
+
+<h2 id="update"><a href="#update" class="headerlink" title="update()"></a>update()</h2><p>update()方法更新实例。 它返回成功更新的实例数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">query = Note.update(created=datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">27</span>)).where(Note.id == <span class="number">1</span>)</span><br><span class="line">n = query.execute()</span><br><span class="line"></span><br><span class="line">print(<span class="string">'# of rows updated: &#123;&#125;'</span>.format(n))</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><br/>
+
+<h2 id="count"><a href="#count" class="headerlink" title="count()"></a>count()</h2><p>要计算表中的模型实例数，我们可以使用count()方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">n = Note.select().count()</span><br><span class="line">print(n)</span><br><span class="line"></span><br><span class="line">n2 = Note.select().where(Note.created &gt;= datetime.date(<span class="number">2018</span>, <span class="number">10</span>, <span class="number">20</span>)).count()</span><br><span class="line">print(n2)</span><br></pre></td></tr></table></figure>
+
+<h2 id="sql"><a href="#sql" class="headerlink" title="sql()"></a>sql()</h2><p>可以使用sql()方法显示生成的 SQL 语句。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">note3 = Note.select().where(Note.id == <span class="number">3</span>)</span><br><span class="line">print(note3.sql())</span><br></pre></td></tr></table></figure>
+
+<p>该示例显示将 ORM 查询转换为的 SQL。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">('<span class="keyword">SELECT</span> <span class="string">"t1"</span>.<span class="string">"id"</span>, <span class="string">"t1"</span>.<span class="string">"text"</span>, <span class="string">"t1"</span>.<span class="string">"created"</span> <span class="keyword">FROM</span> <span class="string">"notes"</span> <span class="keyword">AS</span> <span class="string">"t1"</span> <span class="keyword">WHERE</span> (<span class="string">"t1"</span>.<span class="string">"id"</span> = ?)<span class="string">', [3])</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="offset和limit"><a href="#offset和limit" class="headerlink" title="offset和limit"></a>offset和limit</h2><p>通过offset和limit属性，我们可以定义实例的初始跳过和要包含在select()中的实例数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">notes = Note.select().offset(<span class="number">2</span>).limit(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> note <span class="keyword">in</span> notes:</span><br><span class="line">    print(note.id, note.text, note.created)</span><br></pre></td></tr></table></figure>
+
+<h2 id="order-by"><a href="#order-by" class="headerlink" title="order_by()"></a>order_by()</h2><p>可以使用order_by()对检索到的实例进行排序。</p>
+<p>要按升序检索笔记，我们在字段上附加desc()方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Note</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    text = peewee.CharField()</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db </span><br><span class="line">        db_table = <span class="string">'notes'</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'Ascending order'</span>)</span><br><span class="line">print(<span class="string">'*****************************'</span>)</span><br><span class="line"></span><br><span class="line">notes = Note.select(Note.text, Note.created).order_by(Note.created)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> note <span class="keyword">in</span> notes:</span><br><span class="line">    print(note.text, note.created)</span><br><span class="line"></span><br><span class="line">print()</span><br><span class="line">print(<span class="string">'Descending order'</span>)</span><br><span class="line">print(<span class="string">'*****************************'</span>)</span><br><span class="line"></span><br><span class="line">notes = Note.select(Note.text, Note.created).order_by(Note.created.desc())</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> note <span class="keyword">in</span> notes:</span><br><span class="line">    print(note.text, note.created)</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="一对多关系"><a href="#一对多关系" class="headerlink" title="一对多关系"></a>一对多关系</h1><br/>
+
+<p>我们将模型映射到现有表。 使用ForeignKeyField创建模型之间的关系。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">BEGIN</span> <span class="keyword">TRANSACTION</span>;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> reservations;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> customers;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> customers(<span class="keyword">id</span> <span class="built_in">INTEGER</span> PRIMARY <span class="keyword">KEY</span>, <span class="keyword">name</span> <span class="built_in">TEXT</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(<span class="keyword">Name</span>) <span class="keyword">VALUES</span>(<span class="string">'Paul Novak'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(<span class="keyword">Name</span>) <span class="keyword">VALUES</span>(<span class="string">'Terry Neils'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(<span class="keyword">Name</span>) <span class="keyword">VALUES</span>(<span class="string">'Jack Fonda'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(<span class="keyword">Name</span>) <span class="keyword">VALUES</span>(<span class="string">'Tom Willis'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> reservations(<span class="keyword">id</span> <span class="built_in">INTEGER</span> PRIMARY <span class="keyword">KEY</span>, </span><br><span class="line">    customer_id <span class="built_in">INTEGER</span>, created <span class="built_in">DATE</span>, </span><br><span class="line">    <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span>(customer_id) <span class="keyword">REFERENCES</span> customers(<span class="keyword">id</span>));</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> reservations(customer_id, created) <span class="keyword">VALUES</span>(<span class="number">1</span>, <span class="string">'2018-22-11'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> reservations(customer_id, created) <span class="keyword">VALUES</span>(<span class="number">2</span>, <span class="string">'2018-28-11'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> reservations(customer_id, created) <span class="keyword">VALUES</span>(<span class="number">2</span>, <span class="string">'2018-29-11'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> reservations(customer_id, created) <span class="keyword">VALUES</span>(<span class="number">1</span>, <span class="string">'2018-29-11'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> reservations(customer_id, created) <span class="keyword">VALUES</span>(<span class="number">3</span>, <span class="string">'2018-02-12'</span>);</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>one2many.py</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> peewee</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">db = peewee.SqliteDatabase(<span class="string">'test.db'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Customer</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    name = peewee.TextField()</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'customers'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Reservation</span><span class="params">(peewee.Model)</span>:</span></span><br><span class="line"></span><br><span class="line">    customer = peewee.ForeignKeyField(Customer, backref=<span class="string">'reservations'</span>)</span><br><span class="line">    created = peewee.DateField(default=datetime.date.today)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line"></span><br><span class="line">        database = db</span><br><span class="line">        db_table = <span class="string">'reservations'</span></span><br><span class="line"></span><br><span class="line">customer = Customer.select().where(Customer.name == <span class="string">'Paul Novak'</span>).get()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> reservation <span class="keyword">in</span> customer.reservations:</span><br><span class="line"></span><br><span class="line">    print(reservation.id)</span><br><span class="line">    print(reservation.created)</span><br></pre></td></tr></table></figure>
+
+<p>在示例中，我们定义了两个映射到表的模型。 然后，我们选择一个客户并显示其预订。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">customer = peewee.ForeignKeyField(Customer, backref=<span class="string">'reservations'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Customer和Reservation模型之间的关系是通过ForeignKeyField创建的。 backref属性设置了我们如何参考客户的预订。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> reservation <span class="keyword">in</span> customer.reservations:</span><br></pre></td></tr></table></figure>
+
+<p>客户实例具有reservations属性，其中包含相应的预留。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2018</span><span class="number">-22</span><span class="number">-11</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">2018</span><span class="number">-29</span><span class="number">-11</span></span><br></pre></td></tr></table></figure>
+
+<p>这是输出。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/peewee/" rel="tag"># peewee</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/14/python76/" rel="prev" title="python | whl 以及各种包的搜集网站">
+      <i class="fa fa-chevron-left"></i> python | whl 以及各种包的搜集网站
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/14/hexo23/" rel="next" title="hexo | 转译特殊字符">
+      hexo | 转译特殊字符 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">2.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Peewee-映射"><span class="nav-number">3.</span> <span class="nav-text">Peewee 映射</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Peewee-字段类型"><span class="nav-number">4.</span> <span class="nav-text">Peewee 字段类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Peewee-模型定义"><span class="nav-number">5.</span> <span class="nav-text">Peewee 模型定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查"><span class="nav-number">6.</span> <span class="nav-text">查</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#查询单条记录"><span class="nav-number">6.1.</span> <span class="nav-text">查询单条记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询全部"><span class="nav-number">6.2.</span> <span class="nav-text">查询全部</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#条件查询"><span class="nav-number">6.3.</span> <span class="nav-text">条件查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择特定的列"><span class="nav-number">6.4.</span> <span class="nav-text">选择特定的列</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#删"><span class="nav-number">7.</span> <span class="nav-text">删</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#删除表"><span class="nav-number">7.1.</span> <span class="nav-text">删除表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除实例"><span class="nav-number">7.2.</span> <span class="nav-text">删除实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除多个实例"><span class="nav-number">7.3.</span> <span class="nav-text">删除多个实例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#增"><span class="nav-number">8.</span> <span class="nav-text">增</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#create"><span class="nav-number">8.1.</span> <span class="nav-text">create()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#insert-many"><span class="nav-number">8.2.</span> <span class="nav-text">insert_many()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#改"><span class="nav-number">9.</span> <span class="nav-text">改</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#update"><span class="nav-number">9.1.</span> <span class="nav-text">update()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他"><span class="nav-number">10.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#count"><span class="nav-number">10.1.</span> <span class="nav-text">count()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sql"><span class="nav-number">10.2.</span> <span class="nav-text">sql()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#offset和limit"><span class="nav-number">10.3.</span> <span class="nav-text">offset和limit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#order-by"><span class="nav-number">10.4.</span> <span class="nav-text">order_by()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一对多关系"><span class="nav-number">11.</span> <span class="nav-text">一对多关系</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

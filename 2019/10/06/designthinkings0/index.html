@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这里讲述了MVC的设计思想。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MVC设计思想">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/10/06/designthinkings0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里讲述了MVC的设计思想。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_1.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_2.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_3.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_4.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_5.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_6.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_7.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_8.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_9.jpg">
+<meta property="article:published_time" content="2019-10-06T06:43:03.000Z">
+<meta property="article:modified_time" content="2021-08-08T15:13:32.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="MVC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/designthinkings/0_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/10/06/designthinkings0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>MVC设计思想 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/10/06/designthinkings0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MVC设计思想
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-06 14:43:03" itemprop="dateCreated datePublished" datetime="2019-10-06T14:43:03+08:00">2019-10-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-08 23:13:32" itemprop="dateModified" datetime="2021-08-08T23:13:32+08:00">2021-08-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">架构算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E6%9E%B6%E6%9E%84/MVC/" itemprop="url" rel="index"><span itemprop="name">MVC</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/10/06/designthinkings0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/10/06/designthinkings0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里讲述了MVC的设计思想。</p>
+<a id="more"></a>
+<p>近期，币币生息的陈哥让我重新组建代码架构，他让我按照MVC的设计模式来，经过查阅相关资料，我会将我的想法搬上来。</p>
+<br/>
+
+<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><br/>
+
+<p><a href="https://zhuanlan.zhihu.com/p/35680070">深入理解MVC</a><br><a href="https://www.cnblogs.com/helloworld2048/p/10879587.html">代码结构中Dao，Service，Controller，Util，Model是什么意思？</a></p>
+<br/>
+
+<h1 id="原文内容"><a href="#原文内容" class="headerlink" title="原文内容"></a>原文内容</h1><br/>
+
+
+<h2 id="知乎"><a href="#知乎" class="headerlink" title="知乎"></a>知乎</h2><p>首先我想搬运两篇文章，第一篇是知乎的文章。</p>
+<p>MVC无人不知，可很多程序员对MVC的概念的理解似乎有误，换言之他们一直在错用MVC，尽管即使如此软件也能被写出来，然而软件内部代码的组织方式却是不科学的，这会影响到软件的可维护性、可移植性，代码的可重用性。</p>
+<blockquote>
+<p>MVC即Model、View、Controller即模型、视图、控制器。</p>
+</blockquote>
+<p>我在和同行讨论技术，阅读别人的代码时发现，很多程序员倾向于将软件的业务逻辑放在Controller里，将数据库访问操作的代码放在Model里。</p>
+<p>最终软件（网站）的代码结构是</p>
+<pre><code>View层是界面
+Controller层是业务逻辑
+Model层是数据库访问。</code></pre><p>不知道大家知不知道另外一种软件开发模式三层架构，它和MVC相似之处是也分为三层，分别是UI层表示用户界面，BLL层表示业务逻辑，DAL层表示数据访问。三层架构曾经红极一时，MVC大行其道之后它就销声匿迹了， 可现在看来， 它似乎只是改头换面， 装扮成MVC的样子，并且深受程序员们的欢迎，因为它的这种分层方式和前文描述的MVC如出一辙。</p>
+<p>再说的直白点，很多程序员将MVC当成了三层架构在用，这看起来似乎没什么问题，毕竟三层架构也是一种和MVC齐名的架构模式。可问题在于用三成架构的思路写MVC，那么写出来的东西既不是三成架构也不是MVC，到是像一个什么都不是四不像。熟悉天龙八部的同学应该知道这样一段情节，吐蕃番僧鸠摩智强行用道家的小无相功为基础修炼少林的七十二绝技和易筋经最终导致走火入魔。其实用这个例子来形容现在一些程序员用三层架构的思想写MVC最恰当不过了，三层架构的核心思想是面向接口编程和各层之间的解耦和可替换性，MVC框架中没有这种概念，因为MVC要面对的问题本就不是三成架构要面对的问题，所以以MVC为基础写出来的三成架构是不会具备三层架构的核心要义的，换言之，这种代码是放弃了三层架构和MVC的精华，获得了它们的糟粕，是愚蠢的编码方式。</p>
+<p>我吐槽了这么多，对于吐槽的理由要是说不出个所以然来，估计要被人喷死，下面就来说说MVC本质原理和正确使用方式，当然，这里的MVC指的最纯粹MVC，适合各类软件，而不仅仅指Web框架中的变体MVC，然而万变不离其宗，文中所述的MVC思想同样适用于Web开发。</p>
+<p>MVC要实现的目标是将软件用户界面和业务逻辑分离以使代码可扩展性、可复用性、可维护性、灵活性加强。</p>
+<p>View层是界面，Model层是业务逻辑，Controller层用来调度View层和Model层，将用户界面和业务逻辑合理的组织在一起，起粘合剂的效果。所以Controller中的内容能少则少，这样才能提供最大的灵活性。</p>
+<p>比方说，有一个View会提交数据给Model进行处理以实现具体的行为，View通常不会直接提交数据给Model，它会先把数据提交给Controller，然后Controller再将数据转发给Model。假如此时程序业务逻辑的处理方式有变化，那么只需要在Controller中将原来的Model换成新实现的Model就可以了，控制器的作用就是这么简单， 用来将不同的View和不同的Model组织在一起，顺便替双方传递消息，仅此而已。</p>
+<p>合理的使用MVC有很多好处，要一一道尽是一件异常困难的任务。在这里我们通过一个反面示例来侧面的证明正确使用MVC的好处与依据。</p>
+<p>如前文所言， 很多程序员偏爱于将业务逻辑放在Controller中，我极力反对这种做法，现在我就来证明这中做法的错误性。</p>
+<p>我们知道在写程序时，业务逻辑的重复使用是经常要面对的场景。 如果业务逻辑写在控制器中， 要重用它的唯一方法就是将它提升到父类之中，通过继承来达到代码复用的效果。但这么做会带来一个巨大的副作用，违背了一项重要的面向对象设计原则：接口隔离。</p>
+<p>什么是接口隔离，我在这里简单的讲述一下。通俗一点讲，接口隔离就是当一个类需要继承另一个类时， 如果被继承的类中有继承的类用不到的方法或者属性时，就不要去实现这个继承。如果真的情非得已必须要继承，那么也需要从被继承的类中再提取出一个只包含需要部分功能的新类型，最终去继承这个新类型才是正确的做法。 换句话说，实现继承的时候，不要去继承那些用不到的事物。</p>
+<p>回到之前的话题，通过继承父控制器的方式复用业务逻辑时，往往会出现为了重用一个方法而继承来一大堆用不到的方法，表面上看起来似乎没什么问题，但是这会使代码变的难以理解，</p>
+<p>长此以往， 软件的代码会朝着不健康的方向发展。</p>
+<p>要知道，使用继承的条件是很苛刻的，我们学习面向对象变编程继承特性时，第一课就是只有满足IS-A（是一个）关系时才可以使用继承，如果仅仅是复用代码，并不是我们使用继承的理由。使用组合是复用代码提倡的方式，也就是所谓的HAS-A（有一个）的关系，相信每个程序员都听过“少用继承，多有组合”这句话，这句话是软件开发业的先驱们千锤百炼总结出来的，值得我们去遵循。</p>
+<p>各Model之间是可以相互调用的， Controller也可以无障碍的调用Model，因此将业务逻辑放在Model中可以灵活的使用组合的方式复用代码。</p>
+<p>而Controller之间是不可以相互调用的，要复用代码只能将代码提升至父类，通过继承实现，显然这种做法既不正确，也不灵活，因此完全不提倡。</p>
+<p>综上所述，仅仅只是代码复用这一点，也足以将“厚Controller，薄Model”这种不健康的MVC思想打入十八层地狱。</p>
+<p>现在我们大概知道了代码应该如何分布于MVC三层之间， 知其然，并且也知其所以然。接下来我们再从另一个角度深刻剖析MVC，脱它个精光，让它赤条条展示在我们眼前。</p>
+<p>众所周知，GoF总结过23个设计模式，这23个设计模式是某些特定的编程问题的特效药，这是业内公认的。</p>
+<p>MVC是一种模式，但却在GoF总结出来的这个23个设计模式之外，确切的说它不是一种设计模式，它是多种设计模式的组合，并不仅仅只是一个单独的一个模式。</p>
+<p>组成MVC的三个模式分别是:</p>
+<pre><code>组合模式、策咯模式、观察者模式</code></pre><p>MVC在软件开发中发挥的威力，最终离不开这三个模式的默契配合。 那些崇尚设计模式无用论的程序员，请了解只要你们使用MVC，就离不开设计模式。</p>
+<p>注意，以下内容以这三个设计模式的知识为基础，如果对这三个设计模式没概念，或许会阅读困难。</p>
+<p>先说组合模式在MVC中扮演什么样的角色。</p>
+<p>组合模式只在视图层活动， 视图层的实现用的就是组合模式，当然，这里指的实现是底层的实现，是由编程框架厂商做的事情，用不着普通程序员插手。</p>
+<p>组合模式的类层次结构是树状的， 而我们做Web时视图层是html页面，html的结构不正是树状的吗，这其实就是一个组合模式的应用，只是浏览器厂商已经把界面相关的工作帮我们做掉了，但它确确实实是我们应用MVC的其中一部分，只是我们感觉不到罢了，这也是我们觉得View是实现起来最简单最没有歧义的一层的原因。</p>
+<p>除网页以外的其他用户界面程序，如WPF、Android、<a href="http://ASP.NET">http://ASP.NET</a> 等等都是使用树状结构来组织界面控件对象的，因为组合模式就是从界面设计的通用解决方案总提炼出来的。所以与其说MVC选择了组合模式，还不如说组合模式是必定会存在MVC中的，因为只要涉及到用户界面，组合模式就必定存。事实上即使不理解组合模式，也不影响程序员正确的使用MVC，组合模式本就存在于程序员接触不到的位置。</p>
+<p>然而，观察者模式和策略模式就显得比较重要，是实实在在MVC中接触的到的部分。</p>
+<p>观察者模式有两部分组成，被观察的对象和观察者，观察者也被称为监听者。对应到MVC中，Model是被观察的对象，View是观察者，Model层一旦发生变化，View层即被通知更新。View层和Model层互相之间是持有引用的。 我们在开发Web MVC程序时，因为视图层的html和Model层的业务逻辑之间隔了一个http，所以不能显示的进行关联，但是他们观察者和收听者的关系却没有改变。当View通过http提交数据给服务器，服务器上的Model接受到数据执行某些操作，再通过http响应将结果回送给View，View（浏览器）接受到数据更新界面，这不正是一个接受到通知并执行更新的行为吗，是观察者模式的另一种表现形式。</p>
+<p>但是，脱离Web，当通过代码去纯粹的表示一个MVC结构的时候，View和Model间无疑是观察者和被观察的关系，是以观察者模式为理论基础的。即使在Web中因为http壁垒的原因导致真正的实现有点走样，但是原理核心和思路哲学却是不变的。</p>
+<p>最后是策略模式。策略模式是View和Controller之间的关系，Controller是View的一个策略，Controller对于View是可替换的， View和Controller的关系是一对多，在实际的开发场景中，也经常会碰到一个View被多个Controller引用，这即使策咯模式的一种体现，只是不那么直观而已。</p>
+<p>总结一下，关于MVC各层之间关系所对应的设计模式</p>
+<pre><code>View层，单独实现了组合模式
+Model层和View层，实现了观察者模式
+View层和Controller层，实现了策咯模式</code></pre><p>MVC就是将这三个设计模式在一起用了，将这三个设计模式弄明白，MVC将毫无神秘感可言。如果不了解这三个设计模式去学习MVC，那不管怎么学总归是一知半解，用的时候也难免不会出想问题。</p>
+<p>再次回到最前面讨论的业务逻辑应该放在Controller还是Model的问题上，从设计模式的角度讲，策略模式中的策略通常都很小很薄，不会包含太多的内容， Controller是一个策略， 自然不应该在里面放置过多的内容，否则要替换一个新的会相当麻烦，与此同时也会破坏View-Model的观察者模式，仿佛View-Controller之间即实现了策略模式又实现了观察者模式，这种混乱是罪恶的根源，是制造焦油坑让程序员陷入其中无法自拔的罪魁祸首。切忌，应当避免。</p>
+<p>注：此文核心思想来自《head first设计模式》</p>
+<h2 id="博客"><a href="#博客" class="headerlink" title="博客"></a>博客</h2><p>内容大纲：</p>
+<p>1.为什么需要一个好的代码结构<br>2.什么样才是一个好的结构<br>3.每一个分类代表什么含义<br>4.是否适用于WEB，Android和IOS？<br>5.进一步的学习的话，是要学习系统架构么？</p>
+<h3 id="为什么需要一个好的代码结构"><a href="#为什么需要一个好的代码结构" class="headerlink" title="为什么需要一个好的代码结构"></a>为什么需要一个好的代码结构</h3><pre><code>好的代码结构并不仅仅是为了看上去清晰，它更像是我们对一个系统的拆解和组装。
+好的代码结构可以让你在遇到代码交接这种天理不容的情况时，减少提刀砍人的可能性。
+好的代码结构可以让多人协作开发更容易，而不会缠缠绵绵到天涯，再相爱相杀。</code></pre><p>我们经常形容一个坏的代码结构，像屎一样。</p>
+<p><img src="/images/designthinkings/0_0.jpg" alt=""></p>
+<p>我们称它为一坨，说真的，接手过烂代码之后，真的找不到比屎更能描述自己感受的词了。</p>
+<p>“屎”代表着混乱，一坨，各种杂质。接手一堆烂代码的难度就像是用一坨屎来做沙画。</p>
+<p>有时候我们还会用一团毛线来形容代码，大概是这样的。</p>
+<p><img src="/images/designthinkings/0_1.jpg" alt=""></p>
+<p>对的，这种感受是绝对不会错的。而我们要做的就是把这团毛线，变成像瑞士军刀一样的清晰。</p>
+<p><img src="/images/designthinkings/0_2.jpg" alt=""></p>
+<p>你们觉得哪个更有成就感？</p>
+<h3 id="什么样才是一个好的结构"><a href="#什么样才是一个好的结构" class="headerlink" title="什么样才是一个好的结构"></a>什么样才是一个好的结构</h3><pre><code>好的结构应该保持单一职责。
+好的结构应该是通用的。
+好的结构应该是有明确定义的。</code></pre><p>这其实就是所谓的脚手架提供的最大的价值，一般而言，Java，Android，IOS都有一套明确的框架体系，JS本来没有，后来有了，然后。。他们就打起来了。</p>
+<p>就像。。。他们一样。</p>
+<p><img src="/images/designthinkings/0_3.jpg" alt=""></p>
+<p>该喷火的喷火，该喷水的喷水，每个人分工都很明确。</p>
+<h3 id="每一个分类代表什么含义"><a href="#每一个分类代表什么含义" class="headerlink" title="每一个分类代表什么含义"></a>每一个分类代表什么含义</h3><h4 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h4><p>Model是模型，一般而言，会有人分的更细，VO，DTO等等。我并不推荐分的更细，这个Model常常和持久化的数据一一对应，如Mysql和MongoDB。</p>
+<p>Model承载的作用就是数据的抽象，描述了一个数据的定义，Model的实例就是一组组的数据。整个系统都可以看成是数据的 流动，既然要流动，就一定是有流动的载体。</p>
+<p><img src="/images/designthinkings/0_4.jpg" alt=""></p>
+<p>这个红圈标的就是Model。它就应该是一个纯数据的集合，就是被各种东西传来传去，被各种加工处理的数据团。</p>
+<p>通常会有很多Model，一条业务流就是对应一条或者多条数据流，拿知乎为例子。</p>
+<p>文章是一个Model，一般叫Article，包括Title，Summary，Author，Content等等。</p>
+<p>评论也是一个Model，一般叫Comment，包括Content，userID等等。</p>
+<p>对于初学者而言，第一个要学会，就是建模，把业务逻辑映射成数据模型。</p>
+<h4 id="Util"><a href="#Util" class="headerlink" title="Util"></a>Util</h4><p>Util是工具的意思，一般来说，常常用来描述和业务逻辑没有关系的数据处理。</p>
+<p>Util一般要和私有方法对比：私有方法一般来说是只是在特地场景下使用的，私有方法越多，代码结构越乱。常见的重构策略就是首先从一个越长行数的代码里抽象出若干个私有方法，然后再抽出公用的Util。</p>
+<p>如果有可能，尽可能的少用私有方法，而是把他换成一个公用的Util，代表他和业务逻辑是不相关的。通常命名也是ArticleUtil，CommentUtil之类的。</p>
+<p><img src="/images/designthinkings/0_5.jpg" alt=""></p>
+<p>像这种打包，不管是充气娃娃还是别的什么东西，都打包。你可以理解为图中的黑衣人就是一个Util。</p>
+<p>某中程度上也会跟Service有点接近。但是Service一般而言，都是包含有业务逻辑的，很少能做单元测试。</p>
+<p>Util一般来说，就是一个明确的输入和一个明确的输出结果。单元测试中，多数也是来测试Util。</p>
+<p>积累好自己的Util是一件很重要的事儿。</p>
+<h4 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h4><p>Service比Util的概念大很多，它的重点是在于提供一个服务。这个服务可能包括一系列的数据处理，也有可能会调用多个Util，或者是调用别的服务。总归一句话，就是，有什么事情，你来找我。</p>
+<p><img src="/images/designthinkings/0_6.jpg" alt=""></p>
+<p>就像这个图上的妹妹一样，她就是一个Service，她能提供什么样的服务？这个是必须定义好的。如果是洗脚，她要帮你脱鞋，要端盆子烫你的脚。这里面，你的脚就是一个Model，盆子里的水相当于Util，不管里面放进去啥都能烫一烫。</p>
+<p>帮你脱鞋可以是一个Service，也可以是一个私有函数，也可以是一个Util。看你的是让这个小妹妹帮你脱，还是别的小妹妹脱，还是自动脱鞋机。</p>
+<p>如果是你自动脱。。。说明你在Model里面加上了功能，你的脚就不是一个纯粹的数据模型了，而是一个包含业务功能在里面的充血模型。</p>
+<p>这样不好。老老实实让小妹妹帮你拖鞋不好么。</p>
+<h4 id="Dao"><a href="#Dao" class="headerlink" title="Dao"></a>Dao</h4><p>Dao一般而言，都是用来和底层数据库通信，负责对数据库的增删改查。</p>
+<p><img src="/images/designthinkings/0_7.jpg" alt=""></p>
+<p>是的。他就是一个Dao。他从来不关心这些货物要去哪里，他只关心。入库，出库，查询和更换。</p>
+<p>所谓的CRUD就是创建，读取，更新，删除。</p>
+<p>Dao最好都是要独立出来。</p>
+<p>到现在为止，最佳实践就是一个Service只对应一个Dao。Service会做一些额外的检查，如货物是否损坏，入库单是否完整，等等等等。</p>
+<p>我并不推荐在Service里调用多个Dao，也推荐在Service里调用多个Service，大多数情况下我都不推荐这么干。</p>
+<p>具体原因以后再说，这也是一个开放性的话题。</p>
+<p>现在我们分清楚了Model，Util，Service和Dao，可是谁来做总的调度呢？</p>
+<h4 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h4><p><img src="/images/designthinkings/0_8.jpg" alt=""></p>
+<p>控制中心，所有的指令，调度都从这里发出去。</p>
+<p>哪一个Service做什么事儿，谁的数据提供给谁，一般而言，都是在Controller里实现的。</p>
+<p>Controller也是最常见的容易产生脏代码地方，通常他们会把一些不该放到Controller里东西也放进来。</p>
+<p>大概的感觉就是这样的。</p>
+<p><img src="/images/designthinkings/0_9.jpg" alt=""></p>
+<h2 id="我的思考"><a href="#我的思考" class="headerlink" title="我的思考"></a>我的思考</h2><p>其实MVC是一种架构思想，但是这种架构思想确实可以让开发或者维护更加容易，也就是可扩展性更强。</p>
+<p>下面我来具体讲讲里面的模块。</p>
+<h3 id="model"><a href="#model" class="headerlink" title="model"></a>model</h3><p>model 可以分为两个部分，一个是 dao ，一个是 model 层，不一定非要叫这个名字。</p>
+<p>其中 dao 层是直接对数据库的增删改查，是 sql 语句，而且，据我目前的项目经验来说，我们应该对相同类型的表来创建一个专门的 dao 文件。</p>
+<p>具体来说，对于用户，可能分为用户表和用户关系表，对这两个表的操作，就可以组成一个类，然后这个 dao 层的类，是专门用来执行 sql 的。</p>
+<p>而 model 是专门对于数据库的逻辑推理或者封装，比如达到什么条件就要执行 dao 层 哪个类的方法，当然，这个 model 层也可以更根据场景来细分。</p>
+<h3 id="view"><a href="#view" class="headerlink" title="view"></a>view</h3><p>这个还没有弄。</p>
+<h3 id="controller"><a href="#controller" class="headerlink" title="controller"></a>controller</h3><p>这个层其实也包括两个部分，一个是 main ，另一个是 service 。</p>
+<p>其中，main 相当于传统意义上的 controller ，但是，并不一定名字非要是 main ，我只是举一个这样的例子。</p>
+<p>然后这个 main 文件中，是专门调度各种方法的，代码尽量少，只有调度和返回，而没有业务逻辑处理。</p>
+<p>而，业务的逻辑处理要放在 service 中，我们建立这个文件夹，在里面放上各种业务逻辑，比如生辰文件、下载，当然，你可以根据喜好来划分不同的业务逻辑。</p>
+<p>但是，所有的业务逻辑应该是放在 service 中的。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>当，客户端来了一个命令，我们首先会在 main 中查询到对应的处理，然后在这个处理命令中找到 service 中具体的业务逻辑处理，根据这个业务逻辑，我们会将数据库的判断逻辑下放到 model 中，然后model 再调 dao 层，执行具体的 sql 语句，返回的结果传给 view 或者 service 继续处理。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MVC/" rel="tag"># MVC</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/05/software1/" rel="prev" title="software | postman">
+      <i class="fa fa-chevron-left"></i> software | postman
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/06/designthinkings1/" rel="next" title="三层架构">
+      三层架构 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文章"><span class="nav-number">1.</span> <span class="nav-text">参考文章</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原文内容"><span class="nav-number">2.</span> <span class="nav-text">原文内容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#知乎"><span class="nav-number">2.1.</span> <span class="nav-text">知乎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#博客"><span class="nav-number">2.2.</span> <span class="nav-text">博客</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么需要一个好的代码结构"><span class="nav-number">2.2.1.</span> <span class="nav-text">为什么需要一个好的代码结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么样才是一个好的结构"><span class="nav-number">2.2.2.</span> <span class="nav-text">什么样才是一个好的结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#每一个分类代表什么含义"><span class="nav-number">2.2.3.</span> <span class="nav-text">每一个分类代表什么含义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Model"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">Model</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Util"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">Util</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Service"><span class="nav-number">2.2.3.3.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dao"><span class="nav-number">2.2.3.4.</span> <span class="nav-text">Dao</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Controller"><span class="nav-number">2.2.3.5.</span> <span class="nav-text">Controller</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#我的思考"><span class="nav-number">2.3.</span> <span class="nav-text">我的思考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#model"><span class="nav-number">2.3.1.</span> <span class="nav-text">model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#view"><span class="nav-number">2.3.2.</span> <span class="nav-text">view</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#controller"><span class="nav-number">2.3.3.</span> <span class="nav-text">controller</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">2.3.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

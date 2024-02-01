@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="如题，这是安装系统前必须要知道的知识。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UEFI+GPT与BIOS+MBR区别">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/01/19/computer3/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="如题，这是安装系统前必须要知道的知识。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_4.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_5.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_7.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/computer/3_8.png">
+<meta property="article:published_time" content="2019-01-18T21:24:16.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:24:23.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="UEFI+GPT">
+<meta property="article:tag" content="BIOS+MBR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/computer/3_2.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/01/19/computer3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>UEFI+GPT与BIOS+MBR区别 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/01/19/computer3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          UEFI+GPT与BIOS+MBR区别
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-19 05:24:16" itemprop="dateCreated datePublished" datetime="2019-01-19T05:24:16+08:00">2019-01-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:24:23" itemprop="dateModified" datetime="2020-05-12T10:24:23+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%94%B5%E8%84%91%E7%9B%B8%E5%85%B3/" itemprop="url" rel="index"><span itemprop="name">电脑相关</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%94%B5%E8%84%91%E7%9B%B8%E5%85%B3/%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">系统</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/01/19/computer3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/01/19/computer3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如题，这是安装系统前必须要知道的知识。</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://blog.csdn.net/qq_33212020/article/details/53066434">MBR+BIOS与GPT+UEFI启动系统的区别</a></p>
+<p><a href="http://www.kqidong.com/bios/876.html">GPT+UEFI与BIOS+MBR的区别</a></p>
+<p><a href="https://www.zhihu.com/question/28471913/answer/155332057">UEFI+GPT与BIOS+MBR各自有什么优缺点？</a></p>
+<p><a href="https://jingyan.baidu.com/article/ad310e80a9298a1849f49e17.html">如何查看电脑硬盘是gpt分区还是MBR分区</a></p>
+<p><a href="https://jingyan.baidu.com/article/7e440953203e022fc0e2efd0.html">如何判断电脑是否是uefi启动</a></p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>GPT+UEFI是近年来流行的一种U盘装系统模式，与传统的Bios+MBR相比具有着更好的可操作性、安全性、兼容性、可扩展性等诸多优点，对此快启动U盘启动盘制作工具的UEFI版应运而生，同时还支持GPT分区，但是，GPT+UEFI与BIOS+MBR究竟有什么区别。</p>
+<p>这个是传统的Legacy运行流程：</p>
+<p><img src="/images/computer/3_2.png" alt=""></p>
+<p>这个是UEFI运行流程：</p>
+<p><img src="/images/computer/3_3.png" alt=""></p>
+<h2 id="什么是MBR，什么是GPT"><a href="#什么是MBR，什么是GPT" class="headerlink" title="什么是MBR，什么是GPT"></a>什么是MBR，什么是GPT</h2><p>GPT和MBR是两种不同的分区方案。目前在Windows下广泛采用的磁盘分区方案仍然是MBR分区结构，但不容怀疑GPT是今后的趋势。</p>
+<h3 id="MBR磁盘分区结构用下图简单表示（Windows下基本磁盘、4个主分区）"><a href="#MBR磁盘分区结构用下图简单表示（Windows下基本磁盘、4个主分区）" class="headerlink" title="MBR磁盘分区结构用下图简单表示（Windows下基本磁盘、4个主分区）"></a>MBR磁盘分区结构用下图简单表示（Windows下基本磁盘、4个主分区）</h3><p><img src="/images/computer/3_4.jpg" alt=""></p>
+<p>为了方便计算机访问硬盘，把硬盘上的空间划分成许许多多的区块（英文叫sectors，即扇区），然后给每个区块分配一个地址，称为逻辑块地址（即LBA）。 </p>
+<p>在MBR磁盘的第一个扇区内保存着启动代码和硬盘分区表。启动代码的作用是指引</p>
+<p>计算机从活动分区引导启动操作系统（BIOS下启动操作系统的方式）；分区表的作用是记录硬盘的分区信息。在MBR中，分区表的大小是固定的，一共可容纳4个主分区信息。在MBR分区表中逻辑块地址采用32位二进制数表示，因此一共可表示2^32（2的32次方）个逻辑块地址。如果一个扇区大小为512字节，那么硬盘最大分区容量仅为2TB。</p>
+<h3 id="GPT磁盘分区结构可用下图简单表示（Windows下基本磁盘）"><a href="#GPT磁盘分区结构可用下图简单表示（Windows下基本磁盘）" class="headerlink" title="GPT磁盘分区结构可用下图简单表示（Windows下基本磁盘）"></a>GPT磁盘分区结构可用下图简单表示（Windows下基本磁盘）</h3><p><img src="/images/computer/3_5.jpg" alt=""></p>
+<p>可以看到，在GTP磁盘的第一个数据块中同样有一个与MBR（主引导记录）类似的标记，叫做PMBR。PMBR的作用是，当使用不支持GPT的分区工具时，整个硬盘将显示为一个受保护的分区，以防止分区表及硬盘数据遭到破坏。UEFI并不从PMBR中获取GPT磁盘的分区信息，它有自己的分区表，即GPT分区表。</p>
+<h2 id="GPT分区表的优势"><a href="#GPT分区表的优势" class="headerlink" title="GPT分区表的优势"></a>GPT分区表的优势</h2><p>GPT的分区方案之所以比MBR更先进，是因为在GPT分区表头中可自定义分区数量的最大值，也就是说GPT分区表的大小不是固定的。在Windows中，微软设定GPT磁盘最大分区数量为128个。另外，GPT分区方案中逻辑块地址（LBA）采用64位二进制数表示，可以计算一下2^64是一个多么庞大的数据，以我们的需求来讲完全有理由认为这个大小约等于无限。除此之外，GPT分区方案在硬盘的末端还有一个备份分区表，保证了分区信息不容易丢失。</p>
+<h2 id="什么是BIOS，什么是UEFI"><a href="#什么是BIOS，什么是UEFI" class="headerlink" title="什么是BIOS，什么是UEFI"></a>什么是BIOS，什么是UEFI</h2><p>BIOS和UEFI都是引导操作系统启动的必须介质，目前在Windows下广泛采用的引导方案仍然是BIOS引导，但不容怀疑UEFI是今后的趋势。</p>
+<h2 id="BIOS引导系统方式（引导Windows）"><a href="#BIOS引导系统方式（引导Windows）" class="headerlink" title="BIOS引导系统方式（引导Windows）"></a>BIOS引导系统方式（引导Windows）</h2><p><img src="/images/computer/3_2.png" alt=""></p>
+<p>BIOS下启动操作系统之前，必须从硬盘上指定扇区读取系统启动代码（包含在MBR主引导记录中），然后从活动分区中引导启动操作系统，所以在BIOS下引导安装Windows操作系统，我们不得不使用一些工具（DiskGenius）对硬盘进行配置以达到启动要求（即建立MBR硬盘主引导和活动分区）。</p>
+<p>传统BIOS的过程好像也不算复杂，但是由于BIOS的资源控制采用了中断向量的方式，所它在扩展性方面以及安全性上都不能有所保障。除此之外，有些电脑的BIOS的硬件自检时间非常长，这个时间大概就是我们的任务管理器显示的BIOS时间。</p>
+<p>因为BIOS无法识别GPT分区，所以BIOS下GPT磁盘不能用于启动操作系统，在操作系统提供支持的情况下可用于数据存储。</p>
+<p>BIOS方式启动过程看起来很不好，他要不断交接电脑控制权和读取引导记录并尝试引导，屏幕要闪很多次，还要看一段时间的Windows窗口的加载图标。</p>
+<h2 id="UEFI引导系统方式（引导Windows）"><a href="#UEFI引导系统方式（引导Windows）" class="headerlink" title="UEFI引导系统方式（引导Windows）"></a>UEFI引导系统方式（引导Windows）</h2><p><img src="/images/computer/3_3.png" alt=""></p>
+<p>在UEFI下启动操作系统，不再需要主引导记录，不再需要活动分区，不需要任何工具，只要复制安装文件到一个FAT32（主）分区/U盘中，然后从这个分区/U盘启动。</p>
+<p>UEFI在开机方面相比BIOS少了自检这一步，它把硬件信息存在了硬盘里，直接读取，因此它的启动速度更快；UEFI是BIOS的一种升级替代方案，UEFI之所以比BIOS强大，是因为UEFI本身已经相当于一个微型操作系统，其带来的便利之处在于：首先，UEFI已具备文件系统（文件系统是操作系统组织管理文件的一种方法，直白点说就是把硬盘上的数据以文件的形式呈现给用户。Fat32、NTFS都是常见的文件系统类型）的支持，它能够直接读取FAT分区中的文件；其次，可开发出直接在UEFI下运行的应用程序，这类程序文件通常以efi结尾。既然UEFI可以直接识别FAT分区中的文件，又有可直接在其中运行的应用程序。那么完全可以将Windows安装程序做成efi类型应用程序，然后把它放到任意fat分区中直接运行即可，如此一来安装Windows操作系统这件过去看上去稍微有点复杂的事情突然就变非常简单了，就像在Windows下打开QQ一样简单。</p>
+<p>UEFI可同时识别MBR分区和GPT分区，因此UEFI下，MBR磁盘和GPT磁盘都可用于启动操作系统和数据存储。不过微软限制，UEFI下使用Windows安装程序安装操作系统是只能将系统安装在GPT磁盘中。</p>
+<p>UEFI方式启动过程以SSD中启动WIN10为例，按下电源键，过1-2秒，然后出现主板的标志，过1-2秒，标志下出现转圈的点（表示正在加载Windows，这和BIOS启动完全不一样），过5-7S，黑一下，过1-2S，到开机锁屏界面；中间没有出现Windows窗口的加载图标，开机全程给人一种行云流水的感觉。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><ol>
+<li>GPT能使用大于2.2T的硬盘，MBR不行。支持最大卷为18 EB（1EB=1048576TB）。</li>
+<li>GPT可以支持无限个分区，微软目前的限定是128个。Linux、ubuntu、macos都能支持这种分区格式。MBR最多4个主分区，超过4个再分区只能通过逻辑分区。</li>
+<li>GPT分区磁盘有备份分区表来提高分区数据结构的完整性。</li>
+<li>UEFI + GPT 开机启动更快，开机时跳过外设检测，并且可以实现启动时原生分辨率，搭载固态硬盘开机时间很短，十秒左右。（没有开机硬件自检会稍微快了那么1、2秒）</li>
+<li>UEFI + GPT 支持Secure Boot。通过保护预启动或预引导进程，抵御bootkit攻击，从而提高安全性。所有在开机时比Windows内核更早加载，实现内核劫持的技术，都可以称之为Bootkit。</li>
+<li>UEFI BIOS 可用鼠标操作图形界面，不再是枯燥的蓝底白字的英文。（Intel提出，用于取代BIOS）。UEFI的优越特性：可操作性、安全性、兼容性、可扩展性。</li>
+</ol>
+<h2 id="其他2"><a href="#其他2" class="headerlink" title="其他2"></a>其他2</h2><blockquote>
+<p>分区数量上，gpt好像可以支持无限个分区，不过window上只认128个，而且gpt分区不分主分区，逻辑分区，可以理解为全部都是主分区，就相当于可以允许你一个分区一个系统，128个系统了。而这是mbr做不到的，mbr最多只能有四个系统，如果你想要多于四个的分区，那还得牺牲掉可以装一个系统的主分区，即把它装换为逻辑分区。 安全性上，gpt会更安全，因为分区表会备份，且加入校验算法，一旦被病毒感染或误操作可以及时发现，使用安全的备份的分区表补救。 分区容量上，gpt可以识别出大于2T的硬盘，而mbr最大就2t容量</p>
+</blockquote>
+<h2 id="查看我分区的类型"><a href="#查看我分区的类型" class="headerlink" title="查看我分区的类型"></a>查看我分区的类型</h2><p>进入磁盘管理可以看到我们硬盘的一般情况，那么该如何查看我的硬盘的分区模式。</p>
+<p>右击”磁盘0“选择”属性“</p>
+<p><img src="/images/computer/3_6.png" alt=""></p>
+<p>在”属性“中切换到”卷“标签,这时我们就可以看到”磁盘分区形式“可以看到为gpt</p>
+<p><img src="/images/computer/3_7.png" alt=""></p>
+<h2 id="查看启动类型"><a href="#查看启动类型" class="headerlink" title="查看启动类型"></a>查看启动类型</h2><p>按下win+r打开运行，输入msinfo32，确定，打开系统信息；</p>
+<p><img src="/images/computer/3_8.png" alt=""></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/UEFI-GPT/" rel="tag"># UEFI+GPT</a>
+              <a href="/tags/BIOS-MBR/" rel="tag"># BIOS+MBR</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/19/deeplearning3/" rel="prev" title="卷积神经网络（CNN）入门">
+      <i class="fa fa-chevron-left"></i> 卷积神经网络（CNN）入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/20/python44/" rel="next" title="安装 Anaconda">
+      安装 Anaconda <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正文"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是MBR，什么是GPT"><span class="nav-number">3.</span> <span class="nav-text">什么是MBR，什么是GPT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MBR磁盘分区结构用下图简单表示（Windows下基本磁盘、4个主分区）"><span class="nav-number">3.1.</span> <span class="nav-text">MBR磁盘分区结构用下图简单表示（Windows下基本磁盘、4个主分区）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GPT磁盘分区结构可用下图简单表示（Windows下基本磁盘）"><span class="nav-number">3.2.</span> <span class="nav-text">GPT磁盘分区结构可用下图简单表示（Windows下基本磁盘）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GPT分区表的优势"><span class="nav-number">4.</span> <span class="nav-text">GPT分区表的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是BIOS，什么是UEFI"><span class="nav-number">5.</span> <span class="nav-text">什么是BIOS，什么是UEFI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BIOS引导系统方式（引导Windows）"><span class="nav-number">6.</span> <span class="nav-text">BIOS引导系统方式（引导Windows）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UEFI引导系统方式（引导Windows）"><span class="nav-number">7.</span> <span class="nav-text">UEFI引导系统方式（引导Windows）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">8.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他2"><span class="nav-number">9.</span> <span class="nav-text">其他2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看我分区的类型"><span class="nav-number">10.</span> <span class="nav-text">查看我分区的类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看启动类型"><span class="nav-number">11.</span> <span class="nav-text">查看启动类型</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

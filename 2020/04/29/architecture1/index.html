@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="当初，瑞哥和我说的时候，就说，未来这个 eosvoter 要做成微服务，我当时对微服务没有什么直观感受。 今天花了点时间了解，将我的感悟在这里进行总结。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="架构 | 什么是微服务?">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/29/architecture1/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="当初，瑞哥和我说的时候，就说，未来这个 eosvoter 要做成微服务，我当时对微服务没有什么直观感受。 今天花了点时间了解，将我的感悟在这里进行总结。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/1_18.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/1_19.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/1_20.png">
+<meta property="article:published_time" content="2020-04-29T13:56:14.000Z">
+<meta property="article:modified_time" content="2021-08-08T15:16:03.921Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="微服务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/architecture/1_18.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/29/architecture1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>架构 | 什么是微服务? | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/29/architecture1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          架构 | 什么是微服务?
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-29 21:56:14" itemprop="dateCreated datePublished" datetime="2020-04-29T21:56:14+08:00">2020-04-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-08 23:16:03" itemprop="dateModified" datetime="2021-08-08T23:16:03+08:00">2021-08-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">架构算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/29/architecture1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/29/architecture1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>当初，瑞哥和我说的时候，就说，未来这个 eosvoter 要做成微服务，我当时对微服务没有什么直观感受。</p>
+<p>今天花了点时间了解，将我的感悟在这里进行总结。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://www.cnblogs.com/xiao2shiqi/p/11298663.html">什么是微服务？为什么你要用微服务？</a></li>
+<li><a href="https://blog.csdn.net/wuxiaobingandbob/article/details/78642020">什么是微服务</a></li>
+<li><a href="https://www.sohu.com/a/221400925_100039689">漫画：什么是微服务？</a></li>
+</ul>
+<br/>
+
+<h1 id="什么是微服务"><a href="#什么是微服务" class="headerlink" title="什么是微服务?"></a>什么是微服务?</h1><br/>
+
+<p>我先说一下，微服务只是一种架构思想，不能说什么框架是微服务，什么框架是单体服务，什么框架是SOA。</p>
+<p>架构只是思想，框架只是工具，两者不是对应关系，而是组成演变关系。</p>
+<p>在介绍微服务时，首先得先理解什么是微服务，顾名思义，微服务得从两个方面去理解，什么是”微”、什么是”服务”， 微 狭义来讲就是体积小、著名的”2 pizza 团队”很好的诠释了这一解释（2 pizza 团队最早是亚马逊 CEO Bezos提出来的，意思是说单个服务的设计，所有参与人从设计、开发、测试、运维所有人加起来 只需要2个披萨就够了 ）。 而所谓服务，一定要区别于系统，服务一个或者一组相对较小且独立的功能单元，是用户可以感知最小功能集。</p>
+<p>与微服务相对应的是单体架构。</p>
+<h2 id="单体架构"><a href="#单体架构" class="headerlink" title="单体架构"></a>单体架构</h2><p>单体架构是将所有的服务都放在一个项目中，比如拿一个电商系统来说，其单体服务包括前段、订单系统、用户系统等。</p>
+<p>但是，单体服务并不会将其一个个的进行抽象，而是，整个都杂糅到一起。</p>
+<p>其优点是</p>
+<ul>
+<li>由于整个项目集中在一起，所以便于排查异常，也便于管理。</li>
+</ul>
+<p>但是，缺点更加明显</p>
+<ul>
+<li><p>项目过于臃肿当大大小小的功能模块都集中在同一项目的时候，整个项目必然会变得臃肿，让开发者难以维护。</p>
+</li>
+<li><p>资源无法隔离，整个单体系统的各个功能模块都依赖于同样的数据库、内存等资源，一旦某个功能模块对资源使用不当，整个系统都会被拖垮。</p>
+</li>
+<li><p>无法灵活扩展当系统的访问量越来越大的时候，单体系统固然可以进行水平扩展，部署在多台机器上组成集群，但是这种扩展并非灵活的扩展。比如我们现在的性能瓶颈是支付模块，希望只针对支付模块做水平扩展，这一点在单体系统是做不到的。</p>
+</li>
+</ul>
+<p>其公司里面的人员可能如下分布</p>
+<p><img src="/images/architecture/1_18.jpg" alt=""></p>
+<h2 id="微服务架构"><a href="#微服务架构" class="headerlink" title="微服务架构"></a>微服务架构</h2><p>微服务更看重于纵向的项目集成。</p>
+<p>比如说，横向上看一个电商项目，其可以抽象成几个系统</p>
+<ul>
+<li>前端展示</li>
+<li>订单系统</li>
+<li>促销系统</li>
+<li>…</li>
+</ul>
+<p>纵向上，拿订单系统来说</p>
+<ul>
+<li>数据库表</li>
+<li>请求/服务</li>
+<li>…</li>
+</ul>
+<p>其可以按照功能进行分类。其成员构成可能如下</p>
+<p><img src="/images/architecture/1_19.jpg" alt=""></p>
+<p>当然，这种垂直划分只是一个理想的架构，实际在企业中并不会把团队组织架构拆分得这么绝对。</p>
+<ul>
+<li><p>服务，关键其实不仅仅是微服务本身，而是系统要提供一套基础的架构，这种架构使得微服务可以独立的部署、运行、升级，不仅如此，这个系统架构还让微服务与微服务之间在结构上“松耦合”，而在功能上则表现为一个统一的整体。这种所谓的“统一的整体”表现出来的是统一风格的界面，统一的权限管理，统一的安全策略，统一的上线过程，统一的日志和审计方法，统一的调度方式，统一的访问入口等等。</p>
+</li>
+<li><p>微服务的目的是有效的拆分应用，实现敏捷开发和部署 。</p>
+</li>
+<li><p>微服务提倡的理念团队间应该是 inter-operate, not integrate 。inter-operate是定义好系统的边界和接口，在一个团队内全栈，让团队自治，原因就是因为如果团队按照这样的方式组建，将沟通的成本维持在系统内部，每个子系统就会更加内聚，彼此的依赖耦合能变弱，跨系统的沟通成本也就能降低。</p>
+</li>
+</ul>
+<p>微服务的优点很多</p>
+<ul>
+<li><p>易于开发和维护</p>
+<ul>
+<li>由于微服务单个模块就相当于一个项目，开发这个模块我们就只需关心这个模块的逻辑即可，代码量和逻辑复杂度都会降低，从而易于开发和维护。</li>
+</ul>
+</li>
+<li><p>启动较快</p>
+<ul>
+<li>这是相对单个微服务来讲的，相比于启动单体架构的整个项目，启动某个模块的服务速度明显是要快很多的。</li>
+</ul>
+</li>
+<li><p>局部修改容易部署</p>
+<ul>
+<li>在开发中发现了一个问题，如果是单体架构的话，我们就需要重新发布并启动整个项目，非常耗时间，但是微服务则不同，哪个模块出现了bug我们只需要解决那个模块的bug就可以了，解决完bug之后，我们只需要重启这个模块的服务即可，部署相对简单，不必重启整个项目从而大大节约时间。</li>
+</ul>
+</li>
+<li><p>技术栈不受限</p>
+<ul>
+<li>比如订单微服务和电影微服务原来都是用java写的，现在我们想把电影微服务改成nodeJs技术，这是完全可以的，而且由于所关注的只是电影的逻辑而已，因此技术更换的成本也就会少很多。</li>
+</ul>
+</li>
+<li><p>按需伸缩</p>
+<ul>
+<li>我们上面说了单体架构在想扩展某个模块的性能时不得不考虑到其它模块的性能会不会受影响，对于我们微服务来讲，完全不是问题，电影模块通过什么方式来提升性能不必考虑其它模块的情况。</li>
+</ul>
+</li>
+</ul>
+<p>但是缺点也很明显</p>
+<ul>
+<li><p>运维要求较高</p>
+<p>  -对于单体架构来讲，我们只需要维护好这一个项目就可以了，但是对于微服务架构来讲，由于项目是由多个微服务构成的，每个模块出现问题都会造成整个项目运行出现异常，想要知道是哪个模块造成的问题往往是不容易的，因为我们无法一步一步通过debug的方式来跟踪，这就对运维人员提出了很高的要求。</p>
+</li>
+<li><p>分布式的复杂性</p>
+<ul>
+<li>对于单体架构来讲，我们可以不使用分布式，但是对于微服务架构来说，分布式几乎是必会用的技术，由于分布式本身的复杂性，导致微服务架构也变得复杂起来。</li>
+</ul>
+</li>
+<li><p>接口调整成本高</p>
+<ul>
+<li>比如，用户微服务是要被订单微服务和电影微服务所调用的，一旦用户微服务的接口发生大的变动，那么所有依赖它的微服务都要做相应的调整，由于微服务可能非常多，那么调整接口所造成的成本将会明显提高。</li>
+</ul>
+</li>
+<li><p>重复劳动</p>
+<ul>
+<li>对于单体架构来讲，如果某段业务被多个模块所共同使用，我们便可以抽象成一个工具类，被所有模块直接调用，但是微服务却无法这样做，因为这个微服务的工具类是不能被其它微服务所直接调用的，从而我们便不得不在每个微服务上都建这么一个工具类，从而导致代码的重复。</li>
+</ul>
+</li>
+</ul>
+<br/>
+
+<h1 id="什么样的项目适合微服务"><a href="#什么样的项目适合微服务" class="headerlink" title="什么样的项目适合微服务"></a>什么样的项目适合微服务</h1><br/>
+
+<p>微服务可以按照业务功能本身的独立性来划分，如果系统提供的业务是非常底层的，如：操作系统内核、存储系统、网络系统、数据库系统等等，这类系统都偏底层，功能和功能之间有着紧密的配合关系，如果强制拆分为较小的服务单元，会让集成工作量急剧上升，并且这种人为的切割无法带来业务上的真正的隔离，所以无法做到独立部署和运行，也就不适合做成微服务了。</p>
+<p>能不能做成微服务，取决于四个要素：</p>
+<ul>
+<li>小：微服务体积小，2 pizza 团队。</li>
+<li>独：能够独立的部署和运行，避免共享数据库（避免因为数据库而影响整个分布式系统）</li>
+<li>轻：使用轻量级的通信机制和架构，标准的 REST 风格接口（基于 HTTP 和 JSON 格式）</li>
+<li>松：为服务之间是松耦合的，业务上的高内聚，减少依赖（从设计上要避免服务过大或者太小）</li>
+</ul>
+<h2 id="微服务折分与设计"><a href="#微服务折分与设计" class="headerlink" title="微服务折分与设计"></a>微服务折分与设计</h2><p>单体式结构转向微服务架构中会持续碰到服务边界划分的问题：比如，我们有user 服务来提供用户的基础信息，那么用户的头像和图片等是应该单独划分为一个新的service更好还是应该合并到user服务里呢？如果服务的粒度划分的过粗，那就回到了单体式的老路；如果过细，那服务间调用的开销就变得不可忽视了，管理难度也会指数级增加。目前为止还没有一个可以称之为服务边界划分的标准，只能根据不同的业务系统加以调节</p>
+<p>拆分的大原则是当一块业务不依赖或极少依赖其它服务，有独立的业务语义，为超过2个的其他服务或客户端提供数据，那么它就应该被拆分成一个独立的服务模块。</p>
+<h2 id="微服务设计原则"><a href="#微服务设计原则" class="headerlink" title="微服务设计原则"></a>微服务设计原则</h2><ul>
+<li><p>单一职责原则</p>
+<ul>
+<li>意思是每个微服务只需要实现自己的业务逻辑就可以了，比如订单管理模块，它只需要处理订单的业务逻辑就可以了，其它的不必考虑。</li>
+</ul>
+</li>
+<li><p>服务自治原则</p>
+<ul>
+<li>意思是每个微服务从开发、测试、运维等都是独立的，包括存储的数据库也都是独立的，自己就有一套完整的流程，我们完全可以把它当成一个项目来对待。不必依赖于其它模块。</li>
+</ul>
+</li>
+<li><p>轻量级通信原则</p>
+<ul>
+<li>首先是通信的语言非常的轻量，第二，该通信方式需要是跨语言、跨平台的，之所以要跨平台、跨语言就是为了让每个微服务都有足够的独立性，可以不受技术的钳制。</li>
+</ul>
+</li>
+<li><p>接口明确原则</p>
+<ul>
+<li>由于微服务之间可能存在着调用关系，为了尽量避免以后由于某个微服务的接口变化而导致其它微服务都做调整，在设计之初就要考虑到所有情况，让接口尽量做的更通用，更灵活，从而尽量避免其它模块也做调整。</li>
+</ul>
+</li>
+</ul>
+<br/>
+
+<h1 id="微服务应该注意哪些问题"><a href="#微服务应该注意哪些问题" class="headerlink" title="微服务应该注意哪些问题"></a>微服务应该注意哪些问题</h1><br/>
+
+<h2 id="基础设施"><a href="#基础设施" class="headerlink" title="基础设施"></a>基础设施</h2><p>需要强大基础设施来支撑</p>
+<ul>
+<li>CI/CD和自动化（分布式系统几乎不可能通过人工手动发布）</li>
+<li>虚拟化技术（要保证微服务运行环境隔离，目前行业主流的是使用 Docker 容器）</li>
+<li>日志聚合，全链路监控（高度可观察和分析诊断问题）</li>
+</ul>
+<h2 id="微服务基本能力"><a href="#微服务基本能力" class="headerlink" title="微服务基本能力"></a>微服务基本能力</h2><p><img src="/images/architecture/1_20.png" alt=""></p>
+<h2 id="服务注册中心"><a href="#服务注册中心" class="headerlink" title="服务注册中心"></a>服务注册中心</h2><p>服务之间需要创建一种服务发现机制，用于帮助服务之间互相感知彼此的存在。服务启动时会将自身的服务信息注册到注册中心，并订阅自己需要消费的服务。</p>
+<p>能够作为服务注册中心的有：</p>
+<ul>
+<li>Netflix Eureka 就是一个服务注册中心。它提供了服务注册和查询服务信息的REST API</li>
+<li>etcd —– 高可用，分布式，强一致性的，key-value，Kubernetes和Cloud Foundry都是使用了etcd。</li>
+<li>consul —–一个用于discovering和configuring的工具。它提供了允许客户端注册和发现服务的API。Consul可以进行服务健康检查，以确定服务的可用性。</li>
+<li>zookeeper —— 在分布式应用中被广泛使用，高性能的协调服务。 Apache Zookeeper 最初为Hadoop的一个子项目，但现在是一个顶级项目。</li>
+</ul>
+<h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><p>服务高可用的保证手段，为了保证高可用，每一个微服务都需要部署多个服务实例来提供服务。此时客户端进行服务的负载均衡。</p>
+<h2 id="容错"><a href="#容错" class="headerlink" title="容错"></a>容错</h2><p>容错，这个词的理解，直面意思就是可以容下错误，不让错误再次扩张，让这个错误产生的影响在一个固定的边界之内，“千里之堤毁于蚁穴”我们用容错的方式就是让这种蚁穴不要变大。那么我们常见的降级，限流，熔断器，超时重试等等都是容错的方法。</p>
+<p>在调用服务集群时，如果一个微服务调用异常，如超时，连接异常，网络异常等，则根据容错策略进行服务容错。目前支持的服务容错策略有快速失败，失效切换。如果连续失败多次则直接熔断，不再发起调用。这样可以避免一个服务异常拖垮所有依赖于他的服务。</p>
+<h2 id="熔断"><a href="#熔断" class="headerlink" title="熔断"></a>熔断</h2><p>熔断技术可以说是一种“智能化的容错”，当调用满足失败次数，失败比例就会触发熔断器打开，有程序自动切断当前的RPC调用,来防止错误进一步扩大。实现一个熔断器主要是考虑三种模式，关闭，打开，半开。</p>
+<h2 id="限流和降级"><a href="#限流和降级" class="headerlink" title="限流和降级"></a>限流和降级</h2><p>保证核心服务的稳定性。为了保证核心服务的稳定性，随着访问量的不断增加，需要为系统能够处理的服务数量设置一个极限阀值，超过这个阀值的请求则直接拒绝。同时，为了保证核心服务的可用，可以对否些非核心服务进行降级，通过限制服务的最大访问量进行限流，通过管理控制台对单个微服务进行人工降级。</p>
+<h2 id="API网关"><a href="#API网关" class="headerlink" title="API网关"></a>API网关</h2><p>这里说的网关是指API网关，直面意思是将所有API调用统一接入到API网关层，有网关层统一接入和输出。一个网关的基本功能有：统一接入、安全防护、协议适配、流量管控、长短链接支持、容错能力。有了网关之后，各个API服务提供团队可以专注于自己的的业务逻辑处理，而API网关更专注于安全、流量、路由等问题。</p>
+<h2 id="多级缓存"><a href="#多级缓存" class="headerlink" title="多级缓存"></a>多级缓存</h2><p>最简单的缓存就是查一次数据库然后将数据写入缓存比如redis中并设置过期时间。</p>
+<h2 id="超时和重试"><a href="#超时和重试" class="headerlink" title="超时和重试"></a>超时和重试</h2><p>超时与重试机制也是容错的一种方法，凡是发生RPC调用的地方，比如读取redis，db，mq等，因为网络故障或者是所依赖的服务故障，长时间不能返回结果，就会导致线程增加，加大cpu负载，甚至导致雪崩。所以对每一个RPC调用都要设置超时时间。</p>
+<h2 id="线程池隔离"><a href="#线程池隔离" class="headerlink" title="线程池隔离"></a>线程池隔离</h2><p>在抗量这个环节，Servlet3异步的时候，有提到过线程隔离。线程隔离的之间优势就是防止级联故障，甚至是雪崩。当网关调用N多个接口服务的时候，我们要对每个接口进行线程隔离。比如，我们有调用订单、商品、用户。那么订单的业务不能够影响到商品和用户的请求处理。如果不做线程隔离，当访问订单服务出现网络故障导致延时，线程积压最终导致整个服务CPU负载满。就是我们说的服务全部不可用了，有多少机器都会被此刻的请求塞满。那么有了线程隔离就会使得我们的网关能保证局部问题不会影响全局。</p>
+<h2 id="降级和限流"><a href="#降级和限流" class="headerlink" title="降级和限流"></a>降级和限流</h2><p>关于降级限流的方法业界都已经有很成熟的方法了，比如FAILBACK机制，限流的方法令牌桶，漏桶，信号量等。这里谈一下我们的一些经验，降级一般都是由统一配置中心的降级开关来实现的，那么当有很多个接口来自同一个提供方，这个提供方的系统或这机器所在机房网络出现了问题，我们就要有一个统一的降级开关，不然就要一个接口一个接口的来降级。也就是要对业务类型有一个大闸刀。还有就是 降级切记暴力降级，什么是暴力降级的，比如把论坛功能降调，结果用户显示一个大白板，我们要实现缓存住一些数据，也就是有托底数据。限流一般分为分布式限流和单机限流，如果实现分布式限流的话就要一个公共的后端存储服务比如redis，在大nginx节点上利用lua读取redis配置信息。</p>
+<h2 id="网关监控和统计"><a href="#网关监控和统计" class="headerlink" title="网关监控和统计"></a>网关监控和统计</h2><p>API网关是一个串行的调用，那么每一步发生的异常要记录下来，统一存储到一个地方比如elasticserach中，便于后续对调用异常的分析。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag"># 微服务</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/29/architecture0/" rel="prev" title="编程之道 | 支付宝的架构到底有多牛逼！还没看完我就跪了！「转载」">
+      <i class="fa fa-chevron-left"></i> 编程之道 | 支付宝的架构到底有多牛逼！还没看完我就跪了！「转载」
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/29/architecture2/" rel="next" title="架构 | 一文详解微服务架构「转载」">
+      架构 | 一文详解微服务架构「转载」 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是微服务"><span class="nav-number">2.</span> <span class="nav-text">什么是微服务?</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单体架构"><span class="nav-number">2.1.</span> <span class="nav-text">单体架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微服务架构"><span class="nav-number">2.2.</span> <span class="nav-text">微服务架构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#什么样的项目适合微服务"><span class="nav-number">3.</span> <span class="nav-text">什么样的项目适合微服务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#微服务折分与设计"><span class="nav-number">3.1.</span> <span class="nav-text">微服务折分与设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微服务设计原则"><span class="nav-number">3.2.</span> <span class="nav-text">微服务设计原则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#微服务应该注意哪些问题"><span class="nav-number">4.</span> <span class="nav-text">微服务应该注意哪些问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础设施"><span class="nav-number">4.1.</span> <span class="nav-text">基础设施</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微服务基本能力"><span class="nav-number">4.2.</span> <span class="nav-text">微服务基本能力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务注册中心"><span class="nav-number">4.3.</span> <span class="nav-text">服务注册中心</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#负载均衡"><span class="nav-number">4.4.</span> <span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容错"><span class="nav-number">4.5.</span> <span class="nav-text">容错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#熔断"><span class="nav-number">4.6.</span> <span class="nav-text">熔断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限流和降级"><span class="nav-number">4.7.</span> <span class="nav-text">限流和降级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API网关"><span class="nav-number">4.8.</span> <span class="nav-text">API网关</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多级缓存"><span class="nav-number">4.9.</span> <span class="nav-text">多级缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超时和重试"><span class="nav-number">4.10.</span> <span class="nav-text">超时和重试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程池隔离"><span class="nav-number">4.11.</span> <span class="nav-text">线程池隔离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#降级和限流"><span class="nav-number">4.12.</span> <span class="nav-text">降级和限流</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网关监控和统计"><span class="nav-number">4.13.</span> <span class="nav-text">网关监控和统计</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这一章主要讲解神经网络的优化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorflow 神经网络的损失函数">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/09/13/tensorflow5/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这一章主要讲解神经网络的优化。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/3_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/3_1.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/3_2.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/3_3.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/3_4.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/3_5.JPG">
+<meta property="article:published_time" content="2018-09-13T08:16:13.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:14:22.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="tensorflow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/tensorflow/3_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/09/13/tensorflow5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>tensorflow 神经网络的损失函数 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/09/13/tensorflow5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tensorflow 神经网络的损失函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-09-13 16:16:13" itemprop="dateCreated datePublished" datetime="2018-09-13T16:16:13+08:00">2018-09-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-22 14:14:22" itemprop="dateModified" datetime="2021-01-22T14:14:22+08:00">2021-01-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/tensorflow/" itemprop="url" rel="index"><span itemprop="name">tensorflow</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/09/13/tensorflow5/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/09/13/tensorflow5/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这一章主要讲解神经网络的优化。</p>
+<a id="more"></a>
+
+<p><img src="/images/tensorflow/3_0.jpg" alt=""></p>
+<h2 id="激活函数"><a href="#激活函数" class="headerlink" title="激活函数"></a>激活函数</h2><p><img src="/images/tensorflow/3_1.jpg" alt=""></p>
+<h2 id="神经网络的复杂度"><a href="#神经网络的复杂度" class="headerlink" title="神经网络的复杂度"></a>神经网络的复杂度</h2><p>层数 = 隐藏层数 + 1 个输出层，特别注意的是，是不包含输入层的</p>
+<p>总参数 = 总 W + 总 b</p>
+<p>比如输入层有 3 个节点，隐藏层有一层为 4 个节点，输出层有两个节点。</p>
+<p>总参数为 3 * 4 + 4 + 4 * 2 + 2 = 26</p>
+<h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>部分细节可以参考下面的文章。</p>
+<p><a href="/2018/09/08/tensorflow2/">tensorflow 反向传播</a></p>
+<h3 id="主流的损失函数"><a href="#主流的损失函数" class="headerlink" title="主流的损失函数"></a>主流的损失函数</h3><p>一共可以分为三类</p>
+<pre><code>1. 均方误差
+    loss_mse = tf.reduce_mean(tf.square(y_ - y))
+2. 自定义
+3. 交叉熵</code></pre><h2 id="场景模拟"><a href="#场景模拟" class="headerlink" title="场景模拟"></a>场景模拟</h2><h3 id="场景-1-均方误差损失函数"><a href="#场景-1-均方误差损失函数" class="headerlink" title="场景 1 均方误差损失函数"></a>场景 1 均方误差损失函数</h3><p>描述</p>
+<p>一个酸奶生产厂，想要预测最佳的生产量。其中 x1 , x2 是影响酸奶的两个因素。</p>
+<p>日销量为 y_ 。</p>
+<p>为了更加贴近现实，我们队 x1 和 x2 添加正负 0.05 的噪声。</p>
+<p>拟合可以预测销量的函数。</p>
+<p>代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入模块，生成模拟数据集</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">BATCH_SIZE = <span class="number">8</span></span><br><span class="line">seed = <span class="number">23455</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 基于 seed 产生随机数</span></span><br><span class="line">rng = np.random.RandomState(seed)</span><br><span class="line"><span class="comment"># 随机数返回 32 行 2 列 的矩阵 表示 32 组 体积和重量 作为输入数据集</span></span><br><span class="line">X = rng.rand(<span class="number">32</span>,<span class="number">2</span>)</span><br><span class="line">Y_ = [[x1 + x2 + (rng.rand()/<span class="number">10.0</span> - <span class="number">0.05</span>)] <span class="keyword">for</span> (x1,x2) <span class="keyword">in</span> X ]</span><br><span class="line">	<span class="comment"># 拟合数据</span></span><br><span class="line">	<span class="comment"># rng.rand() 生成 [0,1) 随机数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1 定义神经网络的输入，参数和输入，定义前向传播过程</span></span><br><span class="line">x = tf.placeholder(tf.float32,shape=(<span class="literal">None</span>,<span class="number">2</span>))</span><br><span class="line">y_ = tf.placeholder(tf.float32,shape=(<span class="literal">None</span>,<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">w1 = tf.Variable(tf.random_normal([<span class="number">2</span>,<span class="number">1</span>],stddev=<span class="number">1</span>,seed=<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">y = tf.matmul(x,w1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#2 定义损失函数及反向传播方法</span></span><br><span class="line">loss = tf.reduce_mean(tf.square(y - y_))</span><br><span class="line">train_step = tf.train.GradientDescentOptimizer(<span class="number">0.001</span>).minimize(loss)</span><br><span class="line"></span><br><span class="line"><span class="comment">#3 生成会话，训练 steps 轮</span></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">	init_op = tf.global_variables_initializer()</span><br><span class="line">	sess.run(init_op)</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 训练模型</span></span><br><span class="line">	STEPS = <span class="number">20000</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(STEPS):</span><br><span class="line">		start = (i * BATCH_SIZE) % <span class="number">32</span></span><br><span class="line">		end = start + BATCH_SIZE</span><br><span class="line">		sess.run(train_step,feed_dict=&#123;x:X[start:end],y_:Y_[start:end]&#125;)</span><br><span class="line">		<span class="keyword">if</span> i % <span class="number">500</span> == <span class="number">0</span>:</span><br><span class="line">			total_loss = sess.run(loss,feed_dict=&#123;x:X,y_:Y_&#125;)</span><br><span class="line">			print(sess.run(w1))</span><br><span class="line">			print(<span class="string">"After %d training step(s),loss on all data is %g"</span> % (i,total_loss))</span><br><span class="line"></span><br><span class="line"><span class="comment"># [[-0.80974597]</span></span><br><span class="line"><span class="comment">#  [ 1.4852903 ]]</span></span><br><span class="line"><span class="comment"># After 0 training step(s),loss on all data is 0.655701</span></span><br><span class="line"><span class="comment"># [[-0.46074435]</span></span><br><span class="line"><span class="comment">#  [ 1.641878  ]]</span></span><br><span class="line"><span class="comment"># After 500 training step(s),loss on all data is 0.35731</span></span><br><span class="line"><span class="comment"># [[-0.21939856]</span></span><br><span class="line"><span class="comment">#  [ 1.6984766 ]]</span></span><br><span class="line"><span class="comment"># After 1000 training step(s),loss on all data is 0.232481</span></span><br><span class="line"><span class="comment"># [[-0.04415595]</span></span><br><span class="line"><span class="comment">#  [ 1.7003176 ]]</span></span><br><span class="line"><span class="comment"># After 1500 training step(s),loss on all data is 0.170404</span></span><br><span class="line"><span class="comment"># [[0.08942621]</span></span><br><span class="line"><span class="comment">#  [1.673328  ]]</span></span><br><span class="line"><span class="comment"># After 2000 training step(s),loss on all data is 0.133037</span></span><br><span class="line"><span class="comment"># [[0.19583555]</span></span><br><span class="line"><span class="comment">#  [1.6322677 ]]</span></span><br><span class="line"><span class="comment"># After 2500 training step(s),loss on all data is 0.106939</span></span><br><span class="line"><span class="comment"># [[0.28375748]</span></span><br><span class="line"><span class="comment">#  [1.5854434 ]]</span></span><br><span class="line"><span class="comment"># After 3000 training step(s),loss on all data is 0.0870619</span></span><br><span class="line"><span class="comment"># [[0.35848638]</span></span><br><span class="line"><span class="comment">#  [1.5374472 ]]</span></span><br><span class="line"><span class="comment"># After 3500 training step(s),loss on all data is 0.0712709</span></span><br><span class="line"><span class="comment"># [[0.42332518]</span></span><br><span class="line"><span class="comment">#  [1.4907393 ]]</span></span><br><span class="line"><span class="comment"># After 4000 training step(s),loss on all data is 0.0584907</span></span><br><span class="line"><span class="comment"># [[0.48040026]</span></span><br><span class="line"><span class="comment">#  [1.4465574 ]]</span></span><br><span class="line"><span class="comment"># After 4500 training step(s),loss on all data is 0.0480653</span></span><br><span class="line"><span class="comment"># [[0.53113604]</span></span><br><span class="line"><span class="comment">#  [1.4054536 ]]</span></span><br><span class="line"><span class="comment"># After 5000 training step(s),loss on all data is 0.0395331</span></span><br><span class="line"><span class="comment"># [[0.5765325]</span></span><br><span class="line"><span class="comment">#  [1.3675941]]</span></span><br><span class="line"><span class="comment"># After 5500 training step(s),loss on all data is 0.0325409</span></span><br><span class="line"><span class="comment"># [[0.61732584]</span></span><br><span class="line"><span class="comment">#  [1.3329403 ]]</span></span><br><span class="line"><span class="comment"># After 6000 training step(s),loss on all data is 0.0268078</span></span><br><span class="line"><span class="comment"># [[0.6540846]</span></span><br><span class="line"><span class="comment">#  [1.3013426]]</span></span><br><span class="line"><span class="comment"># After 6500 training step(s),loss on all data is 0.0221059</span></span><br><span class="line"><span class="comment"># [[0.6872685]</span></span><br><span class="line"><span class="comment">#  [1.272602 ]]</span></span><br><span class="line"><span class="comment"># After 7000 training step(s),loss on all data is 0.0182493</span></span><br><span class="line"><span class="comment"># [[0.71725976]</span></span><br><span class="line"><span class="comment">#  [1.2465005 ]]</span></span><br><span class="line"><span class="comment"># After 7500 training step(s),loss on all data is 0.015086</span></span><br><span class="line"><span class="comment"># [[0.7443861]</span></span><br><span class="line"><span class="comment">#  [1.2228197]]</span></span><br><span class="line"><span class="comment"># After 8000 training step(s),loss on all data is 0.0124914</span></span><br><span class="line"><span class="comment"># [[0.7689324]</span></span><br><span class="line"><span class="comment">#  [1.2013483]]</span></span><br><span class="line"><span class="comment"># After 8500 training step(s),loss on all data is 0.0103631</span></span><br><span class="line"><span class="comment"># [[0.79115134]</span></span><br><span class="line"><span class="comment">#  [1.1818889 ]]</span></span><br><span class="line"><span class="comment"># After 9000 training step(s),loss on all data is 0.00861742</span></span><br><span class="line"><span class="comment"># [[0.811267 ]</span></span><br><span class="line"><span class="comment">#  [1.1642567]]</span></span><br><span class="line"><span class="comment"># After 9500 training step(s),loss on all data is 0.00718553</span></span><br><span class="line"><span class="comment"># [[0.8294814]</span></span><br><span class="line"><span class="comment">#  [1.1482829]]</span></span><br><span class="line"><span class="comment"># After 10000 training step(s),loss on all data is 0.006011</span></span><br><span class="line"><span class="comment"># [[0.84597576]</span></span><br><span class="line"><span class="comment">#  [1.1338125 ]]</span></span><br><span class="line"><span class="comment"># After 10500 training step(s),loss on all data is 0.00504758</span></span><br><span class="line"><span class="comment"># [[0.8609128]</span></span><br><span class="line"><span class="comment">#  [1.1207061]]</span></span><br><span class="line"><span class="comment"># After 11000 training step(s),loss on all data is 0.00425734</span></span><br><span class="line"><span class="comment"># [[0.87444043]</span></span><br><span class="line"><span class="comment">#  [1.1088346 ]]</span></span><br><span class="line"><span class="comment"># After 11500 training step(s),loss on all data is 0.00360914</span></span><br><span class="line"><span class="comment"># [[0.88669145]</span></span><br><span class="line"><span class="comment">#  [1.0980824 ]]</span></span><br><span class="line"><span class="comment"># After 12000 training step(s),loss on all data is 0.00307745</span></span><br><span class="line"><span class="comment"># [[0.8977863]</span></span><br><span class="line"><span class="comment">#  [1.0883439]]</span></span><br><span class="line"><span class="comment"># After 12500 training step(s),loss on all data is 0.00264134</span></span><br><span class="line"><span class="comment"># [[0.9078348]</span></span><br><span class="line"><span class="comment">#  [1.0795243]]</span></span><br><span class="line"><span class="comment"># After 13000 training step(s),loss on all data is 0.00228362</span></span><br><span class="line"><span class="comment"># [[0.91693527]</span></span><br><span class="line"><span class="comment">#  [1.0715363 ]]</span></span><br><span class="line"><span class="comment"># After 13500 training step(s),loss on all data is 0.00199021</span></span><br><span class="line"><span class="comment"># [[0.92517716]</span></span><br><span class="line"><span class="comment">#  [1.0643018 ]]</span></span><br><span class="line"><span class="comment"># After 14000 training step(s),loss on all data is 0.00174954</span></span><br><span class="line"><span class="comment"># [[0.93264157]</span></span><br><span class="line"><span class="comment">#  [1.0577497 ]]</span></span><br><span class="line"><span class="comment"># After 14500 training step(s),loss on all data is 0.00155213</span></span><br><span class="line"><span class="comment"># [[0.9394023]</span></span><br><span class="line"><span class="comment">#  [1.0518153]]</span></span><br><span class="line"><span class="comment"># After 15000 training step(s),loss on all data is 0.00139019</span></span><br><span class="line"><span class="comment"># [[0.9455251]</span></span><br><span class="line"><span class="comment">#  [1.0464406]]</span></span><br><span class="line"><span class="comment"># After 15500 training step(s),loss on all data is 0.00125737</span></span><br><span class="line"><span class="comment"># [[0.95107025]</span></span><br><span class="line"><span class="comment">#  [1.0415728 ]]</span></span><br><span class="line"><span class="comment"># After 16000 training step(s),loss on all data is 0.00114842</span></span><br><span class="line"><span class="comment"># [[0.9560928]</span></span><br><span class="line"><span class="comment">#  [1.037164 ]]</span></span><br><span class="line"><span class="comment"># After 16500 training step(s),loss on all data is 0.00105905</span></span><br><span class="line"><span class="comment"># [[0.96064115]</span></span><br><span class="line"><span class="comment">#  [1.0331714 ]]</span></span><br><span class="line"><span class="comment"># After 17000 training step(s),loss on all data is 0.000985753</span></span><br><span class="line"><span class="comment"># [[0.96476096]</span></span><br><span class="line"><span class="comment">#  [1.0295546 ]]</span></span><br><span class="line"><span class="comment"># After 17500 training step(s),loss on all data is 0.000925622</span></span><br><span class="line"><span class="comment"># [[0.9684917]</span></span><br><span class="line"><span class="comment">#  [1.0262802]]</span></span><br><span class="line"><span class="comment"># After 18000 training step(s),loss on all data is 0.00087631</span></span><br><span class="line"><span class="comment"># [[0.9718707]</span></span><br><span class="line"><span class="comment">#  [1.0233142]]</span></span><br><span class="line"><span class="comment"># After 18500 training step(s),loss on all data is 0.000835858</span></span><br><span class="line"><span class="comment"># [[0.974931 ]</span></span><br><span class="line"><span class="comment">#  [1.0206276]]</span></span><br><span class="line"><span class="comment"># After 19000 training step(s),loss on all data is 0.000802676</span></span><br><span class="line"><span class="comment"># [[0.9777026]</span></span><br><span class="line"><span class="comment">#  [1.0181949]]</span></span><br><span class="line"><span class="comment"># After 19500 training step(s),loss on all data is 0.000775461</span></span><br></pre></td></tr></table></figure>
+
+<p>结论</p>
+<p>逻辑上我们可以得出，当销量和产量平齐的时候，企业能获得最大的利润，所以，我们可以看到参数慢慢趋近于 1，而 loss 也越来越小。</p>
+<h3 id="场景二-自定义损失函数"><a href="#场景二-自定义损失函数" class="headerlink" title="场景二 自定义损失函数"></a>场景二 自定义损失函数</h3><p>描述</p>
+<p>还是接上一个例子，虽然均方误差能够使得产量和销量相平齐，但是无法使得利益最大化。</p>
+<p>比如，预测多了，成本会增加，预测少了，利润会减少。</p>
+<p>所以我们要自定义损失函数，公式如下：</p>
+<p><img src="/images/tensorflow/3_2.JPG" alt=""></p>
+<p><img src="/images/tensorflow/3_3.JPG" alt=""></p>
+<p>在 tf 中，具体代码如下：</p>
+<pre><code>loss = tf.reduce_sum(tf.where(tf.greater(y,y_),(y - y_) * COST,(y_ - y) * PROFIT))
+tf.where(tf.greater(y,y_) 相当于一个三元选择器 即 y &gt; y_ ? ，如果式子条件成立则选择前面，如果不成立则选择后面</code></pre><p>代码1</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入模块，生成模拟数据集</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">BATCH_SIZE = <span class="number">8</span></span><br><span class="line">seed = <span class="number">23455</span></span><br><span class="line">COST = <span class="number">1</span>	<span class="comment"># 成本</span></span><br><span class="line">PROFIT = <span class="number">9</span> <span class="comment"># 利润</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 基于 seed 产生随机数</span></span><br><span class="line">rng = np.random.RandomState(seed)</span><br><span class="line"><span class="comment"># 随机数返回 32 行 2 列 的矩阵 表示 32 组 体积和重量 作为输入数据集</span></span><br><span class="line">X = rng.rand(<span class="number">32</span>,<span class="number">2</span>)</span><br><span class="line">Y_ = [[x1 + x2 + (rng.rand()/<span class="number">10.0</span> - <span class="number">0.05</span>)] <span class="keyword">for</span> (x1,x2) <span class="keyword">in</span> X ]</span><br><span class="line">	<span class="comment"># rng.rand() 生成 [0,1) 随机数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1 定义神经网络的输入，参数和输入，定义前向传播过程</span></span><br><span class="line">x = tf.placeholder(tf.float32,shape=(<span class="literal">None</span>,<span class="number">2</span>))</span><br><span class="line">y_ = tf.placeholder(tf.float32,shape=(<span class="literal">None</span>,<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">w1 = tf.Variable(tf.random_normal([<span class="number">2</span>,<span class="number">1</span>],stddev=<span class="number">1</span>,seed=<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">y = tf.matmul(x,w1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#2 定义损失函数及反向传播方法</span></span><br><span class="line">loss = tf.reduce_sum(tf.where(tf.greater(y,y_),(y - y_) * COST,(y_ - y) * PROFIT))</span><br><span class="line">train_step = tf.train.GradientDescentOptimizer(<span class="number">0.001</span>).minimize(loss)</span><br><span class="line"></span><br><span class="line"><span class="comment">#3 生成会话，训练 steps 轮</span></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">	init_op = tf.global_variables_initializer()</span><br><span class="line">	sess.run(init_op)</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 训练模型</span></span><br><span class="line">	STEPS = <span class="number">20000</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(STEPS):</span><br><span class="line">		start = (i * BATCH_SIZE) % <span class="number">32</span></span><br><span class="line">		end = start + BATCH_SIZE</span><br><span class="line">		sess.run(train_step,feed_dict=&#123;x:X[start:end],y_:Y_[start:end]&#125;)</span><br><span class="line">		<span class="keyword">if</span> i % <span class="number">500</span> == <span class="number">0</span>:</span><br><span class="line">			total_loss = sess.run(loss,feed_dict=&#123;x:X,y_:Y_&#125;)</span><br><span class="line">			print(sess.run(w1))</span><br><span class="line">			print(<span class="string">"After %d training step(s),loss on all data is %g"</span> % (i,total_loss))</span><br><span class="line"></span><br><span class="line"><span class="comment"># [[-0.762993 ]</span></span><br><span class="line"><span class="comment">#  [ 1.5095658]]</span></span><br><span class="line"><span class="comment"># After 0 training step(s),loss on all data is 178.826</span></span><br><span class="line"><span class="comment"># [[1.0235443]</span></span><br><span class="line"><span class="comment">#  [1.0463386]]</span></span><br><span class="line"><span class="comment"># After 500 training step(s),loss on all data is 1.93054</span></span><br><span class="line"><span class="comment"># [[1.0174844]</span></span><br><span class="line"><span class="comment">#  [1.0406483]]</span></span><br><span class="line"><span class="comment"># After 1000 training step(s),loss on all data is 1.92153</span></span><br><span class="line"><span class="comment"># [[1.0211805]</span></span><br><span class="line"><span class="comment">#  [1.0472497]]</span></span><br><span class="line"><span class="comment"># After 1500 training step(s),loss on all data is 1.92689</span></span><br><span class="line"><span class="comment"># [[1.0179386]</span></span><br><span class="line"><span class="comment">#  [1.0412899]]</span></span><br><span class="line"><span class="comment"># After 2000 training step(s),loss on all data is 1.91444</span></span><br><span class="line"><span class="comment"># [[1.0205938]</span></span><br><span class="line"><span class="comment">#  [1.0390677]]</span></span><br><span class="line"><span class="comment"># After 2500 training step(s),loss on all data is 1.91977</span></span><br><span class="line"><span class="comment"># [[1.0242898]</span></span><br><span class="line"><span class="comment">#  [1.0456691]]</span></span><br><span class="line"><span class="comment"># After 3000 training step(s),loss on all data is 1.92866</span></span><br><span class="line"><span class="comment"># [[1.01823  ]</span></span><br><span class="line"><span class="comment">#  [1.0399789]]</span></span><br><span class="line"><span class="comment"># After 3500 training step(s),loss on all data is 1.91861</span></span><br><span class="line"><span class="comment"># [[1.021926 ]</span></span><br><span class="line"><span class="comment">#  [1.0465802]]</span></span><br><span class="line"><span class="comment"># After 4000 training step(s),loss on all data is 1.92529</span></span><br><span class="line"><span class="comment"># [[1.0245812]</span></span><br><span class="line"><span class="comment">#  [1.044358 ]]</span></span><br><span class="line"><span class="comment"># After 4500 training step(s),loss on all data is 1.92074</span></span><br><span class="line"><span class="comment"># [[1.0185213]</span></span><br><span class="line"><span class="comment">#  [1.0386678]]</span></span><br><span class="line"><span class="comment"># After 5000 training step(s),loss on all data is 1.92279</span></span><br><span class="line"><span class="comment"># [[1.0245652]</span></span><br><span class="line"><span class="comment">#  [1.0446368]]</span></span><br><span class="line"><span class="comment"># After 5500 training step(s),loss on all data is 1.92261</span></span><br><span class="line"><span class="comment"># [[1.0185053]</span></span><br><span class="line"><span class="comment">#  [1.0389466]]</span></span><br><span class="line"><span class="comment"># After 6000 training step(s),loss on all data is 1.92151</span></span><br><span class="line"><span class="comment"># [[1.0222014]</span></span><br><span class="line"><span class="comment">#  [1.045548 ]]</span></span><br><span class="line"><span class="comment"># After 6500 training step(s),loss on all data is 1.91924</span></span><br><span class="line"><span class="comment"># [[1.0161415]</span></span><br><span class="line"><span class="comment">#  [1.0398577]]</span></span><br><span class="line"><span class="comment"># After 7000 training step(s),loss on all data is 1.93691</span></span><br><span class="line"><span class="comment"># [[1.0198376]</span></span><br><span class="line"><span class="comment">#  [1.0464591]]</span></span><br><span class="line"><span class="comment"># After 7500 training step(s),loss on all data is 1.91587</span></span><br><span class="line"><span class="comment"># [[1.0224928]</span></span><br><span class="line"><span class="comment">#  [1.0442369]]</span></span><br><span class="line"><span class="comment"># After 8000 training step(s),loss on all data is 1.91131</span></span><br><span class="line"><span class="comment"># [[1.0174738]</span></span><br><span class="line"><span class="comment">#  [1.0473702]]</span></span><br><span class="line"><span class="comment"># After 8500 training step(s),loss on all data is 1.91249</span></span><br><span class="line"><span class="comment"># [[1.0222716]</span></span><br><span class="line"><span class="comment">#  [1.0383747]]</span></span><br><span class="line"><span class="comment"># After 9000 training step(s),loss on all data is 1.92229</span></span><br><span class="line"><span class="comment"># [[1.0172527]</span></span><br><span class="line"><span class="comment">#  [1.041508 ]]</span></span><br><span class="line"><span class="comment"># After 9500 training step(s),loss on all data is 1.91914</span></span><br><span class="line"><span class="comment"># [[1.0199078]</span></span><br><span class="line"><span class="comment">#  [1.0392858]]</span></span><br><span class="line"><span class="comment"># After 10000 training step(s),loss on all data is 1.919</span></span><br><span class="line"><span class="comment"># [[1.0236039]</span></span><br><span class="line"><span class="comment">#  [1.0458871]]</span></span><br><span class="line"><span class="comment"># After 10500 training step(s),loss on all data is 1.92736</span></span><br><span class="line"><span class="comment"># [[1.017544 ]</span></span><br><span class="line"><span class="comment">#  [1.0401969]]</span></span><br><span class="line"><span class="comment"># After 11000 training step(s),loss on all data is 1.92332</span></span><br><span class="line"><span class="comment"># [[1.0212401]</span></span><br><span class="line"><span class="comment">#  [1.0467982]]</span></span><br><span class="line"><span class="comment"># After 11500 training step(s),loss on all data is 1.92399</span></span><br><span class="line"><span class="comment"># [[1.0238953]</span></span><br><span class="line"><span class="comment">#  [1.044576 ]]</span></span><br><span class="line"><span class="comment"># After 12000 training step(s),loss on all data is 1.91943</span></span><br><span class="line"><span class="comment"># [[1.0178354]</span></span><br><span class="line"><span class="comment">#  [1.0388858]]</span></span><br><span class="line"><span class="comment"># After 12500 training step(s),loss on all data is 1.92749</span></span><br><span class="line"><span class="comment"># [[1.0215315]</span></span><br><span class="line"><span class="comment">#  [1.0454872]]</span></span><br><span class="line"><span class="comment"># After 13000 training step(s),loss on all data is 1.91606</span></span><br><span class="line"><span class="comment"># [[1.0154716]</span></span><br><span class="line"><span class="comment">#  [1.039797 ]]</span></span><br><span class="line"><span class="comment"># After 13500 training step(s),loss on all data is 1.94288</span></span><br><span class="line"><span class="comment"># [[1.0191677]</span></span><br><span class="line"><span class="comment">#  [1.0463983]]</span></span><br><span class="line"><span class="comment"># After 14000 training step(s),loss on all data is 1.91269</span></span><br><span class="line"><span class="comment"># [[1.0162914]</span></span><br><span class="line"><span class="comment">#  [1.0427582]]</span></span><br><span class="line"><span class="comment"># After 14500 training step(s),loss on all data is 1.92095</span></span><br><span class="line"><span class="comment"># [[1.0189465]</span></span><br><span class="line"><span class="comment">#  [1.040536 ]]</span></span><br><span class="line"><span class="comment"># After 15000 training step(s),loss on all data is 1.91422</span></span><br><span class="line"><span class="comment"># [[1.0216017]</span></span><br><span class="line"><span class="comment">#  [1.0383139]]</span></span><br><span class="line"><span class="comment"># After 15500 training step(s),loss on all data is 1.92261</span></span><br><span class="line"><span class="comment"># [[1.0252978]</span></span><br><span class="line"><span class="comment">#  [1.0449152]]</span></span><br><span class="line"><span class="comment"># After 16000 training step(s),loss on all data is 1.92756</span></span><br><span class="line"><span class="comment"># [[1.0192379]</span></span><br><span class="line"><span class="comment">#  [1.039225 ]]</span></span><br><span class="line"><span class="comment"># After 16500 training step(s),loss on all data is 1.91931</span></span><br><span class="line"><span class="comment"># [[1.022934 ]</span></span><br><span class="line"><span class="comment">#  [1.0458263]]</span></span><br><span class="line"><span class="comment"># After 17000 training step(s),loss on all data is 1.92419</span></span><br><span class="line"><span class="comment"># [[1.0168741]</span></span><br><span class="line"><span class="comment">#  [1.0401361]]</span></span><br><span class="line"><span class="comment"># After 17500 training step(s),loss on all data is 1.92929</span></span><br><span class="line"><span class="comment"># [[1.0205702]</span></span><br><span class="line"><span class="comment">#  [1.0467374]]</span></span><br><span class="line"><span class="comment"># After 18000 training step(s),loss on all data is 1.92081</span></span><br><span class="line"><span class="comment"># [[1.0232253]</span></span><br><span class="line"><span class="comment">#  [1.0445153]]</span></span><br><span class="line"><span class="comment"># After 18500 training step(s),loss on all data is 1.91626</span></span><br><span class="line"><span class="comment"># [[1.0171654]</span></span><br><span class="line"><span class="comment">#  [1.038825 ]]</span></span><br><span class="line"><span class="comment"># After 19000 training step(s),loss on all data is 1.93347</span></span><br><span class="line"><span class="comment"># [[1.0208615]</span></span><br><span class="line"><span class="comment">#  [1.0454264]]</span></span><br><span class="line"><span class="comment"># After 19500 training step(s),loss on all data is 1.91289</span></span><br></pre></td></tr></table></figure>
+
+<p>结论2</p>
+<p>系数都偏大</p>
+<p>代码2</p>
+<p>我们修改参数，让成本为 9，利润为 1</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入模块，生成模拟数据集</span></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">BATCH_SIZE = <span class="number">8</span></span><br><span class="line">seed = <span class="number">23455</span></span><br><span class="line">COST = <span class="number">9</span></span><br><span class="line">PROFIT = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 基于 seed 产生随机数</span></span><br><span class="line">rng = np.random.RandomState(seed)</span><br><span class="line"><span class="comment"># 随机数返回 32 行 2 列 的矩阵 表示 32 组 体积和重量 作为输入数据集</span></span><br><span class="line">X = rng.rand(<span class="number">32</span>,<span class="number">2</span>)</span><br><span class="line">Y_ = [[x1 + x2 + (rng.rand()/<span class="number">10.0</span> - <span class="number">0.05</span>)] <span class="keyword">for</span> (x1,x2) <span class="keyword">in</span> X ]</span><br><span class="line">	<span class="comment"># rng.rand() 生成 [0,1) 随机数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1 定义神经网络的输入，参数和输入，定义前向传播过程</span></span><br><span class="line">x = tf.placeholder(tf.float32,shape=(<span class="literal">None</span>,<span class="number">2</span>))</span><br><span class="line">y_ = tf.placeholder(tf.float32,shape=(<span class="literal">None</span>,<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">w1 = tf.Variable(tf.random_normal([<span class="number">2</span>,<span class="number">1</span>],stddev=<span class="number">1</span>,seed=<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">y = tf.matmul(x,w1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#2 定义损失函数及反向传播方法</span></span><br><span class="line">loss = tf.reduce_sum(tf.where(tf.greater(y,y_),(y - y_) * COST,(y_ - y) * PROFIT))</span><br><span class="line">train_step = tf.train.GradientDescentOptimizer(<span class="number">0.001</span>).minimize(loss)</span><br><span class="line"></span><br><span class="line"><span class="comment">#3 生成会话，训练 steps 轮</span></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">	init_op = tf.global_variables_initializer()</span><br><span class="line">	sess.run(init_op)</span><br><span class="line"></span><br><span class="line">	<span class="comment"># 训练模型</span></span><br><span class="line">	STEPS = <span class="number">20000</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(STEPS):</span><br><span class="line">		start = (i * BATCH_SIZE) % <span class="number">32</span></span><br><span class="line">		end = start + BATCH_SIZE</span><br><span class="line">		sess.run(train_step,feed_dict=&#123;x:X[start:end],y_:Y_[start:end]&#125;)</span><br><span class="line">		<span class="keyword">if</span> i % <span class="number">500</span> == <span class="number">0</span>:</span><br><span class="line">			total_loss = sess.run(loss,feed_dict=&#123;x:X,y_:Y_&#125;)</span><br><span class="line">			print(sess.run(w1))</span><br><span class="line">			print(<span class="string">"After %d training step(s),loss on all data is %g"</span> % (i,total_loss))</span><br><span class="line"></span><br><span class="line"><span class="comment"># [[-0.80594873]</span></span><br><span class="line"><span class="comment">#  [ 1.4873729 ]]</span></span><br><span class="line"><span class="comment"># After 0 training step(s),loss on all data is 29.8745</span></span><br><span class="line"><span class="comment"># [[0.8732146]</span></span><br><span class="line"><span class="comment">#  [1.006204 ]]</span></span><br><span class="line"><span class="comment"># After 500 training step(s),loss on all data is 2.38814</span></span><br><span class="line"><span class="comment"># [[0.9658064]</span></span><br><span class="line"><span class="comment">#  [0.9698208]]</span></span><br><span class="line"><span class="comment"># After 1000 training step(s),loss on all data is 1.46394</span></span><br><span class="line"><span class="comment"># [[0.9645447]</span></span><br><span class="line"><span class="comment">#  [0.9682946]]</span></span><br><span class="line"><span class="comment"># After 1500 training step(s),loss on all data is 1.46911</span></span><br><span class="line"><span class="comment"># [[0.9602475]</span></span><br><span class="line"><span class="comment">#  [0.9742084]]</span></span><br><span class="line"><span class="comment"># After 2000 training step(s),loss on all data is 1.43915</span></span><br><span class="line"><span class="comment"># [[0.96100295]</span></span><br><span class="line"><span class="comment">#  [0.96993417]]</span></span><br><span class="line"><span class="comment"># After 2500 training step(s),loss on all data is 1.45907</span></span><br><span class="line"><span class="comment"># [[0.9654102]</span></span><br><span class="line"><span class="comment">#  [0.9761159]]</span></span><br><span class="line"><span class="comment"># After 3000 training step(s),loss on all data is 1.43333</span></span><br><span class="line"><span class="comment"># [[0.96414846]</span></span><br><span class="line"><span class="comment">#  [0.9745897 ]]</span></span><br><span class="line"><span class="comment"># After 3500 training step(s),loss on all data is 1.43359</span></span><br><span class="line"><span class="comment"># [[0.95985126]</span></span><br><span class="line"><span class="comment">#  [0.9805035 ]]</span></span><br><span class="line"><span class="comment"># After 4000 training step(s),loss on all data is 1.44526</span></span><br><span class="line"><span class="comment"># [[0.9636422]</span></span><br><span class="line"><span class="comment">#  [0.9687893]]</span></span><br><span class="line"><span class="comment"># After 4500 training step(s),loss on all data is 1.46411</span></span><br><span class="line"><span class="comment"># [[0.959345 ]</span></span><br><span class="line"><span class="comment">#  [0.9747031]]</span></span><br><span class="line"><span class="comment"># After 5000 training step(s),loss on all data is 1.44187</span></span><br><span class="line"><span class="comment"># [[0.9667877]</span></span><br><span class="line"><span class="comment">#  [0.9734448]]</span></span><br><span class="line"><span class="comment"># After 5500 training step(s),loss on all data is 1.44656</span></span><br><span class="line"><span class="comment"># [[0.9641995]</span></span><br><span class="line"><span class="comment">#  [0.9676626]]</span></span><br><span class="line"><span class="comment"># After 6000 training step(s),loss on all data is 1.4717</span></span><br><span class="line"><span class="comment"># [[0.9655712 ]</span></span><br><span class="line"><span class="comment">#  [0.98128426]]</span></span><br><span class="line"><span class="comment"># After 6500 training step(s),loss on all data is 1.48756</span></span><br><span class="line"><span class="comment"># [[0.9653083]</span></span><br><span class="line"><span class="comment">#  [0.9817019]]</span></span><br><span class="line"><span class="comment"># After 7000 training step(s),loss on all data is 1.48998</span></span><br><span class="line"><span class="comment"># [[0.9670821 ]</span></span><br><span class="line"><span class="comment">#  [0.97273576]]</span></span><br><span class="line"><span class="comment"># After 7500 training step(s),loss on all data is 1.4512</span></span><br><span class="line"><span class="comment"># [[0.964802 ]</span></span><br><span class="line"><span class="comment">#  [0.9759015]]</span></span><br><span class="line"><span class="comment"># After 8000 training step(s),loss on all data is 1.42806</span></span><br><span class="line"><span class="comment"># [[0.9658656]</span></span><br><span class="line"><span class="comment">#  [0.9805752]]</span></span><br><span class="line"><span class="comment"># After 8500 training step(s),loss on all data is 1.48214</span></span><br><span class="line"><span class="comment"># [[0.9646039]</span></span><br><span class="line"><span class="comment">#  [0.979049 ]]</span></span><br><span class="line"><span class="comment"># After 9000 training step(s),loss on all data is 1.45434</span></span><br><span class="line"><span class="comment"># [[0.96303403]</span></span><br><span class="line"><span class="comment">#  [0.9685749 ]]</span></span><br><span class="line"><span class="comment"># After 9500 training step(s),loss on all data is 1.46374</span></span><br><span class="line"><span class="comment"># [[0.95873684]</span></span><br><span class="line"><span class="comment">#  [0.9744887 ]]</span></span><br><span class="line"><span class="comment"># After 10000 training step(s),loss on all data is 1.44686</span></span><br><span class="line"><span class="comment"># [[0.9598004]</span></span><br><span class="line"><span class="comment">#  [0.9791624]]</span></span><br><span class="line"><span class="comment"># After 10500 training step(s),loss on all data is 1.43406</span></span><br><span class="line"><span class="comment"># [[0.966935 ]</span></span><br><span class="line"><span class="comment">#  [0.9689562]]</span></span><br><span class="line"><span class="comment"># After 11000 training step(s),loss on all data is 1.47155</span></span><br><span class="line"><span class="comment"># [[0.95929414]</span></span><br><span class="line"><span class="comment">#  [0.97336197]]</span></span><br><span class="line"><span class="comment"># After 11500 training step(s),loss on all data is 1.4499</span></span><br><span class="line"><span class="comment"># [[0.96004957]</span></span><br><span class="line"><span class="comment">#  [0.9690877 ]]</span></span><br><span class="line"><span class="comment"># After 12000 training step(s),loss on all data is 1.46982</span></span><br><span class="line"><span class="comment"># [[0.9600948 ]</span></span><br><span class="line"><span class="comment">#  [0.97845334]]</span></span><br><span class="line"><span class="comment"># After 12500 training step(s),loss on all data is 1.43006</span></span><br><span class="line"><span class="comment"># [[0.96085024]</span></span><br><span class="line"><span class="comment">#  [0.9741791 ]]</span></span><br><span class="line"><span class="comment"># After 13000 training step(s),loss on all data is 1.4356</span></span><br><span class="line"><span class="comment"># [[0.9649493 ]</span></span><br><span class="line"><span class="comment">#  [0.97141284]]</span></span><br><span class="line"><span class="comment"># After 13500 training step(s),loss on all data is 1.45304</span></span><br><span class="line"><span class="comment"># [[0.96499455]</span></span><br><span class="line"><span class="comment">#  [0.98077846]]</span></span><br><span class="line"><span class="comment"># After 14000 training step(s),loss on all data is 1.47699</span></span><br><span class="line"><span class="comment"># [[0.96373284]</span></span><br><span class="line"><span class="comment">#  [0.9792523 ]]</span></span><br><span class="line"><span class="comment"># After 14500 training step(s),loss on all data is 1.4492</span></span><br><span class="line"><span class="comment"># [[0.962163  ]</span></span><br><span class="line"><span class="comment">#  [0.96877813]]</span></span><br><span class="line"><span class="comment"># After 15000 training step(s),loss on all data is 1.46042</span></span><br><span class="line"><span class="comment"># [[0.9601911]</span></span><br><span class="line"><span class="comment">#  [0.9808918]]</span></span><br><span class="line"><span class="comment"># After 15500 training step(s),loss on all data is 1.44943</span></span><br><span class="line"><span class="comment"># [[0.95892936]</span></span><br><span class="line"><span class="comment">#  [0.97936565]]</span></span><br><span class="line"><span class="comment"># After 16000 training step(s),loss on all data is 1.43981</span></span><br><span class="line"><span class="comment"># [[0.9660639]</span></span><br><span class="line"><span class="comment">#  [0.9691594]]</span></span><br><span class="line"><span class="comment"># After 16500 training step(s),loss on all data is 1.46822</span></span><br><span class="line"><span class="comment"># [[0.9604402 ]</span></span><br><span class="line"><span class="comment">#  [0.97081715]]</span></span><br><span class="line"><span class="comment"># After 17000 training step(s),loss on all data is 1.45746</span></span><br><span class="line"><span class="comment"># [[0.96484745]</span></span><br><span class="line"><span class="comment">#  [0.97699887]]</span></span><br><span class="line"><span class="comment"># After 17500 training step(s),loss on all data is 1.43351</span></span><br><span class="line"><span class="comment"># [[0.9642764 ]</span></span><br><span class="line"><span class="comment">#  [0.96846855]]</span></span><br><span class="line"><span class="comment"># After 18000 training step(s),loss on all data is 1.46748</span></span><br><span class="line"><span class="comment"># [[0.9599792 ]</span></span><br><span class="line"><span class="comment">#  [0.97438234]]</span></span><br><span class="line"><span class="comment"># After 18500 training step(s),loss on all data is 1.4398</span></span><br><span class="line"><span class="comment"># [[0.9630599]</span></span><br><span class="line"><span class="comment">#  [0.976308 ]]</span></span><br><span class="line"><span class="comment"># After 19000 training step(s),loss on all data is 1.42141</span></span><br><span class="line"><span class="comment"># [[0.967159  ]</span></span><br><span class="line"><span class="comment">#  [0.97354174]]</span></span><br><span class="line"><span class="comment"># After 19500 training step(s),loss on all data is 1.44697</span></span><br></pre></td></tr></table></figure>
+
+<p>结论2</p>
+<p>系数都小于 1</p>
+<h3 id="场景模拟-3-交叉熵"><a href="#场景模拟-3-交叉熵" class="headerlink" title="场景模拟 3 交叉熵"></a>场景模拟 3 交叉熵</h3><p>交叉熵表征两个概率分布之间的距离，公式如下：</p>
+<p><img src="/images/tensorflow/3_4.JPG" alt=""></p>
+<p>交叉熵越小，两个概率分布越近，就越接近正确答案。</p>
+<p>例子：</p>
+<pre><code>已知答案，y_ = (1,0) 预测 Y1 = (0.6,0.4) Y2 = (0.8,0.2) 哪个更接近标准答案？
+H1((1,0),(0.6,0.4)) = -(1 * log0.6 + 0 * log0.4) = 0.222
+H2((1,0),(0.8,0.2)) = -(1 * log0.8 + 0 * log0.2) = 0.097
+所以 Y2 更加准一些</code></pre><p>在 tf 中的表现</p>
+<pre><code>ce = -tf.reduce_mean(y_ * tf.log(tf.clip_by_value(y,1e-12,1.0)))
+# 意思就是 y 小于 1e-12 为 1e-12 大于 1.0 为 1.0，这是为了防止数据出错，因为是 log 函数，所以不存在 log0 或者 log负数，另外，因为是概率问题，所以输入都是[0,1] 之间的数。</code></pre><p>数据的制作</p>
+<pre><code>我们知道，对一件事的发生，有很多种可能，即有很多种概率，但这些概率有一个前提，就是加起来等于 1。
+所以我们要使用 softmax() 函数来制造这类数据</code></pre><p>公式如下：</p>
+<p><img src="/images/tensorflow/3_5.JPG" alt=""></p>
+<p>在 tf 中的代码</p>
+<pre><code>ce = tf.nn.sparse_softmax_cross_entropy_with_logits(logits = y,labels = y,labels=tf.argmax(y_,1))
+cem = tf.reduce_mean(ce)</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/08/tensorflow4/" rel="prev" title="tensorflow 反向传播">
+      <i class="fa fa-chevron-left"></i> tensorflow 反向传播
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/23/math7/" rel="next" title="正态分布">
+      正态分布 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#激活函数"><span class="nav-number">1.</span> <span class="nav-text">激活函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#神经网络的复杂度"><span class="nav-number">2.</span> <span class="nav-text">神经网络的复杂度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#损失函数"><span class="nav-number">3.</span> <span class="nav-text">损失函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主流的损失函数"><span class="nav-number">3.1.</span> <span class="nav-text">主流的损失函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景模拟"><span class="nav-number">4.</span> <span class="nav-text">场景模拟</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#场景-1-均方误差损失函数"><span class="nav-number">4.1.</span> <span class="nav-text">场景 1 均方误差损失函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#场景二-自定义损失函数"><span class="nav-number">4.2.</span> <span class="nav-text">场景二 自定义损失函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#场景模拟-3-交叉熵"><span class="nav-number">4.3.</span> <span class="nav-text">场景模拟 3 交叉熵</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

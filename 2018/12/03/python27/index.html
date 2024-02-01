@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这里是介绍 pillow Image 模块的章节。 OK，enjoy it。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PIL Image 模块函数详解">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/12/03/python27/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里是介绍 pillow Image 模块的章节。 OK，enjoy it。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_1.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_2.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_3.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_5.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_6.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_7.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_8.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_9.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/27_0.png">
+<meta property="article:published_time" content="2018-12-03T08:58:39.000Z">
+<meta property="article:modified_time" content="2020-11-30T09:17:54.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="tutorial">
+<meta property="article:tag" content="PIL">
+<meta property="article:tag" content="pillow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/python/27_1.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/12/03/python27/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>PIL Image 模块函数详解 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/12/03/python27/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PIL Image 模块函数详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-03 16:58:39" itemprop="dateCreated datePublished" datetime="2018-12-03T16:58:39+08:00">2018-12-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-30 17:17:54" itemprop="dateModified" datetime="2020-11-30T17:17:54+08:00">2020-11-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/" itemprop="url" rel="index"><span itemprop="name">模块</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">高级</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E9%AB%98%E7%BA%A7/PIL/" itemprop="url" rel="index"><span itemprop="name">PIL</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/12/03/python27/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/12/03/python27/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里是介绍 pillow Image 模块的章节。</p>
+<p>OK，enjoy it。</p>
+<a id="more"></a>
+
+<h1 id="Image-模块"><a href="#Image-模块" class="headerlink" title="Image 模块"></a>Image 模块</h1><h2 id="C"><a href="#C" class="headerlink" title="C"></a>C</h2><h3 id="convert"><a href="#convert" class="headerlink" title="convert()"></a>convert()</h3><p><a href="https://blog.csdn.net/icamera0/article/details/50843172">Python图像处理库PIL中图像格式转换</a></p>
+<p>Convert()函数有三种形式的定义，它们定义形式如下：</p>
+<pre><code>im.convert(mode) ⇒ image
+im.convert(“P”, **options) ⇒ image
+im.convert(mode, matrix) ⇒ image</code></pre><p>使用不同的参数，将当前的图像转换为新的模式，并产生新的图像作为返回值。</p>
+<p>PIL中有九种不同模式。分别为1，L，P，RGB，RGBA，CMYK，YCbCr，I，F。</p>
+<p>本文我采用的示例图像是图像处理中经典的lena照片。分辨率为512x512的lena图片如下：</p>
+<p><img src="/images/python/27_1.jpg" alt=""></p>
+<h4 id="一、模式“RGB”转换为其他不同模式"><a href="#一、模式“RGB”转换为其他不同模式" class="headerlink" title="一、模式“RGB”转换为其他不同模式"></a>一、模式“RGB”转换为其他不同模式</h4><p>模式“1”</p>
+<p>模式“1”为二值图像，非黑即白。但是它每个像素用8个bit表示，0表示黑，255表示白。下面我们将lena图像转换为“1”图像。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;<span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena.mode</span><br><span class="line"><span class="string">'RGB'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_1 = lena.convert(<span class="string">"1"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_1.mode</span><br><span class="line"><span class="string">'1'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_1.size</span><br><span class="line">(<span class="number">512</span>, <span class="number">512</span>)</span><br><span class="line">&gt;&gt;&gt;lena_1.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">255</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_1.getpixel((<span class="number">10</span>,<span class="number">10</span>))</span><br><span class="line"><span class="number">255</span></span><br><span class="line">&gt;&gt;&gt;lena_1.getpixel((<span class="number">10</span>,<span class="number">120</span>))</span><br><span class="line"><span class="number">0</span> </span><br><span class="line">&gt;&gt;&gt;lena_1.getpixel((<span class="number">130</span>,<span class="number">120</span>))</span><br><span class="line"><span class="number">255</span></span><br></pre></td></tr></table></figure>
+
+<p>图像lena_1的模式为“1”，分辨率为512x512，如下：</p>
+<p><img src="/images/python/27_2.jpg" alt=""></p>
+<p>2、 模式“L”</p>
+<p>模式“L”为灰色图像，它的每个像素用8个bit表示，0表示黑，255表示白，其他数字表示不同的灰度。在PIL中，从模式“RGB”转换为“L”模式是按照下面的公式转换的：</p>
+<p>L = R * 299/1000 + G * 587/1000+ B * 114/1000</p>
+<p>下面我们将lena图像转换为“L”图像。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PIL importImage</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena = Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena.mode</span><br><span class="line"><span class="string">'RGB'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_L =lena.convert(<span class="string">"L"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_L.mode</span><br><span class="line"><span class="string">'L'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_L.size</span><br><span class="line">(<span class="number">512</span>, <span class="number">512</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena_L.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">132</span></span><br></pre></td></tr></table></figure>
+
+<p>对于第一个像素点，原始图像lena为(197, 111, 78)，其转换为灰色值为：</p>
+<p>197 *299/1000 + 111 * 587/1000 + 78 * 114/1000 = 132.952，PIL中只取了整数部分，即为132。</p>
+<p>转换后的图像lena_L如下：</p>
+<p><img src="/images/python/27_3.jpg" alt=""></p>
+<p>3、 模式“P”</p>
+<p>模式“P”为8位彩色图像，它的每个像素用8个bit表示，其对应的彩色值是按照调色板查询出来的。</p>
+<p>下面我们使用默认的调色板将lena图像转换为“P”图像。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PIL importImage</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena = Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena.mode</span><br><span class="line"><span class="string">'RGB'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_P =lena.convert(<span class="string">"P"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_P.mode</span><br><span class="line"><span class="string">'P'</span></span><br><span class="line">&gt;&gt;&gt;lena_P.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">62</span></span><br></pre></td></tr></table></figure>
+
+<p>转换后的图像lena_P如下：</p>
+<p><img src="/images/python/27_4.png" alt=""></p>
+<p>4、 模式“RGBA”</p>
+<p>模式“RGBA”为32位彩色图像，它的每个像素用32个bit表示，其中24bit表示红色、绿色和蓝色三个通道，另外8bit表示alpha通道，即透明通道。</p>
+<p>下面我们将模式为“RGB”的lena图像转换为“RGBA”图像。</p>
+<p>例子： </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line">&gt;&gt;&gt;lena = Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.mode</span><br><span class="line"><span class="string">'RGB'</span></span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>,<span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena_rgba = lena.convert(<span class="string">"RGBA"</span>)</span><br><span class="line">&gt;&gt;&gt;lena_rgba.mode</span><br><span class="line"><span class="string">'RGBA'</span></span><br><span class="line">&gt;&gt;&gt;lena_rgba.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>,<span class="number">111</span>, <span class="number">78</span>, <span class="number">255</span>)</span><br><span class="line">&gt;&gt;&gt;lena_rgba.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">(<span class="number">196</span>,<span class="number">110</span>, <span class="number">77</span>, <span class="number">255</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>,<span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">(<span class="number">196</span>,<span class="number">110</span>, <span class="number">77</span>)</span><br></pre></td></tr></table></figure>
+
+<p>从实例中可以看到，使用当前这个方式将“RGB”图像转为“RGBA”图像时，alpha通道全部设置为255，即完全不透明。</p>
+<p>转换后的图像lena_rgba如下：</p>
+<p><img src="/images/python/27_5.jpg" alt=""></p>
+<p>5、 模式“CMYK”</p>
+<p>模式“CMYK”为32位彩色图像，它的每个像素用32个bit表示。模式“CMYK”就是印刷四分色模式，它是彩色印刷时采用的一种套色模式，利用色料的三原色混色原理，加上黑色油墨，共计四种颜色混合叠加，形成所谓“全彩印刷”。</p>
+<p>四种标准颜色是：C：Cyan = 青色，又称为‘天蓝色’或是‘湛蓝’M：Magenta = 品红色，又称为‘洋红色’；Y：Yellow = 黄色；K：Key Plate(blacK) = 定位套版色（黑色）。</p>
+<p>下面我们将模式为“RGB”的lena图像转换为“CMYK”图像。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;<span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_cmyk =lena.convert(<span class="string">"CMYK"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_cmyk.mode</span><br><span class="line"><span class="string">'CMYK'</span></span><br><span class="line">&gt;&gt;&gt;lena_cmyk.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">58</span>, <span class="number">144</span>, <span class="number">177</span>, <span class="number">0</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_cmyk.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">(<span class="number">59</span>, <span class="number">145</span>, <span class="number">178</span>, <span class="number">0</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">(<span class="number">196</span>, <span class="number">110</span>, <span class="number">77</span>)</span><br></pre></td></tr></table></figure>
+
+<p>从实例中可以得知PIL中“RGB”转换为“CMYK”的公式如下：</p>
+<pre><code>C = 255 - R
+M = 255 - G
+Y = 255 - B
+K = 0</code></pre><p>由于该转换公式比较简单，转换后的图像颜色有些失真。</p>
+<p>转换后的图像lena_cmyk如下：</p>
+<p><img src="/images/python/27_6.jpg" alt=""></p>
+<p>6、 模式“YCbCr”</p>
+<p>模式“YCbCr”为24位彩色图像，它的每个像素用24个bit表示。YCbCr其中Y是指亮度分量，Cb指蓝色色度分量，而Cr指红色色度分量。人的肉眼对视频的Y分量更敏感，因此在通过对色度分量进行子采样来减少色度分量后，肉眼将察觉不到的图像质量的变化。</p>
+<p>模式“RGB”转换为“YCbCr”的公式如下：</p>
+<pre><code>Y= 0.257*R+0.504*G+0.098*B+16
+Cb = -0.148*R-0.291*G+0.439*B+128
+Cr = 0.439*R-0.368*G-0.071*B+128</code></pre><p>下面我们将模式为“RGB”的lena图像转换为“YCbCr”图像。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;<span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_ycbcr =lena.convert(<span class="string">"YCbCr"</span>)</span><br><span class="line">&gt;&gt;&gt;lena_ycbcr.mode</span><br><span class="line"><span class="string">'YCbCr'</span></span><br><span class="line">&gt;&gt;&gt;lena_ycbcr.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">132</span>, <span class="number">97</span>, <span class="number">173</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br></pre></td></tr></table></figure>
+
+<p>按照公式，Y = 0.257<em>197+0.564</em>111+0.098*78+16= 136.877</p>
+<pre><code>Cb= -0.148*197-0.291*111+0.439*78+128= 100.785
+Cr = 0.439*197-0.368*111-0.071*78+128 = 168.097</code></pre><p>由此可见，PIL中并非按照这个公式进行“RGB”到“YCbCr”的转换。</p>
+<p>转换后的图像lena_ycbcr如下：</p>
+<p><img src="/images/python/27_7.jpg" alt=""></p>
+<p>7、 模式“I”</p>
+<p>模式“I”为32位整型灰色图像，它的每个像素用32个bit表示，0表示黑，255表示白，(0,255)之间的数字表示不同的灰度。在PIL中，从模式“RGB”转换为“I”模式是按照下面的公式转换的：</p>
+<pre><code>I = R * 299/1000 + G * 587/1000 + B * 114/1000</code></pre><p>下面我们将模式为“RGB”的lena图像转换为“I”图像。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line">&gt;&gt;&gt;lena = Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>,<span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">(<span class="number">196</span>,<span class="number">110</span>, <span class="number">77</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_I =lena.convert(<span class="string">"I"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_I.mode</span><br><span class="line"><span class="string">'I'</span></span><br><span class="line">&gt;&gt;&gt;lena_I.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">132</span></span><br><span class="line">&gt;&gt;&gt;lena_I.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line"><span class="number">131</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_L =lena.convert(<span class="string">"L"</span>)</span><br><span class="line">&gt;&gt;&gt;lena_L.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">132</span></span><br><span class="line">&gt;&gt;&gt;lena_L.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line"><span class="number">131</span></span><br></pre></td></tr></table></figure>
+
+<p>从实验的结果看，模式“I”与模式“L”的结果是完全一样，只是模式“L”的像素是8bit，而模式“I”的像素是32bit。</p>
+<p>8、 模式“F”</p>
+<p>模式“F”为32位浮点灰色图像，它的每个像素用32个bit表示，0表示黑，255表示白，(0,255)之间的数字表示不同的灰度。在PIL中，从模式“RGB”转换为“F”模式是按照下面的公式转换的：</p>
+<p>F = R * 299/1000+ G * 587/1000 + B * 114/1000</p>
+<p>下面我们将模式为“RGB”的lena图像转换为“F”图像。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;<span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">(<span class="number">196</span>, <span class="number">110</span>, <span class="number">77</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_F =lena.convert(<span class="string">"F"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_F.mode</span><br><span class="line"><span class="string">'F'</span></span><br><span class="line">&gt;&gt;&gt;lena_F.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">132.95199584960938</span></span><br><span class="line">&gt;&gt;&gt;lena_F.getpixel((<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line"><span class="number">131.95199584960938</span></span><br></pre></td></tr></table></figure>
+
+<p>模式“F”与模式“L”的转换公式是一样的，都是RGB转换为灰色值的公式，但模式“F”会保留小数部分，如实验中的数据。</p>
+<h4 id="二、其他不同模式转换为“RGB”模式"><a href="#二、其他不同模式转换为“RGB”模式" class="headerlink" title="二、其他不同模式转换为“RGB”模式"></a>二、其他不同模式转换为“RGB”模式</h4><p>模式“RGB”为24位彩色图像，它的每个像素用24个bit表示，分别表示红色、绿色和蓝色三个通道。</p>
+<p>在PIL中，对于彩色图像，open后都会转换为“RGB”模式，然后该模式可以转换为其他模式，比如“1”、“L”、“P”和“RGBA”，这几种模式也可以转换为“RGB”模式。</p>
+<p>1、 模式“1”转换为模式“RGB”</p>
+<p>模式“RGB”转换为模式“1”以后，像素点变成黑白两种点，要么是0，要么是255。而从模式“1”转换成“RGB”时，“RGB”的三个通道都是模式“1”的像素值的拷贝。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PILimport Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_1 =lena.convert(<span class="string">"1"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_1_rgb =lena_1.convert(<span class="string">"RGB"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena_1.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">255</span></span><br><span class="line">&gt;&gt;&gt;lena_1_rgb.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)</span><br></pre></td></tr></table></figure>
+
+<p>2、 模式“L”转换为模式“RGB”</p>
+<p>模式“RGB”转换为模式“L”以后，像素值为[0,255]之间的某个数值。而从模式“L”转换成“RGB”时，“RGB”的三个通道都是模式“L”的像素值的拷贝。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena = Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_L =lena.convert(<span class="string">"L"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_L_rgb =lena_L.convert(<span class="string">"RGB"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena_L.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">132</span></span><br><span class="line">&gt;&gt;&gt;lena_rgb.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">132</span>, <span class="number">132</span>, <span class="number">132</span>)</span><br></pre></td></tr></table></figure>
+
+<p>3、 模式“P”转换为模式“RGB”</p>
+<p>模式“RGB”转换为模式“P”以后，像素值为[0,255]之间的某个数值，但它为调色板的索引值，其最终还是彩色图像。从模式“P”转换成“RGB”时，“RGB”的三个通道会变成模式“P”的像素值索引的彩色值。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_P =lena.convert(<span class="string">"P"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_P_rgb =lena_P.convert(<span class="string">"RGB"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena_P.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">62</span></span><br><span class="line">&gt;&gt;&gt;lena_P_rgb.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">204</span>, <span class="number">102</span>, <span class="number">51</span>)</span><br></pre></td></tr></table></figure>
+
+<p>4、 模式“RGBA”转换为模式“RGB”</p>
+<p>模式“RGB”转换为模式“RGBA”以后，图像从三通道变成了四通道，其R、G、B三个通道的数值没有变化，新增的alpha通道均为255，表示不透明。从模式“RGBA”转换成“RGB”时，“RGB”的三个通道又变回原来的数值。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PILimport Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_RGBA =lena.convert(<span class="string">"RGBA"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_RGBA_rgb= lena_RGBA.convert(<span class="string">"RGB"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena_RGBA.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>, <span class="number">255</span>)</span><br><span class="line">&gt;&gt;&gt;lena_RGBA_rgb.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br></pre></td></tr></table></figure>
+
+<p>5、 模式“CMYK”转换为模式“RGB”</p>
+<p>模式“RGB”转换为模式“CMYK”以后，图像从三通道变成了四通道，其C、M、Y三个通道的数值是通过之前的公式计算得到，K通道被直接赋值为0。</p>
+<pre><code>C = 255 - R
+M = 255 - G
+Y = 255 - B
+K = 0</code></pre><p>从模式“CMYK”转换成“RGB”时，“RGB”的三个通道又变回原来的数值，这是无损的转换。</p>
+<pre><code>R = 255 - C
+G = 255 - M
+B = 255 - Y</code></pre><p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_CMYK =lena.convert(<span class="string">"CMYK"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_CMYK_rgb= lena_CMYK.convert(<span class="string">"RGB"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena_CMYK.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">58</span>, <span class="number">144</span>, <span class="number">177</span>, <span class="number">0</span>)</span><br><span class="line">&gt;&gt;&gt;lena_CMYK_rgb.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br></pre></td></tr></table></figure>
+
+<p>6、 模式“YCbCr”转换为模式“RGB”</p>
+<p>模式“RGB”转换为模式“YCbCr”，通常都是使用下面的公式计算，但PIL中并没有严格按照这个公式进行转换。</p>
+<pre><code>Y= 0.257*R+0.564*G+0.098*B+16
+Cb = -0.148*R-0.291*G+0.439*B+128
+Cr = 0.439*R-0.368*G-0.071*B+128</code></pre><p>从模式“YCbCr”转换成“RGB”时，通常是按照下面的公式计算，但PIL中并没有严格按照这个公式进行转换。</p>
+<pre><code>R= 1.164*(Y-16)+1.596*(Cr-128)
+G = 1.164*(Y-16)-0.392*(Cb-128)-0.813*(Cr-128)
+B = 1.164*(Y-16)+2.017*(Cb-128)</code></pre><p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PILimport Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_YCbCr =lena.convert(<span class="string">"YCbCr"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_YCbCr_rgb= lena_YCbCr.convert(<span class="string">"RGB"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>) </span><br><span class="line">&gt;&gt;&gt;lena_YCbCr.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">132</span>, <span class="number">97</span>, <span class="number">173</span>)</span><br><span class="line">&gt;&gt;&gt;lena_YCbCr_rgb.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">195</span>, <span class="number">110</span>, <span class="number">77</span>)</span><br></pre></td></tr></table></figure>
+
+<p>7、 模式“I”转换为模式“RGB”</p>
+<p>模式“RGB”转换为模式“I”，将三通道变成了单通道，使用下面的公式计算获得像素值：</p>
+<p>I = R * 299/1000+ G * 587/1000 + B * 114/1000</p>
+<p>从模式“I”转换成“RGB”时，“RGB”的三个通道都是模式“I”的像素值的拷贝。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PILimport Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_I =lena.convert(<span class="string">"I"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_I_rgb =lena_I.convert(<span class="string">"RGB"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line">&gt;&gt;&gt;lena_I.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">132</span></span><br><span class="line">&gt;&gt;&gt;lena_I_rgb.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">132</span>, <span class="number">132</span>, <span class="number">132</span>)</span><br></pre></td></tr></table></figure>
+
+<p>8、 模式“F”转换为模式“RGB”</p>
+<p>模式“RGB”转换为模式“F”，将彩色图像变成了32位浮点灰色图像。在PIL中，从模式“RGB”转换为“F”模式是按照下面的公式转换的：</p>
+<pre><code>F = R * 299/1000+ G * 587/1000 + B * 114/1000</code></pre><p>从模式“F”转换成“RGB”时，“RGB”的三个通道都是模式“F”的像素值整数部分的拷贝。</p>
+<p>例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PILimport Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_F =lena.convert(<span class="string">"F"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_F_rgb =lena_F.convert(<span class="string">"RGB"</span>)</span><br><span class="line">&gt;&gt;&gt;lena.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">197</span>, <span class="number">111</span>, <span class="number">78</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_F.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line"><span class="number">132.95199584960938</span></span><br><span class="line">&gt;&gt;&gt;lena_F_rgb.getpixel((<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">(<span class="number">132</span>, <span class="number">132</span>, <span class="number">132</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="三、调色板图像的转换"><a href="#三、调色板图像的转换" class="headerlink" title="三、调色板图像的转换"></a>三、调色板图像的转换</h4><p>在PIL中，将“RGB”图像转换为“P”模式图像时，有对应的convert()函数定义，如下：</p>
+<p>im.convert(“P”,**options) ⇒ image</p>
+<p>这个定义将模式固定为“P”，后面可以带几个可选参数。它们分别为：dither，palette和colors。</p>
+<p>参数dither用于控制颜色抖动。默认是FLOYDSTEINBERG，不使能该功能，则赋值为NONE。</p>
+<p>参数palette用于控制调色板的产生。默认是WEB，这是标准的216色的“web palette”。要使用优化的调色板，则赋值为ADAPTIVE。</p>
+<p>参数colors用于控制调色板颜色数目。当参数palette为ADAPTIVE时，colors数值表示调色板的颜色数目。默认是最大值，即256种颜色。</p>
+<p>使用默认值，将“RGB”转换为“P”模式图像后如下：</p>
+<p>参数dither默认为FLOYDSTEINBERG；如果不开启颜色抖动功能，则赋值为NONE。其转换结果如下：</p>
+<p>参数palette默认是WEB。要使用优化的调色板，则赋值为ADAPTIVE。其转换结果为：</p>
+<p>当参数palette为ADAPTIVE时，colors数值表示调色板的颜色数目。默认值为256。当colors设置为10时，其转换结果为：</p>
+<p>上述转换代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> PILimport Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_P_dither= lena.convert(<span class="string">"P"</span>, dither = Image.NONE)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena_P_palette= lena.convert(<span class="string">"P"</span>, palette = Image.ADAPTIVE)</span><br><span class="line">&gt;&gt;&gt;lena_P_palette_colors = lena.convert(<span class="string">"P"</span>, palette = Image.ADAPTIVE,colors = <span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="四、带矩阵的模式转换"><a href="#四、带矩阵的模式转换" class="headerlink" title="四、带矩阵的模式转换"></a>四、带矩阵的模式转换</h4><p>模式转换函数convert()的第三种定义如下：</p>
+<p>im.convert(mode,matrix) ⇒ image</p>
+<p>这种定义只适合将一个“RGB”图像转换为“L”或者“RGB”图像，不能转换为其他模式的图像。变量matrix为4或者16元组。</p>
+<p>例子：下面的例子将一个RGB图像（根据ITU-R709线性校准，使用D65亮度）转换到CIE XYZ颜色空间：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;<span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena =Image.open(<span class="string">"D:\\Code\\Python\\test\\img\\lena.jpg"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lena.mode</span><br><span class="line"><span class="string">'RGB'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>rgb2xyz= (</span><br><span class="line">             <span class="number">0.412453</span>,<span class="number">0.357580</span>, <span class="number">0.180423</span>, <span class="number">0</span>,</span><br><span class="line">                       <span class="number">0.212671</span>,<span class="number">0.715160</span>, <span class="number">0.072169</span>, <span class="number">0</span>,</span><br><span class="line">                       <span class="number">0.019334</span>,<span class="number">0.119193</span>, <span class="number">0.950227</span>, <span class="number">0</span> )</span><br><span class="line">&gt;&gt;&gt;lena_L = lena.convert(<span class="string">"L"</span>, rgb2xyz)</span><br><span class="line">&gt;&gt;&gt;lena_rgb = lena.convert(<span class="string">"RGB"</span>, rgb2xyz)</span><br></pre></td></tr></table></figure>
+
+<p>图像lena_L如下：</p>
+<p><img src="/images/python/27_8.jpg" alt=""></p>
+<p>图像lena_rgb如下：</p>
+<p><img src="/images/python/27_9.jpg" alt=""></p>
+<h3 id="alpha-composite"><a href="#alpha-composite" class="headerlink" title="alpha_composite()"></a>alpha_composite()</h3><p>alpha_composite(im1, im2)：在im1对象上的透明层复合im2，返回一个Image对象 </p>
+<pre><code>im1：Image对象1
+im2：Image对象2</code></pre><p>im1和im2的size要相同。且im1和im2的mode都必须是RGBA</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image, ImageDraw</span><br><span class="line">im1 = Image.new(<span class="string">'RGBA'</span>,size=(<span class="number">300</span>,<span class="number">300</span>),color=<span class="string">'red'</span>)</span><br><span class="line">im2 = Image.new(<span class="string">'RGBA'</span>,size=(<span class="number">300</span>,<span class="number">300</span>))</span><br><span class="line">draw = ImageDraw.Draw(im2)</span><br><span class="line">draw.line((<span class="number">0</span>,<span class="number">0</span>) +im2.size,<span class="string">'green'</span>,<span class="number">10</span>)</span><br><span class="line">image = Image.alpha_composite(im1,im2)</span><br><span class="line">image.save(<span class="string">'aaa.png'</span>)</span><br><span class="line">	<span class="comment"># 这个 image 最后的图象是红色背景，绿色的线</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="G"><a href="#G" class="headerlink" title="G"></a>G</h2><h3 id="getpixel"><a href="#getpixel" class="headerlink" title="getpixel()"></a>getpixel()</h3><p>im.getpixel((x, y))    得到某个像素点的颜色</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image, ImageDraw</span><br><span class="line">im1 = Image.new(<span class="string">'RGBA'</span>,size=(<span class="number">300</span>,<span class="number">300</span>),color=<span class="string">'red'</span>)</span><br><span class="line">rgb = im1.getpixel((<span class="number">1</span>,<span class="number">1</span>))</span><br><span class="line">print(rgb)</span><br><span class="line">    <span class="comment"># (255, 0, 0, 255)</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="N"><a href="#N" class="headerlink" title="N"></a>N</h2><h3 id="new"><a href="#new" class="headerlink" title="new"></a>new</h3><p>Image.new(mode,size) ⇒ image</p>
+<p>Image.new(mode, size, color) ⇒ image</p>
+<p>一共有两种模式。</p>
+<p>使用给定的变量mode和size生成新的图像。Size是给定的宽/高二元组，这是按照像素数来计算的。对于单通道图像，变量color只给定一个值；对于多通道图像，变量color给定一个元组（每个通道对应一个值）。在版本1.1.4及其之后，用户也可以用颜色的名称，比如给变量color赋值为“red”。如果没有对变量color赋值，图像内容将会被全部赋值为0（图像即为黑色）。如果变量color是空，图像将不会被初始化，即图像的内容全为0。这对向该图像复制或绘制某些内容是有用的。</p>
+<p><img src="/images/python/27_0.png" alt=""></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line">im= Image.new(<span class="string">"RGB"</span>, (<span class="number">128</span>, <span class="number">128</span>), <span class="string">"#FF0000"</span>)</span><br><span class="line">im.show()</span><br><span class="line">	<span class="comment"># 输出的是一个 128 * 128 的红色矩阵</span></span><br><span class="line">	<span class="comment"># 不设置 color 的话就是黑色</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="O"><a href="#O" class="headerlink" title="O"></a>O</h2><h3 id="open"><a href="#open" class="headerlink" title="open"></a>open</h3><p>Image.open(fp, mode =’r’ )：打开图片文件，返回一个Image对象 </p>
+<pre><code>fp：图片路径
+mode：模式。如果给出，必须是r</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/tutorial/" rel="tag"># tutorial</a>
+              <a href="/tags/PIL/" rel="tag"># PIL</a>
+              <a href="/tags/pillow/" rel="tag"># pillow</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/01/python26/" rel="prev" title="用 PIL 对像素点进行操作">
+      <i class="fa fa-chevron-left"></i> 用 PIL 对像素点进行操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/03/python28/" rel="next" title="PIL ImageDraw 模块函数详解">
+      PIL ImageDraw 模块函数详解 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Image-模块"><span class="nav-number">1.</span> <span class="nav-text">Image 模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#C"><span class="nav-number">1.1.</span> <span class="nav-text">C</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#convert"><span class="nav-number">1.1.1.</span> <span class="nav-text">convert()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一、模式“RGB”转换为其他不同模式"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">一、模式“RGB”转换为其他不同模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二、其他不同模式转换为“RGB”模式"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">二、其他不同模式转换为“RGB”模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三、调色板图像的转换"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">三、调色板图像的转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#四、带矩阵的模式转换"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">四、带矩阵的模式转换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#alpha-composite"><span class="nav-number">1.1.2.</span> <span class="nav-text">alpha_composite()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#G"><span class="nav-number">1.2.</span> <span class="nav-text">G</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#getpixel"><span class="nav-number">1.2.1.</span> <span class="nav-text">getpixel()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#N"><span class="nav-number">1.3.</span> <span class="nav-text">N</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#new"><span class="nav-number">1.3.1.</span> <span class="nav-text">new</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#O"><span class="nav-number">1.4.</span> <span class="nav-text">O</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#open"><span class="nav-number">1.4.1.</span> <span class="nav-text">open</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

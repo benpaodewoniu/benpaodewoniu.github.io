@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="网上的教程玲琅满目，但是，大都是从同一篇教程中 copy 的，不可信。 以下，完全是我成功之后的方案。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ubuntu | 安装显卡驱动和CUDA">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/09/01/ubuntu5/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="网上的教程玲琅满目，但是，大都是从同一篇教程中 copy 的，不可信。 以下，完全是我成功之后的方案。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/ubuntu/5_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/ubuntu/5_0.png">
+<meta property="article:published_time" content="2020-09-01T04:45:56.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:14:22.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="ubuntu">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/ubuntu/5_1.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/09/01/ubuntu5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>ubuntu | 安装显卡驱动和CUDA | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/09/01/ubuntu5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ubuntu | 安装显卡驱动和CUDA
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-09-01 12:45:56" itemprop="dateCreated datePublished" datetime="2020-09-01T12:45:56+08:00">2020-09-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-22 14:14:22" itemprop="dateModified" datetime="2021-01-22T14:14:22+08:00">2021-01-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/ubuntu/" itemprop="url" rel="index"><span itemprop="name">ubuntu</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/09/01/ubuntu5/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/09/01/ubuntu5/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>网上的教程玲琅满目，但是，大都是从同一篇教程中 copy 的，不可信。</p>
+<p>以下，完全是我成功之后的方案。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="环境介绍"><a href="#环境介绍" class="headerlink" title="环境介绍"></a>环境介绍</h1><br/>
+
+<ul>
+<li>amax 小型服务器</li>
+<li>双系统<ul>
+<li>win 10</li>
+<li>ubuntu 18.04</li>
+</ul>
+</li>
+<li>GTX 1080ti</li>
+</ul>
+<br/>
+
+<h1 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h1><br/>
+
+<p>记得联网。</p>
+<p>整个过程我重装了 3 次系统。关于如何重装系统，请参考</p>
+<ul>
+<li><a href="/2019/01/19/ubuntu0/">ubuntu 的安装</a></li>
+</ul>
+<h2 id="检查是否有-GTX-显卡"><a href="#检查是否有-GTX-显卡" class="headerlink" title="检查是否有 GTX 显卡"></a>检查是否有 GTX 显卡</h2><pre><code>lspci | grep -i nvidia</code></pre><p>输出</p>
+<pre><code>65:00.0 VGA compatible controller: NVIDIA Corporation GP102 [GeForce GTX 1080 Ti] (rev a1)
+65:00.1 Audio device: NVIDIA Corporation GP102 HDMI Audio Controller (rev a1)</code></pre><p>可以看我，我的显卡是 <code>GTX 1080 Ti</code> 。符合， <code>cuda</code> 加速显卡。</p>
+<p>这个时候我们查看一下驱动。「驱动是让你的系统可以识别显卡，不然只能使用集显」</p>
+<p>输入</p>
+<pre><code>nvidia-smi</code></pre><p>如果有驱动的话，就会出现类似于下面这种</p>
+<pre><code>Tue Sep  1 14:23:16 2020       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 440.100      Driver Version: 440.100      CUDA Version: 10.2     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  GeForce GTX 108...  Off  | 00000000:65:00.0  On |                  N/A |
+| 27%   36C    P8    18W / 250W |    184MiB / 11175MiB |     11%      Default |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID   Type   Process name                             Usage      |
+|=============================================================================|
+|    0      1100      G   /usr/lib/xorg/Xorg                           100MiB |
+|    0      1336      G   /usr/bin/gnome-shell                          77MiB |
+|    0      1834      G   gnome-control-center                           2MiB |
++-----------------------------------------------------------------------------+</code></pre><p>但是，如果没有安装的话，可能啥也没有，也可能会出现一个提示，让你安装啥，这时候千万别安装。</p>
+<p>因为，使用 <code>apt-get</code> 安装某一个驱动，会让后续工作变得非常麻烦，而且，可能版本老旧，让你运行不了「我因为使用提示安装，重装了系统」。</p>
+<p>有的，教程，这个时候让你使用 <code>nvcc -V</code> 来查看是不是有显卡驱动和 <code>CUDA</code> 的。</p>
+<p>如果，你没有，此时也可能提供一个提示命令，比如，我的是</p>
+<pre><code>sudo apt-get install nvidia-cuda-toolkit</code></pre><p>千万别弄，弄了会崩。</p>
+<p>此时此刻，我们应该静下心来。先搞懂，驱动我们应该安装啥版本。</p>
+<p>使用命令</p>
+<pre><code>ubuntu-drivers devices</code></pre><p>出现</p>
+<pre><code>== /sys/devices/pci0000:64/0000:64:00.0/0000:65:00.0 ==
+modalias : pci:v000010DEd00001B06sv00001043sd000085E5bc03sc00i00
+vendor   : NVIDIA Corporation
+model    : GP102 [GeForce GTX 1080 Ti]
+driver   : nvidia-driver-435 - distro non-free
+driver   : nvidia-driver-390 - distro non-free
+driver   : nvidia-driver-440 - distro non-free
+driver   : nvidia-driver-440-server - distro non-free recommended
+driver   : nvidia-driver-418-server - distro non-free
+driver   : xserver-xorg-video-nouveau - distro free builtin</code></pre><p>可以看到，在 <code>1080ti</code> 下 440 版本是优先推荐的。</p>
+<p>如果，之前你根据提示来安装的话，可能会安装 390 版本的。「亲测，重装了系统。」</p>
+<h2 id="命令行安装「不推荐」"><a href="#命令行安装「不推荐」" class="headerlink" title="命令行安装「不推荐」"></a>命令行安装「不推荐」</h2><p>这个时候，有的教程会推荐使用</p>
+<pre><code>sudo ubuntu-drivers autoinstall </code></pre><p>这个时候，我预测会安装好 440 的驱动，我没试过，我也不建议你尝试，因为，我有更好的方法。</p>
+<p>此时此刻，我们知道了最好的驱动是 440 。假设，你使用 <code>sudo ubuntu-drivers autoinstall</code> 来安装驱动，那么，最后大概率只有驱动能安装上，而 <code>CUDA</code> 是安装不上的。</p>
+<p>也就是，你使用</p>
+<pre><code>nvidia-smi</code></pre><p>只能看到 <code>driver</code> 。所以，你后面还需要装 <code>CUDA</code>。</p>
+<p>既然，搞到了这里，我们就继续看一下， CUDA 和 驱动的关系。</p>
+<p>当你，安装完驱动后，一定要找相应系统相应版本的 <code>CUDA</code>。</p>
+<p>你可以查看我下面的博客。</p>
+<ul>
+<li><a href="/2019/12/07/nvidia1/">cuda、cudnn版本的关系</a></li>
+</ul>
+<p>但是，我更建议你直接看官方的「链接在上面的博文中」。</p>
+<table>
+<thead>
+<tr>
+<th>CUDA Toolkit</th>
+<th>Linux x86_64 Driver Version</th>
+<th>Windows x86_64 Driver Version</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CUDA 11.0.3 Update 1</td>
+<td>&gt;= 450.51.06</td>
+<td>&gt;= 451.82</td>
+</tr>
+<tr>
+<td>CUDA 11.0.2 GA</td>
+<td>&gt;= 450.51.05</td>
+<td>&gt;= 451.48</td>
+</tr>
+<tr>
+<td>CUDA 11.0.1 RC</td>
+<td>&gt;= 450.36.06</td>
+<td>&gt;= 451.22</td>
+</tr>
+<tr>
+<td>CUDA 10.2.89</td>
+<td>&gt;= 440.33</td>
+<td>&gt;= 441.22</td>
+</tr>
+</tbody></table>
+<p>可以看到，驱动 440 的时候， <code>CUDA</code> 的版本是 <code>10.2</code>。</p>
+<p>所以，你安装完驱动还需要去 nvidia 官网,安装 <code>CUDA</code>。</p>
+<ul>
+<li><a href="https://developer.nvidia.com/cuda-toolkit-archive">CUDA工具包档案</a></li>
+</ul>
+<p><img src="/images/ubuntu/5_1.png" alt=""></p>
+<p>根据版本来安装完 CUDA。 此时此刻，我预测应该可以了，但是，这样做，总会出意外。所以，我不建议你这么做。</p>
+<p>另外需要注意的是，如果按照这个方法安装 CUDA 下载 的 nvida cuda 安装包，可能自带驱动，所以，安装的过程要把驱动取消，否则会出问题。</p>
+<p>后面还要配置环境变量之类的，如果你打算走这条路，建议你好好看一下其他的博客指导。</p>
+<ul>
+<li><a href="https://www.jianshu.com/p/00c37b09f0f3">Ubuntu18.04下安装CUDA和cudnn</a></li>
+</ul>
+<p>我更推荐你使用图形化界面的做法。</p>
+<h2 id="图形化安装"><a href="#图形化安装" class="headerlink" title="图形化安装"></a>图形化安装</h2><p>ps: 之前都是推荐这样的安装方式，但是，在后续的使用过程中，这样会出现很多意想不到的问题</p>
+<ul>
+<li><code>ubuntu</code> 安装好驱动后，你不知道驱动放在了什么地方</li>
+<li>在 <code>github</code> 中配置项目的时候，需要指定 <code>cuda</code> 的位置，但是，这样安装的话，你不知道位置在哪里</li>
+</ul>
+<p>图形化安装非常简单。</p>
+<p>找到</p>
+<ul>
+<li>软件和更新「或许叫其他名字，类似的软件点开看一看」</li>
+</ul>
+<p>出现下面。</p>
+<div style="width: 50%;padding-left: 25%">
+
+<p><img src="/images/ubuntu/5_0.png" alt=""></p>
+</div>
+
+<p>附加驱动，然后选择相应的驱动版本。点击应用更改，就会自己下载，时间挺长的，下载完，重启就好了。</p>
+<p>这个时候，你再 <code>nvidia-smi</code></p>
+<p>就会发现</p>
+<ul>
+<li>驱动</li>
+<li>cuda</li>
+</ul>
+<p>都装好了。非常舒服。</p>
+<p>ps: 里面某些具体细节，我都忘了，我记得当时，我只是直接选了上面的 GUI 操作，然后就成功了。</p>
+<p>但是，不排除我遗忘了一些细节。</p>
+<p>我看其他博客说，如果要这么安装还要添加一些存储库，我记忆中是不需要的，但是，保不齐真的需要，所以，贴一下相关的博文。</p>
+<ul>
+<li><a href="https://www.cnblogs.com/answerThe/p/12252464.html">ubuntu18.04安装与更新NVIDIA驱动</a></li>
+</ul>
+<h2 id="nvidia官网下载全集-更有助于编程"><a href="#nvidia官网下载全集-更有助于编程" class="headerlink" title="nvidia官网下载全集 更有助于编程"></a>nvidia官网下载全集 更有助于编程</h2><p>这个不推荐，也没必要，所以，不再写。</p>
+<p>安装完之后，执行</p>
+<pre><code>nvidia-smi</code></pre><p>应该可以看到驱动和 CUDA 版本。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ubuntu/" rel="tag"># ubuntu</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/11/linux16/" rel="prev" title="linux | 命令书写与多命令结合">
+      <i class="fa fa-chevron-left"></i> linux | 命令书写与多命令结合
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/09/01/avatarify/" rel="next" title="开源项目 | avatarify">
+      开源项目 | avatarify <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#环境介绍"><span class="nav-number">1.</span> <span class="nav-text">环境介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#流程"><span class="nav-number">2.</span> <span class="nav-text">流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#检查是否有-GTX-显卡"><span class="nav-number">2.1.</span> <span class="nav-text">检查是否有 GTX 显卡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令行安装「不推荐」"><span class="nav-number">2.2.</span> <span class="nav-text">命令行安装「不推荐」</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图形化安装"><span class="nav-number">2.3.</span> <span class="nav-text">图形化安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nvidia官网下载全集-更有助于编程"><span class="nav-number">2.4.</span> <span class="nav-text">nvidia官网下载全集 更有助于编程</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Lock 解决线程安全性问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python | Python互斥锁（Lock）：解决多线程安全问题">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/12/20/python100/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="Lock 解决线程安全性问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-12-20T01:44:42.000Z">
+<meta property="article:modified_time" content="2022-10-06T13:03:43.244Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="multiprocess">
+<meta property="article:tag" content="多进程">
+<meta property="article:tag" content="多线程">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/12/20/python100/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python | Python互斥锁（Lock）：解决多线程安全问题 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/12/20/python100/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python | Python互斥锁（Lock）：解决多线程安全问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-20 09:44:42" itemprop="dateCreated datePublished" datetime="2018-12-20T09:44:42+08:00">2018-12-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-06 21:03:43" itemprop="dateModified" datetime="2022-10-06T21:03:43+08:00">2022-10-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多进程 & 多线程</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多线程</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">安全</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/12/20/python100/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/12/20/python100/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Lock 解决线程安全性问题。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="为什么要有锁"><a href="#为什么要有锁" class="headerlink" title="为什么要有锁"></a>为什么要有锁</h1><br/>
+
+<p>在我下面的博文中，给出了这样一个例子.</p>
+<ul>
+<li><a href="/2018/12/19/multiprocess3/">python | GLI锁机制</a></li>
+</ul>
+<blockquote>
+<p>注意，有了 GIL，并不意味着 Python 程序员就不用去考虑线程安全了，因为即便 GIL 仅允许一个 Python 线程执行，但别忘了 Python 还有 check interval 这样的抢占机制。</p>
+</blockquote>
+<br/>
+
+<h1 id="什么是锁？"><a href="#什么是锁？" class="headerlink" title="什么是锁？"></a>什么是锁？</h1><br/>
+
+<p>多线程的优势在于并发性，即可以同时运行多个任务。但是当线程需要使用共享数据时，也可能会由于数据不同步产生“错误情况”，这是由系统的线程调度具有一定的随机性造成的。</p>
+<p>互斥锁的作用就是解决数据不同步问题。关于互斥锁，有一个经典的“银行取钱”问题。银行取钱的基本流程可以分为如下几个步骤：</p>
+<ol>
+<li>用户输入账户、密码，系统判断用户的账户、密码是否匹配。</li>
+<li>用户输入取款金额。</li>
+<li>系统判断账户余额是否大于取款金额。</li>
+<li>如果余额大于取款金额，则取款成功；如果余额小于取款金额，则取款失败。</li>
+</ol>
+<p>乍一看上去，这确实就是日常生活中的取款流程，这个流程没有任何问题。但一旦将这个流程放在多线程并发的场景下，就有可能出现问题。注意，此处说的是有可能，并不是一定。也许你的程序运行了一百万次都没有出现问题，但没有出现问题并不等于没有问题！</p>
+<p>按照上面的流程编写取款程序，并使用两个线程分别模拟两个人使用同一个账户做并发取钱操作。此处忽略检查账户和密码的操作，仅仅模拟后面三步操作。下面先定义一个账户类，该账户类封装了账户编号和余额两个成员变量。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Account</span>:</span></span><br><span class="line">    <span class="comment"># 定义构造器</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, account_no, balance)</span>:</span></span><br><span class="line">        <span class="comment"># 封装账户编号、账户余额的两个成员变量</span></span><br><span class="line">        self.account_no = account_no</span><br><span class="line">        self.balance = balance</span><br></pre></td></tr></table></figure>
+
+<p>接下来程序会定义一个模拟取钱的函数，该函数根据执行账户、取钱数量进行取钱操作，取钱的逻辑是当账户余额不足时无法提取现金，当余额足够时系统吐出钞票，余额减少。</p>
+<p>程序的主程序非常简单，仅仅是创建一个账户，并启动两个线程从该账户中取钱。程序如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> Account</span><br><span class="line"><span class="comment"># 定义一个函数来模拟取钱操作</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">draw</span><span class="params">(account, draw_amount)</span>:</span></span><br><span class="line">    <span class="comment"># 账户余额大于取钱数目</span></span><br><span class="line">    <span class="keyword">if</span> account.balance &gt;= draw_amount:</span><br><span class="line">        <span class="comment"># 吐出钞票</span></span><br><span class="line">        print(threading.current_thread().name\</span><br><span class="line">            + <span class="string">"取钱成功！吐出钞票:"</span> + str(draw_amount))</span><br><span class="line"><span class="comment">#        time.sleep(0.001)</span></span><br><span class="line">        <span class="comment"># 修改余额</span></span><br><span class="line">        account.balance -= draw_amount</span><br><span class="line">        print(<span class="string">"\t余额为: "</span> + str(account.balance))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(threading.current_thread().name\</span><br><span class="line">            + <span class="string">"取钱失败！余额不足！"</span>)</span><br><span class="line"><span class="comment"># 创建一个账户</span></span><br><span class="line">acct = Account.Account(<span class="string">"1234567"</span> , <span class="number">1000</span>)</span><br><span class="line"><span class="comment"># 模拟两个线程对同一个账户取钱</span></span><br><span class="line">threading.Thread(name=<span class="string">'甲'</span>, target=draw , args=(acct , <span class="number">800</span>)).start()</span><br><span class="line">threading.Thread(name=<span class="string">'乙'</span>, target=draw , args=(acct , <span class="number">800</span>)).start()</span><br></pre></td></tr></table></figure>
+
+<p>先不要管程序中第 12 行被注释掉的代码，上面程序是一个非常简单的取钱逻辑，这个取钱逻辑与实际的取钱操作也很相似。</p>
+<p>多次运行上面程序，很有可能都会看到下面的错误结果。</p>
+<pre><code>甲取钱成功！吐出钞票:800
+乙取钱成功！吐出钞票:800
+余额为: 200
+余额为: -800</code></pre><p>所示的运行结果并不是银行所期望的结果（不过有可能看到正确的运行结果），这正是多线程编程突然出现的“偶然” 错误因为线程调度的不确定性。</p>
+<p>假设系统线程调度器在注释代码处暂停，让另一个线程执行（为了强制暂停，只要取消程序中注释代码前的注释即可）。取消注释后，再次运行程序，将总可以看到所示的错误结果。</p>
+<p>问题出现了，账户余额只有 1000 元时取出了 1600 元，而且账户余额出现了负值，远不是银行所期望的结果。虽然上面程序是人为地使用 <code>time.sleep(0.001)</code> 来强制线程调度切换，但这种切换也是完全可能发生的（100000 次操作只要有 1 次出现了错误，那就是由编程错误引起的）。</p>
+<br/>
+
+<h1 id="Python互斥锁同步线程"><a href="#Python互斥锁同步线程" class="headerlink" title="Python互斥锁同步线程"></a>Python互斥锁同步线程</h1><br/>
+
+<p>之所以出现错误结果，是因为 <code>run()</code> 方法的方法体不具有线程安全性，程序中有两个并发线程在修改 Account 对象，而且系统恰好在注释代码处执行线程切换，切换到另一个修改 Account 对象的线程，所以就出现了问题。</p>
+<p>为了解决这个问题，Python 的 threading 模块引入了互斥锁（Lock）。threading 模块提供了 </p>
+<ul>
+<li>Lock 「同步锁」</li>
+<li>RLock 「递归锁」</li>
+</ul>
+<p>两个类，它们都提供了如下两个方法来加互斥锁和释放互斥锁：</p>
+<ul>
+<li>acquire(blocking=True, timeout=-1)：请求对 Lock 或 RLock 加锁，其中 timeout 参数指定加锁多少秒。</li>
+<li>release()：释放锁。</li>
+</ul>
+<p>Lock 和 RLock 的区别如下：</p>
+<ul>
+<li>threading.Lock：它是一个基本的锁对象，每次只能锁定一次，其余的锁请求，需等待锁释放后才能获取。</li>
+<li>threading.RLock：它代表可重入锁（Reentrant Lock）。对于可重入锁，在同一个线程中可以对它进行多次锁定，也可以多次释放。如果使用 RLock，那么 acquire() 和 release() 方法必须成对出现。如果调用了 n 次 acquire() 加锁，则必须调用 n 次 release() 才能释放锁。</li>
+</ul>
+<p>由此可见，RLock 锁具有可重入性。也就是说，同一个线程可以对已被加锁的 RLock 锁再次加锁，RLock 对象会维持一个计数器来追踪 acquire() 方法的嵌套调用，线程在每次调用 acquire() 加锁后，都必须显式调用 release() 方法来释放锁。所以，一段被锁保护的方法可以调用另一个被相同锁保护的方法。</p>
+<p>RLock 支持在同一线程中多次请求同一资源。</p>
+<p>Lock 是控制多个线程对共享资源进行访问的工具。通常，锁提供了对共享资源的独占访问，每次只能有一个线程对 Lock 对象加锁，线程在开始访问共享资源之前应先请求获得 Lock 对象。当对共享资源访问完成后，程序释放对 Lock 对象的锁定。</p>
+<h2 id="Lock用法"><a href="#Lock用法" class="headerlink" title="Lock用法"></a>Lock用法</h2><p>锁通常被用来实现对共享资源的同步访问。为每一个共享资源创建一个Lock对象，当你需要访问该资源时，调用acquire方法来获取锁对象（如果其它线程已经获得了该锁，则当前线程需等待其被释放），待资源访问完后，再调用release方法释放锁。</p>
+<p>下面我们来举个例子说明如果多线程在没有同步锁的情况下访问公共资源会导致什么情况</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fun_sub</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    <span class="comment"># num -= 1</span></span><br><span class="line">    num2 = num</span><br><span class="line">    time.sleep(<span class="number">0.001</span>)</span><br><span class="line">    num = num2<span class="number">-1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">'开始测试同步锁 at %s'</span> % time.ctime())</span><br><span class="line"></span><br><span class="line">    thread_list = []</span><br><span class="line">    <span class="keyword">for</span> thread <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">        t = threading.Thread(target=fun_sub)</span><br><span class="line">        t.start()</span><br><span class="line">        thread_list.append(t)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> thread_list:</span><br><span class="line">        t.join()</span><br><span class="line">    print(<span class="string">'num is %d'</span> % num)</span><br><span class="line">    print(<span class="string">'结束测试同步锁 at %s'</span> % time.ctime())</span><br></pre></td></tr></table></figure>
+
+<p>上面的例子其实很简单就是创建100的线程，然后每个线程去从公共资源num变量去执行减1操作，按照正常情况下面，等到代码执行结束，打印num变量，应该得到的是0，因为100个线程都去执行了一次减1的操作。</p>
+<p>但是结果却不是我们想想的，我们看看结果</p>
+<pre><code>开始测试同步锁 at Sun Apr 28 09:56:45 2019
+num is 91
+结束测试同步锁 at Sun Apr 28 09:56:45 2019</code></pre><p>我们会发现，每次执行的结果num值都不是一样的，上面显示的是91，那就存在问题了，为什么结果不是0呢？</p>
+<p>我们来看看上面代码的执行流程。</p>
+<pre><code>1.因为GIL，只有一个线程（假设线程1）拿到了num这个资源，然后把变量赋值给num2,sleep 0.001秒，这时候num=100
+
+2.当第一个线程sleep 0.001秒这个期间，这个线程会做yield操作，就是把cpu切换给别的线程执行（假设线程2拿到个GIL，获得cpu使用权），线程2也和线程1一样也拿到num,返回赋值给num2，然sleep,这时候，其实num还是=100.
+
+3.线程2 sleep时候，又要yield操作，假设线程3拿到num,执行上面的操作，其实num有可能还是100
+
+4.等到后面cpu重新切换给线程1，线程2，线程3上执行的时候，他们执行减1操作后，其实等到的num其实都是99，而不是顺序递减的。
+
+5.其他剩余的线程操作如上</code></pre><p>大家应该发现问题了，结果和我们想想的不一样，那我们怎么才能等到我们想要的结果呢？就是100个线程操作num变量得到最后结果为0？</p>
+<p>这里就要借助于python的同步锁了，也就是同一时间只能放一个线程来操作num变量，减1之后，后面的线程操作来操作num变量。看看下面我们怎么实现。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">num = <span class="number">100</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fun_sub</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> num</span><br><span class="line">    lock.acquire()</span><br><span class="line">    print(<span class="string">'----加锁----'</span>)</span><br><span class="line">    print(<span class="string">'现在操作共享资源的线程名字是:'</span>,t.name)</span><br><span class="line">    num2 = num</span><br><span class="line">    time.sleep(<span class="number">0.001</span>)</span><br><span class="line">    num = num2<span class="number">-1</span></span><br><span class="line">    lock.release()</span><br><span class="line">    print(<span class="string">'----释放锁----'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    print(<span class="string">'开始测试同步锁 at %s'</span> % time.ctime())</span><br><span class="line"></span><br><span class="line">    lock = threading.Lock() <span class="comment">#创建一把同步锁</span></span><br><span class="line"></span><br><span class="line">    thread_list = []</span><br><span class="line">    <span class="keyword">for</span> thread <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">        t = threading.Thread(target=fun_sub)</span><br><span class="line">        t.start()</span><br><span class="line">        thread_list.append(t)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> thread_list:</span><br><span class="line">        t.join()</span><br><span class="line">    print(<span class="string">'num is %d'</span> % num)</span><br><span class="line">    print(<span class="string">'结束测试同步锁 at %s'</span> % time.ctime())</span><br></pre></td></tr></table></figure>
+
+<p>看到上面我们给中间的减1代码块，加个一把同步锁，这样，我们就可以得到我们想要的结果了，这就是同步锁的作用，一次只有一个线程操作同享资源。</p>
+<p>看看上面代码执行的结果：</p>
+<pre><code>.......
+----加锁----
+现在操作共享资源的线程名字是: Thread-98
+----释放锁----
+----加锁----
+现在操作共享资源的线程名字是: Thread-100
+----释放锁----
+num is 0
+结束测试同步锁 at Sun Apr 28 12:08:27 2019</code></pre><h2 id="RLock-用法"><a href="#RLock-用法" class="headerlink" title="RLock 用法"></a>RLock 用法</h2><p>在实现线程安全的控制中，比较常用的是 RLock。</p>
+<p>通常使用 RLock 的代码格式如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">X</span>:</span></span><br><span class="line">    <span class="comment">#定义需要保证线程安全的方法</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">m</span> <span class="params">()</span> :</span></span><br><span class="line">        <span class="comment">#加锁</span></span><br><span class="line">        self.lock.acquire()</span><br><span class="line">        <span class="keyword">try</span> :</span><br><span class="line">            <span class="comment">#需要保证线程安全的代码</span></span><br><span class="line">            ＃...方法体</span><br><span class="line">        <span class="comment">#使用finally 块来保证释放锁</span></span><br><span class="line">        <span class="keyword">finally</span> :</span><br><span class="line">            <span class="comment">#修改完成，释放锁</span></span><br><span class="line">            self.lock.release()</span><br></pre></td></tr></table></figure>
+
+<p>使用 RLock 对象来控制线程安全，当加锁和释放锁出现在不同的作用范围内时，通常建议使用 finally 块来确保在必要时释放锁。</p>
+<p>通过使用 Lock 对象可以非常方便地实现线程安全的类，线程安全的类具有如下特征：</p>
+<ul>
+<li>该类的对象可以被多个线程安全地访问。</li>
+<li>每个线程在调用该对象的任意方法之后，都将得到正确的结果。</li>
+<li>每个线程在调用该对象的任意方法之后，该对象都依然保持合理的状态。</li>
+</ul>
+<p>总的来说，不可变类总是线程安全的，因为它的对象状态不可改变；但可变对象需要额外的方法来保证其线程安全。例如，上面的 Account 就是一个可变类，它的 <code>self.account_no</code> 和 <code>self._balance</code>（为了更好地封装，将 balance 改名为 _balance）两个成员变量都可以被改变，当两个钱程同时修改 Account 对象的 <code>self._balance</code> 成员变量的值时，程序就出现了异常。下面将 Account 类对 <code>self.balance</code> 的访问设置成线程安全的，那么只需对修改 self.balance 的方法增加线程安全的控制即可。</p>
+<p>将 Account 类改为如下形式，它就是线程安全的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Account</span>:</span></span><br><span class="line">    <span class="comment"># 定义构造器</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, account_no, balance)</span>:</span></span><br><span class="line">        <span class="comment"># 封装账户编号、账户余额的两个成员变量</span></span><br><span class="line">        self.account_no = account_no</span><br><span class="line">        self._balance = balance</span><br><span class="line">        self.lock = threading.RLock()</span><br><span class="line">    <span class="comment"># 因为账户余额不允许随便修改，所以只为self._balance提供getter方法</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getBalance</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self._balance</span><br><span class="line">    <span class="comment"># 提供一个线程安全的draw()方法来完成取钱操作</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">draw</span><span class="params">(self, draw_amount)</span>:</span></span><br><span class="line">        <span class="comment"># 加锁</span></span><br><span class="line">        self.lock.acquire()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="comment"># 账户余额大于取钱数目</span></span><br><span class="line">            <span class="keyword">if</span> self._balance &gt;= draw_amount:</span><br><span class="line">                <span class="comment"># 吐出钞票</span></span><br><span class="line">                print(threading.current_thread().name\</span><br><span class="line">                    + <span class="string">"取钱成功！吐出钞票:"</span> + str(draw_amount))</span><br><span class="line">                time.sleep(<span class="number">0.001</span>)</span><br><span class="line">                <span class="comment"># 修改余额</span></span><br><span class="line">                self._balance -= draw_amount</span><br><span class="line">                print(<span class="string">"\t余额为: "</span> + str(self._balance))</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                print(threading.current_thread().name\</span><br><span class="line">                    + <span class="string">"取钱失败！余额不足！"</span>)</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            <span class="comment"># 修改完成，释放锁</span></span><br><span class="line">            self.lock.release()</span><br></pre></td></tr></table></figure>
+
+<p>上面程序中的定义了一个 RLock 对象。在程序中实现 <code>draw()</code> 方法时，进入该方法开始执行后立即请求对 RLock 对象加锁，当执行完 <code>draw()</code> 方法的取钱逻辑之后，程序使用 finally 块来确保释放锁。</p>
+<p>程序中 RLock 对象作为同步锁，线程每次开始执行 <code>draw()</code> 方法修改 self.balance 时，都必须先对 RLock 对象加锁。当该线程完成对 self._balance 的修改，将要退出 <code>draw()</code> 方法时，则释放对 RLock 对象的锁定。这样的做法完全符合“加锁→修改→释放锁”的安全访问逻辑。</p>
+<p>当一个线程在 <code>draw()</code> 方法中对 RLock 对象加锁之后，其他线程由于无法获取对 RLock 对象的锁定，因此它们同时执行 <code>draw()</code> 方法对 self._balance 进行修改。这意味着，并发线程在任意时刻只有一个线程可以进入修改共享资源的代码区（也被称为临界区），所以在同一时刻最多只有一个线程处于临界区内，从而保证了线程安全。</p>
+<p>为了保证 Lock 对象能真正“锁定”它所管理的 Account 对象，程序会被编写成每个 Account 对象有一个对应的 Lock（就像一个房间有一个锁一样）。</p>
+<p>上面的 Account 类增加了一个代表取钱的 <code>draw()</code> 方法，并使用 Lock 对象保证该 <code>draw()</code> 方法的线程安全，而且取消了 setBalance() 方法（避免程序直接修改 self._balance 成员变量），因此线程执行体只需调用 Account 对象的 <code>draw()</code> 方法即可执行取钱操作。</p>
+<p>下面程序创建并启动了两个取钱线程：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> Account</span><br><span class="line"><span class="comment"># 定义一个函数来模拟取钱操作</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">draw</span><span class="params">(account, draw_amount)</span>:</span></span><br><span class="line">    <span class="comment"># 直接调用account对象的draw()方法来执行取钱操作</span></span><br><span class="line">    account.draw(draw_amount)</span><br><span class="line"><span class="comment"># 创建一个账户</span></span><br><span class="line">acct = Account.Account(<span class="string">"1234567"</span> , <span class="number">1000</span>)</span><br><span class="line"><span class="comment"># 模拟两个线程对同一个账户取钱</span></span><br><span class="line">threading.Thread(name=<span class="string">'甲'</span>, target=draw , args=(acct , <span class="number">800</span>)).start()</span><br><span class="line">threading.Thread(name=<span class="string">'乙'</span>, target=draw , args=(acct , <span class="number">800</span>)).start()</span><br></pre></td></tr></table></figure>
+
+<p>上面程序中代表线程执行体的 <code>draw()</code> 函数无须自己实现取钱操作，而是直接调用 account 的 <code>draw()</code> 方法来执行取钱操作。由于 <code>draw()</code> 方法己经使用 RLock 对象实现了线程安全，因此上面程序就不会导致线程安全问题。</p>
+<p>可变类的线程安全是以降低程序的运行效率作为代价的，为了减少线程安全所带来的负面影响，程序可以采用如下策略：</p>
+<ul>
+<li><p>不要对线程安全类的所有方法都进行同步，只对那些会改变竞争资源（竞争资源也就是共享资源）的方法进行同步。例如，上面 Account 类中的 account_no 实例变量就无须同步，所以程序只对 draw() 方法进行了同步控制。</p>
+</li>
+<li><p>如果可变类有两种运行环境，单线程环境和多线程环境，则应该为该可变类提供两种版本，即线程不安全版本和线程安全版本。在单线程环境中使用钱程不安全版本以保证性能，在多线程环境中使用线程安全版本。</p>
+</li>
+</ul>
+<br/>
+
+<h1 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h1><br/>
+
+<p>当两个线程相互等待对方释放资源时，就会发生死锁。Python 解释器没有监测，也不会主动采取措施来处理死锁情况，所以在进行多线程编程时应该采取措施避免出现死锁。<br>一旦出现死锁，整个程序既不会发生任何异常，也不会给出任何提示，只是所有线程都处于阻塞状态，无法继续。</p>
+<p>死锁是很容易发生的，尤其是在系统中出现多个同步监视器的情况下，如下程序将会出现死锁：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.lock = threading.RLock()</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(self, b)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.lock.acquire()</span><br><span class="line">            print(<span class="string">"当前线程名: "</span> + threading.current_thread().name\</span><br><span class="line">                + <span class="string">" 进入了A实例的foo()方法"</span> )     <span class="comment"># ①</span></span><br><span class="line">            time.sleep(<span class="number">0.2</span>)</span><br><span class="line">            print(<span class="string">"当前线程名: "</span> + threading.current_thread().name\</span><br><span class="line">                + <span class="string">" 企图调用B实例的last()方法"</span>)   <span class="comment"># ③</span></span><br><span class="line">            b.last()</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.lock.release()</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">last</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.lock.acquire()</span><br><span class="line">            print(<span class="string">"进入了A类的last()方法内部"</span>)</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.lock.release()</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.lock = threading.RLock()</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">bar</span><span class="params">(self, a)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.lock.acquire()</span><br><span class="line">            print(<span class="string">"当前线程名: "</span> + threading.current_thread().name\</span><br><span class="line">                + <span class="string">" 进入了B实例的bar()方法"</span> )   <span class="comment"># ②</span></span><br><span class="line">            time.sleep(<span class="number">0.2</span>)</span><br><span class="line">            print(<span class="string">"当前线程名: "</span> + threading.current_thread().name\</span><br><span class="line">                + <span class="string">" 企图调用A实例的last()方法"</span>)  <span class="comment"># ④</span></span><br><span class="line">            a.last()</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.lock.release()</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">last</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.lock.acquire()</span><br><span class="line">            print(<span class="string">"进入了B类的last()方法内部"</span>)</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.lock.release()</span><br><span class="line">a = A()</span><br><span class="line">b = B()</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">init</span><span class="params">()</span>:</span></span><br><span class="line">    threading.current_thread().name = <span class="string">"主线程"</span></span><br><span class="line">    <span class="comment"># 调用a对象的foo()方法</span></span><br><span class="line">    a.foo(b)</span><br><span class="line">    print(<span class="string">"进入了主线程之后"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">action</span><span class="params">()</span>:</span></span><br><span class="line">    threading.current_thread().name = <span class="string">"副线程"</span></span><br><span class="line">    <span class="comment"># 调用b对象的bar()方法</span></span><br><span class="line">    b.bar(a)</span><br><span class="line">    print(<span class="string">"进入了副线程之后"</span>)</span><br><span class="line"><span class="comment"># 以action为target启动新线程</span></span><br><span class="line">threading.Thread(target=action).start()</span><br><span class="line"><span class="comment"># 调用init()函数</span></span><br><span class="line">init()</span><br></pre></td></tr></table></figure>
+<p>程序既无法向下执行，也不会抛出任何异常，就一直“僵持”着。究其原因，是因为上面程序中 A 对象和 B 对象的方法都是线程安全的方法。</p>
+<p>死锁是不应该在程序中出现的，在编写程序时应该尽量避免出现死锁。下面有几种常见的方式用来解决死锁问题：</p>
+<ol>
+<li><p>避免多次锁定。尽量避免同一个线程对多个 Lock 进行锁定。例如上面的死锁程序，主线程要对 A、B 两个对象的 Lock 进行锁定，副线程也要对 A、B 两个对象的 Lock 进行锁定，这就埋下了导致死锁的隐患。</p>
+</li>
+<li><p>具有相同的加锁顺序。如果多个线程需要对多个 Lock 进行锁定，则应该保证它们以相同的顺序请求加锁。比如上面的死锁程序，主线程先对 A 对象的 Lock 加锁，再对 B 对象的 Lock 加锁；而副线程则先对 B 对象的 Lock 加锁，再对 A 对象的 Lock 加锁。这种加锁顺序很容易形成嵌套锁定，进而导致死锁。如果让主线程、副线程按照相同的顺序加锁，就可以避免这个问题。</p>
+</li>
+<li><p>使用定时锁。程序在调用 acquire() 方法加锁时可指定 timeout 参数，该参数指定超过 timeout 秒后会自动释放对 Lock 的锁定，这样就可以解开死锁了。</p>
+</li>
+<li><p>死锁检测。死锁检测是一种依靠算法机制来实现的死锁预防机制，它主要是针对那些不可能实现按序加锁，也不能使用定时锁的场景的。</p>
+</li>
+</ol>
+<p>另外如何在 debug 中监测到 「死锁」，请看我下面的博文中的死锁。</p>
+<ul>
+<li><a href="/2018/12/20/python42/">python threading 多线程</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/multiprocess/" rel="tag"># multiprocess</a>
+              <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag"># 多进程</a>
+              <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag"># 多线程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/20/python42/" rel="prev" title="python threading 多线程">
+      <i class="fa fa-chevron-left"></i> python threading 多线程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/20/python43/" rel="next" title="python matplotlib 函数详解，基础画图">
+      python matplotlib 函数详解，基础画图 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么要有锁"><span class="nav-number">1.</span> <span class="nav-text">为什么要有锁</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是锁？"><span class="nav-number">2.</span> <span class="nav-text">什么是锁？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Python互斥锁同步线程"><span class="nav-number">3.</span> <span class="nav-text">Python互斥锁同步线程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Lock用法"><span class="nav-number">3.1.</span> <span class="nav-text">Lock用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RLock-用法"><span class="nav-number">3.2.</span> <span class="nav-text">RLock 用法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#死锁"><span class="nav-number">4.</span> <span class="nav-text">死锁</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

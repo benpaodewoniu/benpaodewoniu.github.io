@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="thlm 关于 AI Arena 的研报。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="aiarena | 研报">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2024/01/29/aiarena2/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="thlm 关于 AI Arena 的研报。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-01-29T12:59:38.000Z">
+<meta property="article:modified_time" content="2024-01-29T13:28:54.688Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="aiarena">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2024/01/29/aiarena2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>aiarena | 研报 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2024/01/29/aiarena2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          aiarena | 研报
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-01-29 20:59:38 / 修改时间：21:28:54" itemprop="dateCreated datePublished" datetime="2024-01-29T20:59:38+08:00">2024-01-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/" itemprop="url" rel="index"><span itemprop="name">dapp</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/aiarena/" itemprop="url" rel="index"><span itemprop="name">aiarena</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/thlm/" itemprop="url" rel="index"><span itemprop="name">thlm</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/thlm/%E7%A0%94%E6%8A%A5/" itemprop="url" rel="index"><span itemprop="name">研报</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2024/01/29/aiarena2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2024/01/29/aiarena2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>thlm</code> 关于 <code>AI Arena</code> 的研报。</p>
+<a id="more"></a>
+
+<p><code>1956</code>年，美国达特茅斯学院首次提出“人工智能”（<code>Artificial Intelligence</code>，简称<code>AI</code>）。</p>
+<p><code>1989</code>年，<code>LeCun</code>结合反向传播算法与权值共享的卷积神经层发明了卷积神经网络，并首次将卷积神经网络成功应用到美国邮局的手写字符识别系统中。</p>
+<p><code>2008</code>年，中本聪发表了一篇名为《比特币：一种点对点式的电子现金系统》论文。得益于硬件和理论的飞速增长，<code>AI</code>届不断的提出新的网络模型，卷积、残差、transform等等，让<code>AI</code>蓬勃发展。</p>
+<p><code>2022</code>年<code>chatgpt</code>出现，彻底引爆全球。截止文章发布时，加密货币总市值为<code>1.7</code>兆美金。无论是<code>AI</code>还是加密货币都已经成为人类文明史上不可磨灭的部分了。</p>
+<p>虽然，<code>AI</code>的应用已经渗透到生活中的各个层次，甚至也包括加密货币，如中心化交易所的<code>AI</code>客服、风险控制等。但是，对于面向群众的加密货币项目来说，两者还停留在很肤浅的结合阶段。比如，<code>AIGC</code>各种生成<code>NFT</code>、项目方使用<code>chatgpt</code>编写小作文。AI离我们很近，近到生活的每一个角落，AI又离加密货币很远，看起来只是小孩子的玩闹。</p>
+<p>而有一个项目，却把两个领域进行了充分的结合。它就是融资<code>1100W</code>美元的，<code>AI Arena</code>。（<code>1</code>月底项目开启<code>P2A</code>，并空投<code>4000万</code>代币）</p>
+<h2 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h2><ul>
+<li><a href="https://aiarena.io/#/">官网</a></li>
+<li><a href="https://discord.com/invite/aiarena">discord</a></li>
+<li><a href="http://discord.gg/aiarenaplaytest">专门的游戏discord</a></li>
+<li><a href="https://twitter.com/aiarena_">twitter</a></li>
+<li><a href="https://opensea.io/collection/ai-arena-mint-pass">opensea</a></li>
+</ul>
+<p>无论如何，成长历程中我们都会经历或者见过各种游戏。以平台格斗类游戏这个方向来说，有《拳皇》、《街霸》、《火影忍者》等。其中，梅原大吾在该领域中更是贡献了<code>EVO MOMENT#37</code>（超越人类极限）名场面，至今为止观看次数最多的游戏场面（吉尼斯认证）。但是，无论是哪种平台格斗类游戏，其操作人还是人类。</p>
+<p>让我们放开想象，假设游戏中的人物可以自动运行，这种行为通常被称为人机，如果我们能在人机运行的基础上，注入我们的思想，点亮游戏中人物的灵魂，我们称为什么？这就是<code>AI Arena</code>要做的事情。</p>
+<p>通过<code>AI Arena</code>提供的训练平台，结合人工智能，我们可以把我们的操作、意识和思想存储在<code>AI</code>模型中，这样，游戏中的人物就能按照我们设定的方式进行格斗了。也就是，在<code>AI Arena</code>中，真正参与格斗的是带着我们思想的游戏人物。这难道不是简化版的数字生命吗？</p>
+<p>训练AI，游戏人物按照训练人的思想去战斗，还有比这更酷的事情吗？</p>
+<h2 id="融资情况"><a href="#融资情况" class="headerlink" title="融资情况"></a>融资情况</h2><ul>
+<li>种子轮（500W 美元）<ul>
+<li>投资方：<code>Paradigm</code>、<code>Framework Ventures</code></li>
+</ul>
+</li>
+<li>第一轮（600W 美元）<ul>
+<li><code>Framework Ventures</code>、<code>FunPlus、SevenX Ventures</code></li>
+</ul>
+</li>
+</ul>
+<p>上述数据参考：<a href="https://www.rootdata.com/zh/Projects/detail/AI%20Arena?k=NTI4Nw%3D%3D">https://www.rootdata.com/zh/Projects/detail/AI%20Arena?k=NTI4Nw%3D%3D</a></p>
+<h2 id="代币模型"><a href="#代币模型" class="headerlink" title="代币模型"></a>代币模型</h2><p>代币为 <code>$NRN</code>，共计<code>10亿</code>。具体分配如下：</p>
+<ul>
+<li><code>8%</code> 空投<ul>
+<li><code>4%</code> NRN宝箱（通过 <code>discord</code> 活动获得）</li>
+<li><code>4%</code> <code>P2A</code>竞赛</li>
+</ul>
+</li>
+<li><code>12%</code> 基金会</li>
+<li><code>14%</code> 投资者</li>
+<li><code>30%</code> 社区</li>
+<li><code>36%</code> 贡献者</li>
+</ul>
+<h2 id="NFT"><a href="#NFT" class="headerlink" title="NFT"></a>NFT</h2><p>目前，<code>NFT</code> 一共是 <code>420</code> 个，已经全部 <code>mint</code> 完毕。后续 <code>NFT</code> 获得的途径包括</p>
+<ul>
+<li>参加比赛免费获得 <code>NFT</code>（极少量）</li>
+<li>在 <code>NFT市场</code> 购买<ul>
+<li><a href="https://opensea.io/collection/ai-arena-mint-pass">opensea</a></li>
+</ul>
+</li>
+<li>游戏中合成</li>
+</ul>
+<p>属于社区 <code>30%</code> 的那部分，即 <code>3亿 $NRN</code>，是在上公链后经由电竞空投。上公链后参加电竞需要NFT, <code>web2</code>版所有人都可以玩但没有$NRN奖励。（<code>NFT</code>除了包括 <code>420</code> 个初始NFT外，还包括游戏后续产生的<code>NFT</code>）</p>
+<p>据了解，后续官方会开展租赁<code>protocol</code>，即玩家可以租赁 <code>NFT</code> 参与游戏。</p>
+<h2 id="活动简介"><a href="#活动简介" class="headerlink" title="活动简介"></a>活动简介</h2><p>目前和代币息息相关的活动有两个</p>
+<ul>
+<li><code>discord</code> 赢 <code>$NRN</code> 宝箱（<code>4000W NRN</code>）<ul>
+<li>正在进行</li>
+</ul>
+</li>
+<li><code>P2A</code> 赢 <code>$NRN</code> 宝箱<ul>
+<li><code>2024</code>年<code>1</code>月底开始</li>
+</ul>
+</li>
+</ul>
+<h3 id="discord-赢-NRN-宝箱"><a href="#discord-赢-NRN-宝箱" class="headerlink" title="discord 赢 $NRN 宝箱"></a>discord 赢 $NRN 宝箱</h3><p>这里将详细带你了解如何在<code>discord</code>获取宝箱的完整流程。这里假定你已经加入<code>discord</code>并完成验证。（下述频道，均指 <code>AI Arena discord</code> 频道）</p>
+<p>首先应进入 <code>#?︱must-do</code> （必须做）频道，根据步骤将该做的都做完。</p>
+<p>接下来就要获取<code>AP</code>（<code>Arena Points</code>，积分）。所谓的 <code>AP</code> 是 <code>discord</code> 奖励证明。持有足量的积分后，可以抽奖$NRN宝箱。更具体的参考 <code>#?︱faq</code> 频道。</p>
+<p>获取积分主要有两个方式：</p>
+<ul>
+<li>开 <code>AP</code> 盒子</li>
+<li>做相关的任务</li>
+</ul>
+<h4 id="ap盒子"><a href="#ap盒子" class="headerlink" title="ap盒子"></a>ap盒子</h4><p>其中盒子的获取途径如下：</p>
+<ul>
+<li><code>?︱new-joiner-ap</code>频道 先领新人专属积分</li>
+<li><code>?︱daily-drops</code>频道 是每天可以领</li>
+<li><code>?︱roll-your-die</code>频道 是每周可以领</li>
+</ul>
+<p>当你获取盒子后，可以去 <code>#?︱bots</code> 频道上，使用指令 <code>/profile</code> 进行开盒，来随机获取不同额度的 <code>AP</code>。</p>
+<h4 id="任务"><a href="#任务" class="headerlink" title="任务"></a>任务</h4><p><code>discord</code> 会定期发布任务，如回答问题、竞猜、点击活动等，具体请看 <code>#⁠?︱when-drops</code> 频道的通知。</p>
+<p>当你积累了足量的 <code>AP</code> 后，就可以参加 ⁠<code>?︱nrn-box-pool</code> 的抽奖了。</p>
+<h3 id="P2A-赢-4000W-NRN-空投"><a href="#P2A-赢-4000W-NRN-空投" class="headerlink" title="P2A 赢 4000W $NRN 空投"></a>P2A 赢 4000W $NRN 空投</h3><p><code>P2A</code>（<code>Play To Airdrop</code>）锦标赛，于<code>2024</code>年<code>1</code>月底开始，所有人都可以参加。</p>
+<p>关于<code>P2A</code>的更多细节如下</p>
+<ul>
+<li>共空投 <code>4000W $NRN</code></li>
+<li><code>P2A</code>是放在测试网上的</li>
+<li>所有人都可以参加</li>
+<li>未来数周经邀请链接参加的人会有加成奖励。</li>
+<li>NFT 持有者的优势只有最后的奖励会有倍数加成，在其他方面没有优势。(<code>NFT</code>快照在北京时间<code>22</code>号晚上<code>9</code>时)</li>
+</ul>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>目前官方可以玩的是 <code>web2</code> 版本，旨在让大家熟悉如何上手游戏。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>上小学的时候，我哥带我去游戏厅打《拳皇》、《街霸》等游戏。当时的游戏厅的游戏机我们称之为“摇杆”，物价是1块钱1个游戏币。为了躲避老师的追查，甚至干过把草木灰抹在脸上去打游戏的白痴操作。电脑普及后，就再也没去过游戏厅。平台格斗类游戏也被现在的网游、单机所替代。</p>
+<p>伴随年龄的增长，操作意识还有，但是，反应已经跟不上了。又有谁不想打出梅原大吾的操作，享受全场欢呼呢？而<code>AI Arena</code>将你的操作意识投射到人物上，让人物代替你自动执行，这何尝不是一种数字生命。<code>AI</code>让文明更伟大，区块链让经济更透明，两者的结合会造出什么样的未来呢？让我们拭目以待。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/aiarena/" rel="tag"># aiarena</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/01/28/skytopia1/" rel="prev" title="skytopia | 信息">
+      <i class="fa fa-chevron-left"></i> skytopia | 信息
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/01/29/skytopia2/" rel="next" title="skytopia | 研报">
+      skytopia | 研报 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#项目介绍"><span class="nav-number">1.</span> <span class="nav-text">项目介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#融资情况"><span class="nav-number">2.</span> <span class="nav-text">融资情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代币模型"><span class="nav-number">3.</span> <span class="nav-text">代币模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NFT"><span class="nav-number">4.</span> <span class="nav-text">NFT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#活动简介"><span class="nav-number">5.</span> <span class="nav-text">活动简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#discord-赢-NRN-宝箱"><span class="nav-number">5.1.</span> <span class="nav-text">discord 赢 $NRN 宝箱</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ap盒子"><span class="nav-number">5.1.1.</span> <span class="nav-text">ap盒子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#任务"><span class="nav-number">5.1.2.</span> <span class="nav-text">任务</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#P2A-赢-4000W-NRN-空投"><span class="nav-number">5.2.</span> <span class="nav-text">P2A 赢 4000W $NRN 空投</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">6.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">7.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

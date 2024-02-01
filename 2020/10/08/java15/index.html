@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="java 原生 map 解析。  HashMap TreeMap LinkedHashMap Hashtable">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java | Map">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/10/08/java15/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="java 原生 map 解析。  HashMap TreeMap LinkedHashMap Hashtable">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-08T09:02:48.000Z">
+<meta property="article:modified_time" content="2020-10-08T15:16:48.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/10/08/java15/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>java | Map | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/10/08/java15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java | Map
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-08 17:02:48 / 修改时间：23:16:48" itemprop="dateCreated datePublished" datetime="2020-10-08T17:02:48+08:00">2020-10-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/08/java15/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/08/java15/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>java</code> 原生 <code>map</code> 解析。</p>
+<ul>
+<li><code>HashMap</code></li>
+<li><code>TreeMap</code></li>
+<li><code>LinkedHashMap</code></li>
+<li><code>Hashtable</code></li>
+</ul>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="环境说明"><a href="#环境说明" class="headerlink" title="环境说明"></a>环境说明</h1><br/>
+
+<ul>
+<li><code>java 14</code></li>
+</ul>
+<br/>
+
+<h1 id="通用用法"><a href="#通用用法" class="headerlink" title="通用用法"></a>通用用法</h1><br/>
+
+<table>
+<thead>
+<tr>
+<th>方法名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>clear()</td>
+<td>从 Map 中删除所有映射</td>
+</tr>
+<tr>
+<td>remove(Object key)</td>
+<td>从 Map 中删除键和关联的值</td>
+</tr>
+<tr>
+<td>put(Object key, Object value)</td>
+<td>将指定值与指定键相关联</td>
+</tr>
+<tr>
+<td>putAll(Map t)</td>
+<td>将指定 Map 中的所有映射复制到此 map</td>
+</tr>
+<tr>
+<td>entrySet()</td>
+<td>返回 Map 中所包含映射的 Set 视图。<br/> Set 中的每个元素都是一个 Map.Entry 对象，<br/> 可以使用 getKey() 和 getValue() 方法（还有一个 setValue() 方法）访问后者的键元素和值元素</td>
+</tr>
+<tr>
+<td>keySet()</td>
+<td>返回 Map 中所包含键的 Set 视图。删除 Set 中的元素还将删除 Map 中相应的映射（键和值）</td>
+</tr>
+<tr>
+<td>values()</td>
+<td>返回 map 中所包含值的 Collection 视图。<br/> 删除 Collection 中的元素还将删除 Map 中相应的映射（键和值）</td>
+</tr>
+<tr>
+<td>get(Object key)</td>
+<td>返回与指定键关联的值</td>
+</tr>
+<tr>
+<td>getOrDefault(Object key,String defaultValue)</td>
+<td>返回指定键，如果没有返回预定值</td>
+</tr>
+<tr>
+<td>containsKey(Object key)</td>
+<td>如果 Map 包含指定键的映射，则返回 true</td>
+</tr>
+<tr>
+<td>containsValue(Object value)</td>
+<td>如果此 Map 将一个或多个键映射到指定值，则返回 true</td>
+</tr>
+<tr>
+<td>isEmpty()</td>
+<td>如果 Map 不包含键-值映射，则返回 true</td>
+</tr>
+<tr>
+<td>size()</td>
+<td>返回 Map 中的键-值映射的数目</td>
+</tr>
+</tbody></table>
+<br/>
+
+<h1 id="各类型区别"><a href="#各类型区别" class="headerlink" title="各类型区别"></a>各类型区别</h1><br/>
+
+<ul>
+<li><code>HashMap</code><ul>
+<li>最常用的<code>Map</code>,它根据键的<code>HashCode</code> 值存储数据,根据键可以直接获取它的值，具有很快的访问速度。<code>HashMap</code>最多只允许一条记录的键为<code>Null</code>(多条会覆盖);允许多条记录的值为 <code>Null</code>。非同步的。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><code>TreeMap</code><ul>
+<li>能够把它保存的记录根据键(<code>key</code>)排序,默认是按升序排序，也可以指定排序的比较器，当用<code>Iterator</code> 遍历<code>TreeMap</code>时，得到的记录是排过序的。<code>TreeMap</code>不允许<code>key</code>的值为<code>null</code>。非同步的。 </li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><code>Hashtable</code><ul>
+<li>与 <code>HashMap</code>类似,不同的是:<code>key</code>和<code>value</code>的值均不允许为<code>null</code>;它支持线程的同步，即任一时刻只有一个线程能写<code>Hashtable</code>,因此也导致了<code>Hashtale</code>在写入时会比较慢。 </li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><code>LinkedHashMap</code><ul>
+<li>保存了记录的插入顺序，在用<code>Iterator</code>遍历<code>LinkedHashMap</code>时，先得到的记录肯定是先插入的.在遍历的时候会比<code>HashMap</code>慢。<code>key</code>和<code>value</code>均允许为空，非同步的。</li>
+</ul>
+</li>
+</ul>
+<h2 id="四种常用Map插入与读取性能比较"><a href="#四种常用Map插入与读取性能比较" class="headerlink" title="四种常用Map插入与读取性能比较"></a>四种常用<code>Map</code>插入与读取性能比较</h2><p>网上数据</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>插入10次平均(ms)</th>
+<th>插入10次平均(ms)</th>
+<th>插入10次平均(ms)</th>
+<th>读取10次平均(ms)</th>
+<th>读取10次平均(ms)</th>
+<th>读取10次平均(ms)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td>1W</td>
+<td>10W</td>
+<td>100W</td>
+<td>1W</td>
+<td>10W</td>
+<td>100W</td>
+</tr>
+<tr>
+<td>HashMap</td>
+<td>56</td>
+<td>261</td>
+<td>3030</td>
+<td>2</td>
+<td>21</td>
+<td>220</td>
+</tr>
+<tr>
+<td>LinkedHashMap</td>
+<td>25</td>
+<td>229</td>
+<td>3069</td>
+<td>2</td>
+<td>20</td>
+<td>216</td>
+</tr>
+<tr>
+<td>TreeMap</td>
+<td>29</td>
+<td>295</td>
+<td>4117</td>
+<td>5</td>
+<td>103</td>
+<td>1446</td>
+</tr>
+<tr>
+<td>Hashtable</td>
+<td>24</td>
+<td>234</td>
+<td>3275</td>
+<td>2</td>
+<td>22</td>
+<td>259</td>
+</tr>
+</tbody></table>
+<br/>
+
+<h1 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h1><br/>
+
+<ul>
+<li>常态方法</li>
+<li>匿名内部类方法</li>
+<li><code>collections</code> 实现以及其他</li>
+<li>使用<code>guava</code></li>
+</ul>
+<h2 id="常态方法"><a href="#常态方法" class="headerlink" title="常态方法"></a>常态方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; m = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line">m.put(<span class="string">"1"</span>, <span class="string">"test1"</span>);</span><br><span class="line">m.put(<span class="string">"2"</span>, <span class="string">"test2"</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="匿名内部类"><a href="#匿名内部类" class="headerlink" title="匿名内部类"></a>匿名内部类</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; m = <span class="keyword">new</span> LinkedHashMap&lt;&gt;()&#123;&#123;</span><br><span class="line">    put(<span class="string">"1"</span>,<span class="string">"test1"</span>);</span><br><span class="line">    put(<span class="string">"2"</span>,<span class="string">"test2"</span>);</span><br><span class="line">&#125;&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>我们必须避免使用这种初始化技术，因为它在每次使用时都会创建一个匿名的额外类，并且还包含对封闭对象的隐藏引用，这可能会导致内存泄漏问题。</p>
+<h2 id="collections-实现"><a href="#collections-实现" class="headerlink" title="collections 实现"></a><code>collections</code> 实现</h2><h3 id="单例-Map"><a href="#单例-Map" class="headerlink" title="单例 Map"></a>单例 <code>Map</code></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String,String&gt; m = Collections.singletonMap(<span class="string">"1"</span>,<span class="string">"test1"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>map</code> 是不可变的，如果我们尝试添加更多条目，它将抛出 </p>
+<pre><code>java.lang.UnsupportedOperationException</code></pre><p><code>Collections.emptyMap()</code>创建一个不变的空地图 ：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; emptyMap = Collections.emptyMap();</span><br></pre></td></tr></table></figure>
+
+<h3 id="java-8"><a href="#java-8" class="headerlink" title="java 8"></a><code>java 8</code></h3><p><code>java 8</code> 的实现方式会造成巨大开销，如使用 <code>Streams</code> 进行此类初始化。</p>
+<p>感兴趣的可以看下面的文章</p>
+<ul>
+<li><a href="https://rumenz.com/rumenbiji/java-directly-initialize-hashmap.html">用Java初始化HashMap</a></li>
+</ul>
+<h3 id="java-9"><a href="#java-9" class="headerlink" title="java 9"></a><code>java 9</code></h3><h4 id="Map-of"><a href="#Map-of" class="headerlink" title="Map.of()"></a>Map.of()</h4><p><code>Java 9</code> 在 <code>Map</code> 界面中附带了各种工厂方法 ，从而简化了不可变 <code>map</code> 的创建和初始化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; emptyMap = Map.of();</span><br><span class="line">Map&lt;String, String&gt; singletonMap = Map.of(<span class="string">"key1"</span>, <span class="string">"value"</span>);</span><br><span class="line">Map&lt;String, String&gt; map = Map.of(<span class="string">"key1"</span>,<span class="string">"value1"</span>, <span class="string">"key2"</span>, <span class="string">"value2"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>ps:</p>
+<ul>
+<li>此方法最多仅支持10个键值对</li>
+<li><code>map</code> 都是不可变的</li>
+</ul>
+<h4 id="Map-ofEntries"><a href="#Map-ofEntries" class="headerlink" title="Map.ofEntries()"></a>Map.ofEntries()</h4><p>它与 <code>Map.of()</code>类似， 但对键值对的数量没有限制：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> Map&lt;String, String&gt; map = Map.ofEntries(</span><br><span class="line">  <span class="keyword">new</span> AbstractMap.SimpleEntry&lt;String, String&gt;(<span class="string">"name"</span>, <span class="string">"John"</span>),</span><br><span class="line">  <span class="keyword">new</span> AbstractMap.SimpleEntry&lt;String, String&gt;(<span class="string">"city"</span>, <span class="string">"budapest"</span>),</span><br><span class="line">  <span class="keyword">new</span> AbstractMap.SimpleEntry&lt;String, String&gt;(<span class="string">"zip"</span>, <span class="string">"000000"</span>),</span><br><span class="line">  <span class="keyword">new</span> AbstractMap.SimpleEntry&lt;String, String&gt;(<span class="string">"home"</span>, <span class="string">"1231231231"</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>请注意，工厂方法会生成不可变的映射，因此任何突变都将导致 <code>UnsupportedOperationException</code>。</p>
+<p>而且，它们不允许空键和重复键。</p>
+<p>现在，如果在初始化后需要可变的或正在增长的地图，则可以创建Map接口的任何实现， 并将这些不可变的地图传递给构造函数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;String, String&gt; (</span><br><span class="line">  Map.of(<span class="string">"key1"</span>,<span class="string">"value1"</span>, <span class="string">"key2"</span>, <span class="string">"value2"</span>));</span><br><span class="line">Map&lt;String, String&gt; map2 = <span class="keyword">new</span> HashMap&lt;String, String&gt; (</span><br><span class="line">  Map.ofEntries(</span><br><span class="line">    <span class="keyword">new</span> AbstractMap.SimpleEntry&lt;String, String&gt;(<span class="string">"name"</span>, <span class="string">"John"</span>),    </span><br><span class="line">    <span class="keyword">new</span> AbstractMap.SimpleEntry&lt;String, String&gt;(<span class="string">"city"</span>, <span class="string">"budapest"</span>)));</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用guava"><a href="#使用guava" class="headerlink" title="使用guava"></a>使用<code>guava</code></h2><p>现在，当我们研究了使用核心Java的方式时，让我们继续使用Guava库初始化地图：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; articles </span><br><span class="line">  = ImmutableMap.of(<span class="string">"Title"</span>, <span class="string">"My New Article"</span>, <span class="string">"Title2"</span>, <span class="string">"Second Article"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这将创建一个不变的 <code>map</code>，</p>
+<p>创建一个可变的 <code>map</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; articles </span><br><span class="line">  = Maps.newHashMap(ImmutableMap.of(<span class="string">"Title"</span>, <span class="string">"My New Article"</span>, <span class="string">"Title2"</span>, <span class="string">"Second Article"</span>));</span><br></pre></td></tr></table></figure>
+
+<p>[<code>ImmutableMap.of()</code>] 方法 还具有重载版本，最多可以包含5对键值参数。这是带有两个参数对的示例：</p>
+<pre><code>ImmutableMap.of(&quot;key1&quot;, &quot;value1&quot;, &quot;key2&quot;, &quot;value2&quot;);</code></pre><p>超过5个 <code>key value</code>时</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; test = ImmutableMap.&lt;String, String&gt;builder()</span><br><span class="line">    .put(<span class="string">"k1"</span>, <span class="string">"v1"</span>)</span><br><span class="line">    .put(<span class="string">"k2"</span>, <span class="string">"v2"</span>)</span><br><span class="line">    ...</span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h1><br/>
+
+<h2 id="增强for循环遍历"><a href="#增强for循环遍历" class="headerlink" title="增强for循环遍历"></a>增强for循环遍历</h2><h3 id="使用keySet-遍历"><a href="#使用keySet-遍历" class="headerlink" title="使用keySet()遍历"></a>使用<code>keySet()</code>遍历</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (String key : map.keySet()) &#123;</span><br><span class="line">    System.out.println(key + <span class="string">" ："</span> + map.get(key));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用entrySet-遍历"><a href="#使用entrySet-遍历" class="headerlink" title="使用entrySet()遍历"></a>使用<code>entrySet()</code>遍历</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : map.entrySet()) &#123;</span><br><span class="line">    System.out.println(entry.getKey() + <span class="string">" ："</span> + entry.getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="迭代器遍历"><a href="#迭代器遍历" class="headerlink" title="迭代器遍历"></a>迭代器遍历</h2><h3 id="使用keySet-遍历-1"><a href="#使用keySet-遍历-1" class="headerlink" title="使用keySet()遍历"></a>使用<code>keySet()</code>遍历</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Iterator&lt;String&gt; iterator = map.keySet().iterator();</span><br><span class="line"><span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">    String key = iterator.next();</span><br><span class="line">    System.out.println(key + <span class="string">"　："</span> + map.get(key));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="使用entrySet-遍历-1"><a href="#使用entrySet-遍历-1" class="headerlink" title="使用entrySet()遍历"></a>使用<code>entrySet()</code>遍历</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Iterator&lt;Map.Entry&lt;String, String&gt;&gt; iterator = map.entrySet().iterator();</span><br><span class="line"><span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">    Map.Entry&lt;String, String&gt; entry = iterator.next();</span><br><span class="line">    System.out.println(entry.getKey() + <span class="string">"　："</span> + entry.getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有人专门比较过他们的性能</p>
+<ul>
+<li><code>增强for</code>循环使用方便，但性能较差，不适合处理超大量级的数据</li>
+<li>迭代器的遍历速度要比<code>增强for</code>循环快很多，是<code>增强for</code>循环的<code>2</code>倍左右</li>
+<li>使用<code>entrySet</code>遍历的速度要比<code>keySet</code>快很多，是<code>keySet</code>的<code>1.5</code>倍左右</li>
+</ul>
+<br/>
+
+<h1 id="Map-排序"><a href="#Map-排序" class="headerlink" title="Map 排序"></a>Map 排序</h1><br/>
+
+<h2 id="HashMap、Hashtable、LinkedHashMap排序"><a href="#HashMap、Hashtable、LinkedHashMap排序" class="headerlink" title="HashMap、Hashtable、LinkedHashMap排序"></a><code>HashMap</code>、<code>Hashtable</code>、<code>LinkedHashMap</code>排序</h2><p>ps:<code>TreeMap</code>也可以使用此方法进行排序，但是更推荐下面的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;String, String&gt;();</span><br><span class="line">map.put(<span class="string">"a"</span>, <span class="string">"c"</span>);</span><br><span class="line">map.put(<span class="string">"b"</span>, <span class="string">"b"</span>);</span><br><span class="line">map.put(<span class="string">"c"</span>, <span class="string">"a"</span>);</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 通过ArrayList构造函数把map.entrySet()转换成list</span></span><br><span class="line">List&lt;Map.Entry&lt;String, String&gt;&gt; list = <span class="keyword">new</span> ArrayList&lt;Map.Entry&lt;String, String&gt;&gt;(map.entrySet());</span><br><span class="line"><span class="comment">// 通过比较器实现比较排序</span></span><br><span class="line">Collections.sort(list, <span class="keyword">new</span> Comparator&lt;Map.Entry&lt;String, String&gt;&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Map.Entry&lt;String, String&gt; mapping1, Map.Entry&lt;String, String&gt; mapping2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mapping1.getKey().compareTo(mapping2.getKey());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> (Map.Entry&lt;String, String&gt; mapping : list) &#123;</span><br><span class="line">    System.out.println(mapping.getKey() + <span class="string">" ："</span> + mapping.getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="TreeMap排序"><a href="#TreeMap排序" class="headerlink" title="TreeMap排序"></a><code>TreeMap</code>排序</h2><p><code>TreeMap</code>默认按<code>key</code>进行升序排序，如果想改变默认的顺序，可以使用比较器:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; map = <span class="keyword">new</span> TreeMap&lt;String, String&gt;(<span class="keyword">new</span> Comparator&lt;String&gt;() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(String obj1, String obj2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> obj2.compareTo(obj1);<span class="comment">// 降序排序</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">map.put(<span class="string">"a"</span>, <span class="string">"c"</span>);</span><br><span class="line">map.put(<span class="string">"b"</span>, <span class="string">"b"</span>);</span><br><span class="line">map.put(<span class="string">"c"</span>, <span class="string">"a"</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> (String key : map.keySet()) &#123;</span><br><span class="line">    System.out.println(key + <span class="string">" ："</span> + map.get(key));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="按value排序-通用"><a href="#按value排序-通用" class="headerlink" title="按value排序(通用)"></a>按value排序(通用)</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; map = <span class="keyword">new</span> TreeMap&lt;String, String&gt;();</span><br><span class="line">        map.put(<span class="string">"a"</span>, <span class="string">"c"</span>);</span><br><span class="line">        map.put(<span class="string">"b"</span>, <span class="string">"b"</span>);</span><br><span class="line">        map.put(<span class="string">"c"</span>, <span class="string">"a"</span>);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 通过ArrayList构造函数把map.entrySet()转换成list</span></span><br><span class="line">        List&lt;Map.Entry&lt;String, String&gt;&gt; list = <span class="keyword">new</span> ArrayList&lt;Map.Entry&lt;String, String&gt;&gt;(map.entrySet());</span><br><span class="line">        <span class="comment">// 通过比较器实现比较排序</span></span><br><span class="line">        Collections.sort(list, <span class="keyword">new</span> Comparator&lt;Map.Entry&lt;String, String&gt;&gt;() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Map.Entry&lt;String, String&gt; mapping1, Map.Entry&lt;String, String&gt; mapping2)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> mapping1.getValue().compareTo(mapping2.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">for</span> (String key : map.keySet()) &#123;</span><br><span class="line">            System.out.println(key + <span class="string">" ："</span> + map.get(key));</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/08/java14/" rel="prev" title="java | com.alibaba.fastjson">
+      <i class="fa fa-chevron-left"></i> java | com.alibaba.fastjson
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/08/java16/" rel="next" title="java | 匿名内部类">
+      java | 匿名内部类 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#环境说明"><span class="nav-number">1.</span> <span class="nav-text">环境说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通用用法"><span class="nav-number">2.</span> <span class="nav-text">通用用法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#各类型区别"><span class="nav-number">3.</span> <span class="nav-text">各类型区别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#四种常用Map插入与读取性能比较"><span class="nav-number">3.1.</span> <span class="nav-text">四种常用Map插入与读取性能比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初始化"><span class="nav-number">4.</span> <span class="nav-text">初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#常态方法"><span class="nav-number">4.1.</span> <span class="nav-text">常态方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#匿名内部类"><span class="nav-number">4.2.</span> <span class="nav-text">匿名内部类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#collections-实现"><span class="nav-number">4.3.</span> <span class="nav-text">collections 实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单例-Map"><span class="nav-number">4.3.1.</span> <span class="nav-text">单例 Map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#java-8"><span class="nav-number">4.3.2.</span> <span class="nav-text">java 8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#java-9"><span class="nav-number">4.3.3.</span> <span class="nav-text">java 9</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Map-of"><span class="nav-number">4.3.3.1.</span> <span class="nav-text">Map.of()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Map-ofEntries"><span class="nav-number">4.3.3.2.</span> <span class="nav-text">Map.ofEntries()</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用guava"><span class="nav-number">4.4.</span> <span class="nav-text">使用guava</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#遍历"><span class="nav-number">5.</span> <span class="nav-text">遍历</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#增强for循环遍历"><span class="nav-number">5.1.</span> <span class="nav-text">增强for循环遍历</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用keySet-遍历"><span class="nav-number">5.1.1.</span> <span class="nav-text">使用keySet()遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用entrySet-遍历"><span class="nav-number">5.1.2.</span> <span class="nav-text">使用entrySet()遍历</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代器遍历"><span class="nav-number">5.2.</span> <span class="nav-text">迭代器遍历</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用keySet-遍历-1"><span class="nav-number">5.2.1.</span> <span class="nav-text">使用keySet()遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用entrySet-遍历-1"><span class="nav-number">5.2.2.</span> <span class="nav-text">使用entrySet()遍历</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Map-排序"><span class="nav-number">6.</span> <span class="nav-text">Map 排序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap、Hashtable、LinkedHashMap排序"><span class="nav-number">6.1.</span> <span class="nav-text">HashMap、Hashtable、LinkedHashMap排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TreeMap排序"><span class="nav-number">6.2.</span> <span class="nav-text">TreeMap排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#按value排序-通用"><span class="nav-number">6.3.</span> <span class="nav-text">按value排序(通用)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

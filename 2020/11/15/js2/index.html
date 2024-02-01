@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="很早之前我一直用 var 来声明变量，但是，最近看到的 js 大都用 let，于是想探究一番。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="js | var,let,const,隐式声明">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/11/15/js2/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="很早之前我一直用 var 来声明变量，但是，最近看到的 js 大都用 let，于是想探究一番。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-11-15T04:03:28.000Z">
+<meta property="article:modified_time" content="2020-12-26T09:39:44.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="js">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/11/15/js2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>js | var,let,const,隐式声明 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/11/15/js2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          js | var,let,const,隐式声明
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-15 12:03:28" itemprop="dateCreated datePublished" datetime="2020-11-15T12:03:28+08:00">2020-11-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-26 17:39:44" itemprop="dateModified" datetime="2020-12-26T17:39:44+08:00">2020-12-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">网站设计</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/js/" itemprop="url" rel="index"><span itemprop="name">js</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/js/ES6/" itemprop="url" rel="index"><span itemprop="name">ES6</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/11/15/js2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/11/15/js2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>很早之前我一直用 <code>var</code> 来声明变量，但是，最近看到的 <code>js</code> 大都用 <code>let</code>，于是想探究一番。</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a href="https://blog.csdn.net/muzidigbig/article/details/81075545">js 变量声明</a></li>
+<li><a href="https://segmentfault.com/a/1190000018650933">ES6-新的变量声明方式</a></li>
+</ul>
+<p>在<code>ES5</code>中，变量声明只有<code>var</code>和<code>function</code>以及<code>隐式声明</code>。</p>
+<p>ECMAScript 2015(ECMAScript 6)</p>
+<p><code>ES2015(ES6)</code> 新增加了两个重要的 <code>JavaScript</code> 关键字: <code>let</code> 和 <code>const</code>。</p>
+<p><code>let</code> 声明的变量只在 <code>let</code> 命令所在的代码块内有效。</p>
+<p><code>const</code> 声明一个只读的常量，一旦声明，常量的值就不能改变。</p>
+<p>在 <code>ES6</code> 之前，<code>JavaScript</code> 只有两种作用域： <code>全局变量</code> 与 <code>函数内的局部变量</code>。</p>
+<h2 id="隐式声明"><a href="#隐式声明" class="headerlink" title="隐式声明"></a>隐式声明</h2><p>没有用<code>var</code>,<code>let</code> 等关键字，使用直接赋值方式声明的是全局变量（全局对象属性）。</p>
+<pre><code>name = &apos;muzidigbig&apos;;//隐式声明（为全局变量的一个属性）</code></pre><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//    name = 'muzidigbig';//隐式声明（为全局变量的一个属性）</span></span><br><span class="line"><span class="built_in">console</span>.log(name);</span><br><span class="line"><span class="function"><span class="keyword">function</span>  <span class="title">person</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    name = <span class="string">'木子大大'</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(name);</span><br><span class="line">&#125;</span><br><span class="line">person();</span><br></pre></td></tr></table></figure>
+
+<p>当我们使用访问一个没有声明的变量时，<code>JS</code>会报错；而当我们给一个没有声明的变量赋值时，<code>JS</code>不会报错，相反它会认为我们是要隐式声明一个全局变量，这一点一定要注意。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">name = <span class="string">'muzidigbig'</span>;<span class="comment">//隐式声明（为全局变量的一个属性）</span></span><br><span class="line"><span class="built_in">console</span>.log(name);</span><br><span class="line"><span class="function"><span class="keyword">function</span>  <span class="title">person</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    name = <span class="string">'木子大大'</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(name);<span class="comment">//木子大大</span></span><br><span class="line">&#125;</span><br><span class="line">person();</span><br></pre></td></tr></table></figure>
+
+<p>在当前域中声明变量. 如果在方法中声明，则为局部变量（<code>local variable</code>）；如果是在全局域中声明，则为全局变量。</p>
+<p>而事实上是对属性赋值操作。首先，它会尝试在当前作用域链（如在方法中声明，则当前作用域链代表全局作用域和方法局部作用域）中解析 <code>name</code>； 如果在任何当前作用域链中找到<code>name</code>，则会执行对<code>name</code>属性赋值； 如果没有找到<code>name</code>，它才会在全局对象（即当前作用域链的最顶层对象，如<code>window</code>对象）中创造<code>name</code>属性并赋值。</p>
+<p>注意！它并不是声明了一个全局变量，而是创建了一个全局对象的属性。<br>即便如此，可能你还是很难明白“变量声明”跟“创建对象属性”在这里的区别。事实上，<code>Javascript</code>的变量声明、创建属性以及每个<code>Javascript</code>中的每个属性都有一定的标志说明它们的属性—-如只读（<code>ReadOnly</code>）不可枚举（<code>DontEnum</code>）不可删除（<code>DontDelete</code>）等等。</p>
+<p> 由于变量声明自带不可删除属性，比较 </p>
+<ul>
+<li>var name = ‘muzidigbig’</li>
+<li>name = ‘muzidigbig’</li>
+</ul>
+<p>前者是变量声明，带不可删除属性，因此无法被删除；后者为全局变量的一个属性，因此可以从全局变量中删除。</p>
+<h2 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h2><p>在函数外声明的变量作用域是全局的：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> carName = <span class="string">"Volvo"</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 这里可以使用 carName 变量</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 这里也可以使用 carName 变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>全局变量在 JavaScript 程序的任何地方都可以访问。</p>
+<h2 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h2><p>在函数内声明的变量作用域是局部的（函数内）：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里不能使用 carName 变量</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> carName = <span class="string">"Volvo"</span>;</span><br><span class="line">    <span class="comment">// 这里可以使用 carName 变量</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 这里不能使用 carName 变量</span></span><br></pre></td></tr></table></figure>
+
+<p>函数内使用 <code>var</code> 声明的变量只能在函数内容访问，如果不使用 <code>var</code> 则是全局变量。</p>
+<h2 id="JavaScript-块级作用域-Block-Scope"><a href="#JavaScript-块级作用域-Block-Scope" class="headerlink" title="JavaScript 块级作用域(Block Scope)"></a>JavaScript 块级作用域(Block Scope)</h2><p>使用 <code>var</code> 关键字声明的变量不具备块级作用域的特性，它在 <code>{}</code> 外依然能被访问到。</p>
+<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123; </span><br><span class="line">    <span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">2</span>; </span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里可以使用 x 变量</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>ES6</code> 之前，是没有块级作用域的概念的。</p>
+<p><code>ES6</code> 可以使用 <code>let</code> 关键字来实现块级作用域。</p>
+<p><code>let</code> 声明的变量只在 <code>let</code> 命令所在的代码块 <code>{}</code> 内有效，在 <code>{}</code> 之外不能访问。</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123; </span><br><span class="line">    let x = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里不能使用 x 变量</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="重新定义变量"><a href="#重新定义变量" class="headerlink" title="重新定义变量"></a>重新定义变量</h2><p>使用 <code>var</code> 关键字重新声明变量可能会带来问题。</p>
+<p>在块中重新声明变量也会重新声明块外的变量：</p>
+<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">10</span>;</span><br><span class="line"><span class="comment">// 这里输出 x 为 10</span></span><br><span class="line">&#123; </span><br><span class="line">    <span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">2</span>;</span><br><span class="line">    <span class="comment">// 这里输出 x 为 2</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里输出 x 为 2</span></span><br></pre></td></tr></table></figure>
+
+<p><code>let</code> 关键字就可以解决这个问题，因为它只在 <code>let</code> 命令所在的代码块 <code>{}</code> 内有效。</p>
+<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">10</span>;</span><br><span class="line"><span class="comment">// 这里输出 x 为 10</span></span><br><span class="line">&#123; </span><br><span class="line">    let <span class="symbol">x</span> = <span class="number">2</span>;</span><br><span class="line">    <span class="comment">// 这里输出 x 为 2</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里输出 x 为 10</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="循环作用域"><a href="#循环作用域" class="headerlink" title="循环作用域"></a>循环作用域</h2><p>使用 <code>var</code> 关键字：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var i = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">for</span> (var i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">    <span class="comment">// 一些代码...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里输出 i 为 10</span></span><br></pre></td></tr></table></figure>
+
+
+<p>使用 <code>let</code> 关键字：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let i = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">for</span> (let i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">    <span class="comment">// 一些代码...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里输出 i 为 5</span></span><br></pre></td></tr></table></figure>
+
+<p>在第一个实例中，使用了 <code>var</code> 关键字，它声明的变量是全局的，包括循环体内与循环体外。</p>
+<p>在第二个实例中，使用 <code>let</code> 关键字， 它声明的变量作用域只在循环体内，循环体外的变量不受影响。</p>
+<h2 id="局部变量-1"><a href="#局部变量-1" class="headerlink" title="局部变量"></a>局部变量</h2><p>在函数体内使用 <code>var</code> 和 <code>let</code> 关键字声明的变量有点类似。</p>
+<p>它们的作用域都是 局部的:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 var</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myFunction</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> carName = <span class="string">"Volvo"</span>;   <span class="comment">// 局部作用域</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 let</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myFunction</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> carName = <span class="string">"Volvo"</span>;   <span class="comment">//  局部作用域</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="全局变量-1"><a href="#全局变量-1" class="headerlink" title="全局变量"></a>全局变量</h2><p>在函数体外或代码块外使用 <code>var</code> 和 <code>let</code> 关键字声明的变量也有点类似。</p>
+<p>它们的作用域都是 全局的:</p>
+<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 var</span></span><br><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">2</span>;       <span class="comment">// 全局作用域</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 let</span></span><br><span class="line">let <span class="symbol">x</span> = <span class="number">2</span>;       <span class="comment">// 全局作用域</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="HTML-代码中使用全局变量"><a href="#HTML-代码中使用全局变量" class="headerlink" title="HTML 代码中使用全局变量"></a>HTML 代码中使用全局变量</h2><p>在 <code>JavaScript</code> 中, 全局作用域是针对 <code>JavaScript</code> 环境。</p>
+<p>在 <code>HTML</code> 中, 全局作用域是针对 <code>window</code> 对象。</p>
+<p>使用 <code>var</code> 关键字声明的全局作用域变量属于 <code>window</code> 对象:</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> carName = <span class="string">"Volvo"</span>;</span><br><span class="line"><span class="comment">// 可以使用 window.carName 访问变量</span></span><br></pre></td></tr></table></figure>
+
+
+<p>使用 <code>let</code> 关键字声明的全局作用域变量不属于 <code>window</code> 对象:</p>
+<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> carName = <span class="string">"Volvo"</span>;</span><br><span class="line"><span class="comment">// 不能使用 window.carName 访问变量</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="重置变量"><a href="#重置变量" class="headerlink" title="重置变量"></a>重置变量</h2><p>使用 var 关键字声明的变量在任何地方都可以修改：</p>
+<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">2</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// x 为 2</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">3</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 现在 x 为 3</span></span><br></pre></td></tr></table></figure>
+
+<p>在相同的作用域或块级作用域中，不能使用 <code>let</code> 关键字来重置 <code>var</code> 关键字声明的变量:</p>
+<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">2</span>;       <span class="comment">// 合法</span></span><br><span class="line">let <span class="symbol">x</span> = <span class="number">3</span>;       <span class="comment">// 不合法</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">4</span>;   <span class="comment">// 合法</span></span><br><span class="line">    let <span class="symbol">x</span> = <span class="number">5</span>   <span class="comment">// 不合法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在相同的作用域或块级作用域中，不能使用 <code>let</code> 关键字来重置 <code>let</code> 关键字声明的变量:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let x = <span class="number">2</span>;       <span class="comment">// 合法</span></span><br><span class="line">let x = <span class="number">3</span>;       <span class="comment">// 不合法</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    let x = <span class="number">4</span>;   <span class="comment">// 合法</span></span><br><span class="line">    let x = <span class="number">5</span>;   <span class="comment">// 不合法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在相同的作用域或块级作用域中，不能使用 <code>var</code> 关键字来重置 <code>let</code> 关键字声明的变量:</p>
+<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let <span class="symbol">x</span> = <span class="number">2</span>;       <span class="comment">// 合法</span></span><br><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">3</span>;       <span class="comment">// 不合法</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    let <span class="symbol">x</span> = <span class="number">4</span>;   <span class="comment">// 合法</span></span><br><span class="line">    <span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">5</span>;   <span class="comment">// 不合法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>let</code> 关键字在不同作用域，或不同块级作用域中是可以重新声明赋值的:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">let x = <span class="number">2</span>;       <span class="comment">// 合法</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    let x = <span class="number">3</span>;   <span class="comment">// 合法</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    let x = <span class="number">4</span>;   <span class="comment">// 合法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="变量提升"><a href="#变量提升" class="headerlink" title="变量提升"></a>变量提升</h2><p><code>JavaScript</code> 中，<code>var</code> 关键字定义的变量可以在使用后声明，也就是变量可以先使用再声明。</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在这里可以使用 carName 变量</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">var</span> carName;</span><br></pre></td></tr></table></figure>
+
+<p>let 关键字定义的变量则不可以在使用后声明，也就是变量需要先声明再使用。</p>
+<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在这里不可以使用 carName 变量</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> carName;</span><br></pre></td></tr></table></figure>
+
+<h2 id="const-关键字"><a href="#const-关键字" class="headerlink" title="const 关键字"></a>const 关键字</h2><p><code>const</code> 用于声明一个或多个常量，声明时必须进行初始化，且初始化后值不可再修改：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const <span class="literal">PI</span> = <span class="number">3.141592653589793</span>;</span><br><span class="line"><span class="literal">PI</span> = <span class="number">3.14</span>;      <span class="comment">// 报错</span></span><br><span class="line"><span class="literal">PI</span> = <span class="literal">PI</span> + <span class="number">10</span>;   <span class="comment">// 报错</span></span><br></pre></td></tr></table></figure>
+
+<p><code>const</code>定义常量与使用<code>let</code> 定义的变量相似：</p>
+<p>二者都是块级作用域,都不能和它所在作用域内的其他变量或函数拥有相同的名称。</p>
+<p>两者还有以下两点区别：</p>
+<ul>
+<li><code>const</code>声明的常量必须初始化，而<code>let</code>声明的变量不用</li>
+<li><code>const</code> 定义常量的值不能通过再赋值修改，也不能再次声明。而 <code>let</code> 定义的变量值可以修改。</li>
+</ul>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var x = <span class="number">10</span>;</span><br><span class="line"><span class="comment">// 这里输出 x 为 10</span></span><br><span class="line">&#123; </span><br><span class="line">    <span class="keyword">const</span> x = <span class="number">2</span>;</span><br><span class="line">    <span class="comment">// 这里输出 x 为 2</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里输出 x 为 10</span></span><br></pre></td></tr></table></figure>
+
+<p><code>const</code> 声明的常量必须初始化：</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误写法</span></span><br><span class="line"><span class="keyword">const</span> <span class="literal">PI</span>;</span><br><span class="line"><span class="literal">PI</span> = <span class="number">3.14159265359</span>;</span><br><span class="line"><span class="comment">// 正确写法</span></span><br><span class="line"><span class="keyword">const</span> <span class="literal">PI</span> = <span class="number">3.14159265359</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="并非真正的常量"><a href="#并非真正的常量" class="headerlink" title="并非真正的常量"></a>并非真正的常量</h2><p><code>const</code> 的本质: <code>const</code> 定义的变量并非常量，并非不可变，它定义了一个常量引用一个值。使用 <code>const</code> 定义的对象或者数组，其实是可变的。下面的代码并不会报错：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建常量对象</span></span><br><span class="line">const car = &#123;<span class="string">type:</span><span class="string">"Fiat"</span>, <span class="string">model:</span><span class="string">"500"</span>, <span class="string">color:</span><span class="string">"white"</span>&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 修改属性:</span></span><br><span class="line">car.color = <span class="string">"red"</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 添加属性</span></span><br><span class="line">car.owner = <span class="string">"Johnson"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>但是我们不能对常量对象重新赋值：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const car = &#123;<span class="string">type:</span><span class="string">"Fiat"</span>, <span class="string">model:</span><span class="string">"500"</span>, <span class="string">color:</span><span class="string">"white"</span>&#125;;</span><br><span class="line">car = &#123;<span class="string">type:</span><span class="string">"Volvo"</span>, <span class="string">model:</span><span class="string">"EX60"</span>, <span class="string">color:</span><span class="string">"red"</span>&#125;;    <span class="comment">// 错误</span></span><br></pre></td></tr></table></figure>
+
+<p>以下实例修改常量数组：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建常量数组</span></span><br><span class="line"><span class="keyword">const</span> cars = [<span class="string">"Saab"</span>, <span class="string">"Volvo"</span>, <span class="string">"BMW"</span>];</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 修改元素</span></span><br><span class="line">cars[<span class="number">0</span>] = <span class="string">"Toyota"</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 添加元素</span></span><br><span class="line">cars.push(<span class="string">"Audi"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>但是我们不能对常量数组重新赋值：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> cars = [<span class="string">"Saab"</span>, <span class="string">"Volvo"</span>, <span class="string">"BMW"</span>];</span><br><span class="line">cars = [<span class="string">"Toyota"</span>, <span class="string">"Volvo"</span>, <span class="string">"Audi"</span>];    <span class="comment">// 错误</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="重置变量-1"><a href="#重置变量-1" class="headerlink" title="重置变量"></a>重置变量</h2><p>使用 <code>var</code> 关键字声明的变量在任何地方都可以修改：</p>
+<figure class="highlight gml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">2</span>;    <span class="comment">//  合法</span></span><br><span class="line"><span class="keyword">var</span> <span class="symbol">x</span> = <span class="number">3</span>;    <span class="comment">//  合法</span></span><br><span class="line"><span class="symbol">x</span> = <span class="number">4</span>;        <span class="comment">//  合法</span></span><br></pre></td></tr></table></figure>
+
+<p>在相同的作用域或块级作用域中，不能使用 <code>const</code> 关键字来重置 <code>var</code> 和 <code>let</code> 关键字声明的变量:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var x = <span class="number">2</span>;         <span class="comment">// 合法</span></span><br><span class="line"><span class="keyword">const</span> x = <span class="number">2</span>;       <span class="comment">// 不合法</span></span><br><span class="line">&#123;</span><br><span class="line">    let x = <span class="number">2</span>;     <span class="comment">// 合法</span></span><br><span class="line">    <span class="keyword">const</span> x = <span class="number">2</span>;   <span class="comment">// 不合法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在相同的作用域或块级作用域中，不能使用 <code>const</code> 关键字来重置 <code>const</code> 关键字声明的变量:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> x = <span class="number">2</span>;       <span class="comment">// 合法</span></span><br><span class="line"><span class="keyword">const</span> x = <span class="number">3</span>;       <span class="comment">// 不合法</span></span><br><span class="line">x = <span class="number">3</span>;             <span class="comment">// 不合法</span></span><br><span class="line">var x = <span class="number">3</span>;         <span class="comment">// 不合法</span></span><br><span class="line">let x = <span class="number">3</span>;         <span class="comment">// 不合法</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">const</span> x = <span class="number">2</span>;   <span class="comment">// 合法</span></span><br><span class="line">    <span class="keyword">const</span> x = <span class="number">3</span>;   <span class="comment">// 不合法</span></span><br><span class="line">    x = <span class="number">3</span>;         <span class="comment">// 不合法</span></span><br><span class="line">    var x = <span class="number">3</span>;     <span class="comment">// 不合法</span></span><br><span class="line">    let x = <span class="number">3</span>;     <span class="comment">// 不合法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>const</code> 关键字在不同作用域，或不同块级作用域中是可以重新声明赋值的:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> x = <span class="number">2</span>;       <span class="comment">// 合法</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">const</span> x = <span class="number">3</span>;   <span class="comment">// 合法</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">const</span> x = <span class="number">4</span>;   <span class="comment">// 合法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="变量提升-1"><a href="#变量提升-1" class="headerlink" title="变量提升"></a>变量提升</h2><p><code>JavaScript</code> <code>var</code> 关键字定义的变量可以在使用后声明，也就是变量可以先使用再声明（JavaScript 变量提升）。</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">carName</span> = <span class="string">"Volvo"</span><span class="comment">;    // 这里可以使用 carName 变量</span></span><br><span class="line">var carName<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>const</code> 关键字定义的变量则不可以在使用后声明，也就是变量需要先声明再使用。</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">carName</span> = <span class="string">"Volvo"</span><span class="comment">;    // 在这里不可以使用 carName 变量</span></span><br><span class="line">const carName = <span class="string">"Volvo"</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<h2 id="ps"><a href="#ps" class="headerlink" title="ps"></a>ps</h2><ul>
+<li>使用var关键字声明的全局作用域变量属于window对象。</li>
+<li>使用let关键字声明的全局作用域变量不属于window对象。</li>
+<li>使用var关键字声明的变量在任何地方都可以修改。</li>
+<li>在相同的作用域或块级作用域中，不能使用let关键字来重置var关键字声明的变量。</li>
+<li>在相同的作用域或块级作用域中，不能使用let关键字来重置let关键字声明的变量。</li>
+<li>let关键字在不同作用域，或不用块级作用域中是可以重新声明赋值的。</li>
+<li>在相同的作用域或块级作用域中，不能使用const关键字来重置var和let关键字声明的变量。</li>
+<li>在相同的作用域或块级作用域中，不能使用const关键字来重置const关键字声明的变量</li>
+<li>const 关键字在不同作用域，或不同块级作用域中是可以重新声明赋值的:</li>
+<li>var关键字定义的变量可以先使用后声明。</li>
+<li>let关键字定义的变量需要先声明再使用。</li>
+<li>const关键字定义的常量，声明时必须进行初始化，且初始化后不可再修改。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/js/" rel="tag"># js</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/15/js1/" rel="prev" title="js | 变量提升">
+      <i class="fa fa-chevron-left"></i> js | 变量提升
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/16/python128/" rel="next" title="python 模块 | faker">
+      python 模块 | faker <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#隐式声明"><span class="nav-number">2.</span> <span class="nav-text">隐式声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全局变量"><span class="nav-number">3.</span> <span class="nav-text">全局变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#局部变量"><span class="nav-number">4.</span> <span class="nav-text">局部变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript-块级作用域-Block-Scope"><span class="nav-number">5.</span> <span class="nav-text">JavaScript 块级作用域(Block Scope)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重新定义变量"><span class="nav-number">6.</span> <span class="nav-text">重新定义变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#循环作用域"><span class="nav-number">7.</span> <span class="nav-text">循环作用域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#局部变量-1"><span class="nav-number">8.</span> <span class="nav-text">局部变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全局变量-1"><span class="nav-number">9.</span> <span class="nav-text">全局变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTML-代码中使用全局变量"><span class="nav-number">10.</span> <span class="nav-text">HTML 代码中使用全局变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重置变量"><span class="nav-number">11.</span> <span class="nav-text">重置变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量提升"><span class="nav-number">12.</span> <span class="nav-text">变量提升</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#const-关键字"><span class="nav-number">13.</span> <span class="nav-text">const 关键字</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并非真正的常量"><span class="nav-number">14.</span> <span class="nav-text">并非真正的常量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重置变量-1"><span class="nav-number">15.</span> <span class="nav-text">重置变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量提升-1"><span class="nav-number">16.</span> <span class="nav-text">变量提升</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ps"><span class="nav-number">17.</span> <span class="nav-text">ps</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

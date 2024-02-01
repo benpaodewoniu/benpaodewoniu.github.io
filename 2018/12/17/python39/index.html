@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="如题，另外，这篇是我大段 copy 的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="numpy 和 pandas 的区别详解">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/12/17/python39/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="如题，另外，这篇是我大段 copy 的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_5.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_7.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_8.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_9.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_10.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_11.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_12.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_13.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_14.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_15.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_16.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_17.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_18.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_19.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_20.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_21.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_22.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_23.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_24.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_25.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_26.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_27.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/39_28.png">
+<meta property="article:published_time" content="2018-12-17T12:56:33.000Z">
+<meta property="article:modified_time" content="2020-11-30T09:11:28.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="python 第三方库">
+<meta property="article:tag" content="numpy">
+<meta property="article:tag" content="pandas">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/python/39_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/12/17/python39/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>numpy 和 pandas 的区别详解 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/12/17/python39/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          numpy 和 pandas 的区别详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-17 20:56:33" itemprop="dateCreated datePublished" datetime="2018-12-17T20:56:33+08:00">2018-12-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-30 17:11:28" itemprop="dateModified" datetime="2020-11-30T17:11:28+08:00">2020-11-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/" itemprop="url" rel="index"><span itemprop="name">模块</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">高级</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E9%AB%98%E7%BA%A7/numpy/" itemprop="url" rel="index"><span itemprop="name">numpy</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E9%AB%98%E7%BA%A7/pandas/" itemprop="url" rel="index"><span itemprop="name">pandas</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/12/17/python39/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/12/17/python39/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如题，另外，这篇是我大段 copy 的。</p>
+<a id="more"></a>
+
+<p><a href="https://zhuanlan.zhihu.com/p/27624814">numpy和pandas入门</a></p>
+<p>数据分析绝对绕不过的三个包是numpy、scipy和pandas。numpy是Python的数值计算扩展，专门用来处理矩阵，它的运算效率比列表更高效。scipy是基于numpy的科学计算包，包括统计、线性代数等工具。pandas是基于numpy的数据分析工具，能更方便的操作大型数据集。</p>
+<p>numpy和pandas</p>
+<h2 id="numpy"><a href="#numpy" class="headerlink" title="numpy"></a>numpy</h2><p>numpy的数据结构是n维的数组对象，叫做ndarray。Python的list虽然也能表示，但是不高效，随着列表数据的增加，效率会降低。</p>
+<p>我们首先载入numpy包，因为它是第三方工具，所以每次使用前必须在代码中载入。as是命名为别名，方便调用，np是numpy约定俗成的简写。</p>
+<p><img src="/images/python/39_0.png" alt=""></p>
+<p>创建数组使用numpy中的array函数，新手要记住加np。我们将系统自带的列表list转换成了numpy中的数组。</p>
+<p><img src="/images/python/39_1.png" alt=""></p>
+<p>嵌套列表会被转换为一个多维数组，它也可以被称为矩阵。</p>
+<p>array数组需要注意的是，它内部的元素必须为相同类型，比如数值或者字符串。可以用dtype查询其类型，不用加括号。</p>
+<p><img src="/images/python/39_2.png" alt=""></p>
+<p>numpy的数据类型比较丰富，包括int8，int16，int32等，不过这块更接近计算机底层，数据分析用不太到。当我们想转换数据格式时，可以用astype函数。</p>
+<p><img src="/images/python/39_3.png" alt=""></p>
+<p>数组的计算非常方便，不要大量的循环即可批量运算。</p>
+<p><img src="/images/python/39_4.png" alt=""></p>
+<p>数组索引和列表相同，通过方括号和数字即可选择，也可直接赋值。</p>
+<p><img src="/images/python/39_5.png" alt=""></p>
+<p>可以通过递归对多维数组进行筛选，如果省略了后面的索引，则返回次一级的维度，这一点和list一样。</p>
+<p><img src="/images/python/39_6.png" alt=""></p>
+<p>numpy除了上述的基础操作之外，还有reshape、T转置、ufunc、sort等函数，功能强大，大家可以自行查阅文档学习，这里我不再花费时间讲解。对于数据分析师，pandas是一个更常用的包，在抽象概念上它更接近我们熟悉的excel和sql，也是最主要的分析工具。</p>
+<h2 id="pandas"><a href="#pandas" class="headerlink" title="pandas"></a>pandas</h2><p>pandas有两个主要的数据结构，Series和DataFrame，记住大小写区分，后续使用中不多提醒。Series类似于一维数组，和numpy的array接近，由一组数据和数据标签组成。数据标签有索引的作用。</p>
+<p><img src="/images/python/39_7.png" alt=""></p>
+<p>加载pandas包，通过Series函数生成一个对象。我们很明显地看到，在jupyter上它的样式不同于array，它是竖着的。右边是我们输入的一组数据，左边是数据的索引，即标签。数据标签是pandas区分于numpy的重要特征。</p>
+<p>索引不一定是从0开始的数字，它可以被定义。</p>
+<p><img src="/images/python/39_8.png" alt=""></p>
+<p>索引的概念有点像SQL的主键，不过它的功能更强大，分析师能够很轻松的通过索引选取一个数据或者一组数据。<br><img src="/images/python/39_9.png" alt=""></p>
+<p>index函数可以显示Series的索引。Series和array一样，通过方括号选取数据，当要选取多个数据时，应该用列表表示多个索引，所以第三个案例嵌套了两层方括号。</p>
+<p>如果数据是一个字典，也能直接通过这个字典创建Series。</p>
+<p><img src="/images/python/39_10.png" alt=""><br>此时，字典的key就是Series的索引。</p>
+<p><img src="/images/python/39_11.png" alt=""></p>
+<p>Series有自动对齐索引的功能，当自定义的索引qinqin和字典队员不上时，会自动选择NaN，即结果为空，表示缺失。缺失值的处理会在后续讲解。</p>
+<h3 id="DataFrame"><a href="#DataFrame" class="headerlink" title="DataFrame"></a>DataFrame</h3><p>Series是一维的数据结构，DataFrame是一个表格型的数据结构，它含有不同的列，每列都是不同的数据类型。我们可以把DataFrame看作Series组成的字典，它既有行索引也有列索引。想象得更明白一点，它类似一张excel表格或者SQL，只是功能更强大。</p>
+<p>构建DataFrame的方法有很多，最常用的是传入一个字典。</p>
+<p><img src="/images/python/39_12.png" alt=""><br>DataFrame会自动补充索引，并且将字典的key作为列标签，即column。在这里，dict的key顺序是DataFame的顺序，不再是无序的。</p>
+<p>DataFrame中可以通过info函数直接查看数据类型和统计。</p>
+<p><img src="/images/python/39_13.png" alt=""></p>
+<p>列名后面是列的非空值统计量，以及数据类型，最后一行是DataFrame占用的内存大小，对于pandas来说，千万行几百兆的数据也是不再话下的。</p>
+<p><img src="/images/python/39_14.png" alt=""><br>DataFrame的数据类型变更和numpy一样，用astype就行，记住要赋值。df.age = df.age.astype，图上只是举例，没有真的更改数据类型。</p>
+<p>DataFrame的索引方式和Series一样，它选取的是列。</p>
+<p><img src="/images/python/39_15.png" alt=""></p>
+<p>返回的是一组Series，索引和原DataFrame一致。除了方括号选取，DataFrame还有更简单的选取方法。</p>
+<p><img src="/images/python/39_16.png" alt=""></p>
+<p>行也可以通过通过位置获取，用索引字段ix的方式。</p>
+<p><img src="/images/python/39_17.png" alt=""></p>
+<p>第二个方法不需要调用ix，直接以切片的形式获取行，切片的用啊和数组一样。记住，切片无法用单独的数字选取，只能用冒号切选范围。</p>
+<p>列可以通过赋值的方式修改和添加，当列的名称是全新，则会在DataFrame的最右边自动加上新的一列。<br><img src="/images/python/39_18.png" alt=""></p>
+<p>列表和数组都可以赋值到列，长度必须匹配，列表是按照顺序，数组的话，可以按index参数设置的索引对应，若为空，则填上缺失值。</p>
+<p>DataFrame的index不可更改，这是为了数据的安全性，但我们能通过index函数获取详情。</p>
+<p><img src="/images/python/39_19.png" alt=""><br>DataFrame在数据选取上面非常强大。</p>
+<p><img src="/images/python/39_20.png" alt=""></p>
+<p>它支持常用的逻辑判断，例子中，后两种数据选取是通过布尔数组过滤出我们想要的结果。</p>
+<p><img src="/images/python/39_21.png" alt=""></p>
+<p>df.sex == ‘男’返回了一个布尔数组(记住，是两个等号，一个等号是赋值），然后通过布尔数组找出df中符合条件为true的结果。</p>
+<p>现在我们希望找出年龄在20以下，且性别为男的人。</p>
+<p><img src="/images/python/39_22.png" alt=""></p>
+<p>这里用到布尔类型数据的计算公式，true and true 为true，false and true 为false。pandas中的逻辑符号，并且是&amp;，或者是|。接下来过滤出性别为女，或者年龄为18的人。</p>
+<p><img src="/images/python/39_23.png" alt=""></p>
+<p>当逻辑条件复杂时，这种写法并不优雅，比如性别为男，且年龄在18岁，以及性别为女，且年龄在18岁以上的两类人群，这种过滤条件就比较复杂了。pandas中可以用query函数以类SQL语言执行查询。</p>
+<p><img src="/images/python/39_24.png" alt=""></p>
+<p>query中可以直接使用列名，它的功能远不至于此，大家有兴趣可以深入学习。</p>
+<p><img src="/images/python/39_25.png" alt=""></p>
+<p>DataFrame可以直接在列上进行运算，当DataFrame和DataFrame之间运算时，按索引进行加减乘除。</p>
+<p><img src="/images/python/39_26.png" alt=""></p>
+<p>如果直接用加法，若列名匹配不上，会产生NaN 的缺失值，我们可以在后续后续fillna函数填充。另外一种方法是add函数，它可以直接通过参数选择填充值。减乘除对应sub、mul、div。</p>
+<p>DataFrame还有两个常用函数，又特别容易搞混的是，iloc和loc。</p>
+<p><img src="/images/python/39_27.png" alt=""></p>
+<p>它们都是通过索引选取行，iloc是通过所在行的数字为索引，loc是所在行的标签为索引，简单讲，iloc是第几行，loc是标签。当索引没有标签时，loc和iloc等价。两者支持冒号的范围选择。</p>
+<p>上文提到的过的ix，则是两者的混合，即可以行号，也可以行索引。</p>
+<p>当行和列需要同时选择的时候，用逗号分割，逗号前是想要选择的行，逗号后是想要选择的列。</p>
+<p><img src="/images/python/39_28.png" alt=""></p>
+<p>完整形式是ix[ 行1:行2, 列1:列2 ]，iloc和loc也支持行列同时选择，方法一样。新人接触这几块比较容易混淆。后续联系即可掌握。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/python-%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/" rel="tag"># python 第三方库</a>
+              <a href="/tags/numpy/" rel="tag"># numpy</a>
+              <a href="/tags/pandas/" rel="tag"># pandas</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/17/python38/" rel="prev" title="python pandas 函数详解">
+      <i class="fa fa-chevron-left"></i> python pandas 函数详解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/19/python40/" rel="next" title="numpy pandas scipy 的简单区别">
+      numpy pandas scipy 的简单区别 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#numpy"><span class="nav-number">1.</span> <span class="nav-text">numpy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pandas"><span class="nav-number">2.</span> <span class="nav-text">pandas</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DataFrame"><span class="nav-number">2.1.</span> <span class="nav-text">DataFrame</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

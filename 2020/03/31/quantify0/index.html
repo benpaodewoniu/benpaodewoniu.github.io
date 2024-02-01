@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="该教程参考慕课网的量化投资，是免费教程。 Python量化投资">
+<meta property="og:type" content="article">
+<meta property="og:title" content="量化投资 | 三个理论基础">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/03/31/quantify0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="该教程参考慕课网的量化投资，是免费教程。 Python量化投资">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_0.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_1.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_2.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_3.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_4.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_5.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_6.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_7.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_8.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_9.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_10.jpeg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/quantify/0_11.jpeg">
+<meta property="article:published_time" content="2020-03-31T07:08:19.000Z">
+<meta property="article:modified_time" content="2021-02-28T16:08:04.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="量化投资">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/quantify/0_0.jpeg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/03/31/quantify0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>量化投资 | 三个理论基础 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/03/31/quantify0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          量化投资 | 三个理论基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-31 15:08:19" itemprop="dateCreated datePublished" datetime="2020-03-31T15:08:19+08:00">2020-03-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-01 00:08:04" itemprop="dateModified" datetime="2021-03-01T00:08:04+08:00">2021-03-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%87%8F%E5%8C%96%E6%8A%95%E8%B5%84/" itemprop="url" rel="index"><span itemprop="name">量化投资</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%87%8F%E5%8C%96%E6%8A%95%E8%B5%84/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/31/quantify0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/31/quantify0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>该教程参考慕课网的量化投资，是免费教程。</p>
+<p><a href="https://www.imooc.com/learn/1206">Python量化投资</a></p>
+<a id="more"></a>
+
+<p>关于量化投资你需要知道三个理论基础。</p>
+<ul>
+<li>市场有效性假说</li>
+<li>现代资产定价理论</li>
+<li>投资组合理论</li>
+</ul>
+<br/>
+
+<h1 id="市场有效性假说"><a href="#市场有效性假说" class="headerlink" title="市场有效性假说"></a>市场有效性假说</h1><br/>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://xueqiu.com/3926587841/71244912">市场有效性假说是过时的书呆子理论么？</a><br><a href="https://www.zhihu.com/question/54777214">如何理解有效市场假说？</a></p>
+<p>市场有效性假说(Efficient Market Hypothesis，以下简称EMH)由芝加哥大学的金融教授Eugene Fama在1960年代提出。在EMH中，Fama教授提出了三种有效程度不同的市场。</p>
+<ul>
+<li>弱式有效市场假说 (Weak Form)</li>
+<li>半强式有效市场假说(Semi—Strong Form)</li>
+<li>强式有效市场假说(Strong Form)</li>
+</ul>
+<h2 id="强式有效市场假说-Strong-Form"><a href="#强式有效市场假说-Strong-Form" class="headerlink" title="强式有效市场假说(Strong Form)"></a>强式有效市场假说(Strong Form)</h2><p>在最有效的市场中，证券的价格反映了所有公开和不公开的信息。信息全部体现在价格里面了，无论内幕与否，所以没办法赚钱。这里的赚钱指超额收益。</p>
+<p>举个例子来说，假设工商银行的股票价格是每股50块钱，那么根据EMH，这每股50块钱的股票价格已经将所有关于工商银行的信息包含了进去，比如该银行的盈利前景，成本估算，行业竞争情况，等等。目前市场上交易的股票价格，是最公平，最准确的价格。</p>
+<p>这样的市场被称为是有效的，但市场有效并不代表证券价格就静止不动了。如果有更新的信息被发现，那么证券价格会变化。比如当大家知道工商银行下一季度的盈利会下降时，其股票价格会随之跌落，一直跌到在盈利下降后该股票反应的公平价格为止。</p>
+<p>在完全有效的市场下，任何买卖股票的行为都是浪费时间。因为当前的股票价格已经完全反应了所有相关的信息，也就是说其股票价格是公平合理的，不高也不低。如果在这种情况下去买卖股票，相当于赌一个未来的不确定，因为未来的新信息可能是利好，也可能是利空，在这种情况下买卖股票和投一枚硬币猜正反面的性质是类似的。所以对于一个投资者来说，买或者卖都无法给他任何优势，最好的策略是呆而不动(Buy and Hold)，什么都不做。</p>
+<p>这样的策略背后的逻辑是什么呢？让我通过下面这个例子来说明一下：</p>
+<p>假设你去一个行人拥挤的地铁站里坐地铁。因为地铁有很多道门，因此你可以选择在任何一道门前排队等地铁。每个人都想快点进地铁，在这种情况下大致来说你有两种策略：</p>
+<ol>
+<li><p>主动去寻找最短的队伍并且排在后面。在这种策略下，你需要先望一眼，找到最短的队伍，然后在最短时间呢跑到那里排进去。事实上大部分人确实都是这么做的，当然这种策略也有其风险。最大的风险是你找了半天，后来发现队伍都差不多长，但是因为寻找最短的队伍而浪费了一定时间，到最后反而排在更后面。还有一种风险是你远远看去那个队伍比较短，等你跑到时可能中间已经有人加入了队伍，或者走近一看才发现原来并不是那么短，那么你花了额外的时间寻找那样的队伍并且跑过去，对你来说也是一笔成本。</p>
+</li>
+<li><p>第二种策略是假定每条队伍都是一样长。每当某个队伍比其他队伍短的时候，总有人会在最短的时间内把那个空给补上。在这种情况下，花时间去找更短的队伍简直就是浪费精力，最合理的策略是看到一条随机的队伍就排上，而不去浪费任何时间寻找更短的队伍。</p>
+</li>
+</ol>
+<p>如果市场是高度有效的，那么第二种策略要比第一种策略更优。因为在第一种策略下，乘客首先需要付出一定的成本（比如花时间找，花力气跑来跑去，等等）去寻找最短的队伍。换句话说，在完全有效的市场下，是没有“免费”的午餐的。</p>
+<h2 id="半强式有效市场假说-Semi—Strong-Form"><a href="#半强式有效市场假说-Semi—Strong-Form" class="headerlink" title="半强式有效市场假说(Semi—Strong Form)"></a>半强式有效市场假说(Semi—Strong Form)</h2><p>无法用公开信息赚钱。</p>
+<p>价格已充分反应出所有已公开的有关公司营运前景的信息.这些信息有成交价,成交量,盈利资料,盈利预测值,公司管理状况及其它公开披露的财务信息等.假如投资者能迅速获得这些信息,股价应迅速作出反应。</p>
+<p>如果半强式有效假说成立,则在市场中利用技术分析和基本分析都失去作用,内幕消息可能获得超额利润.</p>
+<p>比如你在路透社这个新闻机构工作，借用公司内部的便利，你听闻今天下午你们要发布一个关于facebook的巨大丑闻，你也知道当这个新闻发出去的那一刻，facebook的股价就会应声大幅下跌，所以你怎么办？</p>
+<p>当然是趁着新闻没发布的时候赶紧把你手里facebook的股票转手卖出去呀！观察一些历史数据就会发现，往往在大型丑闻被报道的几十分钟前，这些作恶的公司的股票就已经开始持续下跌了，这说明什么？说明早已经有内部的人员比我们提前知道了丑闻的发生，并且早已经有人开始抛售相应的股票！</p>
+<h2 id="弱式有效市场假说-Weak-Form"><a href="#弱式有效市场假说-Weak-Form" class="headerlink" title="弱式有效市场假说 (Weak Form)"></a>弱式有效市场假说 (Weak Form)</h2><p>用历史信息赚钱。比如股票的 K 线。市场价格已充分反应出所有过去历史的证券价格信息,包括股票的成交价,成交量,卖空金额,融资金融等 。</p>
+<p>如果弱式有效市场假说成立,则股票价格的技术分析失去作用,基本分析还可能帮助投资者获得超额利润.</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>市场有效假说背后隐含的逻辑是：很多人做出的判断要优于某些人做出的判断。一个证券的价格，比如工商银行股票的价格，到最后显示50元，是因为市场上有千千万万的交易者，在经过多次交易以后形成了对这支股票价格的共识。这也说明如果你想去购买这支股票，别人不会愿意以49元卖给你，而如果你要卖出这支股票，也没人愿意以51元买入。50元是市场上所有人对这支股票形成的价格共识。在成千上万的投资者说，他们对工商银行股票估值肯定不同，有些人可能会估30元，有些人可能会估100元，但经过股市将这些所有人的估值综合起来以后，形成了50元这个合起来的估计。</p>
+<p>那么在资本市场中，众人的智慧程度如何呢？很多有炒股经验的朋友可能会忙不迭举出不少例子，比如1999年的纳斯达克股灾，2008年的金融危机，2015年的中国A股波动，等等，作为众人不理智，其智慧不如个人的例子。这样的想法无可厚非，但却不一定正确。</p>
+<p>Fischer Black（对，就是那个Black-schole期权模型中的Black）曾经写过一篇非常有名的文章，叫做Noise。在其中他提到过市场上有两种交易者，Noise trader（噪音交易者）和Information trader（信息交易者）。噪音交易者在进行买卖的时候属于比较非理性的，比如他们听到风吹草，看到新闻报道，或者收到一些小道消息动就忍不住给自己的券商打电话要购买或者卖出自己的股票。而信息交易者则是那些专心分析高质量信息，有能力将噪音剔除的理性交易者。</p>
+<p>在这样的情况下，噪音交易者不断买卖，人为的造成市场非理性波动，而信息交易者则有机可乘，可以低买高卖。自然的，如果一个市场中有大多数的噪音交易者，那么这个市场的有效程度就很低，因为大部分人都在瞎买瞎卖，因此资产价格很难反映合理公平的水平。而如果一个市场中有更多的信息交易者，那么这个市场就会趋向有效，因为信息交易者只会在资产价格偏离基本面时进行交易，并且把价格水平拉回到合理的位置。</p>
+<p>在文章的最后，Black的结论是：I think almost all markets are efficient almost all of the time. “Almost all” means 90 percent. 就是说，Black认为绝大部分市场在绝大部分时候（90%）都是有效的。虽然有时候确实会有市场无效的时候（比如1999年的科技泡沫），但那还是属于非常少数的情况。</p>
+<p>回到文章开头提到的市场有效理论，因为其假设市场的有效性被无数后来者不断质疑。事实上如果我们仔细分析该理论，就会发现它并不是那么不堪一击。从总体上来说，市场有效理论指向的结论可以被细分为两个：</p>
+<ul>
+<li>市场很难被战胜；（天上不会掉馅饼）</li>
+<li>市场上的价格总是正确的</li>
+</ul>
+<p>市场不可能是完全有效的，存在局部相对弱有效或者无效，这个时候就是套利交易的根本点。</p>
+<br/>
+
+<h1 id="现代资产定价理论"><a href="#现代资产定价理论" class="headerlink" title="现代资产定价理论"></a>现代资产定价理论</h1><br/>
+
+<h2 id="参考资料-1"><a href="#参考资料-1" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://cloud.tencent.com/developer/article/1084689">量化投资之资本资产定价模型</a></p>
+<p>现代资产定价模型即 CAPM。</p>
+<p>有效市场假说是为了方便研究金融市场而对经济世界做的一个假想，而资本资产定价模型就基于这个假设：</p>
+<ol>
+<li><p>这个模型是干嘛的？</p>
+<p> 它是为了研究资本的收益与风险之间的定量关系。</p>
+</li>
+<li><p>为什么要研究这个？</p>
+<p> 我们知道，这个世界有一个基本规律：风险越高、收益越高。当一个产品风险低而收益又高的时候，一定会有大量资金涌入瓜分掉收益。</p>
+</li>
+</ol>
+<p>因此，通过研究资本收益与风险之间的定量关系，我们可以判断这只股票价格的“合理性”，如果风险太大而价格又很低、或者风险太小而价格又太高，说明其价格不合理，有很大变动的可能。此外，还可以估计各种宏观经济变化对股票价格的影响。</p>
+<h2 id="切点组合、分离定理与市场组合"><a href="#切点组合、分离定理与市场组合" class="headerlink" title="切点组合、分离定理与市场组合"></a>切点组合、分离定理与市场组合</h2><p>我们先把前言中说的“研究资本收益与风险之间的定量关系”这个东西放一放。先从金融市场上两个很重要的问题入手——每一天每一刻，投资人们无不在绞尽脑汁思考的两个问题</p>
+<ul>
+<li>有没有一个收益最大、风险最小的投资组合？</li>
+<li>它在哪里？</li>
+</ul>
+<p>为了搞清楚这个问题，经济学家们简化了这个世界，在这个简化的世界中，经济学家们找到了这个最优的投资组合，它被称为切点组合。现在，我们就来聊一聊这个最优的“切点组合”。</p>
+<p>要了解它的原理，我们需要走进经济学家威廉夏普等构建的简化世界：</p>
+<p>在这个世界里</p>
+<ol>
+<li>所有投资者都是理性的，并且希望财富越来越多</li>
+<li>所有投资者都可以及时免费获得充分的市场信息</li>
+<li>影响投资决策的主要因素为期望收益率和风险。即他们依据期望收益率和标准差选择证劵（期望收益率最大，标准差最小）</li>
+<li>投资者具有相同预期，即有相同的投资行为。也意味着他们对证券的期望收益率、标准差及证券间的相关性有相同预期</li>
+<li>市场上存在且只有一种无风险利率</li>
+<li>股票市场存在卖空和买空</li>
+<li>所有投资者都有相同的投资期限，而且只有一期</li>
+<li>股票投资可以无限制的细分</li>
+<li>不存在通货膨胀、折现率也不变</li>
+</ol>
+<h2 id="切点组合"><a href="#切点组合" class="headerlink" title="切点组合"></a>切点组合</h2><p>根据假设1、2、3，我们知道投资者将会从所有风险证券组合构成的可行区域（下图的灰色区域）中选择其最优证券组合（灰色区域的外圈黑色沿线）。</p>
+<p>根据假设4，我们知道所有投资者的风险可行区域是相同的。如下图所示，纵轴是组合的预期收益，横轴是组合的标准差，标准差反映了组合收益的变动情况，即风险大小，标准差越大，收益变动越大，越不稳定，说明风险越大。</p>
+<p>下面的灰色区域就是所有投资者的可行区域，黑色外沿就是最优的证券组合，为什么是最优的呢？以A点为例，在外沿线上面总能找到一个B，它的风险与A一样，但收益更高。</p>
+<p><img src="/images/quantify/0_0.jpeg" alt=""></p>
+<p>注意，以上讨论的资产组合，都是有风险的，因为横轴不等于零，在不考虑无风险资产的时候，黑色沿线的组合<b>都是</b>最优组合，但有无风险资产介入情况就有所不同。</p>
+<p>根据 假设5 ，市场上只有一种无风险资产C，收益为r0，方差即风险为0，如下图所示。</p>
+<p><img src="/images/quantify/0_1.jpeg" alt=""></p>
+<ul>
+<li>投资者可以将钱全部投向于某个最优的资产组合，比如B，那么获得收益和承担的风险将全部是rB和σB。</li>
+<li>同样，投资者也可以将钱全部投向无风险资产，那么获得收益和承担的风险将全部是r0和0。</li>
+<li>事情当然没有那么极端，更多人把部分钱投资于B、部分投资于无风险资产C，这样形成的组合形成了B-C的连线，在这条线上，任何一个点都是B与C之间的再组合。</li>
+</ul>
+<p>那么问题就来了，不考虑无风险资产的时候，黑色沿线上的点都是最优组合，考虑无风险资产，为什么情况就不同？实际上，考虑无风险资产的时候，黑色沿线上有一个最最优的点M，M与C的连线优于M与任何其他组合的连线：</p>
+<p><img src="/images/quantify/0_2.jpeg" alt=""></p>
+<p>聪明的你一定看出来了，CM先与黑色沿线相切，相比其他连线，CM上的点可以在相同标准差下获取更高的期望收益。此时，我们果断抛弃除M之外的其他任何风险组合。</p>
+<p>至此，我们得到了两个很有用的东西：</p>
+<ol>
+<li><p>切点组合</p>
+<p> 切点对应的风险组合，即M点，被称为切点组合。</p>
+</li>
+<li><p>分离定理</p>
+<p> 分离定理也称分离特性，指最优风险组合的确定，与个别投资者的偏好无关。我们也推导过了，无论是谁，只要是理性投资者，他必定会以M作为他的风险投资组合。</p>
+</li>
+</ol>
+<h3 id="分离定理有什么意义？"><a href="#分离定理有什么意义？" class="headerlink" title="分离定理有什么意义？"></a>分离定理有什么意义？</h3><p>对于从事投资服务的金融机构来说，不管投资者的收益/风险偏好如何，只需找到切点所代表的风险资产组合，再加上无风险证券，就可以为所有投资者提供最佳的投资方案，投资者的收益/风险的偏好，就只需反映在组合中无风险证券所占的比重。</p>
+<p>现在，我们回答了投资者们无时无刻不在绞尽脑汁思考的两个问题，的第一个问题</p>
+<ul>
+<li>有没有一个收益最大、风险最小的投资组合？回答是有的，它就是切点组合。</li>
+</ul>
+<p>现在，我们来搞清楚第二个问题</p>
+<ul>
+<li>它在哪里？</li>
+</ul>
+<p>从上面的图中，我们只能知道有这么一个组合M，但是它具体是什么样的组合，具体是那些证券按照什么比例组合成的？这个我们还不知道，现在我们就来把它搞清楚。</p>
+<p>从分离定理中我们知道，所有投资者的风险资产都会选择M，没有其他选择，因此M必然是一个“市场组合”——由所有证券构成的组合，在这个组合中，每一种证券的构成比例等于该证券的相对市值。</p>
+<p>为什么呢？假设市场上有一种风险证券E，它没有被包括在组合M中，那么肯定没有人持有它，因为所有人都选择了那个最优的M组合，用它来搭配无风险证券。此时这个风险证券E没有需求只有供给，这会使E的价格一直下降，直到人们认为E有利可图并被纳入到组合M中进行持有，此时也许M变成了M’，但这个M’仍然是市场上最最优的风险组合，并与投资者的偏好无关——也只是换个名称而已。至此我们得到了第三个有用的东西：</p>
+<p>市场组合</p>
+<h3 id="市场组合"><a href="#市场组合" class="headerlink" title="市场组合"></a>市场组合</h3><p>切点组合即市场组合——由所有证券构成的组合，在这个组合中，每一种证券的构成比例等于该证券的相对市值。</p>
+<p>而且上述的分析也说明了市场组合中每一种证券的价格都是均衡价格（在这个价格下，供给等于需求），如果不是均衡价格的话，价格可能高于或低于均衡价格，这是买压或卖压会使价格回到均衡水平。</p>
+<h2 id="资本市场线"><a href="#资本市场线" class="headerlink" title="资本市场线"></a>资本市场线</h2><p>目前我们知道了风险组合中，有一个最最优的组合M，它被称为切点组合，也是一个市场组合，如果它搭配无风险证券，那么我们就可以确定一条有效证券组合CM，CM上的点代表（风险组合M + 无风险资产C）搭配起来的所有有效组合。那么，从C出发，穿过M点的这条射线，就被称为资本市场线。它描述了有效组合的风险与收益之间的关系。</p>
+<p><img src="/images/quantify/0_3.jpeg" alt=""></p>
+<p>为什么CM之外的延长线也算上资本市场线？</p>
+<p>因为假设中提到没有卖空和买空的限制，投资者可以借入或者贷出无风险资金，投入到切点组合中。举一个例子，对于某风险厌恶的投资者来说，他可能会选择一般投资于无风险资产C，一般投资于切点组合M，那么他会选择有效组合CM1：</p>
+<p>$$CM_1 = 0.5C + 0.5M$$</p>
+<p>对于某风险厌恶较轻的投资者来说，他可能会借入无风险资产C，连同自己的本金一起投入到切点组合M上，那么他会选择有效组合CM2：</p>
+<p>$$CM_2 = -0.5C + 1.5M$$</p>
+<p><img src="/images/quantify/0_4.jpeg" alt=""></p>
+<p>经过上面的分析，我们得到了本节的一个重要的概念：资本市场线（CML）</p>
+<p>资本市场线描述了有效组合的风险和收益之间的关系。这个关系如何用公式表达？</p>
+<p>$$ r_p = r_0 + \frac{(r_M - r_0)}{\sigma_M}\sigma_p$$</p>
+<ul>
+<li>p 是 C M 这条线的其中一个点。</li>
+</ul>
+<p><img src="/images/quantify/0_5.jpeg" alt=""></p>
+<p>其中</p>
+<p>$$r_M - r_0$$</p>
+<p>为M的风险收益（或风险溢价、风险报酬）。</p>
+<p>至此，我们了解了有效组合的预期回报与标准差之间的关系。但是，有效组合作为从简化世界中推导出来的一个庞大的组合，它的现实意义在哪里？我们在前言中不是说要研究CAPM模型，用它来分析“某股票收益与风险之间的定量关系，以判断其价格是否合理”的吗？不错，我们前面讨论的</p>
+<p>切点组合——分离定理——市场组合（=切点组合）——资本市场线</p>
+<p>就是为了研究这个东西做铺垫。</p>
+<h2 id="证券市场线（资本资产定价模型）"><a href="#证券市场线（资本资产定价模型）" class="headerlink" title="证券市场线（资本资产定价模型）"></a>证券市场线（资本资产定价模型）</h2><p>还是要回到单个风险证券上来，对于单个风险证券，有同学要说话要说：</p>
+<p><img src="/images/quantify/0_6.jpeg" alt=""></p>
+<p>不（bie）对（sha）的（le），单个证券本身是一个非有效的组合，它始终位于资本市场线的下方。不在资本市场线上，因此不能简单的用标准差来取比例套用这个公式。</p>
+<p><img src="/images/quantify/0_7.jpeg" alt=""></p>
+<p>此时我们需要把横轴换一换，考虑单个证券的时候，不再用标准差来度量风险，而是用β系数——β系数反映的是单个证券与整体市场组合的联动性，而不是自己的离散程度。</p>
+<p>$$ \beta_i = \frac{\sigma_{i,M}}{\sigma_M^2} $$</p>
+<p>换成β系数之后，公式就出来了：</p>
+<p>$$ r_i = r_0 + \beta_i (r_M - r_0) $$</p>
+<p>那么ri与βi之间的关系就是一条直线了：</p>
+<p><img src="/images/quantify/0_8.jpeg" alt=""></p>
+<p>等下，有同学又要说话了。</p>
+<p><img src="/images/quantify/0_9.jpeg" alt=""></p>
+<p><img src="/images/quantify/0_10.jpeg" alt=""></p>
+<p>本节至此，我们介绍了几个重要的概念：</p>
+<h3 id="beta-系数"><a href="#beta-系数" class="headerlink" title="$\beta$ 系数"></a>$\beta$ 系数</h3><p>它反映了单个证券与整体市场组合的联动性，用来衡量单个证券的风险，实际上，我们可以根据β系数来区分股票：</p>
+<ul>
+<li>β&gt;1的股票被称为“攻击性股票”，市场上升时其升幅较大；</li>
+<li>β&lt;1的股票被称为“防御性股票”，市场下降时其跌幅较小；</li>
+<li>β=1的股票被称为“中立性股票”，与市场波动一致，适用于指数基金；</li>
+</ul>
+<h3 id="证券市场线（SML）"><a href="#证券市场线（SML）" class="headerlink" title="证券市场线（SML）"></a>证券市场线（SML）</h3><p>证券市场线是反映单个风险证券收益与β系数关系的直线，注意它与资本市场线（CML）的区别：</p>
+<ul>
+<li>CML关注的市场组合（的收益与风险的关系），而SML关注的是单个证券（的收益与风险的关系）。实际上，不仅仅是单个证券，SML适用于所有有效组合和非有效组合，而CML只适用于有效组合；</li>
+<li>CML用标准差来衡量风险，而SML用β系数来衡量风险。</li>
+</ul>
+<p><img src="/images/quantify/0_11.jpeg" alt=""></p>
+<h3 id="资本资产定价模型（CAPM）"><a href="#资本资产定价模型（CAPM）" class="headerlink" title="资本资产定价模型（CAPM）"></a>资本资产定价模型（CAPM）</h3><p>证券市场线其实就是CAPM的图形形式，它的公式：</p>
+<p>$$ r_i = r_0 + \beta_i (r_M - r_0) $$</p>
+<p>正是资本资产定价模型CAPM。</p>
+<h2 id="超额收益形式的CAPM模型"><a href="#超额收益形式的CAPM模型" class="headerlink" title="超额收益形式的CAPM模型"></a>超额收益形式的CAPM模型</h2><h3 id="CAPM模型的贡献"><a href="#CAPM模型的贡献" class="headerlink" title="CAPM模型的贡献"></a>CAPM模型的贡献</h3><p>CAPM模型是在一些假设的基础上，推导出了资产的定价模型，通过无风险利率、市场收益率、以及β系数可以得到某种资产的“理论”价格，从而帮助投资者对股票进行评价。此外CAPM模型还剔除了新的风险测度方法，即β系数。在实际中，具有较强的可操作性，如，</p>
+<ul>
+<li>无风险利率多用短期国债利率或银行业间同业拆利率；</li>
+<li>市场组合的期望收益率，用上证综合指数，美国可以用S&amp;P500指数；</li>
+<li>$\beta$系数，利用单个股票和市场组合的历史数据可以进行计算，之后再进行显著性检验。</li>
+</ul>
+<h3 id="超额收益形式的CAPM模型-1"><a href="#超额收益形式的CAPM模型-1" class="headerlink" title="超额收益形式的CAPM模型"></a>超额收益形式的CAPM模型</h3><p>虽然如此，CAPM模型的缺点也是很明显的，它的成立是基于一连串理想化的假设，这些假设在现实中并不全部成立，这必然使得CAPM的作用大打折扣。</p>
+<p>在理想条件下，股票只能获得平均基准收益，而现实中无法满足那些假设要求，股票的收益也不仅只有基准收益，还包括了超额收益，即$\alpha$收益。</p>
+<p>$$ r_i = \alpha_i + r_0 + \beta_i (r_M - r_0) + \epsilon_i $$</p>
+<p>然后可以转化为</p>
+<p>$$ r_i - r_0 = \alpha_i + \beta_i (r_M - r_0) + \epsilon_i $$</p>
+<p>此外，$\beta_i$度量股票$i$的风险不用多说，要补充的是它其实是一种系统风险，是不可分散的。$\epsilon_i$是股票$i$的随机误差项，是非系统风险，是可以分散掉的；</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>“单炒股票已经是死路，宏观对冲，大类资产配置才能立于不败之地。这是宏观对冲基金最好的时代。”</p>
+<br/>
+
+<h1 id="投资组合理论"><a href="#投资组合理论" class="headerlink" title="投资组合理论"></a>投资组合理论</h1><br/>
+
+<h2 id="参考资料-2"><a href="#参考资料-2" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://xueqiu.com/8287840120/81867846">MPT 模型的解析解</a></p>
+<p>这个不再整理，请参考上面的资料。</p>
+<p>“现代投资组合理论”（MPT）是1952年哈里.马克维茨在金融期刊上发表的名为“Portfolio Selection”的文章上提出的投资理论。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%87%8F%E5%8C%96%E6%8A%95%E8%B5%84/" rel="tag"># 量化投资</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/30/data-structure4/" rel="prev" title="数据结构 | c 语言实现一个数组">
+      <i class="fa fa-chevron-left"></i> 数据结构 | c 语言实现一个数组
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/31/quantify1/" rel="next" title="量化投资 | 常见的策略">
+      量化投资 | 常见的策略 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#市场有效性假说"><span class="nav-number">1.</span> <span class="nav-text">市场有效性假说</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#强式有效市场假说-Strong-Form"><span class="nav-number">1.2.</span> <span class="nav-text">强式有效市场假说(Strong Form)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#半强式有效市场假说-Semi—Strong-Form"><span class="nav-number">1.3.</span> <span class="nav-text">半强式有效市场假说(Semi—Strong Form)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#弱式有效市场假说-Weak-Form"><span class="nav-number">1.4.</span> <span class="nav-text">弱式有效市场假说 (Weak Form)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.5.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#现代资产定价理论"><span class="nav-number">2.</span> <span class="nav-text">现代资产定价理论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料-1"><span class="nav-number">2.1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切点组合、分离定理与市场组合"><span class="nav-number">2.2.</span> <span class="nav-text">切点组合、分离定理与市场组合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切点组合"><span class="nav-number">2.3.</span> <span class="nav-text">切点组合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分离定理有什么意义？"><span class="nav-number">2.3.1.</span> <span class="nav-text">分离定理有什么意义？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#市场组合"><span class="nav-number">2.3.2.</span> <span class="nav-text">市场组合</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资本市场线"><span class="nav-number">2.4.</span> <span class="nav-text">资本市场线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#证券市场线（资本资产定价模型）"><span class="nav-number">2.5.</span> <span class="nav-text">证券市场线（资本资产定价模型）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beta-系数"><span class="nav-number">2.5.1.</span> <span class="nav-text">$\beta$ 系数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#证券市场线（SML）"><span class="nav-number">2.5.2.</span> <span class="nav-text">证券市场线（SML）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#资本资产定价模型（CAPM）"><span class="nav-number">2.5.3.</span> <span class="nav-text">资本资产定价模型（CAPM）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超额收益形式的CAPM模型"><span class="nav-number">2.6.</span> <span class="nav-text">超额收益形式的CAPM模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CAPM模型的贡献"><span class="nav-number">2.6.1.</span> <span class="nav-text">CAPM模型的贡献</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#超额收益形式的CAPM模型-1"><span class="nav-number">2.6.2.</span> <span class="nav-text">超额收益形式的CAPM模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">2.7.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#投资组合理论"><span class="nav-number">3.</span> <span class="nav-text">投资组合理论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料-2"><span class="nav-number">3.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

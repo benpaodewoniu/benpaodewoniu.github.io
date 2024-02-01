@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="如题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorflow 函数详解">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/08/25/tensorflow1/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="如题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/1_1.jpg">
+<meta property="article:published_time" content="2018-08-25T06:51:48.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:44:52.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="tensorflow">
+<meta property="article:tag" content="函数详解">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/tensorflow/1_1.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/08/25/tensorflow1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>tensorflow 函数详解 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/08/25/tensorflow1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tensorflow 函数详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-08-25 14:51:48" itemprop="dateCreated datePublished" datetime="2018-08-25T14:51:48+08:00">2018-08-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:44:52" itemprop="dateModified" datetime="2020-05-12T10:44:52+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/tensorflow/" itemprop="url" rel="index"><span itemprop="name">tensorflow</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/08/25/tensorflow1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/08/25/tensorflow1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如题。</p>
+<a id="more"></a>
+
+<h1 id="A"><a href="#A" class="headerlink" title="A"></a>A</h1><h2 id="add-to-collection"><a href="#add-to-collection" class="headerlink" title="add_to_collection"></a>add_to_collection</h2><p>tf.add_to_collection(‘list_name’, element)：将元素element添加到列表list_name中</p>
+<p>tf.get_collection(‘list_name’)：返回名称为list_name的列表</p>
+<p>tf.add_n(list)：将列表元素相加并返回</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">tf.add_to_collection(<span class="string">'losses'</span>, tf.constant(<span class="number">2.2</span>))</span><br><span class="line">tf.add_to_collection(<span class="string">'losses'</span>, tf.constant(<span class="number">3.</span>))</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    print(sess.run(tf.get_collection(<span class="string">'losses'</span>)))</span><br><span class="line">    print(sess.run(tf.add_n(tf.get_collection(<span class="string">'losses'</span>))</span><br></pre></td></tr></table></figure>
+
+<pre><code>结果：
+[2.2, 3.0] 
+5.2
+注意： 
+使用tf.add_n对列表元素进行相加时，列表内元素类型必须一致，否则会报错。</code></pre><h2 id="all-variables"><a href="#all-variables" class="headerlink" title="all_variables"></a>all_variables</h2><p>参照 trainable_variables</p>
+<h1 id="E"><a href="#E" class="headerlink" title="E"></a>E</h1><h2 id="exp"><a href="#exp" class="headerlink" title="exp()"></a>exp()</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">x = tf.constant([[<span class="number">1.0</span>,<span class="number">2.0</span>],[<span class="number">5.0</span>,<span class="number">3.0</span>]])</span><br><span class="line">x_2 = tf.exp(x)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    print(sess.run(x_2))</span><br><span class="line">	</span><br><span class="line">		<span class="comment"># [[  2.7182817   7.389056 ]</span></span><br><span class="line">		<span class="comment"># [148.41316    20.085537 ]]</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="G"><a href="#G" class="headerlink" title="G"></a>G</h1><h2 id="get-variable"><a href="#get-variable" class="headerlink" title="get_variable"></a>get_variable</h2><p><a href="https://blog.csdn.net/uestc_c2_403/article/details/72327321">tf.get_variable函数的使用</a><br><a href="https://www.w3cschool.cn/tensorflow_python/tensorflow_python-st6f2ez1.html">tf.get_variable函数</a><br>tf.get_variable(name,  shape, initializer)[当然还有更多的参数选项]: name就是变量的名称，shape是变量的维度，initializer是变量初始化的方式，初始化的方式有以下几种：</p>
+<pre><code>tf.constant_initializer：常量初始化函数
+tf.random_normal_initializer：正态分布
+tf.truncated_normal_initializer：截取的正态分布
+tf.random_uniform_initializer：均匀分布
+tf.zeros_initializer：全部是0
+tf.ones_initializer：全是1
+tf.uniform_unit_scaling_initializer：满足均匀分布，但不影响输出数量级的随机值</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf;  </span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np;  </span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt;  </span><br><span class="line">  </span><br><span class="line">a1 = tf.get_variable(name=<span class="string">'a1'</span>, shape=[<span class="number">2</span>,<span class="number">3</span>], initializer=tf.random_normal_initializer(mean=<span class="number">0</span>, stddev=<span class="number">1</span>))</span><br><span class="line">a2 = tf.get_variable(name=<span class="string">'a2'</span>, shape=[<span class="number">1</span>], initializer=tf.constant_initializer(<span class="number">1</span>))</span><br><span class="line">a3 = tf.get_variable(name=<span class="string">'a3'</span>, shape=[<span class="number">2</span>,<span class="number">3</span>], initializer=tf.ones_initializer())</span><br><span class="line"> </span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">	sess.run(tf.initialize_all_variables())</span><br><span class="line">	<span class="keyword">print</span> sess.run(a1)</span><br><span class="line">	<span class="keyword">print</span> sess.run(a2)</span><br><span class="line">	<span class="keyword">print</span> sess.run(a3)</span><br><span class="line"></span><br><span class="line">		[[ <span class="number">0.42299312</span> <span class="number">-0.25459203</span> <span class="number">-0.88605702</span>]</span><br><span class="line">		[ <span class="number">0.22410156</span>  <span class="number">1.34326422</span> <span class="number">-0.39722782</span>]]</span><br><span class="line">		[ <span class="number">1.</span>]</span><br><span class="line">		[[ <span class="number">1.</span>  <span class="number">1.</span>  <span class="number">1.</span>]</span><br><span class="line">		[ <span class="number">1.</span>  <span class="number">1.</span>  <span class="number">1.</span>]]</span><br></pre></td></tr></table></figure>
+<p>注意：不同的变量之间不能有相同的名字，除非你定义了variable_scope，这样才可以有相同的名字。</p>
+<h1 id="M"><a href="#M" class="headerlink" title="M"></a>M</h1><h2 id="matmul"><a href="#matmul" class="headerlink" title="matmul"></a>matmul</h2><p>这是矩阵的相乘，相当于 numpy 的 dot </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">matrix1 = tf.constant([[<span class="number">3</span>,<span class="number">3</span>]])</span><br><span class="line">matrix2 = tf.constant([[<span class="number">2</span>],[<span class="number">2</span>]])</span><br><span class="line">product = tf.matmul(matrix1,matrix2)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    result = sess.run(product)</span><br><span class="line">print(result)</span><br><span class="line">	<span class="comment"># [[12]]</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+<h1 id="N"><a href="#N" class="headerlink" title="N"></a>N</h1><h2 id="newaxis"><a href="#newaxis" class="headerlink" title="newaxis"></a>newaxis</h2><p>np.newaxis的功能是插入新维度，看下面的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">a=np.array([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>])</span><br><span class="line">b=a[np.newaxis,:]</span><br><span class="line"><span class="keyword">print</span> a.shape,b.shape</span><br><span class="line">	<span class="comment"># (5,) (1, 5)</span></span><br><span class="line"><span class="keyword">print</span> a</span><br><span class="line">	<span class="comment"># [1 2 3 4 5]</span></span><br><span class="line"><span class="keyword">print</span> b</span><br><span class="line">	<span class="comment"># [[1 2 3 4 5]]</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">a=np.array([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>])</span><br><span class="line">b=a[:,np.newaxis]</span><br><span class="line"><span class="keyword">print</span> a.shape,b.shape</span><br><span class="line">	<span class="comment"># (5,) (5, 1)</span></span><br><span class="line"><span class="keyword">print</span> a</span><br><span class="line">	<span class="comment"># [1 2 3 4 5]</span></span><br><span class="line"><span class="keyword">print</span> b</span><br><span class="line">	<span class="comment">#  [2]</span></span><br><span class="line">	<span class="comment">#	[3]</span></span><br><span class="line">	<span class="comment">#	[4]</span></span><br><span class="line">	<span class="comment">#	[5]]</span></span><br></pre></td></tr></table></figure>
+<p>可以看出np.newaxis分别是在行或列上增加维度，原来是（6，）的数组，在行上增加维度变成（1,6）的二维数组，在列上增加维度变为(6,1)的二维数组</p>
+<h1 id="I"><a href="#I" class="headerlink" title="I"></a>I</h1><h2 id="initialize-all-variables"><a href="#initialize-all-variables" class="headerlink" title="initialize_all_variables"></a>initialize_all_variables</h2><p>如果定义了变量，就必须先初始化。<br>init = tf.initialize_all_variables()<br>然后在后面激活它</p>
+<pre><code>with tf.Session() as sess:
+    sess.run(init)</code></pre><h1 id="P"><a href="#P" class="headerlink" title="P"></a>P</h1><h2 id="placeholder"><a href="#placeholder" class="headerlink" title="placeholder()"></a>placeholder()</h2><p>这个函数相当于一个占位符，在 sess.run() 的时候通过 feed_dict 的方式，以键值对的方式传入参数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="comment"># 使用 placeholder 的时候，要给类型</span></span><br><span class="line">input1 = tf.placeholder(tf.float32)</span><br><span class="line"><span class="comment"># 规定结构 2 * 2</span></span><br><span class="line">input2 = tf.placeholder(tf.float32,[<span class="number">2</span>,<span class="number">2</span>])</span><br><span class="line">input3 = tf.placeholder(tf.float32)</span><br><span class="line"><span class="comment"># 下面是乘法运算</span></span><br><span class="line">output = tf.multiply(input1,input3)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    <span class="comment"># 因为我们之前用了 placeholder ，所以我们要调用参数 feed_dict 来传入参数 字典的形式</span></span><br><span class="line">    print(sess.run(output,feed_dict=&#123;input1:[<span class="number">7.</span>],input3:[<span class="number">8.</span>]&#125;))</span><br><span class="line">        <span class="comment"># [56.]</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="R"><a href="#R" class="headerlink" title="R"></a>R</h1><h2 id="reduce-mean"><a href="#reduce-mean" class="headerlink" title="reduce_mean()"></a>reduce_mean()</h2><pre><code>tf.reduce_mean(input_tensor, axis=None, keep_dims=False, name=None, reduction_indices=None)
+第一个参数input_tensor： 输入的待降维的tensor;
+第二个参数axis： 指定的轴，如果不指定，则计算所有元素的均值;
+第三个参数keep_dims：是否降维度，设置为True，输出的结果保持输入tensor的形状，设置为False，输出结果会降低维度;
+第四个参数name： 操作的名称;
+第五个参数 reduction_indices：在以前版本中用来指定轴，已弃用;</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"> </span><br><span class="line">x = [[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>],</span><br><span class="line">      [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]]</span><br><span class="line"> </span><br><span class="line">xx = tf.cast(x,tf.float32)</span><br><span class="line"> </span><br><span class="line">mean_all = tf.reduce_mean(xx, keep_dims=<span class="literal">False</span>)</span><br><span class="line">mean_0 = tf.reduce_mean(xx, axis=<span class="number">0</span>, keep_dims=<span class="literal">False</span>)</span><br><span class="line">mean_1 = tf.reduce_mean(xx, axis=<span class="number">1</span>, keep_dims=<span class="literal">False</span>)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    m_a,m_0,m_1 = sess.run([mean_all, mean_0, mean_1])</span><br><span class="line"> </span><br><span class="line"><span class="keyword">print</span> m_a    <span class="comment"># output: 2.0</span></span><br><span class="line"><span class="keyword">print</span> m_0    <span class="comment"># output: [ 1.  2.  3.]</span></span><br><span class="line"><span class="keyword">print</span> m_1    <span class="comment">#output:  [ 2.  2.]</span></span><br><span class="line"><span class="comment"># 如果设置保持原来的张量的维度，keep_dims=True ，结果：</span></span><br><span class="line"><span class="keyword">print</span> m_a    <span class="comment"># output: [[ 2.]]</span></span><br><span class="line"><span class="keyword">print</span> m_0    <span class="comment"># output: [[ 1.  2.  3.]]</span></span><br><span class="line"><span class="keyword">print</span> m_1    <span class="comment">#output:  [[ 2.], [ 2.]]</span></span><br></pre></td></tr></table></figure>
+<h2 id="reduce-sum"><a href="#reduce-sum" class="headerlink" title="reduce_sum()"></a>reduce_sum()</h2><pre><code>reduce_sum(
+    input_tensor,
+    axis=None,
+    keep_dims=False,
+    name=None,
+    reduction_indices=None
+)</code></pre><p>reduce_sum() 就是求和，由于求和的对象是tensor，所以是沿着tensor的某些维度求和。函数名中加了reduce是表示求和后会降维，当然可以通过设置参数来保证不降维，但是默认就是要降维的。<br><img src="/images/tensorflow/1_1.jpg" alt=""></p>
+<h1 id="S"><a href="#S" class="headerlink" title="S"></a>S</h1><h2 id="square"><a href="#square" class="headerlink" title="square"></a>square</h2><p>tf.square(x, name=None)<br>对x内的所有元素进行平方操作</p>
+<h1 id="T"><a href="#T" class="headerlink" title="T"></a>T</h1><h2 id="trainable-variables"><a href="#trainable-variables" class="headerlink" title="trainable_variables()"></a>trainable_variables()</h2><p>tf.trainable_variables返回的是需要训练的变量列表<br>tf.all_variables返回的是所有变量的列表</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf;  </span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np;  </span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt;  </span><br><span class="line"> </span><br><span class="line">v = tf.Variable(tf.constant(<span class="number">0.0</span>, shape=[<span class="number">1</span>], dtype=tf.float32), name=<span class="string">'v'</span>)</span><br><span class="line">v1 = tf.Variable(tf.constant(<span class="number">5</span>, shape=[<span class="number">1</span>], dtype=tf.float32), name=<span class="string">'v1'</span>)</span><br><span class="line">global_step = tf.Variable(tf.constant(<span class="number">5</span>, shape=[<span class="number">1</span>], dtype=tf.float32), name=<span class="string">'global_step'</span>, trainable=<span class="literal">False</span>)</span><br><span class="line">ema = tf.train.ExponentialMovingAverage(<span class="number">0.99</span>, global_step)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> ele1 <span class="keyword">in</span> tf.trainable_variables():</span><br><span class="line">	<span class="keyword">print</span> ele1.name</span><br><span class="line"><span class="keyword">for</span> ele2 <span class="keyword">in</span> tf.all_variables():</span><br><span class="line">	<span class="keyword">print</span> ele2.name</span><br></pre></td></tr></table></figure>
+
+<pre><code>输出：
+v:0
+v1:0
+v:0
+v1:0
+global_step:0</code></pre><p>分析：<br>上面得到两个变量，后面的一个得到上三个变量，因为global_step在声明的时候说明不是训练变量，用来关键字trainable=False。</p>
+<h1 id="V"><a href="#V" class="headerlink" title="V"></a>V</h1><h2 id="Variable"><a href="#Variable" class="headerlink" title="Variable()"></a>Variable()</h2><p>tensorflow 就好像 java 一样，变量必须声明之后才是变量，如果不声明就不是 tensorflow 变量。。。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="comment"># 给变量赋予名字</span></span><br><span class="line">state = tf.Variable(<span class="number">0</span>,name=<span class="string">'counter'</span>)</span><br><span class="line">print(state.name)</span><br><span class="line">    <span class="comment"># counter:0</span></span><br><span class="line"><span class="comment"># 创建一个常数</span></span><br><span class="line">one = tf.constant(<span class="number">1</span>)</span><br><span class="line">new_value = tf.add(state , one)</span><br><span class="line"><span class="comment"># 这个函数是将 new_value 加载到 state 上</span></span><br><span class="line">update = tf.assign(state,new_value)</span><br><span class="line"></span><br><span class="line">init = tf.initialize_all_variables()</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    sess.run(init)</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        sess.run(update)</span><br><span class="line">        print(sess.run(state))</span><br><span class="line">            <span class="comment"># 1</span></span><br><span class="line">            <span class="comment"># 2</span></span><br><span class="line">            <span class="comment"># 3</span></span><br></pre></td></tr></table></figure>
+<h2 id="variable-scope"><a href="#variable-scope" class="headerlink" title="variable_scope"></a>variable_scope</h2><p><a href="https://blog.csdn.net/u012609509/article/details/80045529">tensorflow: name_scope 和 variable_scope区别及理解</a><br><a href="https://www.zhihu.com/question/54513728">tensorflow里面name_scope, variable_scope等如何理解？</a><br>在训练深度网络时，为了减少需要训练参数的个数（比如具有simase结构的LSTM模型）、或是多机多卡并行化训练大数据大模型（比如数据并行化）等情况时，往往需要共享变量。另外一方面是当一个深度学习模型变得非常复杂的时候，往往存在大量的变量和操作，如何避免这些变量名和操作名的唯一不重复，同时维护一个条理清晰的graph非常重要。<br>之所以会出现这两种类型的scope，主要是后者（variable scope）为了实现tensorflow中的变量共享机制：即为了使得在代码的任何部分可以使用某一个已经创建的变量，TF引入了变量共享机制，使得可以轻松的共享变量，而不用传一个变量的引用。具体解释如下：</p>
+<h3 id="tensorflow中创建variable的2种方式："><a href="#tensorflow中创建variable的2种方式：" class="headerlink" title="tensorflow中创建variable的2种方式："></a>tensorflow中创建variable的2种方式：</h3><p>tf.Variable()：只要使用该函数，一律创建新的variable，如果出现重名，变量名后面会自动加上后缀1，2….</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'cltdevelop):</span></span><br><span class="line"><span class="string">    var_1 = tf.Variable(initial_value=[0], name='</span>var_1<span class="string">')</span></span><br><span class="line"><span class="string">    var_2 = tf.Variable(initial_value=[0], name='</span>var_1<span class="string">')</span></span><br><span class="line"><span class="string">    var_3 = tf.Variable(initial_value=[0], name='</span>var_1<span class="string">')</span></span><br><span class="line"><span class="string">print(var_1.name)</span></span><br><span class="line"><span class="string">print(var_2.name)</span></span><br><span class="line"><span class="string">print(var_3.name)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">	cltdevelop/var_1:0</span></span><br><span class="line"><span class="string">	cltdevelop/var_1_1:0</span></span><br><span class="line"><span class="string">	cltdevelop/var_1_2:0</span></span><br></pre></td></tr></table></figure>
+<p>tf.get_variable()：如果变量存在，则使用以前创建的变量，如果不存在，则新创建一个变量。</p>
+<h3 id="tensorflow中的两种作用域"><a href="#tensorflow中的两种作用域" class="headerlink" title="tensorflow中的两种作用域"></a>tensorflow中的两种作用域</h3><p>命名域(name scope)：通过tf.name_scope()来实现；<br>变量域（variable scope）：通过tf.variable_scope()来实现；可以通过设置reuse 标志以及初始化方式来影响域下的变量。<br>这两种作用域都会给tf.Variable()创建的变量加上词头，而tf.name_scope对tf.get_variable()创建的变量没有词头影响，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'cltdevelop'</span>):</span><br><span class="line">    var_1 = tf.Variable(initial_value=[<span class="number">0</span>], name=<span class="string">'var_1'</span>)</span><br><span class="line">    var_2 = tf.get_variable(name=<span class="string">'var_2'</span>, shape=[<span class="number">1</span>, ])</span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'aaa'</span>):</span><br><span class="line">    var_3 = tf.Variable(initial_value=[<span class="number">0</span>], name=<span class="string">'var_3'</span>)</span><br><span class="line">    var_4 = tf.get_variable(name=<span class="string">'var_4'</span>, shape=[<span class="number">1</span>, ])</span><br><span class="line"></span><br><span class="line">print(var_1.name)</span><br><span class="line">print(var_2.name)</span><br><span class="line">print(var_3.name)</span><br><span class="line">print(var_4.name)</span><br><span class="line"></span><br><span class="line">	cltdevelop/var_1:<span class="number">0</span></span><br><span class="line">	var_2:<span class="number">0</span></span><br><span class="line">	aaa/var_3:<span class="number">0</span></span><br><span class="line">	aaa/var_4:<span class="number">0</span></span><br></pre></td></tr></table></figure>
+<h3 id="tensorflow中变量共享机制的实现"><a href="#tensorflow中变量共享机制的实现" class="headerlink" title="tensorflow中变量共享机制的实现"></a>tensorflow中变量共享机制的实现</h3><p>在tensorflow中变量共享机制是通过tf.get_variable()和tf.variable_scope()两者搭配使用来实现的。如下代码所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'cltdevelop'</span>):</span><br><span class="line">    var_1 = tf.get_variable(<span class="string">'var_1'</span>, shape=[<span class="number">1</span>, ])</span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'cltdevelop'</span>, reuse=<span class="literal">True</span>):</span><br><span class="line">    var_2 = tf.get_variable(<span class="string">'var_1'</span>, shape=[<span class="number">1</span>,])</span><br><span class="line"></span><br><span class="line">print(var_1.name)</span><br><span class="line">print(var_2.name)</span><br><span class="line">	</span><br><span class="line">	cltdevelop/var_1:<span class="number">0</span></span><br><span class="line">	cltdevelop/var_1:<span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>[注：]当 reuse 设置为 True 或者 tf.AUTO_REUSE 时，表示这个scope下的变量是重用的或者共享的，也说明这个变量以前就已经创建好了。但如果这个变量以前没有被创建过，则在tf.variable_scope下调用tf.get_variable创建这个变量会报错。如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'cltdevelop'</span>, reuse=<span class="literal">True</span>):</span><br><span class="line">    var_1 = tf.get_variable(<span class="string">'var_1'</span>, shape=[<span class="number">1</span>, ])</span><br></pre></td></tr></table></figure>
+<p>则上述代码会报错</p>
+<pre><code>ValueErrorL Variable cltdevelop/v1 doesnot exist, or was not created with tf.get_variable()</code></pre><p>如果使用tf.get_variable()创建变量，且没有设置共享变量，重名时会报错</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.name_scope(<span class="string">'name_scope_1'</span>):</span><br><span class="line">    var1 = tf.get_variable(name=<span class="string">'var1'</span>, shape=[<span class="number">1</span>], dtype=tf.float32)</span><br><span class="line">    var2 = tf.get_variable(name=<span class="string">'var1'</span>, shape=[<span class="number">1</span>], dtype=tf.float32)</span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    sess.run(tf.global_variables_initializer())</span><br><span class="line">    print(var1.name, sess.run(var1))</span><br><span class="line">    print(var2.name, sess.run(var2))</span><br><span class="line"></span><br><span class="line"><span class="comment"># ValueError: Variable var1 already exists, disallowed. Did you mean </span></span><br><span class="line"><span class="comment"># to set reuse=True in VarScope? Originally defined at:</span></span><br><span class="line"><span class="comment"># var1 = tf.get_variable(name='var1', shape=[1], dtype=tf.float32)</span></span><br></pre></td></tr></table></figure>
+<p>所以要共享变量，需要使用tf.variable_scope()</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'variable_scope_y'</span>) <span class="keyword">as</span> scope:</span><br><span class="line">    var1 = tf.get_variable(name=<span class="string">'var1'</span>, shape=[<span class="number">1</span>], dtype=tf.float32)</span><br><span class="line">    scope.reuse_variables()  <span class="comment"># 设置共享变量</span></span><br><span class="line">    var1_reuse = tf.get_variable(name=<span class="string">'var1'</span>)</span><br><span class="line">    var2 = tf.Variable(initial_value=[<span class="number">2.</span>], name=<span class="string">'var2'</span>, dtype=tf.float32)</span><br><span class="line">    var2_reuse = tf.Variable(initial_value=[<span class="number">2.</span>], name=<span class="string">'var2'</span>, dtype=tf.float32)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">    sess.run(tf.global_variables_initializer())</span><br><span class="line">    print(var1.name, sess.run(var1))</span><br><span class="line">    print(var1_reuse.name, sess.run(var1_reuse))</span><br><span class="line">    print(var2.name, sess.run(var2))</span><br><span class="line">    print(var2_reuse.name, sess.run(var2_reuse))</span><br><span class="line"><span class="comment"># 输出结果：</span></span><br><span class="line"><span class="comment"># variable_scope_y/var1:0 [-1.59682846]</span></span><br><span class="line"><span class="comment"># variable_scope_y/var1:0 [-1.59682846]   可以看到变量var1_reuse重复使用了var1</span></span><br><span class="line"><span class="comment"># variable_scope_y/var2:0 [ 2.]</span></span><br><span class="line"><span class="comment"># variable_scope_y/var2_1:0 [ 2.]</span></span><br></pre></td></tr></table></figure>
+<p>也可以这样</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'foo'</span>) <span class="keyword">as</span> foo_scope:</span><br><span class="line">    v = tf.get_variable(<span class="string">'v'</span>, [<span class="number">1</span>])</span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'foo'</span>, reuse=<span class="literal">True</span>):</span><br><span class="line">    v1 = tf.get_variable(<span class="string">'v'</span>)</span><br><span class="line"><span class="keyword">assert</span> v1 == v</span><br></pre></td></tr></table></figure>
+<p>或者这样：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">'foo'</span>) <span class="keyword">as</span> foo_scope:</span><br><span class="line">    v = tf.get_variable(<span class="string">'v'</span>, [<span class="number">1</span>])</span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(foo_scope, reuse=<span class="literal">True</span>):</span><br><span class="line">    v1 = tf.get_variable(<span class="string">'v'</span>)</span><br><span class="line"><span class="keyword">assert</span> v1 == v</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+              <a href="/tags/%E5%87%BD%E6%95%B0%E8%AF%A6%E8%A7%A3/" rel="tag"># 函数详解</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/08/24/tensorflow0/" rel="prev" title="tensorflow 基础">
+      <i class="fa fa-chevron-left"></i> tensorflow 基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/08/26/tensorflow2/" rel="next" title="tensorflow 张量，计算图，会话">
+      tensorflow 张量，计算图，会话 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#A"><span class="nav-number">1.</span> <span class="nav-text">A</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#add-to-collection"><span class="nav-number">1.1.</span> <span class="nav-text">add_to_collection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#all-variables"><span class="nav-number">1.2.</span> <span class="nav-text">all_variables</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#E"><span class="nav-number">2.</span> <span class="nav-text">E</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#exp"><span class="nav-number">2.1.</span> <span class="nav-text">exp()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#G"><span class="nav-number">3.</span> <span class="nav-text">G</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#get-variable"><span class="nav-number">3.1.</span> <span class="nav-text">get_variable</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#M"><span class="nav-number">4.</span> <span class="nav-text">M</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#matmul"><span class="nav-number">4.1.</span> <span class="nav-text">matmul</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#N"><span class="nav-number">5.</span> <span class="nav-text">N</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#newaxis"><span class="nav-number">5.1.</span> <span class="nav-text">newaxis</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#I"><span class="nav-number">6.</span> <span class="nav-text">I</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#initialize-all-variables"><span class="nav-number">6.1.</span> <span class="nav-text">initialize_all_variables</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#P"><span class="nav-number">7.</span> <span class="nav-text">P</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#placeholder"><span class="nav-number">7.1.</span> <span class="nav-text">placeholder()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#R"><span class="nav-number">8.</span> <span class="nav-text">R</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#reduce-mean"><span class="nav-number">8.1.</span> <span class="nav-text">reduce_mean()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reduce-sum"><span class="nav-number">8.2.</span> <span class="nav-text">reduce_sum()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#S"><span class="nav-number">9.</span> <span class="nav-text">S</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#square"><span class="nav-number">9.1.</span> <span class="nav-text">square</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#T"><span class="nav-number">10.</span> <span class="nav-text">T</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#trainable-variables"><span class="nav-number">10.1.</span> <span class="nav-text">trainable_variables()</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#V"><span class="nav-number">11.</span> <span class="nav-text">V</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Variable"><span class="nav-number">11.1.</span> <span class="nav-text">Variable()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#variable-scope"><span class="nav-number">11.2.</span> <span class="nav-text">variable_scope</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tensorflow中创建variable的2种方式："><span class="nav-number">11.2.1.</span> <span class="nav-text">tensorflow中创建variable的2种方式：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tensorflow中的两种作用域"><span class="nav-number">11.2.2.</span> <span class="nav-text">tensorflow中的两种作用域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tensorflow中变量共享机制的实现"><span class="nav-number">11.2.3.</span> <span class="nav-text">tensorflow中变量共享机制的实现</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

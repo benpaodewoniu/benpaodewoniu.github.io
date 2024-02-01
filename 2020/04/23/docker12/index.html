@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="由于各种原因，eosvoter 需要进行 docker 化，来满足迁移的需要。 经过，帅气的运维小哥方哥指点后，记录一下整个过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker | 实战 配置 eosvoter 项目">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/23/docker12/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="由于各种原因，eosvoter 需要进行 docker 化，来满足迁移的需要。 经过，帅气的运维小哥方哥指点后，记录一下整个过程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/docker/12_0.png">
+<meta property="article:published_time" content="2020-04-23T07:23:20.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:14:22.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="jenkins">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/docker/12_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/23/docker12/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>docker | 实战 配置 eosvoter 项目 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/23/docker12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker | 实战 配置 eosvoter 项目
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-23 15:23:20" itemprop="dateCreated datePublished" datetime="2020-04-23T15:23:20+08:00">2020-04-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-22 14:14:22" itemprop="dateModified" datetime="2021-01-22T14:14:22+08:00">2021-01-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/jenkins/" itemprop="url" rel="index"><span itemprop="name">jenkins</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/jenkins/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/23/docker12/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/23/docker12/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>由于各种原因，<code>eosvoter</code> 需要进行 <code>docker</code> 化，来满足迁移的需要。</p>
+<p>经过，帅气的运维小哥方哥指点后，记录一下整个过程。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="docker-镜像的制作"><a href="#docker-镜像的制作" class="headerlink" title="docker 镜像的制作"></a>docker 镜像的制作</h1><br/>
+
+<p>运维小哥给了我一个最原始 <code>Dockerfile</code> 进行修改，经过我的修改后，我初始的 <code>Dockerfile</code> 内容如下</p>
+<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu</span><br><span class="line"><span class="keyword">MAINTAINER</span> <span class="keyword">from</span> xiniu</span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get update</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y python3.7</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y curl</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y python3.7-distutils</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install git</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install vim</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install telnet</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install lrzsz</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install redis-server</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /root</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> git <span class="built_in">clone</span> git@...</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  redis</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  APScheduler==3.2.0</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  werkzeug==0.15.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  Flask==1.0</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  requests==2.20.0</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  lxml==4.4.2</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  bPyExecJS==1.5.1</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  click==7.0</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  gunicorn==19.9.0</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  pymongo</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的部分错误的内容如下</p>
+<ul>
+<li><code>apt-get</code> 安装软件的时候应该加 <code>-y</code></li>
+<li>最好不好在 <code>Dockerfile</code> 中 <code>clone</code> 项目地址，因为，万一地址失效 <code>Dockerfile</code> 就不能用了，要做到文件是基础版，可以运行</li>
+<li>没有安装 <code>pip</code> 所以 <code>install</code> 不了</li>
+<li>部分 <code>python</code> 依赖不能用</li>
+</ul>
+<p>所以修改成下面的</p>
+<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu</span><br><span class="line"><span class="keyword">MAINTAINER</span> <span class="keyword">from</span> xiniu</span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get update</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y python3.7</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y curl</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y python3.7-distutils</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y git</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y vim</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y telnet</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y lrzsz</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get install -y redis-server</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /root</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> python3.7  get-pip.py</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  redis</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  APScheduler==3.2.0</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  werkzeug==0.15.3</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  Flask==1.0</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  requests==2.20.0</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip install  lxml==4.4.2</span></span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="编译生成"><a href="#编译生成" class="headerlink" title="编译生成"></a>编译生成</h1><br/>
+
+<p>文件写好之后，我们要进行编译生成，使用下面的命令</p>
+<pre><code>docker build -t eosvoter:v1 .</code></pre><p>特别注意的有以下两点</p>
+<ul>
+<li>上面命令的 <code>.</code> 前面有一个空格</li>
+<li><code>Dockerfile</code> 要单独放在一个文件夹里</li>
+</ul>
+<p>其实，我好多次都生成错了，编译编译着就失败了，所以，我们要把生成失败的容器和镜像删除。</p>
+<p>由于，<code>容器</code>是子，<code>镜像</code>是父，所以，我们应该先删除所有的<code>容器</code>。</p>
+<p>当我们生成失败后，我们可以运行下面的</p>
+<pre><code>docker ps -a</code></pre><p>显示如下</p>
+<table>
+<thead>
+<tr>
+<th>CONTAINER ID</th>
+<th>IMAGE</th>
+<th>COMMAND</th>
+<th>CREATED</th>
+<th>STATUS</th>
+<th>PORTS</th>
+<th>NAMES</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>f7a837cbb06e</td>
+<td>e78d721bca5a</td>
+<td>“/bin/sh -c ‘pip ins…”</td>
+<td>40 seconds ago</td>
+<td>Exited (1) 39 seconds ago</td>
+<td></td>
+<td>amazing_kepler</td>
+</tr>
+</tbody></table>
+<p>先删除容器使用 <code>rm</code></p>
+<pre><code>docker rm f7a837cbb06e</code></pre><p>再删除镜像 <code>rmi</code></p>
+<pre><code>docker rmi e78d721bca5a</code></pre><p>最终生成成功。</p>
+<p>使用 </p>
+<pre><code>docker image list</code></pre><p>查看</p>
+<br/>
+
+<h1 id="在-docker-内部部署项目"><a href="#在-docker-内部部署项目" class="headerlink" title="在 docker 内部部署项目"></a>在 docker 内部部署项目</h1><br/>
+
+<h2 id="迁移到宿主机"><a href="#迁移到宿主机" class="headerlink" title="迁移到宿主机"></a>迁移到宿主机</h2><p>首先我想要把相关的项目安装到 <code>docker</code> 中。</p>
+<pre><code>docker run -it eosvoter:v1  /bin/bash</code></pre><p>安装好东西后【开源项目 proxy_pool 一个 IP 代理池】</p>
+<pre><code>exit</code></pre><p>查看容器的 ID</p>
+<pre><code>docker ps -a</code></pre><p>提交</p>
+<pre><code>docker commit -m &quot;更新的东西&quot; -a &quot;你的名字&quot;  容器ID eosvoter:v2
+    例：docker commit -m &quot;update&quot; -a &quot;xiniu&quot;  ad30e719ec6e ant_trade3:v7</code></pre><p>打包</p>
+<pre><code>docker save -o eosvoter.tar eosvoter:v2</code></pre><p>把压缩包传到你需要的服务器上面（因为，我使用的是其他服务器定做的 <code>docker</code> 「<code>docker</code> 对网速要求很高」 ，然后，把 <code>docker</code> 迁移到其他服务器上）</p>
+<p>通过</p>
+<p><a href="/2019/10/27/mysql2/">服务器数据下载到本地</a></p>
+<p>这篇博文来指导如下下载和上传（因为，我们阿里云服务器可以走 <code>内网</code> 所以速度很快）</p>
+<p>去你所需要的服务器的压缩包所在的目录下</p>
+<pre><code>docker load &lt; eosvoter.tar</code></pre><p>使用</p>
+<pre><code>docker image list</code></pre><p>可以查看到你的 image 确实已经移植过来了。</p>
+<p>然后使用</p>
+<pre><code>docker run -it eosvoter:v2  /bin/bash</code></pre><p>进入 <code>proxy_pool</code> 的内在文件夹，然后安装 python 的依赖。</p>
+<h2 id="连接宿主机相关服务"><a href="#连接宿主机相关服务" class="headerlink" title="连接宿主机相关服务"></a>连接宿主机相关服务</h2><p>接着，我修改了 <code>proxy_pool</code> 的 启动文件 <code>start.sh</code></p>
+<pre><code>#!/usr/bin/env bash
+nohup python3.7 proxyPool.py webserver &gt; /root/proxy_pool/log/webserver.log 2&gt;&amp;1 &amp;
+nohup python3.7 proxyPool.py schedule &gt;  /root/proxy_pool/log/schedule.log 2&gt;&amp;1 &amp;</code></pre><p>然后运行，发现，并不能行，查阅「日志」发现出现这样的错误</p>
+<pre><code>redis.exceptions.ConnectionError: Error 111 connecting to 127.0.0.1:6379. Connection refused.</code></pre><p>怀疑是宿主机的 redis 服务没有开启或者 docker 无法连接宿主机的 redis</p>
+<ul>
+<li>查询宿主机开启了 redis</li>
+</ul>
+<p>然后，看 docker 是否可以连接宿主机的 redis。在 docker 中使用</p>
+<pre><code>telnet 宿主机IP 端口</code></pre><p>需要注意的是，宿主机 IP 不能写公网 IP ，要写 <code>docker IP</code>。当宿主机中启动 <code>docker</code> 是，会建立虚拟网卡，并命名为 <code>docker0</code>。</p>
+<p>查询宿主机的 内网 IP ，进入宿主机环境</p>
+<pre><code>ip a</code></pre><p>或者使用</p>
+<pre><code>ifconfig</code></pre><p>出现「这是使用 ip a 出现的」</p>
+<pre><code>1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:16:3e:00:0b:53 brd ff:ff:ff:ff:ff:ff
+    inet ****/20 brd *** scope global eth0
+       valid_lft forever preferred_lft forever
+3: docker_gwbridge: &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt; mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 02:42:b1:77:c0:d9 brd ff:ff:ff:ff:ff:ff
+    inet ****/16 brd *** scope global docker_gwbridge
+       valid_lft forever preferred_lft forever
+4: docker0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default 
+    link/ether ***e brd ff:ff:ff:ff:ff:ff
+    inet ****/16 brd *** scope global docker0
+       valid_lft forever preferred_lft forever
+6: veth1e9d8dc@if5: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether ***:ff:ff:ff:ff:ff link-netnsid 0
+54: vethf42a2d2@if53: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether ***ff:ff:ff:ff:ff:ff link-netnsid 1
+56: veth8827fa3@if55: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue master docker0 state UP group default 
+    link/ether ***f:ff:ff:ff:ff link-netnsid 2</code></pre><p>其中 <code>docker0</code> 所代表的 <code>inet</code> 就是内网 IP。</p>
+<p>然后，我们使用</p>
+<pre><code>telnet *** 6379</code></pre><p>其中</p>
+<ul>
+<li>*** 代表 eth0 中的 inet</li>
+<li>6379 是 宿主机 redis 服务端口</li>
+<li>IP 和 端口之间要有空格</li>
+</ul>
+<p>输出</p>
+<pre><code>Trying **02...
+Connected to **.
+Escape character is &apos;^]&apos;.</code></pre><p>说明，连接正常，退出这个连接使用</p>
+<pre><code>quit</code></pre><p>这个时候就是代码本身出问题，我在连接 redis 的时候，配置为</p>
+<pre><code>DB_TYPE = getenv(&apos;db_type&apos;, &apos;REDIS&apos;).upper()
+DB_HOST = getenv(&apos;db_host&apos;, &apos;127.0.0.1&apos;)
+DB_PORT = getenv(&apos;db_port&apos;, 6379)
+DB_PASSWORD = getenv(&apos;db_password&apos;, &apos;&apos;)</code></pre><p>其中 <code>127.0.0.1</code> 和 <code>localhost</code> 都不能连接宿主机，要将其换成 <code>docker0</code> 的 IP。</p>
+<p>最终， <code>proxy_pool</code> 运行成功。</p>
+<p>然后我在我的浏览器上访问</p>
+<pre><code>宿主机IP:5010</code></pre><p>是可以成功访问的，但是，访问的数据是 0。</p>
+<h2 id="排除-BUG"><a href="#排除-BUG" class="headerlink" title="排除 BUG"></a>排除 BUG</h2><p>经过，一番查询，其中 <code>redis</code> 里面有空，也就是没有 docker 数据写入宿主机的 redis。</p>
+<p>查询日志后，发现，其在验证 IP 是否可用的时候，出现异常。</p>
+<p>整个 <code>IP 代理池</code> 项目可以大致分为两个部分</p>
+<ul>
+<li>收集网上免费的代理IP</li>
+<li>验证这些 IP 是否可用</li>
+</ul>
+<p>第一步，收集 IP 是没问题的，问题出现在 IP 是否可用上。也就是下面代码的验证</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validUsefulProxy</span><span class="params">(proxy)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    检验代理是否可用</span></span><br><span class="line"><span class="string">    :param proxy:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> isinstance(proxy, bytes):</span><br><span class="line">        proxy = proxy.decode(<span class="string">"utf8"</span>)</span><br><span class="line">    proxies = &#123;<span class="string">"http"</span>: <span class="string">"http://&#123;proxy&#125;"</span>.format(proxy=proxy)&#125;</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        r = requests.get(<span class="string">'https://data.eosbeijing.one/api/listBPByEOS?chain=eos'</span>, proxies=proxies, timeout=<span class="number">10</span>, verify=<span class="literal">False</span>)</span><br><span class="line">        <span class="keyword">if</span> r.status_code == <span class="number">200</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<p>换言之，在 docker 中使用 python 的代理模式，不能访问外网，做了以下的努力</p>
+<ul>
+<li>更改 docker 和 宿主机的网络模式，如 bridge/host</li>
+<li>在宿主机上执行项目代码，发现没有问题，可以使用代理访问外网</li>
+<li>使用 curl 可以证明 docker 的外网连接成功</li>
+</ul>
+<p>经过一番查证，发现，是 docker 中，使用代理出现了异常，异常代码如下</p>
+<pre><code>InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised</code></pre><p>经过查询资料</p>
+<p><a href="https://www.jianshu.com/p/bc2ad1311331">资料</a></p>
+<p>是由于</p>
+<pre><code>request.get(url,verify=False) 的 verify=False 导致的</code></pre><p>原因如下</p>
+<blockquote>
+<p>requests 库其实是基于 urllib 编写的，对 urllib 进行了封装，使得使用时候的体验好了很多，现在 urllib 已经出到了3版本，功能和性能自然是提升了不少。<br>所以，requests最新版本也是基于最新的 urllib3 进行封装。</p>
+</blockquote>
+<blockquote>
+<p>在urllib2时代对https的处理非常简单，只需要在请求的时候加上 verify=False 即可，这个参数的意思是忽略https安全证书的验证，也就是不验证证书的可靠性，直接请求，<br>这其实是不安全的，因为证书可以伪造，不验证的话就不能保证数据的真实性。</p>
+</blockquote>
+<blockquote>
+<p>在urllib3时代，官方强制验证https的安全证书，如果没有通过是不能通过请求的，虽然添加忽略验证的参数，但是依然会 给出醒目的 Warning，这一点没毛病。</p>
+</blockquote>
+<p>接下来， 禁用 urllib3 ，然后在相关文件上添加</p>
+<pre><code>import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)</code></pre><p>最后却是没有这个异常了，但是，问题还没有解决，也就是还是不能用 「代理」 访问外网，并且我有如下的疑问</p>
+<ul>
+<li>为什么同样的代码，在宿主机上可以使用，但是 docker 中不能<ul>
+<li>初步怀疑是依赖的问题</li>
+</ul>
+</li>
+</ul>
+<p>下面查询依赖</p>
+<p>发现宿主机的依赖和 docker 的依赖是一样的。。。现在又进入瓶颈。</p>
+<p>经过长时间的探究发现两个原因</p>
+<ul>
+<li>代理代码书写有问题</li>
+<li>确实有大量的 IP 不可用</li>
+</ul>
+<h3 id="修改代码"><a href="#修改代码" class="headerlink" title="修改代码"></a>修改代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">validUsefulProxy</span><span class="params">(proxy)</span>:</span></span><br><span class="line">    proxies = &#123;<span class="string">"http"</span>: <span class="string">f"http://<span class="subst">&#123;proxy&#125;</span>"</span>, <span class="string">"https"</span>: <span class="string">f"http://<span class="subst">&#123;proxy&#125;</span>"</span>&#125;</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        r = requests.get(<span class="string">'https://data.eosbeijing.one/api/listBPByEOS?chain=eos'</span>, proxies=proxies, timeout=<span class="number">30</span>)</span><br><span class="line">        <span class="keyword">if</span> r.status_code == <span class="number">200</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    	<span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<p>然后执行，现在好了。</p>
+<p>还有更多细节上的原因，由于已经超过本文章的探讨范围了，感兴趣的同学请移步到</p>
+<p><a href="/2020/04/28/opensource1/">开源项目 | proxy_pool 更改验证 IP 有效的方式</a></p>
+<p>现在一个开源项目已经部署到 docker 了，然后将这个容器进行 commit 后。</p>
+<p>接下来，就要编写 jenkins 了。</p>
+<br/>
+
+<h1 id="编写-jenkins"><a href="#编写-jenkins" class="headerlink" title="编写 jenkins"></a>编写 jenkins</h1><br/>
+
+<p>首先，明确以下几点</p>
+<ul>
+<li>公司的 eosvoter 项目是私有的</li>
+<li>jenkins 要做到自动拉取最新代码，然后，同时部署 proxy_pool 和 eosvoter 这两个项目「注意顺序」</li>
+</ul>
+<h2 id="编写脚本"><a href="#编写脚本" class="headerlink" title="编写脚本"></a>编写脚本</h2><p>首先，我并不打算做 jenkins 自动拉取代码，我先把 docker 启动服务做了。</p>
+<p>在 docker 中，主要是填写下面的内容</p>
+<p><img src="/images/docker/12_0.png" alt=""></p>
+<p>其中选择哪个服务器你可以在我下面的博文中的插件那里找到。</p>
+<p><a href="/2020/03/09/jenkins2/">jenkins | 向GitHub提交代码时触发Jenkins自动构建</a></p>
+<p>下面重点说一下脚本编写</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;root&#x2F;eosvoter</span><br><span class="line">.&#x2F;start_app.sh</span><br><span class="line">docker stop eosvoter</span><br><span class="line">sleep 5</span><br><span class="line">docker rm eosvoter</span><br><span class="line"></span><br><span class="line">docker run -dit --net&#x3D;host --name eosvoter  eosvoter:v5</span><br><span class="line"></span><br><span class="line">docker cp &#x2F;root&#x2F;eosvoter   eosvoter:&#x2F;root&#x2F;</span><br><span class="line"></span><br><span class="line">sleep 5</span><br><span class="line"></span><br><span class="line">docker exec -i eosvoter &#x2F;bin&#x2F;bash -c &#39;source &#x2F;etc&#x2F;profile &amp;&amp; cd &#x2F;root&#x2F;proxy_pool&#x2F;cli &amp;&amp; sh .&#x2F;start.sh &amp;&amp; cd &#x2F;root&#x2F;eosvoter &amp;&amp; sh .&#x2F;start.sh&#39;</span><br></pre></td></tr></table></figure>
+
+<p>里面大部分都能看得懂值得一提的是 <code>sh文件</code> 在 <code>jenkins</code> 的执行方式</p>
+<pre><code>sh ./***.sh</code></pre><p>经过，我在服务器上的部署，现在可以成功构建，并且服务也可以跑起来。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/jenkins/" rel="tag"># jenkins</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/23/linux10/" rel="prev" title="linux | 网络相关">
+      <i class="fa fa-chevron-left"></i> linux | 网络相关
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/23/hexo25/" rel="next" title="hexo | 自定义友链页面">
+      hexo | 自定义友链页面 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#docker-镜像的制作"><span class="nav-number">1.</span> <span class="nav-text">docker 镜像的制作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译生成"><span class="nav-number">2.</span> <span class="nav-text">编译生成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在-docker-内部部署项目"><span class="nav-number">3.</span> <span class="nav-text">在 docker 内部部署项目</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#迁移到宿主机"><span class="nav-number">3.1.</span> <span class="nav-text">迁移到宿主机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接宿主机相关服务"><span class="nav-number">3.2.</span> <span class="nav-text">连接宿主机相关服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#排除-BUG"><span class="nav-number">3.3.</span> <span class="nav-text">排除 BUG</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改代码"><span class="nav-number">3.3.1.</span> <span class="nav-text">修改代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编写-jenkins"><span class="nav-number">4.</span> <span class="nav-text">编写 jenkins</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#编写脚本"><span class="nav-number">4.1.</span> <span class="nav-text">编写脚本</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这里说一下在机器学习中对于偏差和方差的理解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="权衡偏差和方差">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/06/16/machinelearning0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里说一下在机器学习中对于偏差和方差的理解。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/0_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/0_1.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/0_2.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/0_3.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/0_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/0_5.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/0_6.png">
+<meta property="article:published_time" content="2018-06-16T04:46:52.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:28:38.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="basis">
+<meta property="article:tag" content="math">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="偏差和方差">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/machinelearning/0_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/06/16/machinelearning0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>权衡偏差和方差 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/06/16/machinelearning0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          权衡偏差和方差
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-06-16 12:46:52" itemprop="dateCreated datePublished" datetime="2018-06-16T12:46:52+08:00">2018-06-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:28:38" itemprop="dateModified" datetime="2020-05-12T10:28:38+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">数学</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%95%B0%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">数学</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E5%AD%A6/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/06/16/machinelearning0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/06/16/machinelearning0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里说一下在机器学习中对于偏差和方差的理解。</p>
+<a id="more"></a>
+
+<h2 id="数学定义"><a href="#数学定义" class="headerlink" title="数学定义"></a>数学定义</h2><p>Generalization error又可以细分为Random Error、Bias和Variance三个部分。</p>
+<p>首先需要说的是随机误差。它是数据本身的噪声带来的，这种误差是不可避免的。其次如果我们能够获得所有可能的数据集合，并在这个数据集合上将Loss最小化，这样学习到的模型就可以称之为“真实模型”，当然，我们是无论如何都不能获得并训练所有可能的数据的，所以真实模型一定存在，但无法获得，我们的最终目标就是去学习一个模型使其更加接近这个真实模型。</p>
+<p>Bias和Variance分别从两个方面来描述了我们学习到的模型与真实模型之间的差距（除去随机误差）。</p>
+<p>偏差：描述的是预测值（估计值）的期望与真实值之间的差距。偏差越大，越偏离真实数据，如下图第二行所示。</p>
+<p>方差：描述的是预测值的变化范围，离散程度，也就是离其期望值的距离。方差越大，数据的分布越分散，如下图右列所示。</p>
+<p><img src="/images/machinelearning/0_0.jpg" alt=""></p>
+<h2 id="数学解释"><a href="#数学解释" class="headerlink" title="数学解释"></a>数学解释</h2><p>排除人为的失误，人们一般会遇到三种误差来源：随机误差、偏差和方差。</p>
+<p>首先需要说明的是随机误差。随机误差是数据本身的噪声带来的，这种误差是不可避免的。</p>
+<p>一般认为随机误差服从高斯分布，记作ε N(0,σε)。</p>
+<p>因此，若有变量y作为预测值，以及X作为自变量（协变量），那么我们将数据背后的真实规律f记作</p>
+<p><img src="/images/machinelearning/0_1.JPG" alt=""></p>
+<h2 id="形象说明"><a href="#形象说明" class="headerlink" title="形象说明"></a>形象说明</h2><p>作者：刑无刀</p>
+<p><a href="https://www.zhihu.com/question/20448464/answer/24397161">链接</a></p>
+<p>想象你开着一架黑鹰直升机，得到命令攻击地面上一只敌军部队，于是你连打数十梭子，结果有一下几种情况:</p>
+<p>1.子弹基本上都打在队伍经过的一棵树上了，连在那棵树旁边等兔子的人都毫发无损，这就是方差小（子弹打得很集中），偏差大（跟目的相距甚远）。</p>
+<p>2.子弹打在了树上，石头上，树旁边等兔子的人身上，花花草草也都中弹，但是敌军安然无恙，这就是方差大（子弹到处都是），偏差大（同1）。</p>
+<p>3.子弹打死了一部分敌军，但是也打偏了些打到花花草草了，这就是方差大（子弹不集中），偏差小（已经在目标周围了）。</p>
+<p>4.子弹一颗没浪费，每一颗都打死一个敌军，跟抗战剧里的八路军一样，这就是方差小（子弹全部都集中在一个位置），偏差小（子弹集中的位置正是它应该射向的位置）。方差，是形容数据分散程度的，算是“无监督的”，客观的指标，偏差，形容数据跟我们期望的中心差得有多远，算是“有监督的”，有人的知识参与的指标。</p>
+<p>那么为什么偏差大方差就小，方差小偏差就大呢？</p>
+<p>我们观看下图：</p>
+<p><img src="/images/machinelearning/0_2.jpg" alt=""></p>
+<p>所谓的偏差就是模型对本训练集的拟合程度。</p>
+<p>所谓的方差就是描述的是训练结果的分散程度。</p>
+<p>以上图为例：</p>
+<pre><code>1. 左上的模型偏差最大，右下的模型偏差最小；
+2. 左上的模型方差最小，右下的模型方差最大（因为那个是曲线所以结果很分散，所以方差大）。</code></pre><h2 id="机器学习中的表现"><a href="#机器学习中的表现" class="headerlink" title="机器学习中的表现"></a>机器学习中的表现</h2><p>在统计学习框架下，大家刻画模型复杂度的时候，有这么个观点，认为Error = Bias +Variance。</p>
+<p>这里的Error大概可以理解为模型的预测错误率，是有两部分组成的。</p>
+<p>一部分是由于模型太简单而带来的估计不准确的部分——偏差（Bias）。</p>
+<p>另一部分是由于模型太复杂而带来的更大的变化空间和不确定性——方差（Variance）。</p>
+<p>要想在bias上表现好，low bias，就是复杂化模型，增加模型的参数，但这样容易过拟合 (overfitting)。</p>
+<p>在一个实际系统中，Bias与Variance往往是不能兼得的。</p>
+<p>如果要降低模型的Bias，就一定程度上会提高模型的Variance，反之亦然。</p>
+<p>造成这种现象的根本原因是，我们总是希望试图用有限训练样本去估计无限的真实数据。</p>
+<p>当我们更加相信这些数据的真实性，而忽视对模型的先验知识，就会尽量保证模型在训练样本上的准确度，这样可以减少模型的Bias。</p>
+<p>但是，这样学习到的模型，很可能会失去一定的泛化能力，从而造成过拟合，降低模型在真实数据上的表现，增加模型的不确定性。</p>
+<p>相反，如果更加相信我们对于模型的先验知识，在学习模型的过程中对模型增加更多的限制，就可以降低模型的variance，提高模型的稳定性，但也会使模型的Bias增大。</p>
+<p>再看一个来自PRML的例子：</p>
+<p><img src="/images/machinelearning/0_3.jpg" alt=""></p>
+<p>这是一个曲线拟合的问题，对同分布的不同数据集进行了多次的曲线拟合，左边表示方差（variance），右边表示偏差（bias），绿色是真实值函数。</p>
+<p>lnλ 表示的是模型的复杂度，这个值越小，表示模型的复杂程度越高，在第一行，大家的复杂度都很低的时候，方差是很小的，但是偏差很大；</p>
+<p>但是到了最后一幅图，我们可以得到，每个人的复杂程度都很高的情况下，不同的函数就有着天壤之别了，所以方差就很大，但此时偏差就很小了。</p>
+<h2 id="最佳平衡点"><a href="#最佳平衡点" class="headerlink" title="最佳平衡点"></a>最佳平衡点</h2><p>假设我们现在有一组训练数据，需要训练一个模型（基于梯度的学习）。</p>
+<p>在训练的起始，Bias很大，因为我们的模型还没有来得及开始学习，也就是与“真实模型”差距很大。</p>
+<p>然而此时variance却很小，因为训练数据集（training data）还没有来得及对模型产生影响，所以此时将模型应用于“不同的”训练数据集也不会有太大的差异。</p>
+<p>而随着训练过程的进行，Bias变小了，因为我们的模型变得“聪明”了，懂得了更多关于“真实模型”的信息，输出值与真实值之间更加接近了。</p>
+<p>但是如果我们训练得太久了，variance就会变得很大，因为我们除了学习到关于真实模型的信息，还学到了许多具体的，只针对我们使用的训练集（真实数据的子集）的信息。</p>
+<p>而不同的可能的训练数据集（真实数据的子集）之间的某些特征和噪声是不一致的，这就导致了了我们在很多其他的数据集上就无法获得很好地效果，也就是所谓的Overfitting（过拟合）。</p>
+<p>考虑到模型误差是偏差与方差的加和，因此我们可以绘制出这样的图像。</p>
+<p><img src="/images/machinelearning/0_4.png" alt=""></p>
+<p>图中的最优位置，实际上是Total Error曲线的拐点。我们知道，连续函数的拐点意味着此处一阶导数的值为0。即</p>
+<p><img src="/images/machinelearning/0_5.JPG" alt=""></p>
+<p>这个公式给出了寻找最优平衡点的数学描述。若模型复杂度小于平衡点，则模型的偏差会偏高，模型倾向于欠拟合；若模型复杂度大于平衡点，则模型的方差会偏高，模型倾向于过拟合。</p>
+<h2 id="过拟合与欠拟合的外在表现"><a href="#过拟合与欠拟合的外在表现" class="headerlink" title="过拟合与欠拟合的外在表现"></a>过拟合与欠拟合的外在表现</h2><p>尽管有了上述的数学表述，但是在现实环境中，有时候我们很难计算模型的偏差与方差。因此，我们需要通过外在表现，判断模型的拟合状态：是欠拟合还是过拟合。</p>
+<p>同样地，在有限的训练数据集中，不断增加模型的复杂度，意味着模型会尽可能多地降低在训练集上的误差。因此在训练集上，不断地增加模型的复杂度，训练集上的误差会一直下降。</p>
+<p>我们把数据分为三个部分：训练数据集、验证数据集、测试数据集。</p>
+<p>因此，我们可以绘制出这样的图像。</p>
+<p><img src="/images/machinelearning/0_6.png" alt=""></p>
+<p>在上图左边区域，训练集与验证集的误差都很高，这块区域的偏差比较高。</p>
+<p>在右边区域，在验证集上误差很高，但是在训练集上偏差很低，这块区域的方差比较高。我们希望在中间的区域得到一个最优平衡点。</p>
+<p>所以，偏差较高（欠拟合）有以下两个特征：</p>
+<pre><code>1）训练集误差很高
+2）验证集误差和训练集误差差不多大</code></pre><p>方差较高（过拟合）</p>
+<pre><code>1）训练集误差较低
+2）非常高的验证集误差</code></pre><h2 id="如何处理欠拟合与过拟合"><a href="#如何处理欠拟合与过拟合" class="headerlink" title="如何处理欠拟合与过拟合"></a>如何处理欠拟合与过拟合</h2><p>当模型处于欠拟合状态时，根本的办法是增加模型的复杂度。我们一般有以下一些办法：</p>
+<pre><code>1）增加模型迭代次数；
+2）训练一个复杂度更高的模型：比如在神经网络中增加神经网络层数、在SVM中用非线性SVM（核技术）代替线性SVM
+3）获取更多的特征以供训练使用：特征少，对模型信息的刻画就不足够了
+4）降低正则化权重：正则化正是为了限制模型的灵活度（复杂度）而设定的，降低其权值可以在模型训练中增加模型复杂度。</code></pre><p>当模型处于过拟合状态时，根本的办法是降低模型的复杂度。我们一般有以下一些办法：</p>
+<pre><code>1）获取更多的数据：训练数据集和验证数据集是随机选取的，它们有不同的特征，以致在验证数据集上误差很高。更多的数据可以减小这种随机性的影响。
+2）减少特征数量
+3）增加正则化权重：方差很高时，模型对训练集的拟合很好。实际上，模型很有可能拟合了训练数据集的噪声，拿到验证集上拟合效果就不好了。我们可以增加正则化权重，减小模型的复杂度。</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/basis/" rel="tag"># basis</a>
+              <a href="/tags/math/" rel="tag"># math</a>
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/%E5%81%8F%E5%B7%AE%E5%92%8C%E6%96%B9%E5%B7%AE/" rel="tag"># 偏差和方差</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/15/math3/" rel="prev" title="为什么样本方差（sample variance）的分母是 n-1？">
+      <i class="fa fa-chevron-left"></i> 为什么样本方差（sample variance）的分母是 n-1？
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/17/math4/" rel="next" title="最小二乘法">
+      最小二乘法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数学定义"><span class="nav-number">1.</span> <span class="nav-text">数学定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数学解释"><span class="nav-number">2.</span> <span class="nav-text">数学解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#形象说明"><span class="nav-number">3.</span> <span class="nav-text">形象说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#机器学习中的表现"><span class="nav-number">4.</span> <span class="nav-text">机器学习中的表现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最佳平衡点"><span class="nav-number">5.</span> <span class="nav-text">最佳平衡点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过拟合与欠拟合的外在表现"><span class="nav-number">6.</span> <span class="nav-text">过拟合与欠拟合的外在表现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何处理欠拟合与过拟合"><span class="nav-number">7.</span> <span class="nav-text">如何处理欠拟合与过拟合</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

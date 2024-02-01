@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="如何使用 Jupyter notebook。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jupyter notebook">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/01/20/python46/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="如何使用 Jupyter notebook。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_1.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_2.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_3.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_4.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_5.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_10.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_6.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_7.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_8.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_9.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_11.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_12.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_13.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_14.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_15.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_16.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_17.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_18.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_19.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_20.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_21.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_22.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_23.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_24.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_25.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_26.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_27.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/46_28.jpg">
+<meta property="article:published_time" content="2019-01-20T09:37:27.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:14:22.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="anaconda">
+<meta property="article:tag" content="Anaconda">
+<meta property="article:tag" content="Jupyter notebook">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/python/46_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/01/20/python46/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>Jupyter notebook | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/01/20/python46/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Jupyter notebook
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-20 17:37:27" itemprop="dateCreated datePublished" datetime="2019-01-20T17:37:27+08:00">2019-01-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-22 14:14:22" itemprop="dateModified" datetime="2021-01-22T14:14:22+08:00">2021-01-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/jupyter/" itemprop="url" rel="index"><span itemprop="name">jupyter</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/01/20/python46/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/01/20/python46/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如何使用 Jupyter notebook。</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.zhihu.com/question/46309360/answer/254638807">jupyter notebook 可以做哪些事情？</a></p>
+<h2 id="Jupyter-notebook-是什么？"><a href="#Jupyter-notebook-是什么？" class="headerlink" title="Jupyter notebook 是什么？"></a>Jupyter notebook 是什么？</h2><p>在没有notebook之前，在IT领域工作的我都是这样工作的：</p>
+<p>在普通的 Python shell 或者在IDE（集成开发环境）如Pycharm中写代码，然后在word中写文档来说明你的项目。</p>
+<p>这个过程很反锁，通常是写完代码，再写文档的时候我还的重头回顾一遍代码。最蛋疼的地方在于，有些数据分析的中间结果，我还的重新跑代码，然后把结果弄到文档里给客户看。</p>
+<p>有了notebook之后，我的世界突然美好了许多，因为notebook 可以直接在代码旁写出叙述性文档，而不是另外编写单独的文档。也就是它可以能将代码、文档等这一切集中到一处，让用户一目了然。</p>
+<p>例如，我的数据分析社群小伙伴就用Jupyter notebook写出了他的学习笔记，长这样，是不是很酷：</p>
+<p><img src="/images/python/46_0.jpg" alt=""></p>
+<p>所以，你现在明白了这句话是在说什么了：</p>
+<blockquote>
+<p>Jupyter notebook（<a href="http://jupyter.org/）">http://jupyter.org/）</a> 是一种 Web 应用，能让用户将说明文本、数学方程、代码和可视化内容全部组合到一个易于共享的文档中。</p>
+</blockquote>
+<p><img src="/images/python/46_1.jpg" alt=""></p>
+<p>Jupyter Notebook 已迅速成为数据分析，机器学习的必备工具。因为它可以让数据分析师集中精力向用户解释整个分析过程。</p>
+<p>Jupyter这个名字是它要服务的三种语言的缩写：Julia，PYThon和R，这个名字与“木星（jupiter）”谐音。</p>
+<h2 id="如何安装-Jupyter-notebook？"><a href="#如何安装-Jupyter-notebook？" class="headerlink" title="如何安装 Jupyter notebook？"></a>如何安装 Jupyter notebook？</h2><p>对于做数据分析这么有用的神器，不安装使用下是不是很遗憾？</p>
+<p>安装 Jupyter 的最简单方法是使用 Anaconda。该发行版附带了 Jupyter notebook。你能够在默认环境下使用 notebook。</p>
+<p>确保你已经安装了Anaconda，如果不知道如何安装的，可以看我之前写的：</p>
+<p><a href="/2019/01/20/python44/">安装 Anaconda</a></p>
+<p>但是如果只安装了 conda 和 源生python 的话，你们还需要做下面的工作。</p>
+<p>要在 conda 环境中安装 Jupyter notebook，在conda终端使用命令（以下所有命令是指conda的终端Anaconda Prompt）：</p>
+<pre><code>conda install jupyter notebook</code></pre><p><img src="/images/python/46_2.jpg" alt=""></p>
+<p>也可以通过python shell的 pip 来安装：pip install jupyter notebook。</p>
+<h2 id="如何启动Jupyter-notebook？"><a href="#如何启动Jupyter-notebook？" class="headerlink" title="如何启动Jupyter notebook？"></a>如何启动Jupyter notebook？</h2><p>有两种方法可以启动 notebook 服务器：</p>
+<h3 id="方法一：windowns在开始菜单中按下图点击打开Notebook"><a href="#方法一：windowns在开始菜单中按下图点击打开Notebook" class="headerlink" title="方法一：windowns在开始菜单中按下图点击打开Notebook"></a>方法一：windowns在开始菜单中按下图点击打开Notebook</h3><p><img src="/images/python/46_3.jpg" alt=""></p>
+<h3 id="方法2：在终端中输入命令：-jupyter-notebook。"><a href="#方法2：在终端中输入命令：-jupyter-notebook。" class="headerlink" title="方法2：在终端中输入命令： jupyter notebook。"></a>方法2：在终端中输入命令： jupyter notebook。</h3><p>服务器会在你运行此命令的“notebook工作文件夹”中启动。也就是说后面你操作的任何 notebook 文件都会保存在该文件夹下，类似于你用优酷下载视频，优酷都会放到自己的下载目录一样。例如我在下面的C:\houzi 下面启动目录后，会在该目录下看到我后面运行的文件。</p>
+<p><img src="/images/python/46_4.jpg" alt=""></p>
+<p>启动notebook 服务器后，在浏览器中打开notebook页面地址：<a href="http://localhost:8888">http://localhost:8888</a></p>
+<p><img src="/images/python/46_5.jpg" alt=""></p>
+<p>如果你同时启动了另一个 notebook 服务器，新服务器会尝试使用端口 8888，但由于此端口已被占用，因此新服务器会在端口 8889 上运行。之后，你可以通过 <a href="http://localhost:8889">http://localhost:8889</a> 连接到新服务器。以此类推。</p>
+<h2 id="新手如何快速使用notebook？"><a href="#新手如何快速使用notebook？" class="headerlink" title="新手如何快速使用notebook？"></a>新手如何快速使用notebook？</h2><h3 id="确保你在Anaconda终端中安装了以下包："><a href="#确保你在Anaconda终端中安装了以下包：" class="headerlink" title="确保你在Anaconda终端中安装了以下包："></a>确保你在Anaconda终端中安装了以下包：</h3><h4 id="安装环境自动关联包"><a href="#安装环境自动关联包" class="headerlink" title="安装环境自动关联包"></a>安装环境自动关联包</h4><pre><code>conda install nb_conda</code></pre><p>该包可以将conda中创建的环境自动关联到你的notebook中。</p>
+<p>上面那句话是什么意思呢?</p>
+<p>假设我们创建了一个 conda 的虚拟环境，假设为 py2.</p>
+<p>当我们打开 Jupyter Notebook 的时候。</p>
+<p><img src="/images/python/46_10.png" alt=""></p>
+<p>我们选择 file 打开右边的 new ，虽然我们创建了 py2 虚拟环境，但其实在 new （图中 2）中，是看不见 py2 的。</p>
+<p>但是我们安装了 nb_conda 之后，就会如图所示，能看见了。</p>
+<p>那么要怎样安装 nb_conda 呢。</p>
+<p>首先，我们要进入 conda 的 Anaconda Prompt ,然后</p>
+<pre><code>conda env list</code></pre><p>列出所有的虚拟环境，激活 py2</p>
+<pre><code>activate py2</code></pre><p>进入虚拟环境后，我们再安装</p>
+<pre><code>conda install nb_conda</code></pre><p>这样，我们的 py2 就会再 file 那个界面中出现了。</p>
+<p>下面的这段话，我也没理解是什么意思。。。感觉原作者写的逻辑有问题，但是如果让我猜的话，应该是他创建了虚拟环境 py2 ，但是再执行下面的语句的时候，py2 并没有出来。</p>
+<p>我们可以对应conda中的环境，就知道这些环境对应conda中的环境列表。用 conda env list 就可以列出你创建的所有环境。</p>
+<p><img src="/images/python/46_6.jpg" alt=""></p>
+<p>其中py2是我在conda中创建的Python2环境名称，</p>
+<p>root和default一样是默认环境，因为我安装的是Anaconda3，所以默认环境是Python3。</p>
+<p>你会发现环境名称py3没有出现在notebook中。解决办法是按下图步骤安装包ipykernel。(这个情况我没有遇到过，因为创建的虚拟环境，都有这个包)</p>
+<p>（同样的，在你的py2环境下也要像刚才步骤那样安装一次这个包）</p>
+<p><img src="/images/python/46_7.jpg" alt=""></p>
+<p>完成上面安装步骤，回到标签页“Files”，再新建notebook时，会发现已经关联了环境名称py2和py3：</p>
+<p><img src="/images/python/46_8.jpg" alt=""></p>
+<p>这样你在notebook中可以轻松切换Python2和Python3环境了。</p>
+<p>经过上面步骤后，notebook的首页右上角，在新建的时候没有显示py3和py2两个环境的关联，这个时候，你可以尝试重启浏览器，注意！是重启浏览器，不是notebook！刷新浏览器有时候是没有用滴（因为缓存的原因），而然我刷了两个小时。。。</p>
+<h3 id="在Anaconda终端安装代码自动补全包"><a href="#在Anaconda终端安装代码自动补全包" class="headerlink" title="在Anaconda终端安装代码自动补全包"></a>在Anaconda终端安装代码自动补全包</h3><pre><code>conda install pyreadline</code></pre><p><img src="/images/python/46_9.jpg" alt=""></p>
+<p>什么是代码自动补全呢？</p>
+<p>后面会介绍，您就等好吧。</p>
+<h2 id="顶部的3个选项卡"><a href="#顶部的3个选项卡" class="headerlink" title="顶部的3个选项卡"></a>顶部的3个选项卡</h2><p>这个是老版本的了，现在还多了一个 conda</p>
+<p>顶部的3个选项卡是：Files（文件）、Running（运行）和 Cluster（集群）。</p>
+<p>Files（文件）显示当前“notebook工作文件夹”中的所有文件和文件夹。</p>
+<p>点击 Running（运行）选项卡会列出所有正在运行的 notebook。可以在该选项卡中管理这些 notebook。</p>
+<p>Clusters一般不会用到。因为过去在 Clusters（集群）中创建多个用于并行计算的内核。现在，这项工作已经由 ipyparallel 接管。</p>
+<p><img src="/images/python/46_11.jpg" alt=""></p>
+<h3 id="如何创建一个新的notebook？"><a href="#如何创建一个新的notebook？" class="headerlink" title="如何创建一个新的notebook？"></a>如何创建一个新的notebook？</h3><p>像下面图片中一样，在右侧点击“New”（新建），创建新的 notebook、文本文件、文件夹或终端。</p>
+<p>“Notebooks”下的列表显示了你已安装的内核。由于我在 Python 3 环境中运行服务器，因此列出了 Python 3 内核。你在这里看到的可能是 Python 2。这里我点击Python3。</p>
+<p><img src="/images/python/46_12.jpg" alt=""></p>
+<p>这样你就打开了下面的页面，你会看到外框为绿色的一个小方框。它称为单元格。单元格是你编写和运行代码的地方。以后你就可以在这里写你的数据分析代码了。</p>
+<p><img src="/images/python/46_13.jpg" alt=""></p>
+<p>在这里你可以输入自己人生中的第一行Python代码Hello world。然后点击图中的运行按钮，会执行你当前所在的代码，其实我更喜欢用快捷键（键盘上同时按住ctrl+enter键）来执行代码。</p>
+<p><img src="/images/python/46_14.gif" alt=""></p>
+<p>这句代码的意思是在界面输出字符串”Hello world！”，所以你会看到在下面与输出结果出来。</p>
+<p>运行代码单元格时，单元格下方会显示输出。单元格还会被编号（左侧会显示 In [1]:）。如果运行了多个单元格的话（也就是多块代码），这能让你知道运行的代码和运行顺序。</p>
+<p><img src="/images/python/46_15.jpg" alt=""></p>
+<p>notebook 中的大部分工作均在代码单元格中完成。这是编写和执行代码的地方。在代码单元格中可以执行多种操作，例如编写代码、给变量赋值、导入包，展示数据分析结果等。在一个单元格中执行的任何代码在所有其他单元格中均可用。</p>
+<p>+按钮用于创建新的单元格</p>
+<p><img src="/images/python/46_16.gif" alt=""></p>
+<p>还记得一开始我提到代码自动补全功能吗？那么，什么是代码自动补全呢？</p>
+<p>比如 我定义了下面的变量。</p>
+<p><img src="/images/python/46_17.jpg" alt=""></p>
+<p>在后面代码中用到这个变量是，我只要输入第一个变量的第一个字母p，然后按下Tab键，边会自动查找到代码中以p开头的变量名称，这可以大幅度提供你写代码的效率。</p>
+<p><img src="/images/python/46_18.jpg" alt=""></p>
+<h3 id="重命名notebook"><a href="#重命名notebook" class="headerlink" title="重命名notebook"></a>重命名notebook</h3><p>你会看到刚才我建的notebook文件名是下面这样默认的，我想修改成自己喜欢的文件名如何办呢？</p>
+<p><img src="/images/python/46_19.jpg" alt=""></p>
+<p>点击“File”-&gt;Rename，可以对notebook文件进行重命名，这里我命名成‘Helloworld’</p>
+<p><img src="/images/python/46_20.jpg" alt=""></p>
+<p>同时，你可以在当前运行notebook服务器的“notebook工作文件夹”下看到创建的notebook，文件名后缀是ipynb。</p>
+<p>（其实Notebook 就是个扩展名为 .ipynb 的大型 JSON 文件。）</p>
+<p><img src="/images/python/46_21.jpg" alt=""></p>
+<p>点击下面的保存按钮，可以保存你的notebook文件。但 notebook 也会定期自动保存。</p>
+<p><img src="/images/python/46_22.jpg" alt=""></p>
+<p><img src="/images/python/46_23.jpg" alt=""></p>
+<h3 id="关闭-notebook文件"><a href="#关闭-notebook文件" class="headerlink" title="关闭 notebook文件"></a>关闭 notebook文件</h3><p>通过在服务器主页上选中 notebook 旁边的复选框，然后点击“Shutdown”（关闭），你就可以关闭各个 notebook。</p>
+<p>但是，在这样做之前，请确保你保存了工作！否则，在你上次保存后所做的任何更改都会丢失。同时如果不保存，你下次运行 notebook 时，你还需要重新运行代码。</p>
+<p><img src="/images/python/46_24.jpg" alt=""></p>
+<h3 id="如何共享你的notebook？"><a href="#如何共享你的notebook？" class="headerlink" title="如何共享你的notebook？"></a>如何共享你的notebook？</h3><p>点击File-&gt;Download as，你可以选择多种格式下载你的notebook。一般我都会根据下面的用途来选择不同的下载格式：</p>
+<blockquote>
+<p>1）如果我想和客户分享我的数据分析成果，我会选择将notebook下载为HTML文件。<br>2）如果我希望将自己的数据分析成果和代码嵌入到项目中，比如为药店管理系统做个数据分析子模块，我就会选择Python（.py）模块，这可以将我的代码融入项目中，成为子模块，方便和其他开发人员共同完成任务。<br>3）如果要在博客或文档中使用 notebook，我就选择Markdown格式。</p>
+</blockquote>
+<p><img src="/images/python/46_25.jpg" alt=""></p>
+<h3 id="关闭Jupler-notebook服务器"><a href="#关闭Jupler-notebook服务器" class="headerlink" title="关闭Jupler notebook服务器"></a>关闭Jupler notebook服务器</h3><p>通过在终端中按两次 Ctrl + C，可以关闭整个服务器。再次提醒，这会立即关闭所有运行中的 notebook，因此，请确保你保存了工作！</p>
+<p>关闭notebook服务器后，下次启动再打开notebook，当你继续在该notebook中写代码时，发现之前的变量无法访问了。需要你在该notebook的Kernerl选项卡中选择“Run All”重新编译下之前的代码。</p>
+<p><img src="/images/python/46_26.jpg" alt=""></p>
+<h3 id="安装的包在notebook中不可使用的问题"><a href="#安装的包在notebook中不可使用的问题" class="headerlink" title="安装的包在notebook中不可使用的问题"></a>安装的包在notebook中不可使用的问题</h3><p>是因为安装包的时候，不在当前notebook所在的python环境下安装了包，所以在这个python环境下找不到包。解决办法如下：</p>
+<p><img src="/images/python/46_27.jpg" alt=""></p>
+<p><img src="/images/python/46_28.jpg" alt=""></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/anaconda/" rel="tag"># anaconda</a>
+              <a href="/tags/Anaconda/" rel="tag"># Anaconda</a>
+              <a href="/tags/Jupyter-notebook/" rel="tag"># Jupyter notebook</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/20/python45/" rel="prev" title="Anaconda 所遇到的错误">
+      <i class="fa fa-chevron-left"></i> Anaconda 所遇到的错误
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/20/python47/" rel="next" title="Jupyter 所遇到的错误">
+      Jupyter 所遇到的错误 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jupyter-notebook-是什么？"><span class="nav-number">2.</span> <span class="nav-text">Jupyter notebook 是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何安装-Jupyter-notebook？"><span class="nav-number">3.</span> <span class="nav-text">如何安装 Jupyter notebook？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何启动Jupyter-notebook？"><span class="nav-number">4.</span> <span class="nav-text">如何启动Jupyter notebook？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法一：windowns在开始菜单中按下图点击打开Notebook"><span class="nav-number">4.1.</span> <span class="nav-text">方法一：windowns在开始菜单中按下图点击打开Notebook</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法2：在终端中输入命令：-jupyter-notebook。"><span class="nav-number">4.2.</span> <span class="nav-text">方法2：在终端中输入命令： jupyter notebook。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新手如何快速使用notebook？"><span class="nav-number">5.</span> <span class="nav-text">新手如何快速使用notebook？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#确保你在Anaconda终端中安装了以下包："><span class="nav-number">5.1.</span> <span class="nav-text">确保你在Anaconda终端中安装了以下包：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装环境自动关联包"><span class="nav-number">5.1.1.</span> <span class="nav-text">安装环境自动关联包</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在Anaconda终端安装代码自动补全包"><span class="nav-number">5.2.</span> <span class="nav-text">在Anaconda终端安装代码自动补全包</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#顶部的3个选项卡"><span class="nav-number">6.</span> <span class="nav-text">顶部的3个选项卡</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何创建一个新的notebook？"><span class="nav-number">6.1.</span> <span class="nav-text">如何创建一个新的notebook？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重命名notebook"><span class="nav-number">6.2.</span> <span class="nav-text">重命名notebook</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭-notebook文件"><span class="nav-number">6.3.</span> <span class="nav-text">关闭 notebook文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何共享你的notebook？"><span class="nav-number">6.4.</span> <span class="nav-text">如何共享你的notebook？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭Jupler-notebook服务器"><span class="nav-number">6.5.</span> <span class="nav-text">关闭Jupler notebook服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装的包在notebook中不可使用的问题"><span class="nav-number">6.6.</span> <span class="nav-text">安装的包在notebook中不可使用的问题</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

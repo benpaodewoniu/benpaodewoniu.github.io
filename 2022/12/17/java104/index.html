@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="java 的死锁检查。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java | 线程死锁 「栈」">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2022/12/17/java104/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="java 的死锁检查。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-12-17T14:59:52.000Z">
+<meta property="article:modified_time" content="2022-12-17T15:25:02.046Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2022/12/17/java104/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>java | 线程死锁 「栈」 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2022/12/17/java104/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java | 线程死锁 「栈」
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-17 22:59:52 / 修改时间：23:25:02" itemprop="dateCreated datePublished" datetime="2022-12-17T22:59:52+08:00">2022-12-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/%E8%BF%9B%E9%98%B6/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/%E8%BF%9B%E9%98%B6/JVM/%E9%97%AE%E9%A2%98%E8%AF%8A%E6%96%AD/" itemprop="url" rel="index"><span itemprop="name">问题诊断</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/12/17/java104/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/12/17/java104/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>java</code> 的死锁检查。</p>
+<a id="more"></a>
+
+<p>代码如下</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> &#123;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> &#123;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Run"</span>)</span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Run</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    static A a = <span class="keyword">new</span> A();</span><br><span class="line">    static B b = <span class="keyword">new</span> B();</span><br><span class="line"></span><br><span class="line">    public static <span class="literal">void</span> main(String[] args) throws Exception &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> Thread<span class="function"><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            synchronized (a) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">try</span> &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                    Thread.sleep(<span class="number">2000</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                    e.printStackTrace();</span></span></span><br><span class="line"><span class="function"><span class="params">                &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">                synchronized (b) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">                &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;)</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">Thread</span>.<span class="title">sleep</span><span class="params">(<span class="number">1000</span>)</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">new</span> <span class="title">Thread</span><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            synchronized (b) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                synchronized (a) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">                &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;)</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">    &#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>打包成 <code>jar</code> 包。然后运行。</p>
+<p>使用 <code>pa -aux | grep java</code> 查看</p>
+<pre><code>34341   0.0  0.5  8139576  42724 s000  SN   11:04PM   0:00.41 /usr/bin/java -jar redisc-1.0-SNAPSHOT-jar-with-dependencies.jar</code></pre><p>使用 <code>jstack 34341</code> 输出</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line">2022-12-17 23:05:22</span><br><span class="line">Full thread dump OpenJDK 64-Bit<span class="built_in"> Server </span>VM (14.0.1+7 mixed mode, sharing):</span><br><span class="line"></span><br><span class="line">Threads class SMR info:</span><br><span class="line"><span class="attribute">_java_thread_list</span>=0x00007f958e5418c0, <span class="attribute">length</span>=13, elements=&#123;</span><br><span class="line">0x00007f958f866000, 0x00007f959080a000, 0x00007f958f868000, 0x00007f958f868800,</span><br><span class="line">0x00007f958f86c000, 0x00007f958f86d000, 0x00007f958f009000, 0x00007f958e811800,</span><br><span class="line">0x00007f958e812800, 0x00007f958e890000, 0x00007f958f00d800, 0x00007f958f010800,</span><br><span class="line">0x00007f958f00e800</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="string">"Reference Handler"</span> #2 daemon <span class="attribute">prio</span>=10 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.09ms <span class="attribute">elapsed</span>=22.92s <span class="attribute">tid</span>=0x00007f958f866000 <span class="attribute">nid</span>=0x4603 waiting on condition  [0x000070000c78f000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">        at java.lang.ref.Reference.waitForReferencePendingList(java.base@14.0.1/Native Method)</span><br><span class="line">        at java.lang.ref.Reference.processPendingReferences(java.base@14.0.1/Reference.java:241)</span><br><span class="line">        at java.lang.ref.Reference<span class="variable">$ReferenceHandler</span>.<span class="builtin-name">run</span>(java.base@14.0.1/Reference.java:213)</span><br><span class="line"></span><br><span class="line"><span class="string">"Finalizer"</span> #3 daemon <span class="attribute">prio</span>=8 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.20ms <span class="attribute">elapsed</span>=22.92s <span class="attribute">tid</span>=0x00007f959080a000 <span class="attribute">nid</span>=0x4503 <span class="keyword">in</span> Object.wait()  [0x000070000c892000]</span><br><span class="line">   java.lang.Thread.State: WAITING (on object monitor)</span><br><span class="line">        at java.lang.Object.wait(java.base@14.0.1/Native Method)</span><br><span class="line">        - waiting on &lt;0x0000000787f027f0&gt; (a java.lang.ref.ReferenceQueue<span class="variable">$Lock</span>)</span><br><span class="line">        at java.lang.ref.ReferenceQueue.<span class="builtin-name">remove</span>(java.base@14.0.1/ReferenceQueue.java:155)</span><br><span class="line">        - locked &lt;0x0000000787f027f0&gt; (a java.lang.ref.ReferenceQueue<span class="variable">$Lock</span>)</span><br><span class="line">        at java.lang.ref.ReferenceQueue.<span class="builtin-name">remove</span>(java.base@14.0.1/ReferenceQueue.java:176)</span><br><span class="line">        at java.lang.ref.Finalizer<span class="variable">$FinalizerThread</span>.<span class="builtin-name">run</span>(java.base@14.0.1/Finalizer.java:170)</span><br><span class="line"></span><br><span class="line"><span class="string">"Signal Dispatcher"</span> #4 daemon <span class="attribute">prio</span>=9 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.31ms <span class="attribute">elapsed</span>=22.91s <span class="attribute">tid</span>=0x00007f958f868000 <span class="attribute">nid</span>=0x5703 runnable  [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line"><span class="string">"Service Thread"</span> #5 daemon <span class="attribute">prio</span>=9 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.05ms <span class="attribute">elapsed</span>=22.91s <span class="attribute">tid</span>=0x00007f958f868800 <span class="attribute">nid</span>=0x5903 runnable  [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line"><span class="string">"C2 CompilerThread0"</span> #6 daemon <span class="attribute">prio</span>=9 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=103.43ms <span class="attribute">elapsed</span>=22.91s <span class="attribute">tid</span>=0x00007f958f86c000 <span class="attribute">nid</span>=0xa603 waiting on condition  [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">   <span class="literal">No</span> compile task</span><br><span class="line"></span><br><span class="line"><span class="string">"C1 CompilerThread0"</span> #9 daemon <span class="attribute">prio</span>=9 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=79.09ms <span class="attribute">elapsed</span>=22.91s <span class="attribute">tid</span>=0x00007f958f86d000 <span class="attribute">nid</span>=0xa403 waiting on condition  [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">   <span class="literal">No</span> compile task</span><br><span class="line"></span><br><span class="line"><span class="string">"Sweeper thread"</span> #10 daemon <span class="attribute">prio</span>=9 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=1.93ms <span class="attribute">elapsed</span>=22.91s <span class="attribute">tid</span>=0x00007f958f009000 <span class="attribute">nid</span>=0x5d03 runnable  [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line"><span class="string">"Notification Thread"</span> #11 daemon <span class="attribute">prio</span>=9 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.13ms <span class="attribute">elapsed</span>=22.89s <span class="attribute">tid</span>=0x00007f958e811800 <span class="attribute">nid</span>=0xa103 runnable  [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line"><span class="string">"Common-Cleaner"</span> #12 daemon <span class="attribute">prio</span>=8 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.22ms <span class="attribute">elapsed</span>=22.89s <span class="attribute">tid</span>=0x00007f958e812800 <span class="attribute">nid</span>=0x5e03 <span class="keyword">in</span> Object.wait()  [0x000070000d1b0000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (on object monitor)</span><br><span class="line">        at java.lang.Object.wait(java.base@14.0.1/Native Method)</span><br><span class="line">        - waiting on &lt;0x0000000787f45a60&gt; (a java.lang.ref.ReferenceQueue<span class="variable">$Lock</span>)</span><br><span class="line">        at java.lang.ref.ReferenceQueue.<span class="builtin-name">remove</span>(java.base@14.0.1/ReferenceQueue.java:155)</span><br><span class="line">        - locked &lt;0x0000000787f45a60&gt; (a java.lang.ref.ReferenceQueue<span class="variable">$Lock</span>)</span><br><span class="line">        at jdk.internal.ref.CleanerImpl.<span class="builtin-name">run</span>(java.base@14.0.1/CleanerImpl.java:148)</span><br><span class="line">        at java.lang.Thread.<span class="builtin-name">run</span>(java.base@14.0.1/Thread.java:832)</span><br><span class="line">        at jdk.internal.misc.InnocuousThread.<span class="builtin-name">run</span>(java.base@14.0.1/InnocuousThread.java:134)</span><br><span class="line"></span><br><span class="line"><span class="string">"Thread-0"</span> #13 <span class="attribute">prio</span>=5 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=1.13ms <span class="attribute">elapsed</span>=22.73s <span class="attribute">tid</span>=0x00007f958e890000 <span class="attribute">nid</span>=0x5f03 waiting <span class="keyword">for</span> monitor entry  [0x000070000d2b3000]</span><br><span class="line">   java.lang.Thread.State: BLOCKED (on object monitor)</span><br><span class="line">        at com.redisc.Run.lambda<span class="variable">$main</span><span class="variable">$0</span>(Run.java:28)</span><br><span class="line">        - waiting <span class="keyword">to</span> lock &lt;0x0000000787b0f1d0&gt; (a com.redisc.B)</span><br><span class="line">        - locked &lt;0x0000000787b0de18&gt; (a com.redisc.A)</span><br><span class="line">        at com.redisc.Run$<span class="variable">$Lambda</span><span class="variable">$21</span>/0x0000000800b7b440.<span class="builtin-name">run</span>(Unknown Source)</span><br><span class="line">        at java.lang.Thread.<span class="builtin-name">run</span>(java.base@14.0.1/Thread.java:832)</span><br><span class="line"></span><br><span class="line"><span class="string">"Thread-1"</span> #14 <span class="attribute">prio</span>=5 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=1.46ms <span class="attribute">elapsed</span>=21.72s <span class="attribute">tid</span>=0x00007f958f00d800 <span class="attribute">nid</span>=0x9903 waiting <span class="keyword">for</span> monitor entry  [0x000070000d3b6000]</span><br><span class="line">   java.lang.Thread.State: BLOCKED (on object monitor)</span><br><span class="line">        at com.redisc.Run.lambda<span class="variable">$main</span><span class="variable">$1</span>(Run.java:38)</span><br><span class="line">        - waiting <span class="keyword">to</span> lock &lt;0x0000000787b0de18&gt; (a com.redisc.A)</span><br><span class="line">        - locked &lt;0x0000000787b0f1d0&gt; (a com.redisc.B)</span><br><span class="line">        at com.redisc.Run$<span class="variable">$Lambda</span><span class="variable">$22</span>/0x0000000800b7b840.<span class="builtin-name">run</span>(Unknown Source)</span><br><span class="line">        at java.lang.Thread.<span class="builtin-name">run</span>(java.base@14.0.1/Thread.java:832)</span><br><span class="line"></span><br><span class="line"><span class="string">"DestroyJavaVM"</span> #15 <span class="attribute">prio</span>=5 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=162.42ms <span class="attribute">elapsed</span>=21.72s <span class="attribute">tid</span>=0x00007f958f010800 <span class="attribute">nid</span>=0x2703 waiting on condition  [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line"><span class="string">"Attach Listener"</span> #16 daemon <span class="attribute">prio</span>=9 <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.62ms <span class="attribute">elapsed</span>=0.10s <span class="attribute">tid</span>=0x00007f958f00e800 <span class="attribute">nid</span>=0x9803 waiting on condition  [0x0000000000000000]</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line"></span><br><span class="line"><span class="string">"VM Thread"</span> <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=2.58ms <span class="attribute">elapsed</span>=22.93s <span class="attribute">tid</span>=0x00007f9590876800 <span class="attribute">nid</span>=0x4903 runnable  </span><br><span class="line"></span><br><span class="line"><span class="string">"GC Thread#0"</span> <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=1.10ms <span class="attribute">elapsed</span>=22.96s <span class="attribute">tid</span>=0x00007f958f831800 <span class="attribute">nid</span>=0x3303 runnable  </span><br><span class="line"></span><br><span class="line"><span class="string">"G1 Main Marker"</span> <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.04ms <span class="attribute">elapsed</span>=22.96s <span class="attribute">tid</span>=0x00007f958f842800 <span class="attribute">nid</span>=0x4f03 runnable  </span><br><span class="line"></span><br><span class="line"><span class="string">"G1 Conc#0"</span> <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.04ms <span class="attribute">elapsed</span>=22.96s <span class="attribute">tid</span>=0x00007f958f843800 <span class="attribute">nid</span>=0x3503 runnable  </span><br><span class="line"></span><br><span class="line"><span class="string">"G1 Refine#0"</span> <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=0.04ms <span class="attribute">elapsed</span>=22.96s <span class="attribute">tid</span>=0x00007f959086c000 <span class="attribute">nid</span>=0x3603 runnable  </span><br><span class="line"></span><br><span class="line"><span class="string">"G1 Young RemSet Sampling"</span> <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=3.16ms <span class="attribute">elapsed</span>=22.96s <span class="attribute">tid</span>=0x00007f959086c800 <span class="attribute">nid</span>=0x4a03 runnable  </span><br><span class="line"><span class="string">"VM Periodic Task Thread"</span> <span class="attribute">os_prio</span>=31 <span class="attribute">cpu</span>=16.60ms <span class="attribute">elapsed</span>=22.89s <span class="attribute">tid</span>=0x00007f959087f800 <span class="attribute">nid</span>=0x9f03 waiting on condition  </span><br><span class="line"></span><br><span class="line">JNI global refs: 9, weak refs: 0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Found one Java-level deadlock:</span><br><span class="line">=============================</span><br><span class="line"><span class="string">"Thread-0"</span>:</span><br><span class="line">  waiting <span class="keyword">to</span> lock monitor 0x00007f9590139f00 (object 0x0000000787b0f1d0, a com.redisc.B),</span><br><span class="line">  which is held by <span class="string">"Thread-1"</span></span><br><span class="line"></span><br><span class="line"><span class="string">"Thread-1"</span>:</span><br><span class="line">  waiting <span class="keyword">to</span> lock monitor 0x00007f9590139e00 (object 0x0000000787b0de18, a com.redisc.A),</span><br><span class="line">  which is held by <span class="string">"Thread-0"</span></span><br><span class="line"></span><br><span class="line">Java stack information <span class="keyword">for</span> the threads listed above:</span><br><span class="line">===================================================</span><br><span class="line"><span class="string">"Thread-0"</span>:</span><br><span class="line">        at com.redisc.Run.lambda<span class="variable">$main</span><span class="variable">$0</span>(Run.java:28)</span><br><span class="line">        - waiting <span class="keyword">to</span> lock &lt;0x0000000787b0f1d0&gt; (a com.redisc.B)</span><br><span class="line">        - locked &lt;0x0000000787b0de18&gt; (a com.redisc.A)</span><br><span class="line">        at com.redisc.Run$<span class="variable">$Lambda</span><span class="variable">$21</span>/0x0000000800b7b440.<span class="builtin-name">run</span>(Unknown Source)</span><br><span class="line">        at java.lang.Thread.<span class="builtin-name">run</span>(java.base@14.0.1/Thread.java:832)</span><br><span class="line"><span class="string">"Thread-1"</span>:</span><br><span class="line">        at com.redisc.Run.lambda<span class="variable">$main</span><span class="variable">$1</span>(Run.java:38)</span><br><span class="line">        - waiting <span class="keyword">to</span> lock &lt;0x0000000787b0de18&gt; (a com.redisc.A)</span><br><span class="line">        - locked &lt;0x0000000787b0f1d0&gt; (a com.redisc.B)</span><br><span class="line">        at com.redisc.Run$<span class="variable">$Lambda</span><span class="variable">$22</span>/0x0000000800b7b840.<span class="builtin-name">run</span>(Unknown Source)</span><br><span class="line">        at java.lang.Thread.<span class="builtin-name">run</span>(java.base@14.0.1/Thread.java:832)</span><br><span class="line"></span><br><span class="line">Found 1 deadlock.</span><br></pre></td></tr></table></figure>
+
+<p>后面有个输出 <code>Found one Java-level deadlock</code> 有一个 <code>deadlock</code> 就证明死锁了。后面就是死锁的位置。</p>
+<pre><code>at com.redisc.Run.lambda$main$0(Run.java:28)
+at com.redisc.Run.lambda$main$1(Run.java:38)</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/17/java103/" rel="prev" title="java | 线程诊断「栈」">
+      <i class="fa fa-chevron-left"></i> java | 线程诊断「栈」
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/12/17/java105/" rel="next" title="java | 本地方法栈">
+      java | 本地方法栈 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

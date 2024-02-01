@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="堡垒机也是我在公司接触到的概念。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="运维 | 什么是堡垒机？">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/11/12/ops0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="堡垒机也是我在公司接触到的概念。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/ops/0_0.png">
+<meta property="article:published_time" content="2020-11-12T06:30:54.000Z">
+<meta property="article:modified_time" content="2020-11-13T13:00:59.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="运维">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/ops/0_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/11/12/ops0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>运维 | 什么是堡垒机？ | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/11/12/ops0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          运维 | 什么是堡垒机？
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-12 14:30:54" itemprop="dateCreated datePublished" datetime="2020-11-12T14:30:54+08:00">2020-11-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-13 21:00:59" itemprop="dateModified" datetime="2020-11-13T21:00:59+08:00">2020-11-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%90%E7%BB%B4/" itemprop="url" rel="index"><span itemprop="name">运维</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/11/12/ops0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/11/12/ops0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>堡垒机也是我在公司接触到的概念。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="什么是堡垒机"><a href="#什么是堡垒机" class="headerlink" title="什么是堡垒机"></a>什么是堡垒机</h1><br/>
+
+<p>堡垒机，即在一个特定的网络环境下，为了保障网络和数据不受来自外部和内部用户的入侵和破坏，而运用各种技术手段监控和记录运维人员对网络内的服务器、网络设备、安全设备、数据库等设备的操作行为，以便集中报警、及时处理及审计定责。</p>
+<p>用一句话来说，堡垒机就是用来后控制哪些人可以登录哪些资产（事先防范和事中控制），以及录像记录登录资产后做了什么事情（事溯源）</p>
+<p>堡垒机很多时候也叫运维审计系统，它的核心是可控及审计。可控是指权限可控、行为可控。权限可控，比如某个工程师要离职或要转岗了。如果没有一个统一的权限管理入口，是一场梦魇。行为可控，比如我们需要集中禁用某个危险命令，如果没有一个统一入口，操作的难度可想而知。</p>
+<br/>
+
+<h1 id="为什么需要堡垒机"><a href="#为什么需要堡垒机" class="headerlink" title="为什么需要堡垒机"></a>为什么需要堡垒机</h1><br/>
+
+<p>堡垒机是从跳板机（也叫前置机）的概念演变过来的。早在2000年左右，一些中大型企业为了能对运维人员的远程登录进行集中管理，会在机房部署一台跳板机。跳板机其实就是一台unix/windows操作系统的服务器，所有运维人员都需要先远程登录跳板机，然后再从跳板机登录其他服务器中进行运维操作。</p>
+<p>但跳板机并没有实现对运维人员操作行为的控制和审计，使用跳板机过程中还是会有误操作、违规操作导致的操作事故，一旦出现操作事故很难快速定位原因和责任人。此外，跳板机存在严重的安全风险，一旦跳板机系统被攻入，则将后端资源风险完全暴露无遗。同时，对于个别资源（如telnet）可以通过跳板机来完成一定的内控，但是对于更多更特殊的资源（ftp、rdp等）来讲就显得力不从心了。</p>
+<p>人们逐渐认识到跳板机的不足，进而需要更新、更好的安全技术理念来实现运维操作管理。需要一种能满足角色管理与授权审批、信息资源访问控制、操作记录和审计、系统变更和维护控制要求，并生成一些统计报表配合管理规范来不断提升IT内控的合规性的产品。在这些理念的指导下，2005年前后，堡垒机开始以一个独立的产品形态被广泛部署，有效地降低了运维操作风险，使得运维操作管理变得更简单、更安全。</p>
+<br/>
+
+<h1 id="堡垒机的设计理念"><a href="#堡垒机的设计理念" class="headerlink" title="堡垒机的设计理念"></a>堡垒机的设计理念</h1><br/>
+
+<p>堡垒机主要是有4A理念</p>
+<ul>
+<li>即认证（Authen）</li>
+<li>授权（Authorize）</li>
+<li>账号（Account）</li>
+<li>审计（Audit）</li>
+</ul>
+<br/>
+
+<h1 id="堡垒机的目标"><a href="#堡垒机的目标" class="headerlink" title="堡垒机的目标"></a>堡垒机的目标</h1><br/>
+
+<p>堡垒机的建设目标可以概括为5W，主要是为了降低运维风险。具体如下：</p>
+<ul>
+<li>审计：你做了什么？（What）</li>
+<li>授权：你能做哪些？（Which）</li>
+<li>账号：你要去哪？（Where）</li>
+<li>认证：你是谁？（Who）</li>
+<li>来源：访问时间？（When）</li>
+</ul>
+<br/>
+
+<h1 id="堡垒机的价值"><a href="#堡垒机的价值" class="headerlink" title="堡垒机的价值"></a>堡垒机的价值</h1><br/>
+
+<ul>
+<li>集中管理</li>
+<li>集中权限分配</li>
+<li>统一认证</li>
+<li>集中审计</li>
+<li>数据安全</li>
+<li>运维高效</li>
+<li>运维合规</li>
+<li>风险管控</li>
+</ul>
+<br/>
+
+<h1 id="堡垒机的原理"><a href="#堡垒机的原理" class="headerlink" title="堡垒机的原理"></a>堡垒机的原理</h1><br/>
+
+<p>目前常见堡垒机的主要功能架构</p>
+<p><img src="/images/ops/0_0.png" alt=""></p>
+<p>目前常见堡垒机的主要功能分为以下几个模块：</p>
+<h2 id="运维平台"><a href="#运维平台" class="headerlink" title="运维平台"></a>运维平台</h2><ul>
+<li>RDP/VNC运维</li>
+<li>SSH/Telnet运维</li>
+<li>SFTP/FTP运维</li>
+<li>数据库运维</li>
+<li>Web系统运维</li>
+<li>远程应用运维</li>
+</ul>
+<h2 id="管理平台"><a href="#管理平台" class="headerlink" title="管理平台"></a>管理平台</h2><p>三权分立；身份鉴别；主机管理；密码托管；运维监控；电子工单；</p>
+<h2 id="自动化平台"><a href="#自动化平台" class="headerlink" title="自动化平台"></a>自动化平台</h2><p>自动改密；自动运维；自动收集；自动授权；自动备份；自动告警；</p>
+<h2 id="控制平台"><a href="#控制平台" class="headerlink" title="控制平台"></a>控制平台</h2><p>IP防火墙；命令防火墙；访问控制；传输控制；会话阻断；运维审批；</p>
+<h2 id="审计平台"><a href="#审计平台" class="headerlink" title="审计平台"></a>审计平台</h2><p>命令记录；文字记录；SQL记录；文件保存；全文检索；审计报表；</p>
+<pre><code>说明：三权分立
+三权的理解：配置，授权，审计
+三员的理解：系统管理员，安全保密管理员，安全审计员
+三员之三权：废除超级管理员；三员是三角色并非三人；安全保密管理员与审计员必须非同一个人。</code></pre><br/>
+
+<h1 id="堡垒机的身份认证"><a href="#堡垒机的身份认证" class="headerlink" title="堡垒机的身份认证"></a>堡垒机的身份认证</h1><br/>
+
+<p>堡垒机主要就是为了做统一运维入口，所以登录堡垒机必须支持灵活的身份认证方式，比如：</p>
+<h2 id="本地认证"><a href="#本地认证" class="headerlink" title="本地认证"></a>本地认证</h2><p>本地账号密码认证，一般支持强密码策略</p>
+<h2 id="远程认证"><a href="#远程认证" class="headerlink" title="远程认证"></a>远程认证</h2><p>一般可支持第三方AD/LDAP/Radius认证</p>
+<h2 id="双因子认证"><a href="#双因子认证" class="headerlink" title="双因子认证"></a>双因子认证</h2><p>UsbKey、动态令牌、短信网关、手机APP令牌等</p>
+<h2 id="第三方认证系统"><a href="#第三方认证系统" class="headerlink" title="第三方认证系统"></a>第三方认证系统</h2><p>OAuth2.0、CAS等。</p>
+<br/>
+
+<h1 id="堡垒机的常见运维方式"><a href="#堡垒机的常见运维方式" class="headerlink" title="堡垒机的常见运维方式"></a>堡垒机的常见运维方式</h1><br/>
+
+<ul>
+<li>B/S运维：通过浏览器运维。</li>
+<li>C/S运维：通过客户端软件运维，比如Xshell，CRT等。</li>
+<li>H5运维：直接在网页上可以打开远程桌面，进行运维。无需安装本地运维工具，只要有浏览器就可以对常用协议进行运维操作，支持ssh、telnet、rlogin、rdp、vnc协议</li>
+<li>网关运维：采用SSH网关方式，实现代理直接登录目标主机，适用于运维自动化场景。</li>
+</ul>
+<br/>
+
+<h1 id="堡垒机的其他常见功能"><a href="#堡垒机的其他常见功能" class="headerlink" title="堡垒机的其他常见功能"></a>堡垒机的其他常见功能</h1><br/>
+
+<ul>
+<li>文件传输：一般都是登录堡垒机，通过堡垒机中转。使用RDP/SFTP/FTP/SCP/RZ/SZ等传输协议传输。</li>
+<li>细粒度控制：可以对访问用户、命令、传输等进行精细化控制。</li>
+<li>支持开放的API</li>
+</ul>
+<br/>
+
+<h1 id="堡垒机的部署方式"><a href="#堡垒机的部署方式" class="headerlink" title="堡垒机的部署方式"></a>堡垒机的部署方式</h1><br/>
+
+<h2 id="单机部署"><a href="#单机部署" class="headerlink" title="单机部署"></a>单机部署</h2><p>堡垒机主要都是旁路部署，旁挂在交换机旁边，只要能访问所有设备即可。</p>
+<p>部署特定：</p>
+<ul>
+<li>旁路部署，逻辑串联。</li>
+<li>不影响现有网络结构。</li>
+</ul>
+<h2 id="HA高可靠部署"><a href="#HA高可靠部署" class="headerlink" title="HA高可靠部署"></a>HA高可靠部署</h2><p>旁路部署两台堡垒机，中间有心跳线连接，同步数据。对外提供一个虚拟IP。</p>
+<p>部署特点：</p>
+<ul>
+<li>两台硬件堡垒机，一主一备/提供VIP。</li>
+<li>当主机出现故障时，备机自动接管服务。</li>
+</ul>
+<h2 id="异地同步部署"><a href="#异地同步部署" class="headerlink" title="异地同步部署"></a>异地同步部署</h2><p>通过在多个数据中心部署多台堡垒机。堡垒机之间进行配置信息自动同步。</p>
+<p>部署特点：</p>
+<ul>
+<li>多地部署，异地配置自动同步</li>
+<li>运维人员访问当地的堡垒机进行管理</li>
+<li>不受网络/带宽影响，同时祈祷灾备目的</li>
+</ul>
+<h2 id="集群部署（分布式部署）"><a href="#集群部署（分布式部署）" class="headerlink" title="集群部署（分布式部署）"></a>集群部署（分布式部署）</h2><p>当需要管理的设备数量很多时，可以将n多台堡垒机进行集群部署。其中两台堡垒机一主一备，其他n-2台堡垒机作为集群节点，给主机上传同步数据，整个集群对外提供一个虚拟IP地址。</p>
+<p>部署特点：</p>
+<ul>
+<li>两台硬件堡垒机，一主一备、提供VIP</li>
+<li>当主机出现故障时，备机自动接管服务。</li>
+</ul>
+<br/>
+
+<h1 id="开源堡垒机产品"><a href="#开源堡垒机产品" class="headerlink" title="开源堡垒机产品"></a>开源堡垒机产品</h1><br/>
+
+<p>目前，常用的堡垒机有收费和开源两类。收费的有行云管家、纽盾堡垒机，开源的有jumpserver。这几种各有各的优缺点，如何选择，大家可以根据实际场景来判断。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/11/python127/" rel="prev" title="python | 模块 json">
+      <i class="fa fa-chevron-left"></i> python | 模块 json
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/12/ar-laopo0/" rel="next" title="项目收集 | AR-laopo">
+      项目收集 | AR-laopo <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是堡垒机"><span class="nav-number">1.</span> <span class="nav-text">什么是堡垒机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么需要堡垒机"><span class="nav-number">2.</span> <span class="nav-text">为什么需要堡垒机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堡垒机的设计理念"><span class="nav-number">3.</span> <span class="nav-text">堡垒机的设计理念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堡垒机的目标"><span class="nav-number">4.</span> <span class="nav-text">堡垒机的目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堡垒机的价值"><span class="nav-number">5.</span> <span class="nav-text">堡垒机的价值</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堡垒机的原理"><span class="nav-number">6.</span> <span class="nav-text">堡垒机的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#运维平台"><span class="nav-number">6.1.</span> <span class="nav-text">运维平台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理平台"><span class="nav-number">6.2.</span> <span class="nav-text">管理平台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自动化平台"><span class="nav-number">6.3.</span> <span class="nav-text">自动化平台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制平台"><span class="nav-number">6.4.</span> <span class="nav-text">控制平台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#审计平台"><span class="nav-number">6.5.</span> <span class="nav-text">审计平台</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堡垒机的身份认证"><span class="nav-number">7.</span> <span class="nav-text">堡垒机的身份认证</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#本地认证"><span class="nav-number">7.1.</span> <span class="nav-text">本地认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#远程认证"><span class="nav-number">7.2.</span> <span class="nav-text">远程认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双因子认证"><span class="nav-number">7.3.</span> <span class="nav-text">双因子认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三方认证系统"><span class="nav-number">7.4.</span> <span class="nav-text">第三方认证系统</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堡垒机的常见运维方式"><span class="nav-number">8.</span> <span class="nav-text">堡垒机的常见运维方式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堡垒机的其他常见功能"><span class="nav-number">9.</span> <span class="nav-text">堡垒机的其他常见功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#堡垒机的部署方式"><span class="nav-number">10.</span> <span class="nav-text">堡垒机的部署方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单机部署"><span class="nav-number">10.1.</span> <span class="nav-text">单机部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HA高可靠部署"><span class="nav-number">10.2.</span> <span class="nav-text">HA高可靠部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异地同步部署"><span class="nav-number">10.3.</span> <span class="nav-text">异地同步部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群部署（分布式部署）"><span class="nav-number">10.4.</span> <span class="nav-text">集群部署（分布式部署）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#开源堡垒机产品"><span class="nav-number">11.</span> <span class="nav-text">开源堡垒机产品</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

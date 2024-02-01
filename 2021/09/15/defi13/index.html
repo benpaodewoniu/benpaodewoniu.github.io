@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1inch 和 dodo 一样，并且是先发于 dodo 的，在 api 方面 1inch 比 dodo 更加完善，并且界面体验也更好。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="defi | 1inch 量化简介">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/09/15/defi13/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="1inch 和 dodo 一样，并且是先发于 dodo 的，在 api 方面 1inch 比 dodo 更加完善，并且界面体验也更好。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/defi/13_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/defi/13_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/defi/13_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/defi/13_3.png">
+<meta property="article:published_time" content="2021-09-15T00:20:18.000Z">
+<meta property="article:modified_time" content="2022-05-16T05:34:08.917Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="defi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/defi/13_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/09/15/defi13/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>defi | 1inch 量化简介 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/09/15/defi13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          defi | 1inch 量化简介
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-15 08:20:18" itemprop="dateCreated datePublished" datetime="2021-09-15T08:20:18+08:00">2021-09-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-16 13:34:08" itemprop="dateModified" datetime="2022-05-16T13:34:08+08:00">2022-05-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/" itemprop="url" rel="index"><span itemprop="name">平台 && 公链 && 项目 && 方向</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/" itemprop="url" rel="index"><span itemprop="name">defi</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/" itemprop="url" rel="index"><span itemprop="name">平台</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/1inch/" itemprop="url" rel="index"><span itemprop="name">1inch</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/09/15/defi13/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/09/15/defi13/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>1inch</code> 和 <code>dodo</code> 一样，并且是先发于 <code>dodo</code> 的，在 <code>api</code> 方面 <code>1inch</code> 比 <code>dodo</code> 更加完善，并且界面体验也更好。</p>
+<a id="more"></a>
+
+<h2 id="这些信息已经过期"><a href="#这些信息已经过期" class="headerlink" title="这些信息已经过期"></a>这些信息已经过期</h2><p>目前 <code>1inch</code> 支持</p>
+<ul>
+<li><code>eth</code></li>
+<li><code>bsc</code> </li>
+<li><code>polygon</code> </li>
+<li><code>optimism</code></li>
+</ul>
+<p>如果暂时没办法获取合约信息，可以通过这些 <code>api</code> 来作为暂存方案。我就是因为 <code>uniswap v3</code> 的合约过于难以理解，就用了 <code>1inch</code> 来获取价格。</p>
+<p>经过询问客服， <code>1inch</code> 的频率限制在单 <code>IP</code> <code>300</code> 次每秒的调用。</p>
+<ul>
+<li><a href="https://docs.1inch.io/api/">api</a></li>
+</ul>
+<p>下面我来说一下，<code>api</code> 怎么用，首先进入 <code>api</code> 测试界面，以 <code>eth</code> 为例。</p>
+<ul>
+<li><a href="https://api.1inch.exchange/swagger/ethereum/">eth</a></li>
+</ul>
+<p>在 <code>1inch</code> 要特别注意一下一个属性 <code>protocols</code>，这个指的是，价格来源于哪个平台，平台可以是一个也可以是多个。</p>
+<p><img src="/images/defi/13_0.png" alt=""></p>
+<p>点击 <code>try it out</code>，然后按照下图的方式，就会出现调用 <code>url</code> 。</p>
+<p><img src="/images/defi/13_1.png" alt=""></p>
+<p>可以看到，<code>1inch</code> 支持的平台有</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"protocols"</span>: [</span><br><span class="line">    <span class="string">"PMM5"</span>,</span><br><span class="line">    <span class="string">"PMMX"</span>,</span><br><span class="line">    <span class="string">"UNIFI"</span>,</span><br><span class="line">    <span class="string">"SHIBASWAP"</span>,</span><br><span class="line">    <span class="string">"CLIPPER"</span>,</span><br><span class="line">    <span class="string">"DXSWAP"</span>,</span><br><span class="line">    <span class="string">"FIXED_FEE_SWAP"</span>,</span><br><span class="line">    <span class="string">"DFX_FINANCE"</span>,</span><br><span class="line">    <span class="string">"ONE_INCH_LIMIT_ORDER"</span>,</span><br><span class="line">    <span class="string">"CONVERGENCE_X"</span>,</span><br><span class="line">    <span class="string">"SAKESWAP"</span>,</span><br><span class="line">    <span class="string">"CREAM_LENDING"</span>,</span><br><span class="line">    <span class="string">"DODO_V2"</span>,</span><br><span class="line">    <span class="string">"CURVE_V2"</span>,</span><br><span class="line">    <span class="string">"SETH_WRAPPER"</span>,</span><br><span class="line">    <span class="string">"WETH"</span>,</span><br><span class="line">    <span class="string">"MOONISWAP"</span>,</span><br><span class="line">    <span class="string">"SUSHI"</span>,</span><br><span class="line">    <span class="string">"COMPOUND"</span>,</span><br><span class="line">    <span class="string">"KYBER"</span>,</span><br><span class="line">    <span class="string">"CREAMSWAP"</span>,</span><br><span class="line">    <span class="string">"AAVE"</span>,</span><br><span class="line">    <span class="string">"CURVE"</span>,</span><br><span class="line">    <span class="string">"UNISWAP_V1"</span>,</span><br><span class="line">    <span class="string">"UNISWAP_V2"</span>,</span><br><span class="line">    <span class="string">"BALANCER"</span>,</span><br><span class="line">    <span class="string">"CHAI"</span>,</span><br><span class="line">    <span class="string">"OASIS"</span>,</span><br><span class="line">    <span class="string">"BANCOR"</span>,</span><br><span class="line">    <span class="string">"IEARN"</span>,</span><br><span class="line">    <span class="string">"SWERVE"</span>,</span><br><span class="line">    <span class="string">"VALUELIQUID"</span>,</span><br><span class="line">    <span class="string">"DODO"</span>,</span><br><span class="line">    <span class="string">"SHELL"</span>,</span><br><span class="line">    <span class="string">"BLACKHOLESWAP"</span>,</span><br><span class="line">    <span class="string">"PMM1"</span>,</span><br><span class="line">    <span class="string">"DEFISWAP"</span>,</span><br><span class="line">    <span class="string">"COFIX"</span>,</span><br><span class="line">    <span class="string">"ZRX"</span>,</span><br><span class="line">    <span class="string">"LUASWAP"</span>,</span><br><span class="line">    <span class="string">"MINISWAP"</span>,</span><br><span class="line">    <span class="string">"MSTABLE"</span>,</span><br><span class="line">    <span class="string">"AAVE_LIQUIDATOR"</span>,</span><br><span class="line">    <span class="string">"SYNTHETIX"</span>,</span><br><span class="line">    <span class="string">"AAVE_V2"</span>,</span><br><span class="line">    <span class="string">"ST_ETH"</span>,</span><br><span class="line">    <span class="string">"ONE_INCH_LP"</span>,</span><br><span class="line">    <span class="string">"LINKSWAP"</span>,</span><br><span class="line">    <span class="string">"S_FINANCE"</span>,</span><br><span class="line">    <span class="string">"ONE_INCH_LP_1_1"</span>,</span><br><span class="line">    <span class="string">"PSM"</span>,</span><br><span class="line">    <span class="string">"ONE_INCH_LP_MIGRATOR_V1_1"</span>,</span><br><span class="line">    <span class="string">"UNISWAP_V2_MIGRATOR"</span>,</span><br><span class="line">    <span class="string">"SUSHISWAP_MIGRATOR"</span>,</span><br><span class="line">    <span class="string">"ONE_INCH_LP_MIGRATOR"</span>,</span><br><span class="line">    <span class="string">"POWERINDEX"</span>,</span><br><span class="line">    <span class="string">"INDEXED_FINANCE"</span>,</span><br><span class="line">    <span class="string">"XSIGMA"</span>,</span><br><span class="line">    <span class="string">"SMOOTHY_FINANCE"</span>,</span><br><span class="line">    <span class="string">"PMM2"</span>,</span><br><span class="line">    <span class="string">"PMM3"</span>,</span><br><span class="line">    <span class="string">"SADDLE"</span>,</span><br><span class="line">    <span class="string">"PMM4"</span>,</span><br><span class="line">    <span class="string">"KYBER_DMM"</span>,</span><br><span class="line">    <span class="string">"BALANCER_V2"</span>,</span><br><span class="line">    <span class="string">"UNISWAP_V3"</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面我们再用询价 <code>api</code> 试一试。</p>
+<p>经过上述的步骤，我们得到了 <code>dydx</code> 的 <code>uniswap v3</code> 的询价 <code>api</code></p>
+<pre><code>https://api.1inch.exchange/v3.0/1/quote?fromTokenAddress=0x92d6c1e31e14520e676a687f0a93788b716beff5&amp;toTokenAddress=0xdac17f958d2ee523a2206206994597c13d831ec7&amp;amount=10000000000000000&amp;protocols=UNISWAP_V3</code></pre><p>更多的 <code>api</code> 请查看 <code>1inch</code> 的官网。</p>
+<h2 id="2022年5月16日-更新"><a href="#2022年5月16日-更新" class="headerlink" title="2022年5月16日 更新"></a>2022年5月16日 更新</h2><p>目前，<code>1inch</code> 的 <code>api</code> 已经到了 <code>4</code> 的版本，这里以 <code>ETH</code> 获取为案例。这里的 <code>api</code> 接口是 <code>/quote</code> 是查询最佳报价的接口。</p>
+<ul>
+<li><a href="https://docs.1inch.io/docs/aggregation-protocol/api/swagger">quote</a></li>
+<li><a href="https://docs.1inch.io/docs/aggregation-protocol/api/quote-params">quote 参数详解</a></li>
+</ul>
+<p>参数如下</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>fromTokenAddress*</td>
+<td>string</td>
+</tr>
+<tr>
+<td>toTokenAddress*</td>
+<td>string</td>
+</tr>
+<tr>
+<td>amount*</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>fee</td>
+<td>number</td>
+</tr>
+<tr>
+<td>protocols</td>
+<td>string</td>
+</tr>
+<tr>
+<td>gasPrice</td>
+<td>string</td>
+</tr>
+<tr>
+<td>complexityLevel</td>
+<td>string</td>
+</tr>
+<tr>
+<td>connectorTokens</td>
+<td>string</td>
+</tr>
+<tr>
+<td>gasLimit</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>mainRouteParts</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>parts</td>
+<td>integer</td>
+</tr>
+</tbody></table>
+<p>我们以 <code>USDT</code> 兑换 <code>ALCX</code> 为案例。</p>
+<ul>
+<li>USDT<ul>
+<li>0xdac17f958d2ee523a2206206994597c13d831ec7</li>
+</ul>
+</li>
+<li>ALCX<ul>
+<li>0xdbdb4d16eda451d0503b854cf79d55697f90c8df</li>
+</ul>
+</li>
+</ul>
+<h3 id="只填写必要参数"><a href="#只填写必要参数" class="headerlink" title="只填写必要参数"></a>只填写必要参数</h3><pre><code>data = {
+    &quot;fromTokenAddress&quot;: coin.from_contract,
+    &quot;toTokenAddress&quot;: coin.to_contract,
+    &quot;amount&quot;: int(coin.from_amount),
+}</code></pre><p>返回的参数如下图表示</p>
+<p><img src="/images/defi/13_2.png" alt=""></p>
+<p>这里主要说一下 <code>protocols</code>，再说这个之前，先说一下 <code>1inch</code> 的询价逻辑。</p>
+<p><code>1inch</code> 是返回最佳价格。即，你使用 <code>1000U</code> 换一个 <code>token</code>，<code>1inch</code> 会聚合很多 <code>dex</code> ，来给你找到最佳的兑换路径。而上面的 <code>protocols</code> 就是兑换路径。</p>
+<ul>
+<li>protocols[0]<ul>
+<li>先在 <code>SHELL</code> 交易所，<code>100%</code> 兑换某一种币</li>
+</ul>
+</li>
+<li>protocols[1]<ul>
+<li>以不同比例的那种币，分别在不同 <code>dex</code> 中兑换成 <code>ETH</code></li>
+</ul>
+</li>
+<li>protocols[2]<ul>
+<li>以全部的 <code>ETH</code> 在 <code>SUSHI</code> 中兑换成 <code>ALCX</code></li>
+</ul>
+</li>
+</ul>
+<p>这里面涉及了多个中间币，也涉及了多个兑换路径，多个兑换比例，所以，最终所需的 <code>gas</code> 费是海量的。</p>
+<h3 id="固定兑换-dex"><a href="#固定兑换-dex" class="headerlink" title="固定兑换 dex"></a>固定兑换 dex</h3><p>这里想只在某些 <code>dex</code> 中兑换。</p>
+<pre><code>data = {
+    &quot;fromTokenAddress&quot;: coin.from_contract,
+    &quot;toTokenAddress&quot;: coin.to_contract,
+    &quot;amount&quot;: int(coin.from_amount),
+    &quot;protocols&quot;: &quot;SUSHI,UNISWAP_V1,UNISWAP_V2,UNISWAP_V3,ETH_BANCOR_V3,BANCOR&quot;
+}</code></pre><p>返回的参数如下图表示</p>
+<p><img src="/images/defi/13_3.png" alt=""></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul>
+<li><code>connectorTokens</code><ul>
+<li>指的是中间 <code>token</code>，可以自己设置</li>
+</ul>
+</li>
+</ul>
+<p>其他参数我实验了很久，没有得出结论，以后再说吧。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/defi/" rel="tag"># defi</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/09/14/eth32/" rel="prev" title="eth | ERC 20">
+      <i class="fa fa-chevron-left"></i> eth | ERC 20
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/09/22/eth33/" rel="next" title="eth | NFT制作与OpenSea部署教程">
+      eth | NFT制作与OpenSea部署教程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#这些信息已经过期"><span class="nav-number">1.</span> <span class="nav-text">这些信息已经过期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2022年5月16日-更新"><span class="nav-number">2.</span> <span class="nav-text">2022年5月16日 更新</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#只填写必要参数"><span class="nav-number">2.1.</span> <span class="nav-text">只填写必要参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#固定兑换-dex"><span class="nav-number">2.2.</span> <span class="nav-text">固定兑换 dex</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他"><span class="nav-number">2.3.</span> <span class="nav-text">其他</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

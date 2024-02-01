@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这是mongodb的基础。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MongoDB">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/07/03/database0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这是mongodb的基础。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_1.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_5.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_7.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_8.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/database/0_9.png">
+<meta property="article:published_time" content="2019-07-03T14:02:39.000Z">
+<meta property="article:modified_time" content="2021-09-22T08:11:36.877Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="database">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="mongodb">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/database/0_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/07/03/database0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>MongoDB | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/07/03/database0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MongoDB
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-07-03 22:02:39" itemprop="dateCreated datePublished" datetime="2019-07-03T22:02:39+08:00">2019-07-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-09-22 16:11:36" itemprop="dateModified" datetime="2021-09-22T16:11:36+08:00">2021-09-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sql/" itemprop="url" rel="index"><span itemprop="name">sql</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sql/mongo/" itemprop="url" rel="index"><span itemprop="name">mongo</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/07/03/database0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/07/03/database0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这是mongodb的基础。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://www.jianshu.com/p/b0d6f3633f8e">MongoDB下载与配置+可视化界面</a></li>
+<li><a href="https://www.cnblogs.com/zinan/p/10549405.html">win10安装MongoDB提示 the domain,user name and/or password are incorrect. Remember to use “.” for the domain if the account is on the local machine.</a></li>
+<li><a href="https://blog.csdn.net/SL_World/article/details/82181731">MongoDB启动服务出现“服务没有响应控制功能”错误</a></li>
+<li><a href="https://www.cnblogs.com/whowhere/p/9635956.html">MongoDB安装过程中出现service MongoDB failed to start，verify that you have sufficient privileges to start</a></li>
+<li><a href="https://blog.csdn.net/winstonlau/article/details/79439223">MongoDB下载、安装和配置教程</a></li>
+<li><a href="https://www.cnblogs.com/gjw-hsf/p/7308822.html">MongoDB数据库安装及配置环境windows10系统</a></li>
+<li><a href="https://blog.csdn.net/qq_25964837/article/details/80295041">python中安装包出现Retrying  Retry total=4, connect=None, read=None, redirect=None, status=None</a></li>
+</ul>
+<br/>
+
+<h1 id="MacBook-安装"><a href="#MacBook-安装" class="headerlink" title="MacBook 安装"></a>MacBook 安装</h1><br/>
+
+<p>使用 <code>brew</code> 安装。「因为是 brew 安装，所以，我们可以省略配置相关路径」</p>
+<pre><code>brew tap mongodb/brew
+brew install mongodb-community</code></pre><p>我这样安装的是 <code>&quot;version&quot;: &quot;4.4.3&quot;</code>。</p>
+<ul>
+<li>配置文件：/usr/local/etc/mongod.conf</li>
+<li>日志文件路径：/usr/local/var/log/mongodb</li>
+<li>数据存放路径：/usr/local/var/mongodb</li>
+</ul>
+<p>启动&amp;停止</p>
+<pre><code>brew services start mongodb-community
+brew services stop mongodb-community</code></pre><p>临时启动的话，可以</p>
+<pre><code>sudo mongod</code></pre><h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><pre><code>mongo</code></pre><br/>
+
+<h1 id="linux-安装"><a href="#linux-安装" class="headerlink" title="linux 安装"></a>linux 安装</h1><br/>
+
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/76349679">如何在 Ubuntu 上安装 MongoDB</a></li>
+</ul>
+<p>在基于 <code>Ubuntu</code> 的发行版上安装 <code>MongoDB</code></p>
+<ul>
+<li>使用 <code>Ubuntu</code> 仓库安装 <code>MongoDB</code>。简单但不是最新版本的 <code>MongoDB</code></li>
+<li>使用其官方仓库安装 <code>MongoDB</code>。稍微复杂，但你能得到最新版本的 <code>MongoDB</code>。</li>
+</ul>
+<p>第一种安装方法更容易，但如果你计划使用官方支持的最新版本，那么我建议使用第二种方法。</p>
+<h2 id="从-Ubuntu-仓库安装-MongoDB"><a href="#从-Ubuntu-仓库安装-MongoDB" class="headerlink" title="从 Ubuntu 仓库安装 MongoDB"></a>从 Ubuntu 仓库安装 MongoDB</h2><p>这是在系统中安装 <code>MongoDB</code> 的简便方法，你只需输入一个命令即可。</p>
+<h3 id="安装-MongoDB"><a href="#安装-MongoDB" class="headerlink" title="安装 MongoDB"></a>安装 MongoDB</h3><p>首先，确保你的包是最新的。打开终端并输入：</p>
+<pre><code>sudo apt update &amp;&amp; sudo apt upgrade -y</code></pre><p>继续安装 <code>MongoDB</code>：</p>
+<pre><code>sudo apt install mongodb</code></pre><p>这就完成了！<code>MongoDB</code> 现在安装到你的计算机上了。</p>
+<p><code>MongoDB</code> 服务应该在安装时自动启动，但要检查服务状态：</p>
+<pre><code>sudo systemctl status mongodb</code></pre><p>出现</p>
+<pre><code>Check if the MongoDB service is running.</code></pre><p>你可以看到该服务是活动的。</p>
+<h3 id="运行-MongoDB"><a href="#运行-MongoDB" class="headerlink" title="运行 MongoDB"></a>运行 MongoDB</h3><p><code>MongoDB</code> 目前是一个 <code>systemd</code> 服务，因此我们使用 <code>systemctl</code> 来检查和修改它的状态，使用以下命令：</p>
+<pre><code>sudo systemctl status mongodb
+sudo systemctl stop mongodb
+sudo systemctl start mongodb
+sudo systemctl restart mongodb</code></pre><p>你也可以修改 <code>MongoDB</code> 是否自动随系统启动（默认：启用）：</p>
+<pre><code>sudo systemctl disable mongodb
+sudo systemctl enable mongodb</code></pre><p>要开始使用（创建和编辑）数据库，请输入：</p>
+<pre><code>mongo</code></pre><p>这将启动 <code>mongo shell</code>。有关查询和选项的详细信息，请查看手册。</p>
+<p>注意：根据你计划使用 <code>MongoDB</code> 的方式，你可能需要调整防火墙。不过这超出了本篇的内容，并且取决于你的配置。</p>
+<h3 id="卸载-MongoDB"><a href="#卸载-MongoDB" class="headerlink" title="卸载 MongoDB"></a>卸载 MongoDB</h3><p>如果你从 <code>Ubuntu</code> 仓库安装 <code>MongoDB</code> 并想要卸载它（可能要使用官方支持的方式安装），请输入：</p>
+<pre><code>sudo systemctl stop mongodb
+sudo apt purge mongodb
+sudo apt autoremove</code></pre><p>这应该会完全卸载 <code>MongoDB</code>。确保备份你可能想要保留的任何集合或文档，因为它们将被删除！</p>
+<h2 id="在-Ubuntu-上安装-MongoDB-社区版"><a href="#在-Ubuntu-上安装-MongoDB-社区版" class="headerlink" title="在 Ubuntu 上安装 MongoDB 社区版"></a>在 Ubuntu 上安装 MongoDB 社区版</h2><p>这是推荐的安装 <code>MongoDB</code> 的方法，它使用包管理器。你需要多打几条命令，对于 <code>Linux</code> 新手而言，这可能会感到害怕。</p>
+<p>但没有什么可怕的！我们将一步步说明安装过程。</p>
+<h3 id="安装-MongoDB-1"><a href="#安装-MongoDB-1" class="headerlink" title="安装 MongoDB"></a>安装 MongoDB</h3><p>由 <code>MongoDB Inc</code>. 维护的包称为 <code>mongodb-org</code>，而不是 <code>mongodb</code>（这是 <code>Ubuntu</code> 仓库中包的名称）。在开始之前，请确保系统上未安装 <code>mongodb</code>。因为包之间会发生冲突。让我们开始吧！</p>
+<p>首先，我们必须导入公钥：</p>
+<pre><code>sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4</code></pre><p>现在，你需要在源列表中添加一个新的仓库，以便你可以安装 <code>MongoDB</code> 社区版并获得自动更新：</p>
+<pre><code>echo &quot;deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/4.0 multiverse&quot; | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list</code></pre><p>要安装 <code>mongodb-org</code>，我们需要更新我们的包数据库，以便系统知道可用的新包：</p>
+<pre><code>sudo apt update</code></pre><p>现在你可以安装最新稳定版的 <code>MongoDB</code>：</p>
+<pre><code>sudo apt install -y mongodb-org
+或者某个特定版本（在 = 后面修改版本号）
+sudo apt install -y mongodb-org=4.0.6 mongodb-org-server=4.0.6 mongodb-org-shell=4.0.6 mongodb-org-mongos=4.0.6 mongodb-org-tools=4.0.6</code></pre><p>如果你选择安装特定版本，请确保在所有位置都修改了版本号。如果你修改了 <code>mongodb-org=4.0.6</code>，你将安装最新版本。</p>
+<p>默认情况下，使用包管理器（<code>apt-get</code>）更新时，<code>MongoDB</code> 将更新为最新的版本。要阻止这种情况发生（并冻结为已安装的版本），请使用：</p>
+<pre><code>echo &quot;mongodb-org hold&quot; | sudo dpkg --set-selections
+echo &quot;mongodb-org-server hold&quot; | sudo dpkg --set-selections
+echo &quot;mongodb-org-shell hold&quot; | sudo dpkg --set-selections
+echo &quot;mongodb-org-mongos hold&quot; | sudo dpkg --set-selections
+echo &quot;mongodb-org-tools hold&quot; | sudo dpkg --set-selections</code></pre><p>你现在已经成功安装了 <code>MongoDB</code>！</p>
+<h3 id="配置-MongoDB"><a href="#配置-MongoDB" class="headerlink" title="配置 MongoDB"></a>配置 MongoDB</h3><p>默认情况下，包管理器将创建 <code>/var/lib/mongodb</code> 和 <code>/var/log/mongodb</code>，<code>MongoDB</code> 将使用 <code>mongodb</code> 用户帐户运行。</p>
+<p>我不会去更改这些默认设置，因为这超出了本指南的范围。有关详细信息，请查看手册。</p>
+<p><code>/etc/mongod.conf</code> 中的设置在启动/重新启动 <code>mongodb</code> 服务实例时生效。</p>
+<h3 id="运行-MongoDB-1"><a href="#运行-MongoDB-1" class="headerlink" title="运行 MongoDB"></a>运行 MongoDB</h3><p>要启动 <code>mongodb</code> 的守护进程 <code>mongod</code>，请输入：</p>
+<pre><code>sudo service mongod start</code></pre><p>现在你应该验证 mongod 进程是否已成功启动。此信息（默认情况下）保存在 <code>/var/log/mongodb/mongod.log</code> 中。我们来看看文件的内容：</p>
+<pre><code>sudo cat /var/log/mongodb/mongod.log</code></pre><p>只要你在某处看到：<code>[initandlisten] waiting for connections on port 27017</code>，就说明进程正常运行。</p>
+<p>注意：<code>27017</code> 是 <code>mongod</code> 的默认端口。</p>
+<p>要停止/重启 <code>mongod</code>，请输入：</p>
+<pre><code>sudo service mongod stop
+sudo service mongod restart</code></pre><p>现在，你可以通过打开 <code>mongo shell</code> 来使用 <code>MongoDB</code>：</p>
+<pre><code>mongo</code></pre><h3 id="卸载-MongoDB-1"><a href="#卸载-MongoDB-1" class="headerlink" title="卸载 MongoDB"></a>卸载 MongoDB</h3><p>运行以下命令：</p>
+<pre><code>sudo service mongod stop
+sudo apt purge mongodb-org*</code></pre><p>要删除数据库和日志文件（确保备份你要保留的内容！）：</p>
+<pre><code>sudo rm -r /var/log/mongodb
+sudo rm -r /var/lib/mongodb</code></pre><br/>
+
+<h1 id="win-安装"><a href="#win-安装" class="headerlink" title="win 安装"></a>win 安装</h1><br/>
+
+<p>我在安装Mongodb的时候作死，导致出现了很多很多坑，所以，在这里记录一下。</p>
+<h2 id="安装MongoDB"><a href="#安装MongoDB" class="headerlink" title="安装MongoDB"></a>安装MongoDB</h2><p>到官网上下载相关的文件，我下载的是 msi 格式。</p>
+<p><a href="https://www.mongodb.com/download-center/community">官网</a></p>
+<h3 id="安装时候的坑"><a href="#安装时候的坑" class="headerlink" title="安装时候的坑"></a>安装时候的坑</h3><h4 id="设置名字错误"><a href="#设置名字错误" class="headerlink" title="设置名字错误"></a>设置名字错误</h4><p>在安装的时候，我选择了 custom，然后在下面我又选择了数据库仅用于当地（这个步骤是自己主动选择的），并给与重新命名。</p>
+<p>结果出现这个错误。</p>
+<p><img src="/images/database/0_0.png" alt=""></p>
+<p>这个解决方案是重新安装，选择 custom 后，路径自己配置，然后全部默认就好了。</p>
+<h4 id="界面化安装"><a href="#界面化安装" class="headerlink" title="界面化安装"></a>界面化安装</h4><p>我再安装的过程中，有一个选项是</p>
+<p><img src="/images/database/0_1.jpg" alt=""></p>
+<p>下一步安装 “install mongoDB compass” 不勾选，否则可能要很长时间都一直在执行安装，MongoDB Compass 是一个图形界面管理工具，我们可以在后面自己到官网下载安装。</p>
+<p><a href="https://www.mongodb.com/download-center/compass">下载地址</a></p>
+<p>由于我勾选了这个，所以安装了很久都没有安装成功。我有点烦躁，就把安装的进程强行关了，打算重新安装一遍。</p>
+<p>将这个取消勾选后，我重新安装，结果出现了这个错误。</p>
+<p><img src="/images/database/0_2.png" alt=""></p>
+<h5 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h5><p>直接点Ignore（忽略），然后进入安装MongoDB的目录下，进入data，新建一个文件夹然后命名为db。</p>
+<p>注意<br>路径最好是全英文。</p>
+<p>配置数据库和连接数据库</p>
+<pre><code>进入命令行窗口后
+进入安装MongoDB的文件夹
+进入bin文件夹
+输入——–mongod -dbpath d:\&apos;这是你安装mongoDB的文件夹，根据你自己的命名来写&apos;\data\db
+    我的是 mongodb d:\mongodb\data\db</code></pre><p><img src="/images/database/0_3.png" alt=""></p>
+<p>我的不是上面那个界面，但是也差不多。</p>
+<pre><code>继续在bin文件夹里鼠标右键–&gt;打开命令行窗口，键入 mongo
+此时就成功连接数据库了。
+如图所示</code></pre><p><img src="/images/database/0_4.png" alt=""></p>
+<p>这时，上上面的那个就变成</p>
+<p><img src="/images/database/0_5.png" alt=""></p>
+<p>到这里，就成功连接啦！</p>
+<h2 id="开启mongodb"><a href="#开启mongodb" class="headerlink" title="开启mongodb"></a>开启mongodb</h2><p>在路径上添加 mongodb 的bin 文件夹。</p>
+<h3 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h3><pre><code>net start MongoDB</code></pre><p>结果出现了这个错误：</p>
+<p><img src="/images/database/0_6.png" alt=""></p>
+<p>这是因为 cmd 没有用管理员权限打开的结果。</p>
+<p>用管理员权限后：</p>
+<p>出现：</p>
+<pre><code>服务没有响应控制功能</code></pre><p>这是因为有一个命令没有执行</p>
+<pre><code>mongod --dbpath &quot;D:\MongoDB\data\db&quot; --logpath &quot;D:\MongoDB\data\log\mongo.log&quot; --install --serviceName &quot;MongoDB&quot;</code></pre><p>这个时候提醒我，没有 mongo.log 文件，于是，我在相关目录下重新建了一个。</p>
+<p>执行上面的命令后，显示正常。</p>
+<h4 id="首先确保上述路径中data和log文件夹已建好"><a href="#首先确保上述路径中data和log文件夹已建好" class="headerlink" title="首先确保上述路径中data和log文件夹已建好"></a>首先确保上述路径中data和log文件夹已建好</h4><p><img src="/images/database/0_7.png" alt=""></p>
+<h4 id="输入sc-delete-MongoDB命令"><a href="#输入sc-delete-MongoDB命令" class="headerlink" title="输入sc delete MongoDB命令"></a>输入sc delete MongoDB命令</h4><p>输入如下命令即可</p>
+<pre><code>sc delete MongoDB</code></pre><p><img src="/images/database/0_8.png" alt=""></p>
+<h4 id="如何判断mongo服务已经开启"><a href="#如何判断mongo服务已经开启" class="headerlink" title="如何判断mongo服务已经开启"></a>如何判断mongo服务已经开启</h4><p>“win+r” 进入“运行”界面，输入“services.msc”进入”服务”——&gt; 如图</p>
+<p><img src="/images/database/0_9.png" alt=""></p>
+<h2 id="可视化安装"><a href="#可视化安装" class="headerlink" title="可视化安装"></a>可视化安装</h2><p><a href="https://www.mongodb.com/download-center/compass">下载地址</a></p>
+<p>这个只要选好路径，一路NEXT就好了。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/database/" rel="tag"># database</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/mongodb/" rel="tag"># mongodb</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/01/spider5/" rel="prev" title="mitmproxy基础">
+      <i class="fa fa-chevron-left"></i> mitmproxy基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/08/webdesign1/" rel="next" title="本地构建wordpress">
+      本地构建wordpress <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MacBook-安装"><span class="nav-number">2.</span> <span class="nav-text">MacBook 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#运行"><span class="nav-number">2.1.</span> <span class="nav-text">运行</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#linux-安装"><span class="nav-number">3.</span> <span class="nav-text">linux 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#从-Ubuntu-仓库安装-MongoDB"><span class="nav-number">3.1.</span> <span class="nav-text">从 Ubuntu 仓库安装 MongoDB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-MongoDB"><span class="nav-number">3.1.1.</span> <span class="nav-text">安装 MongoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行-MongoDB"><span class="nav-number">3.1.2.</span> <span class="nav-text">运行 MongoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#卸载-MongoDB"><span class="nav-number">3.1.3.</span> <span class="nav-text">卸载 MongoDB</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-Ubuntu-上安装-MongoDB-社区版"><span class="nav-number">3.2.</span> <span class="nav-text">在 Ubuntu 上安装 MongoDB 社区版</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-MongoDB-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">安装 MongoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-MongoDB"><span class="nav-number">3.2.2.</span> <span class="nav-text">配置 MongoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行-MongoDB-1"><span class="nav-number">3.2.3.</span> <span class="nav-text">运行 MongoDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#卸载-MongoDB-1"><span class="nav-number">3.2.4.</span> <span class="nav-text">卸载 MongoDB</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#win-安装"><span class="nav-number">4.</span> <span class="nav-text">win 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装MongoDB"><span class="nav-number">4.1.</span> <span class="nav-text">安装MongoDB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装时候的坑"><span class="nav-number">4.1.1.</span> <span class="nav-text">安装时候的坑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#设置名字错误"><span class="nav-number">4.1.1.1.</span> <span class="nav-text">设置名字错误</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#界面化安装"><span class="nav-number">4.1.1.2.</span> <span class="nav-text">界面化安装</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#解决方法"><span class="nav-number">4.1.1.2.1.</span> <span class="nav-text">解决方法</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开启mongodb"><span class="nav-number">4.2.</span> <span class="nav-text">开启mongodb</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动服务"><span class="nav-number">4.2.1.</span> <span class="nav-text">启动服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#首先确保上述路径中data和log文件夹已建好"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">首先确保上述路径中data和log文件夹已建好</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#输入sc-delete-MongoDB命令"><span class="nav-number">4.2.1.2.</span> <span class="nav-text">输入sc delete MongoDB命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何判断mongo服务已经开启"><span class="nav-number">4.2.1.3.</span> <span class="nav-text">如何判断mongo服务已经开启</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可视化安装"><span class="nav-number">4.3.</span> <span class="nav-text">可视化安装</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">促席坐鸣琴,写我平生心。平生固如此，松竹谐素音。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">1997</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1071</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">593</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
