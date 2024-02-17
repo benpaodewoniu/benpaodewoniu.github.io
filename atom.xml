@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://benpaodewoniu.github.io/"/>
-  <updated>2024-02-12T08:12:21.643Z</updated>
+  <updated>2024-02-17T03:24:43.113Z</updated>
   <id>http://benpaodewoniu.github.io/</id>
   
   <author>
@@ -15,6 +15,127 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>rhino | 相关的数学计算再次分析</title>
+    <link href="http://benpaodewoniu.github.io/2024/02/17/rhino19/"/>
+    <id>http://benpaodewoniu.github.io/2024/02/17/rhino19/</id>
+    <published>2024-02-17T03:02:46.000Z</published>
+    <updated>2024-02-17T03:24:43.113Z</updated>
+    
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">商业机密，不会公开</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="9329ab123f498304635d911705a106e57a9186e1277c7b8ad0ecdfa4bf41f3ac">b061ff77d492396a0ebed28574e2e96a</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    
+    <summary type="html">
+    
+      商业机密，不会公开
+    
+    </summary>
+    
+      <category term="项目经历" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/"/>
+    
+      <category term="大型" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/"/>
+    
+      <category term="quantify" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/"/>
+    
+      <category term="strategy" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/strategy/"/>
+    
+      <category term="multicexdex" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/strategy/multicexdex/"/>
+    
+      <category term="cex2dex" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/strategy/multicexdex/cex2dex/"/>
+    
+    
+      <category term="tomoon" scheme="http://benpaodewoniu.github.io/tags/tomoon/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>rhino | 客户端和服务器的时间戳分析</title>
+    <link href="http://benpaodewoniu.github.io/2024/02/17/rhino18/"/>
+    <id>http://benpaodewoniu.github.io/2024/02/17/rhino18/</id>
+    <published>2024-02-17T03:02:34.000Z</published>
+    <updated>2024-02-17T03:40:45.753Z</updated>
+    
+    <content type="html"><![CDATA[<p>有这样一个场景，你有多个服务器，然后订阅交易所的数据。</p><p>如何判断哪个服务器连接最快?</p><a id="more"></a><p>很多人可能觉得使用时间戳，接收时间剪去服务器数据发送时间。</p><p>但是，这样是不对的，因为，你不能确定你自己各个服务器的时间是否一致。先说一下结论，每一个服务器的时间一定是不一致的，微小的可能差几ms，但是，对于抢单来说，这几ms就是天差地别。</p><p>所以，需要通过连续数据的差值来判断自身服务器的速度。比如，下面是从一个服务器拿到的日志:</p><figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">06</span>:<span class="number">52</span>:<span class="number">32</span>]<span class="number">.436</span> w.py line:<span class="number">44</span> INFO    increase price BSCSUSDT <span class="number">0.012173</span> <span class="number">3492.42</span> send: <span class="number">1708066352433</span> <span class="keyword">get</span>: <span class="number">1708066352436</span></span><br><span class="line">[<span class="number">06</span>:<span class="number">52</span>:<span class="number">32</span>]<span class="number">.444</span> w.py line:<span class="number">44</span> INFO    increase price BUNNYUSDT <span class="number">0.24206</span> <span class="number">46.76</span> send: <span class="number">1708066352441</span> <span class="keyword">get</span>: <span class="number">1708066352444</span></span><br><span class="line">[<span class="number">06</span>:<span class="number">52</span>:<span class="number">32</span>]<span class="number">.445</span> w.py line:<span class="number">44</span> INFO    increase price BUNNYUSDT <span class="number">0.21663</span> <span class="number">69.19</span> send: <span class="number">1708066352442</span> <span class="keyword">get</span>: <span class="number">1708066352445</span></span><br><span class="line">[<span class="number">06</span>:<span class="number">52</span>:<span class="number">32</span>]<span class="number">.451</span> w.py line:<span class="number">44</span> INFO    increase price BUNNYUSDT <span class="number">0.22517</span> <span class="number">0.0</span> send: <span class="number">1708066352444</span> <span class="keyword">get</span>: <span class="number">1708066352451</span></span><br><span class="line">[<span class="number">06</span>:<span class="number">52</span>:<span class="number">32</span>]<span class="number">.451</span> w.py line:<span class="number">44</span> INFO    increase price BUNNYUSDT <span class="number">0.22746</span> <span class="number">0.0</span> send: <span class="number">1708066352447</span> <span class="keyword">get</span>: <span class="number">1708066352451</span></span><br></pre></td></tr></table></figure><ul><li>send 是交易所服务器发送数据时间</li><li>get 是自己服务器接收数据时间</li></ul><p>分析数据如下：</p><ul><li>第一条和第二条的 send 差 8 ms，get 差 8 ms</li><li>第二条和第三条的 send 差 1 ms，get 差 1 ms</li><li>第三条和第四条的 send 差 2 ms，get 差 6 ms</li><li>第四条和第五条的 send 差 3 ms，get 差 0 ms</li></ul><p>从上面的数据可以得出结论</p><ul><li>websocket 的数据推送并不是实时的，因为第4，5 条数据是同时获得的</li></ul><p>另外一个服务器的日志。</p><figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">08</span>:<span class="number">56</span>:<span class="number">11</span>]<span class="number">.258</span> w.py line:<span class="number">44</span> INFO    increase price MBOXUSDT <span class="number">0.3445</span> <span class="number">2098.3</span> send: <span class="number">1708073771241</span> <span class="keyword">get</span>: <span class="number">1708073771258</span></span><br><span class="line">[<span class="number">08</span>:<span class="number">56</span>:<span class="number">11</span>]<span class="number">.285</span> w.py line:<span class="number">44</span> INFO    increase price XODEXUSDT <span class="number">0.00036507</span> <span class="number">67548.59</span> send: <span class="number">1708073771281</span> <span class="keyword">get</span>: <span class="number">1708073771285</span></span><br><span class="line">[<span class="number">08</span>:<span class="number">56</span>:<span class="number">11</span>]<span class="number">.306</span> w.py line:<span class="number">44</span> INFO    increase price MBOXUSDT <span class="number">0.3449</span> <span class="number">5344.4</span> send: <span class="number">1708073771302</span> <span class="keyword">get</span>: <span class="number">1708073771306</span></span><br><span class="line">[<span class="number">08</span>:<span class="number">56</span>:<span class="number">11</span>]<span class="number">.426</span> w.py line:<span class="number">44</span> INFO    increase price MBOXUSDT <span class="number">0.3484</span> <span class="number">100.0</span> send: <span class="number">1708073771421</span> <span class="keyword">get</span>: <span class="number">1708073771426</span></span><br><span class="line">[<span class="number">08</span>:<span class="number">56</span>:<span class="number">11</span>]<span class="number">.443</span> w.py line:<span class="number">44</span> INFO    increase price BUNNYUSDT <span class="number">0.22257</span> <span class="number">63.6</span> send: <span class="number">1708073771440</span> <span class="keyword">get</span>: <span class="number">1708073771443</span></span><br></pre></td></tr></table></figure><p>这个数据分析如下:</p><ul><li>第一条和第二条的 send 差 40 ms，get 差 27 ms</li><li>第二条和第三条的 send 差 21 ms，get 差 21 ms</li><li>第三条和第四条的 send 差 119 ms，get 差 120 ms</li><li>第四条和第五条的 send 差 19 ms，get 差 17 ms</li></ul><p>从上面的数据来看，第二个服务器的显然更快一些。因为，<code>send</code> 和 <code>get</code> 的差值不算大。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;有这样一个场景，你有多个服务器，然后订阅交易所的数据。&lt;/p&gt;
+&lt;p&gt;如何判断哪个服务器连接最快?&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="项目经历" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/"/>
+    
+      <category term="大型" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/"/>
+    
+      <category term="quantify" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/"/>
+    
+      <category term="Rhino" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/Rhino/"/>
+    
+      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/Rhino/%E5%9F%BA%E7%A1%80/"/>
+    
+    
+      <category term="tomoon" scheme="http://benpaodewoniu.github.io/tags/tomoon/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>rhino | cex2dex 获取数据、处理数据的业务精进</title>
+    <link href="http://benpaodewoniu.github.io/2024/02/17/rhino17/"/>
+    <id>http://benpaodewoniu.github.io/2024/02/17/rhino17/</id>
+    <published>2024-02-17T03:02:21.000Z</published>
+    <updated>2024-02-17T04:16:55.047Z</updated>
+    
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">商业机密，不会公开</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="55cccc340ad7b80db9cab01457d4f61e75f9ea00a3e45a9882086b657271e6b4">c00384b18be5aa06cdbf19df50045eefa51871c820db013726cdeafcaba1ecb8ac771e439ca12fb6763897a9e59abf3598d0651cf4fd5e5dfc81a28c3f5ec6e6b30229a02d3b5f396c5b2eebd4a6389cbb31a3551630be1a0097928f974c64e9aad16beda715fb2af94da77e18bfcd6bd2b1907fb4014dbda70a6e04b63bb3c2afa059c5715138150582e1981d3b35e6ba0bfa20eb5e441c8e583637d786b2463712bc9a7d0d98e16d268ad8559ee07c1aaa0db5d22dd9cd69b80cfa7f89f0b488a6c793217cb2a2ce3212647a2cc68526aaeebcb3c234a46e54ab2f70f0515bf859b5ceb0ff3ca09775d7bea9ef3b4fdda13e25205e436f165a3e668bbea85544c85a6b3c5e7df8517932422092a9ffa6a8e707b5822b6b0fc34e9dcb3922e93b97cf842ef4ca0949ad98519c675234009b646feb6f9f35127781b4bd2003fa4b134c38247bdc1f000de430cf04a1ad530d7efce27b05feb483101875d3a75247f9bc26dcb1a7cd04f71b45597a8ef33c348a326982104f130cc31c230a43624e6306191d80e42fbd0bcfb7785ac7c40d1d5a462ae280145fe16b0faa7d6d1338f90615e05cd380aa4a0a1ad6019f33eb3a481c7b590368bc9aad673f00e501a3bc000e3aa3959e6bc78eb65cbd0494d7d6600580c2a375413fa5c2f781bd3814d107ee24afe0d21a0507c9a1d4504ed5adf9daa5d43c460c79f6350d67ada4600e727b72a7cf14f01771f2b1099fc3dccc3f2a3b544ce0dc58d0dafad04e07d704199ffdc809e91cb2e7a2b2aba842ecdb87cf0069b429a0855b5b0e775b0ecdd3ad7e41c494a814cd388a289a6c3593c65922e791a9f3281185709f377993b71798e9d7b04044822a6afa9a8a83d147987c41c7ae2c9c80607aa1b3147925ea3a5c5c732c7a95382d3f0b19df04912ef17d43b38a5085d825405c5f36a98a629a5e67027e804e7f8c35d3e9f7a2d166904a783dc2a598190e31e869f59393677e956dbe0f76c2db1b194b02f2f3352c1cd7d9a6951caeaa07b4a5f2a938fb8cce51666307ce937ef301684899ce27638900a8e0d1509b8c7ac07f078cc095733a99f5d14565062608996d7c8ba05ac014ba31a96b0a96d14ada8cc94306219d12d64da93659407b947d6af2b45291e27fb6dfcd81394a7791b1749085c818f2c8a5317b77f102b486942025bf92e714cb145505c0026eff1d7fea98a9031a1c51e02599fd6a97f69892c2ef6495b03d5f7356830aa8c852e4fa94eb5b8cc449e59f0fb4f4ca9f4fc5070667d2eb2151ba766a727515eb00bfea6519469546a63e2d7b8e148c79ffb9c6cdf8ef9a4b3b432718612543160e39f0d9697e8f040786328a855cb50fb980f4bd64473dc73b9521d04af1a8874c2fc0997e3989205761b2640f97a5c915f1458a8d5e6d19915765b2300d6364df033a40dbda6bfa35f5d680fab407e696b90b0b6f493a9a78405f929e5ab013079cdb9c639f217c538a8ea7f43a2c59b306224cd2198e0fe6a352100b2228479c8472def54bc2a507ff62cdd169b20a4caebeaf2b18e5fd1bb8e99f1136a4d9c9df6876f61afcbed3ac530595e3868155b26e81417f02e2e98b346f221a34d55e07b48a09a51f3908417e876513b63cc5c2e4ca3dabf17d1122142396c58ba4f630d0000e64a0a005e365463e791e2aa62bb04f608e27624ead71d3fe436b6ef3e05cebb427f356c798db3b589aa0f07aecbf462b1b73821d91c6c1e3d093051655addd294f4f3bab46e3eda5bb443a0bf96f134124d8ec076e4312d658051d574b04fb0a2fee9ddbf96fd2f6e588e1df51d9fe221245437d637773920e6326ff002daa1e0ad3a7f33053039902ad2b8ffed4a118a9027c63d44f7f60d164734bbff1e3062309af9c27be7d973f5b1b1163716dc9ab04eadf05b33c33fd1086410cefa91637eb459daa8bb077367f92d630bddb935a0efb2295a15e8f73f070e0757c858ba649c500ea095f07a00f50203b5724c5035eb7145c43e5967dca1dd99e66ac195ac1405781487b2d4b28d2435396c6e3f88e2f3b9321d61f08aeafc69aa52d280ef3ce8bf32b51a1f9b1dd605aa0d4be73563dceaa8764b0666152b889f8026bb56c02f83e21c3f4886ebbb2608d59569dde894a6093b4e7a407c68e7d8e7f3901daf6ec97353ad5f2ad55c5183c82e2f9cc7ad96aa0c8f77c6ab1fe5b6b7173d2d06515bc4463b6306bfeabdc4e9c6fee951c4c98baa477f79ebf68a1b84e20d6c816fc2bbc97e2e0b7853ceff7f118a462fb6e637c253611ade1f5411c78443c800edd0c68a90f7835add0df12e9e2dc3c3a17571d003d27311316682b9d10baa0c45d786451f1ecb2b573ff3237f62ed14bb30f4563a634e1ffcd87b305eb911ef5953a65ae33502a88530f788eb1ea9ca38c4b18fb323f414512aec6e932c2596769159b38d5d7512ade48d788d2b96620608593b9efddd7fe539be6e369577acb84db3c375b2ce246a000742ab913e0f804442cc351c4c3f048d645fa4157e8febacef069ab036db84d848b68c1b743d1c15a008ddb4b445f4848deb18a487e1dd7779be91349d1abafb6584c0d81c864f6bb31e8c8782257a1a02e479161f99ab8f69fc12b23b2ff22bcd403c96f7aabbaf34b97dd38af2a6f85acd895f3179b36a8463ecd6691cd4089769a58a9ae6c9a26416e854d87a26c034130373a85940968eb06a4c45c74c4fa5c03e3b882afb583e2d9cae256803e7e1d14450431a5997c6ac39fa61f09a37b6bd37724ccbcd6195060c69bd12a0f41a7a20dc7de62bd56fd46de8a1991f865fefa93c2838ef9b58704b0e00eb93a7063610a872fb5f0c949450369765540348297ed2b0d01773728d1b1ed800c4e797998ed6095efb8ff7a1101b5ad22a4a5ff303385c81226f1e274464525972e1495e1a0aa3ef6f796faad95d2fe13a1f3fa8d57495cf638f212c77012b6d02ee61b5181c78b73c4c7116150e63d7ad3dfcb7c00f645e6c42c2ef280fa643920a9b42c513318a9dc68628f3aa12cbedbe7e27dd44f7dc9b0a6985fa973a1c4105b699709f713efb2cc56ce26cf1e126d44be9404934541da7253852217d7535bf1aef558257833d9e74bb151e7c427024635ee0015ed29e6189dc50860ea2e59a3de705a3aec6e041cbd6b670d7d068bf7805162a39d41f022f5bd0bffd1277776ae75817782f1c982c02b4dee3ba75b810a647ea130458a89f31e8afd3fe22045e2c6382a6586c8685f4dabaff2870e546e427c159891cda0b9c0ab8ee996945e59c1e4bdf93882b1a02a22506646819a36bf630a398959876a7c28f7219b061defd306cf47519f3e8668df863d29e1e7a374b9d9856837a69a1912402eaccda4f99010f3f3f94fc76ab8713d2fc5fa2f85f7d6b1bb5be4e991cab067cefb22f16fe1ae198149f0d45c45281f2e9cc701a3c646b04daf384c2cb37a293741946a8871c96ead19ea7026f6f43e70523cf137a7fa4f30a08b4f6a21c9852f3ccc55d5f494797111f47752ca27bfdebec700c9ba807d89b3ce499b24d1afaa355f42af901f9f537edb38c0a3ad7b69639d288d5c4062b9287471e55a15479f6736b1228c0565fa189f7d67836780e360f76a1685d028d0436f7c1a4a331579a3a2950e68ca9eac5be54e6ec175a53b0179d0f453f63e1d025898348518991ecb6dbcffbd274639591ca31a205f3a2c454b75801c99b0dd91da5c0f4c6721df67013d81dbc0556b95fe13acf4139593d221cb5d5cf08f05d4e88a3b646d92792fc99b67e7efa5f35612de2720539845078e1b1dba0b1acb8dbd8bcb26304040f07819bf11a0269afcc534be4af5e89f578af30abf479a58e847c8462b1d88b6fb3e15465dae65f4f490130f06550f248ab1381c730f3a00a7d7ea6a9a59b59573c033302b21c8385a40064e12ef75e9b8f3baf530c4f740c9c244c177d1da5b98c0c9ba51cf34789229ec2a0676c6f9cd0e9898bf811b0092f3e65bcd0f735cd764c2ffbe45efadb565bc6f980bef8421b5bcecbdb56fa6bf25efd453f968934ee314797499b18aa16580ed58b5a97ab21ec1affe9fbdfd6161a14a25a17cd5cced78c1041f961821a3029a0ad6d1d337c20cb4c8c5fc0297667d6b8b77594ff31db3088ad89c8e8c7680c98345ff97f6a92cafb18c06ac342962b4d42e6e02515de785301c6afedd987a2e736c8fb110033309a1ac8907c4e4d9a820fb0821a3a8695293b03c615ae01c2d4292605bbf8cc15362441d7607b80334454a2b22dfbe437d86ce257ced4ecd5c5ee844e331d09fadf70b2043a3f70d8f708bb8f6756439f5c003cd62db13c2833aed28a160943c89afc38a281ee43e43f666847c5af28985009af2c8ed8d670c9f977a1be2770323b417f346c2dbcce15f2dba34a7dd1313e594ec0b4677073da46760f2f154074bdd39bf7bc3f0c5abcd4b8f6e628ee0117e17bc81c6f9a9cbd718c367f6b59d90b0b7f73512119ad33da5a64d3dd818065172254af2efee12e56cd3886fc86b3f4538a221596635d3cc8a41263774fb5bc711a7d40e499a289ba05d04c58db6eee42ac5509d130f7bacdb75fb47fcaba8c4548c52fe264b0c5c7cca2ea54818a3a77e5b5cf334c3de5ab4b13d1b5ae8342b0efc3fc6d84324cc0e02d15e4d4599d78b99816306e627783b52618aba22eedb1d7b1136aee15f128640af271c3b4de03027035213765c0d8bed1987adbc50f6a151ad13eb4840e6cb9d5ad2fe02f2449e81712d157b20dcb957cdaeda3dba66ec7b7c984ea4242afb19d48e17b9637f1be44d20342a1cfb614f7b9cb1ae73d80295f8eac41abfd778adaa9ded3edb300ed4fdb795ee3077556efa7f70e301e5e4645adde79858d3a674899623e3220ea7b665c08adb1ab20c5ea117bac8815ee00e197071b8f928da47379da2f4f706595ded16f09823930d8e84bedf7d08132f408ed337d0dcafe5d0a72a4f30c46fdf1f9b81d2f6f3962a2465ab02ee8014f8885756d30e04cd738e2cbbbfb15dea70c6e9f407b812a5e01de7b04f6403388e3f5539bf4cb65aa01a11da8a6f7767f6afc88be2fa71184c88e42a640674f317ac11d6c004b0eec5ddf1498d7ab64945a61dec5432de11e7c80308e6437c5ccb2354c0e1b612ae40364938aa62e3149e8a09944c9b0d9a0a6da4b841c27cef6b78659099b33786647d7bfa4058b940bc903aeb88f7fd85fceafb10e32862eb79b88bc24be239eee8c3b15d5856cbccd1adc4f14797919170d5595cc55484e4ae5f0a3901904485d28a14199275491bc33d5368b33ac39104805335025959b716943831f82d3033801f041bd842854698fe9c7430b8dec4c886f6744ef17454a45ce48e9554600069981dd33edc4b8173e92e0373297b2a11d85863c6d8a933d3c16403cdd8068d73decfbfcfa89b9d3520cd0c7c995ea2460444779ee13371f1540281e054a200a36eb00d024ecdafaff84e3dd89d0d3b69ed03bce3c53a84c9fec7642bede3ea7778cbdc809dd406662e90720b6d388d8f1ed0c31a43f8f77c965ae2968501e8bb12e2adb5083fdda64ead02a98b16be7e5cfcde094192e7fdef23bbbb040972eb1601f87cb66e8d309b8e2cceb85b63d2f2c39d7fe9b064aad9625b301bed9338f1db89b5cb3e9449d6fcee73e4968ce0c365c5d485f8a356b412be24de80eac63efbff6629cd7cc00e61dfc51603164de0156922df2d6d91bb8e607d9356d3a8c375181c1bc69db234a5f94cac29bf30cd1cafc4fba53c76e4ffd8271254253884bf5871537be25936ab7f88da3ba3507c76040cfdb70e9dea7057fb3e05fe20c7ac8be287749e094cab2599c42067a5d39e35635f6c976f69df174fed4f2dcab6769c86129973b925b6adbb39cba9753db414efa43217b3fbfd383f844005740ec33d7626b1e099903c8021cb88d26f9ae146f33c07b449d98eb612d7bc0df6a088933387ad6ba7e848e89d015281dcd8396d49eee15cf3b4349fbdcbb08dcd73ca4e1ca0b51ffbe03bbad5429bc81b5cb1caf5986c6e64af6cff27b0f1938c40fa53f3a303e10b67533c30875256047fe2758dccb58c2942753486cdf1a0feea0d87998da4fbbac46e38f2993322ff7e0c83fc206026e45c4677adfad62510d88aa81fc3fff0c1590e89c526d6c3a7e6bbed292904ae61bd6a8cab96309e9709fa0c3b7675299c46d472802434cb4aa1ea937f5238afad41b93226b1f441c2eeaa8732cee239cff89c129e713dd3445845a130d926ac36eff031495def93ca4626298c67770c232e92e56b04e8fb36096ef168297616e89f8057d35ad2e55be8593cc61263cafff077c3665ad878de8a88efe5024b0da3f649d85db7cf723f5a221e3e7e901ca2f22442b9b4e3e084f8bec616b1fe2670334e2841c8d7ee87be756c1ca7e64d4d121f06fc06972f0bcab56ec9a0de9e7a202facae90303c5e821f7a455b446c140edf0727349d532eb9008f7d83417fef19e4cdce4001421c1b21aecb3498333471244ca2287b85192228f849965437f8651d93be49588115e596b2559ad2934e04dd1f203c6da5e5e2cc9fd70720ff04e753d8dbcd946dace702455853971903822566fd6a609a6da7f70e511aa5a8d727cf1a629fa04bd27b89b0c9cb31356ac989d74e48969a6fac1c35590f2f17f74423203c44de450a0d20325a82245c0424b4af899738eb6f321e4a6b310a3b82164cc64119efc24c4a47c88f847b4d198a734d2ba8f554bcfe1b2f095b43ede9005e1da8ea8b6f55a9e47e26e50906e37239fc50ceedb1358185e9caf2ea7976f2f7854444a5be1d8f583203c7c8794277e891d8e1cac0416f318d55927cd59905dd89f92b1cc2433bb099cd5b8c1a556c9227857a2931c83a26555da68d603ca4532e15cc31bf65587f5ac7317c7c40264865fce1cacce27eca7b8a38437e23f516523fb3912d5b772981b4065b8717fcefec38f2f845cc3007bd21420eca89596e8497ba392a988ca546bb0095d4b20f001866d71345d59ec36cc5c33ac4a6a9a225f73651987e773a4e11a84095f0d6644c5d06652ab5a30ec2f9fc224ebb09139c2edf9d9a6a05c2e4668bce745092e8bec817b24ca477bfcdc08f381df0ec372eeb1e93005e2dc7dbc795aa0e1378fc527b3df6bf0c776ed0d23eee009bdb6f62d8d6e47d0e34e095f8ca574e14cbf321ad7c287d4272a7a786609496b60e6b9b736726d138e7cdd857010b50a6a2d04ac52a02d2d157bc798340ca3503fae53d23e31fcf91fecc88030be5a0c6695232f3330ed30231e0f0757e33833cb4737cb291a6811a3ee952c6df3f853c83b10a167521c38f029ba288f807f5dfdc32c7960754d35ae0676c6075e4068838bef3e60438cc0ef8e0726d489b17fa57b8d371dbd865d314f82904ba16ce56b57c53ce9ed1d749d3b24dd3aa2a443febebc756e43bddd3d653b91646761d0861717226b52921786697e737ef81bcebacab4cca44d31e299a625ffe4662b59369c3feb749ddc89534203e4aa3efeffe4b035bcaddceabbc0435e4c5eb3d03913c0389978d1fdff8265660dd22a198cc7e6c4a7319980122318d1b8353c9b4337d04bfeede8d1c4be7de0dbb004bbbeffe925a4b5139e696d9622f160b1b7ffdc504f1f10b8806e78748b86d0c72fd3767c02a285a670c949e25d8e38c808a77b4ecd6a2849a1b36d16e1c0505833896828fe29856ede287c03fb25549f0acf392ddfc1220ce99f8ffd1ae1bbaf322dbfc6a499ba82a339aaa106152f61d69c6bb712c6dbbbce6a698990e95b05bc3c57b1ea4b12705eb6c78d55b8af785cf6903e520</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    
+    <summary type="html">
+    
+      商业机密，不会公开
+    
+    </summary>
+    
+      <category term="项目经历" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/"/>
+    
+      <category term="大型" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/"/>
+    
+      <category term="quantify" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/"/>
+    
+      <category term="strategy" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/strategy/"/>
+    
+      <category term="multicexdex" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/strategy/multicexdex/"/>
+    
+      <category term="cex2dex" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/strategy/multicexdex/cex2dex/"/>
+    
+    
+      <category term="tomoon" scheme="http://benpaodewoniu.github.io/tags/tomoon/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>supervlabs | supervlabs</title>
+    <link href="http://benpaodewoniu.github.io/2024/02/14/supervlabs0/"/>
+    <id>http://benpaodewoniu.github.io/2024/02/14/supervlabs0/</id>
+    <published>2024-02-14T03:14:01.000Z</published>
+    <updated>2024-02-17T04:31:46.066Z</updated>
+    
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="82bdf8ab574c7b9a8e421e2d89d3b01fffcb0cd41c744aa9a746d1ae57abd2b3">1cd69c5eed74a598c41fd261ec09456728998e9229312ae95f73f735a407bcd3465be7b7082e003712fd2ca09f01cb2172d423bad75e0891bd789e92acb55ced8c67a72aa19a3f955f070777df34f2bd6220377f189f1fedf494c263d79508a2bb970f7a0f2d28563995b948067452f7071560b33e73dbfd598965df2791ba492ef3c027ac4e21a0659a771e94229bd5b1c8592d0265e2c94308e705792940339fc246a6685fcaa7f724c7a882f76b93649c43ce1cae37384b3c453a4d603eea20c9fb5a12ea8d017a39fcb076ec513a099ee6f2d97616ea85620485c0d31483595ab0c9c84377e0bc4d1f4d1c4c90a95aad59391e978edcc104ebf921a496d3b527d02630806e4707aed0afe24ff3b5e95fcc48647ff5e3406349ff602a64acb818a142354d47b36351bc635cef2bdd38dc0d2caf832fba85d30aa664ef9be73b62f9c300bb4facf9f7893a3d09e6696f7f1a5edf2dd90f65594de134be5c0808178757dba41b42d9113598de81801cd3b744b3709450befb1d2aee63d8093c26a109e970f6417d51eeed73043257449f703a8a5fbb471f0c1f290e448fe21dee0ecc85dc41b38b967008e45ced0804ad90b5af0fbc641f340b18a374475367a9c37777dd2b74c7d3969805455885e7cb7fab8c32e0da963ee2c268a6a7aeb6183853ffc49a4abe2863b34c288de81d74316ffad6c7c85823d80adb869b61f32e3695cd25049ec7a235115762afe67ee01fee1e2c629af4cfdd9803c809df993a4afec1477ad24a69f94e8e4ef451b95e2e2034940860653170e2740b0beb8f81a1d456c6b4c7e8810a22df87cba3603960d402bf42b748f1616e8365df369d6a1bc470604a30e92254a7925262f2f0de40406f209c37e29c61df212ad1d111131ca18cc92b94509437e0773cd8a8c04836bb7b3d14becf59f77ca441bd74520a44bbf0c301f8e7c93cce38ec7e6ef4608db0d21fbef854dad9d49ef4670d88861acaaac9ad7196d30e12e599c43b9402361a8edf395da21aac21396c3fbd1306eacd492d75a8f1dc7c333a3152bbded3e5371ee70e6af9a1c55269fa87ed1cc96ec1fa1c1c517e9455f51bb018ac908198dc1c18baf5c88e455950ae03e39942bb533f7a5614618344026cdb3d3d69a98c4372eecb39200cc090ee243c9269a8890e18c69aaed97c8df15871379d32e60c95678eb42184ba758d81dab06202e43bc03dd43e00ff2aa4687fccddc32c70269db40b3dd84dc3322357dad7ea90bf45552032168c4aa96fed4e8cad776c83c3ddd5440878b9f62ce68bb1776ef024047c3ae156e523948ccf74b7b34764b0ceaf80a835d3ae19e69ec9915b218ed7f914fe2ba78d37103bf3a2ac67e6e4350afa3349dace66ff173c02d87b984279dd8d2e89965d864c27c0ac7c86554d62da3379e565d11447336e5aa8434075d26f7357202d4a270c5987b7e5652ce492ec6a6e8afda0dc02325031e657ed110457f44bc5710a45d2bf30b0d117e7542570694265cc40149745c55b2e7c4288efb2d1ecd120e849246960af85427d4380d572952b9396d43cf29550369b274d04b6c304134284e92eced20384ee3197563395d2cad505de738038b06150a466c8fa00fdfa1f86009f6638dbbc8f6d9aca8decc21171ae226aa2993174ff80583f81578eac1c2fc08500442cbd4ee39d901ecbce1b184a97034e2ee13710949da97551024479fdfca3ddba46c16c9d163b9380d6b68ab1752847b23fe330970073767f566b9f31db953ac96d5b6d96c50928a804623a667d76d652efb99f83a7ead3fdaf70fb5c38381fabf009e4ed89069c819754f72f5819f57484b3190416dc16149afd5464a65652f409788633cd05b32a8e0a9eba91be3a69d916ae344d46798a658c64b3959b7137990234934ec4f8c4cd022d83e76252d3b802f5210503b16150107bf7b6804a51f933f60f3061448cc83b27746f60352534f4029a318aff2d84bdacdc6f2b95fd0e7e1e8afd7712e2d50e9877493cbef3e07a898ab5e538cd5a9bf038f1d2de7c9ab1d221213705a64976840270ca436de99c3b50a67506e52ba90210a39cf6ff8e687245a4ebc095cfe5ab49dc08234c90537eb01392ccceb5bd0d552de1a4b81743e1bf23</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    
+    <summary type="html">
+    
+      密码等级 0
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
+    
+      <category term="supervlabs" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/supervlabs/"/>
+    
+    
+      <category term="supervlabs" scheme="http://benpaodewoniu.github.io/tags/supervlabs/"/>
+    
+  </entry>
   
   <entry>
     <title>eth | 生成账户、转移主币、合约交互</title>
@@ -468,123 +589,6 @@
     
     
       <category term="skygate" scheme="http://benpaodewoniu.github.io/tags/skygate/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>skytopia | web3 的蛋仔派对</title>
-    <link href="http://benpaodewoniu.github.io/2024/01/28/skytopia0/"/>
-    <id>http://benpaodewoniu.github.io/2024/01/28/skytopia0/</id>
-    <published>2024-01-28T10:23:29.000Z</published>
-    <updated>2024-01-28T14:59:00.845Z</updated>
-    
-    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="863dab8344f9a645ae83a1fb19b9d04ed4fbaf76134304fe57974e30c063e44c">35f76b8c8176594102ca7199ddf1368c77199869d2348022ec48d45b8a36543981bb91abdc610a3bf6202a7c89092a2439bb505059da80dc4e93f08bc07c07c30ec0a6e0015bb95fec878f8fbe6b72b6c7bcdfc6801cc7ae0e6a7d0022f9424adeeef11296414dce575b6605e7ca7ef784c2f484ae2608574bb77079546c0431b7c390bb0a83ec4e88de3218c34d06effa837be21fdcfb8690fbc99017295770c4b1a6d1a07e56906430e62755ec39d79fb5575d6de4375a7dcdfe48bbfd5a99fe4da408299d215136862a9abdb948b9cd365d097589386641c487ac482daf4e9e68bd958ce48c757b5e2ef842449fcbe971c1cd4cf442e32419f274326a7934db009400a44fa78f4cce25294599a752cf96eae6478f00524a84093a77e7ea1beb0fd281334dbb38717dabe9a2c7b2f9a82d2fc74824bd225b8674a870b18e334c435f30b03b1bd863fa0a375780c811ea30e32166cfcfb035efb5caa7057ee5b95d6030e575a39b59936962baeedf803236f264b62066c6b63a1dec582720e3e53e4a249c10b5f3fd56353aa97ff1493948a4f17444ea44a43fb6513a5bfa325fd52c9398dfb5d602abcfbcd882b711d7b5363930bbbd3666b0970a2f941f019ad949f42e677a41134441b843a660b8caf55c2ba418c4d742b51a4f09824a2e78b8a8d304041eb2f52dd33338925e3bc664d6cf3b190470f5a78ee2a9000bd6f6ab47bde64820f5996c5937bd9224826e9e7472308e40acb710400c0b9c9587aa768cad096288f5985a2133bb19c4567d799bd35cb39eaf5d702b35aca0444f1d7ae1245bfef15ff2f9ebe8787f1101377ed2d6c2a8ff62c2b64d09b5cd86ad87307238c865e41f590719c03140e3eda61d179cb14363cc14d47bd7e458d7e734da314cbf438e95e06ddfb2aa48ac1762c24d83995faec7c2dab9db71906477fc9b997e424ea24f4e7a62196b5e48ad5d868b4baaf1dfb7df4fe8523a6607fe2fc2752dce16a7b96c8464e69b4830f5637f3630f08ce546cedc4eb7b13f80ee1e6b34cb0a37f70ae3c0865c99839dbb5b28bc7d3c5638b81b3afaf6ea4d31216e8cce5cf0f8434a1d21542757b5c456edd313b27ee6a1a5958a90cd57d94f0c4d2c7c14c85721cbed52f0e8af3757ce610b88c220bfe3322c666f3d6d7944f8890b227e6b2999e1e500928f2b2f23bfbfa8b25c3559c0bdbc577a09ed77b48a4c314cd08fc3f508bdc1f18a777320e3e6c9d9380149248f8cfe0df51c43c0e02722fb271a283201826cacbf4b625d4cf45fabe67d4fa7de89463b55f965a8d9d5dbce6bc35ef702d3db867f185975c394967e5051b8a8592037c5d725db0edcb8c2fb0caf20caa164b08058c8303275394da012815e25ba97f79c6d6ead23ec4fc3f2badeffbefbe0aac2fba9538e09bb09b35e2743b52599a032f5fe5f9c57c436cbf47684902c3e2aa6727196c3a8dfb04f3df3fcc04133eb48e1c23bb40eb558f8a80880a07c7ee0878fa33042368779fde63e5956b78fea187a4abd376648ef13c447388b0f641926e3510cec969c9c6bc9a6def9d03972b9596d026fd7244c42f9d534ede2f47421370fd7f32d0eb1a5467fa53ec0b0659a3708f9bdb4a512a990dff11acaf0ff5eaa95993df1621aa2bdc4b94dd51ffb89eb6b8e00a798c473f4eedf72015d39e2d2febd3ce4fc05e1a3206916129e521dc565ddd1ab8727e8ad1b32d6e8a6c0b2461c7c9ca614bd9d25ad81afc2b3912c661cd6834740ab388a6225f768767aa67ea89bc5012ab823fd15fe4ed5503f24461fb07b0d0645e5bc225e541f1651550cb45e11f94b34fe02141bc4becccaa04a6c068282961851fa6e2417bfeca1709e884292c42d257432a3d36e83e3328c670d955e71f57aebc04b616e3361b4d58a9ce40f6754f710031f31aa77cf6c808600a3ccb2267d36f19e0b2e1b2408a8ac5ba1458af9f3c48c40057702dfb9265916caa2f6127f5e7e198893edc996f2a10ac2ee3a85af4ffa3b8bb771bceb1f5ca89a7eb8a02d1007cdbf55783ad529d56428efcc593f90330dead976f5959abe933e344005be756110198024d5cd27cdb25998196ca07df4247dbf88bbae88fc42847b95f5a5ec14df0aed9bb5b2c12a2ac9ca7cd6a9dbfca0369933430287963bf24978bc84793946e53ec643fd8646d91b179834a86280881ea273857722dab1a103ffa54b0887de257222f53f845be4ebe53430aabd226cb814218c111db347979551b9ba38176fe1ce4a132936cbec1d28b61705d617b47aa12128303a840f217f6cabfb2a41eecfcb48fbd9d65317224be7c31abafb07dedd45a3bf9d5f62848ad4738d5f8246385b29cca48f539456da52b98577bf761b026febd31b0678a29a8a2a0f360fc5c641bc8fc64cadacb8cf17056c8d64767ace087c6bedde573d47f45284cbbbb05757c0bcf3ef1d6e424e03f42136ac273819d350f9ee6d96bb82206dfb8406ba12dce78b7ddc927af2598238ace966ef132839284d9e6e2bdeaaebbfe141854ba67e0e6f0316d9ae88e380683d4247ea41e6fc61ee3f982cc14f8256a8716faacbd95b1c0f57faabd2fc3e292d03b3e6cbd3b6418ec2d1823ae70168ab7873cfb7b709ca08e84b1b5087cefe2c12ac03fec22a012e3b512a73d6a73473ebc8bbede72507c03c50557e5e61d5ece19a6dd5f41412c37c41add5a32ba479a1b4132567159424be0c3c2ede9bb9f2e1e83e542e4d8aba2a9de360d10a7478b3afbf1fed45d2c3849c9a1717331fa595b261d1d193d7157b1a3dc6c56b786e63a7658389344b4bf176e2a1aae55142ae63021cf217963e4ca6c40a71b3d7eb838b9aa2b30739fc05be35cad509444cd59f5d2efef075bf05b633a9cad8ca2d5ff3b5f6dfd11184069c8cc8ec2f5faf47c477903b13f07d590d88d104bbcacd8c4c79eab5ec223a2a43f7cf14bc75126a3993b3e2840421151c197faab1e63daad1c77ed5f87634bf3f027722db01e019039da4153aa44a2cae1a148f159c9988a514ccee7e289416de4eb7ff0c761f2e1c36b594434b8380f989bd3c5c3688dd2ffb2ffa0f3d1cd6ed1681d22abcff46323fb70f9ec7b33950b532f3c0190f007801a7e69e897187991830c5d9e291e8ca5c71cc48639be9c04f2fe0e3544c467a7e94a4d8b3a435e4d70eb776af3e2b5f38820a7782e897e25884fee4a3c27c8eeb96c8b51cf5dd7ca24821a5c99cb259394c42ea63bc8c9bef7e777269e0da3f5a89d3ac5d36d293e0de8ebbbebbec2a27d7804829bd6acbb790d312dac76a8f00764e75d7ede7b8a8cff7bd9361de52b867b005cdf220ef1f63ccc82d81a9588918a198ceeba88426ef3a020a82ce1698a8766cb2503360ca195830b386a06266ecd1d30fd29fe24585a8d7b9c609614ce70fa14d6e5009812325c35abbe9218a0a3a042924cf0d3cfb65536f8dd20ba2a83b7ac4b0f59771bfea2e9601f909c0198a6060f82166ad2ed990e50cb59b25a26454f0541542ba0d84709a90244a76e6c58b28047ac8bd3c617295a215307febac2391311264238680c7d20e99c38bb0e486c6fa0b8b0c7e0eeadc20cdb09e19221f4f7425b6d48a3257113be3258fb9b2f3d2f752c1f7c6fcf98718bd25d0352da27d779c0e9d56bdd7882d9b028813f5bdf23cf7b6565562cb9185c47c573c1d6193306f4ae84565c4ceeaee5a37449423894037f18b93beaba8c76b95ab9d57332885b1afd824835ccedc76bb17d97a880ed1fce13f7234ec78d7351928241118bec5ed58ec73055b05745d2a62002487b940d3eb5051802d58ec5172a5c367e7e9359e1c4e8b0a5fcfdece2b19b97576994c1c7805062371f89fff3c8cda9c549dea28cd34ecec60fbd0f59a2fe803f5aba6ec6cca5724f0005581ec7841c9f371a19b3edf47ce33091e5a5816a04781f8162b77df93c1bc8c02c4860bf985f6f00ae15d01a65d246283bd930036c963a7a8eeca3346ba7959428b5dc9c95de71ade5a2456787d368eef5d41e1bbe4dc8a12e66b6b2b5ceb54a90dfc614510534bde4ff25a087ea8f97da8f4618e04570d327a074c76f8e37e7e6c9c5bab24d93e54bf56c548b1a93d0711079e925293418217c7be1a5d3e155f8ffd688bfc055355e34eb16ad935c0d8495d582b627908720d0f409e16d6e93520b075b41e63b0d5e3b0f89aed5b5f9184b9ad406e763f8b264633e0bef8c254791fa9218c1ba9c58e5615bf353a2ad034b549c1caa7c3ad5fc4c64028badc751e076aa34abb40af867b276a1a04baa92d41b8706de04c2ab6937d57b994fda1b302d0bac4bb124fe1bfc838a4f4484672b7bf5d4048ba76c7f40387520a1f4dd88596a4be30af03c962aec681268a04979524788357ddb85151127b20a95d0f92cb8662da3a2bdc70e909ba9164bdd0e280f86586b08ca99fac7b6462bcefca57ff3f6ac546e8705e2f18f2835f12d75f0b27ede98c35772b79d9254fb9b1f44a91c17cb9db16032dedcce18ecad1067202702e373d45752731a1ac8f7986d1c30e8ad00d31699b1a09218a019f7ab108556581a200bcdbdd76889224db5d2f3cf1ca2a83ad48da7fcc48a7d92e09ddf423f1d33f0ec24a0731e7d6185b9ab3c248f8ed7e2cb1c3c81bba9725b6435707ac2246c2808f361da0f26f00584117d915d17b3c63b35adc2ed6f1ab33a8961d442dda49ef691e3926837cbeaadc4fd5124a35ffce10eea706b91540fe4f0413b51ba374eeead96266ffc005f6934bdc00fb4dafd727a70ff5583ad728c5d7c1fc4dab378411c6f5ffb7480f435883f754a66292e1bd9baf7fb31bd6d467b4193fd02572f101d417836020f6e22809b61a08449e261decdc91a0d485c1b05eba5eb81326b6bdab62eee6b0ceb38da14c76a50f9091ea87de1cbba3d6abd67477e98159fb1bfa728ccddedd454f24c98e830a422c5b563787ffb6a9ffe9b9d3a429d885d2a50ef29845d1b45650218cb2fd55b48a6ec474539a54f9cd6fd0ee084558cee20d6d1b12fc07b0493a98c6b61660a0e6106e87b035180f9453ce80c3197bbff1f711a218436392fe229a15e0d4e2ede5c9216fec0ca6e39d9a6bf761a374225b8e366f3224fd373150774e8274bd0772dc7bf543bcc0f482a8db289e5359fd1754b3408ae3d8665029619c9b6dbb9dcc68e7c4b7701560ced7066227e5a256a6b86dbf847de3931f49bf0f9d6c79e495b406c29068323389511cfff826174b664549378f8c272b23c0ab693770fe15f1eeb8a3e6b9ebda5847ca084f410e7743189b220bf1442210b45a9f582247eb15237659c07de3dfa5074086ac490f63168727f16d28b409edcecdf581a79281c5a0efebd797018399a37a66c69761f896b4d1382846c86fe2bf20439c016d49849abdbb203cc8d96bf164d1bc6d23f775a4de6c5a29712eb895633190d1492b2a1dc3fda106c5179b178628b02c3fde48a842b876901d5258bd6ae45ea20cca30a08a78af2a91793616c0517c5d3bb87d37e002cc24dc95f44aebda397ba27fc7d65568a74948b2a8940e9e96aa9e0749914df825e815356885</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
-    
-    <summary type="html">
-    
-      密码等级 0
-    
-    </summary>
-    
-      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    
-      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
-    
-      <category term="skytopia" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/skytopia/"/>
-    
-    
-      <category term="skygate" scheme="http://benpaodewoniu.github.io/tags/skygate/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>wordpress | smush 图片压缩插件</title>
-    <link href="http://benpaodewoniu.github.io/2024/01/27/wordpress2/"/>
-    <id>http://benpaodewoniu.github.io/2024/01/27/wordpress2/</id>
-    <published>2024-01-27T14:18:48.000Z</published>
-    <updated>2024-01-27T15:00:20.495Z</updated>
-    
-    <content type="html"><![CDATA[<p>免费的图片压缩插件。</p><a id="more"></a><p>挺好使的。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;免费的图片压缩插件。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/"/>
-    
-      <category term="插件" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E6%8F%92%E4%BB%B6/"/>
-    
-      <category term="smush" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E6%8F%92%E4%BB%B6/smush/"/>
-    
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/tags/WordPress/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>wordpress | WeDocs wiki插件</title>
-    <link href="http://benpaodewoniu.github.io/2024/01/27/wordpress1/"/>
-    <id>http://benpaodewoniu.github.io/2024/01/27/wordpress1/</id>
-    <published>2024-01-27T14:18:46.000Z</published>
-    <updated>2024-01-28T04:46:41.591Z</updated>
-    
-    <content type="html"><![CDATA[<p>一个完美的 <code>wiki</code> 插件。缺点：付费，不过，这是我的缺点。</p><a id="more"></a><p>这个插件可以让你的页面显示。</p><p><img src="/images/wordpress/1_0.png" alt=""></p><p>如果你想把这个 wiki 嵌入页面可以这样。</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe <span class="attribute">src</span>=<span class="string">"http://wh-ahhdmfuoqh41bhfgk5k.my3w.com/docs/lumiterra"</span> <span class="attribute">width</span>=<span class="string">"100%"</span> <span class="attribute">height</span>=<span class="string">"800px"</span> <span class="attribute">frameborder</span>=<span class="string">"0"</span> <span class="attribute">scrolling</span>=<span class="string">"no"</span>&gt;&lt;/iframe&gt;</span><br></pre></td></tr></table></figure><p>最后效果如下。</p><p><img src="/images/wordpress/1_1.png" alt=""></p><p>如果你的 <code>wedocs</code> 不能用，请参考</p><ul><li><a href="/2024/01/27/wordpress0/">wordpress | onenav 主题</a></li></ul><p>有的时候，「固定链接」再次保存就好了（使用 <code>%post_id%</code>）。</p><p>这个插件，如果你创建后，不能删除，看后台是报 403 错误，经过漫长的查询后无果，偶然发现，如果你装了下面的插件，就好了。</p><p><img src="/images/wordpress/1_2.png" alt=""></p><p>这个插件安装并启用。</p><p>另外，如果你想付费的话，在官网交完钱后，发给你一个邮件，同时邮件中有一个插件，叫做 <code>wedocs pro</code>。</p><p>把这个插件一起安装，<code>wedocs</code> 就能激活了。</p><p>也就是全功能的 wedocs 需要</p><ul><li>wedocs</li><li>wedocs pro</li><li>DocsPress</li></ul><p>三个同时存在才行。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;一个完美的 &lt;code&gt;wiki&lt;/code&gt; 插件。缺点：付费，不过，这是我的缺点。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/"/>
-    
-      <category term="插件" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E6%8F%92%E4%BB%B6/"/>
-    
-      <category term="WeDocs" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E6%8F%92%E4%BB%B6/WeDocs/"/>
-    
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/tags/WordPress/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>wordpress | onenav 主题</title>
-    <link href="http://benpaodewoniu.github.io/2024/01/27/wordpress0/"/>
-    <id>http://benpaodewoniu.github.io/2024/01/27/wordpress0/</id>
-    <published>2024-01-27T14:18:44.000Z</published>
-    <updated>2024-01-27T14:59:30.425Z</updated>
-    
-    <content type="html"><![CDATA[<p><code>onenav</code> 是一个付费导航网站。</p><ul><li><a href="https://www.iotheme.cn/store/onenav.html">onenav</a></li></ul><p>如果你觉得非常贵，可以使用一个免费版的平替。</p><ul><li><a href="https://github.com/WebStackPage/WebStackPage.github.io">WebStackPage | 个人感觉这个足以了</a></li></ul><a id="more"></a><p>这里说一个 onenav 非常坑的地方。</p><p>如果，你使用该主题，发现访问 <code>/wp-json/wp/v2/docs/...</code> 总是出现 <code>404</code> 的现象。</p><p>在你修改固定链接、伪静态都不行后，点击 onenav 的「优化设置」，看「禁用<code>REST API</code>」是否开启。（这个要关掉）</p><p>保存后，再进入「设置」中的「固定链接」。</p><p>选择「自定义」的「<code>%post_id%</code>」，填写「<code>/%post_id%.html</code>」。保存估计就能用了。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;code&gt;onenav&lt;/code&gt; 是一个付费导航网站。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://www.iotheme.cn/store/onenav.html&quot;&gt;onenav&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;如果你觉得非常贵，可以使用一个免费版的平替。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://github.com/WebStackPage/WebStackPage.github.io&quot;&gt;WebStackPage | 个人感觉这个足以了&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/"/>
-    
-      <category term="主题" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E4%B8%BB%E9%A2%98/"/>
-    
-      <category term="OneNav" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E4%B8%BB%E9%A2%98/OneNav/"/>
-    
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/tags/WordPress/"/>
     
   </entry>
   
