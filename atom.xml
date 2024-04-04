@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://benpaodewoniu.github.io/"/>
-  <updated>2024-03-31T09:39:37.391Z</updated>
+  <updated>2024-04-04T15:11:22.359Z</updated>
   <id>http://benpaodewoniu.github.io/</id>
   
   <author>
@@ -15,6 +15,125 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>solidity | 分发代币</title>
+    <link href="http://benpaodewoniu.github.io/2024/04/04/solidity78/"/>
+    <id>http://benpaodewoniu.github.io/2024/04/04/solidity78/</id>
+    <published>2024-04-04T14:57:55.000Z</published>
+    <updated>2024-04-04T15:11:22.359Z</updated>
+    
+    <content type="html"><![CDATA[<p>分发代币的合约。</p><a id="more"></a><p>已经经过测试了。</p><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span>.<span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">interface Token &#123;</span><br><span class="line">    <span class="keyword">function</span> transfer(address recipient, uint256 amount) external returns (<span class="built_in">bool</span>);</span><br><span class="line">    <span class="keyword">function</span> balance<span class="constructor">Of(<span class="params">address</span> <span class="params">account</span>)</span> external view returns (uint256);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract BatchTokenDistribution &#123;</span><br><span class="line"></span><br><span class="line">    mapping(address =&gt; uint) public sign;</span><br><span class="line"></span><br><span class="line">    constructor<span class="literal">()</span> &#123;</span><br><span class="line">        sign<span class="literal">[<span class="identifier">msg</span>.<span class="identifier">sender</span>]</span> = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> add<span class="constructor">Sign(<span class="params">address</span> <span class="params">signaddress</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        sign<span class="literal">[<span class="identifier">signaddress</span>]</span> = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> delete<span class="constructor">Sign(<span class="params">address</span> <span class="params">signaddress</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        sign<span class="literal">[<span class="identifier">signaddress</span>]</span> = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    modifier only<span class="constructor">Sign(<span class="params">address</span> <span class="params">checkaddress</span>)</span>&#123;</span><br><span class="line">        require(sign<span class="literal">[<span class="identifier">checkaddress</span>]</span><span class="operator"> == </span><span class="number">1</span>, 'ns');</span><br><span class="line">        _;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> batch<span class="constructor">_transfer(<span class="params">address</span> <span class="params">_token</span>, <span class="params">address</span>[] <span class="params">memory</span> <span class="params">to</span>, <span class="params">uint</span> <span class="params">amount</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        Token token = <span class="constructor">Token(<span class="params">_token</span>)</span>;</span><br><span class="line">        for (uint i = <span class="number">0</span>; i &lt; <span class="keyword">to</span>.length; i++) &#123;</span><br><span class="line">            require(token.transfer(<span class="keyword">to</span><span class="literal">[<span class="identifier">i</span>]</span>, amount), <span class="string">"is"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> transfer<span class="constructor">All(<span class="params">address</span> <span class="params">_token</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span>&#123;</span><br><span class="line">        Token token = <span class="constructor">Token(<span class="params">_token</span>)</span>;</span><br><span class="line">        token.transfer(msg.sender,token.balance<span class="constructor">Of(<span class="params">address</span>(<span class="params">this</span>)</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;分发代币的合约。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="平台 &amp;&amp; 公链 &amp;&amp; 项目 &amp;&amp; 方向" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/"/>
+    
+      <category term="eth" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/"/>
+    
+      <category term="solidity" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/"/>
+    
+      <category term="应用" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%BA%94%E7%94%A8/"/>
+    
+      <category term="分发代币" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%BA%94%E7%94%A8/%E5%88%86%E5%8F%91%E4%BB%A3%E5%B8%81/"/>
+    
+    
+      <category term="eth" scheme="http://benpaodewoniu.github.io/tags/eth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>solidity | 从部署到测试</title>
+    <link href="http://benpaodewoniu.github.io/2024/04/04/solidity77/"/>
+    <id>http://benpaodewoniu.github.io/2024/04/04/solidity77/</id>
+    <published>2024-04-04T14:24:23.000Z</published>
+    <updated>2024-04-04T14:56:03.575Z</updated>
+    
+    <content type="html"><![CDATA[<p>我们经常会有合约进行测试，一般来说，我的流程都是</p><ul><li>remix 部署</li><li>代币部署用于测试</li><li>合约编写</li></ul><a id="more"></a><h2 id="remix-编写"><a href="#remix-编写" class="headerlink" title="remix 编写"></a>remix 编写</h2><ul><li><a href="/categories/区块链/平台-公链-项目-方向/eth/solidity/remix/">remix</a></li></ul><h2 id="代币部署用于测试"><a href="#代币部署用于测试" class="headerlink" title="代币部署用于测试"></a>代币部署用于测试</h2><ul><li><a href="/2023/02/15/solidity49/">solidity | 再次探究 ERC20</a></li></ul><p>直接复制代码到 <code>remix</code> 就行。</p><h2 id="合约编写"><a href="#合约编写" class="headerlink" title="合约编写"></a>合约编写</h2><p>这个就个人各异吧。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;我们经常会有合约进行测试，一般来说，我的流程都是&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;remix 部署&lt;/li&gt;
+&lt;li&gt;代币部署用于测试&lt;/li&gt;
+&lt;li&gt;合约编写&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="平台 &amp;&amp; 公链 &amp;&amp; 项目 &amp;&amp; 方向" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/"/>
+    
+      <category term="eth" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/"/>
+    
+      <category term="solidity" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/"/>
+    
+      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%9F%BA%E7%A1%80/"/>
+    
+    
+      <category term="eth" scheme="http://benpaodewoniu.github.io/tags/eth/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>rgb | rgb</title>
+    <link href="http://benpaodewoniu.github.io/2024/04/04/rgb0/"/>
+    <id>http://benpaodewoniu.github.io/2024/04/04/rgb0/</id>
+    <published>2024-04-03T16:40:38.000Z</published>
+    <updated>2024-04-04T15:34:03.654Z</updated>
+    
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="07d60585367fdcc616cda643991dfa3dbe50563e1abd8e93faed858b7e50885b">03ce5089e88b9b98a224bb37ad5ba21174148dd21d380f5df7c68a321713d0d50e823ee732c6163e0e90ac3d6cc06f0003587bddd7b55fd019971830134c2173b727c2942fc13849ea4d66797e6e07d68028e577f02396db0879a5fe0d94e7e8a324b4162c1a8054f191a6d78a9186ad33b2bea10b41117d2125da3ae3b90dbe48be173db225aed60985a54248e41d844767cca6e707030019023b81b64e989e403b95a5906e2effffcd6cd04c23a87286f1f09ec2b968b04f9f22a8533b1b7627f751bfb68312f3d748625405712ae82a313e4d930782169a23ecaf713a1d97eed441ece9eeccf7a37d83d87d444d00343fe379fa6ee161a348415b2aedfad40d658ec221289c7d02b35dafb214f7e4b1f79c474875d54e5a0fa7ce3716e99123ddde98a92520557c5b0564a901e7aec49236cbea9b838a1d51108058eadf539050708b5c04a00c8c4c07a35be4b686316f6773cee083612247bdb5f2e6592fc10d789106fbd8ea1105f4b6e7648987efa81c22026e01dece9d5f88cb932b842773dcc58e748389540036d7df8bdd806216915aefc473ed10fb40728a7150a31a4ea9ad83a099cb6fd9ff2346432cf095d91cc010046bc1ad1e450379a03702c50bc1403dc8b9366cfeb7fa5b641c85dff22a7100363d263f7626d32ff7b5ee</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    
+    <summary type="html">
+    
+      密码等级 0
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
+    
+      <category term="rgb" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/rgb/"/>
+    
+    
+      <category term="rgb" scheme="http://benpaodewoniu.github.io/tags/rgb/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>palio | palio</title>
+    <link href="http://benpaodewoniu.github.io/2024/04/03/palio0/"/>
+    <id>http://benpaodewoniu.github.io/2024/04/03/palio0/</id>
+    <published>2024-04-03T06:30:29.000Z</published>
+    <updated>2024-04-03T07:16:54.081Z</updated>
+    
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="4a875788e9429edfed966267f1420dd2ffadbe4412a7cad66201532c1148f6f9">4d3f0653d14f3c2f193bc612a5f620994bc8363757440e5588c1f2ce7dc59ac0b99d7c75f9702ef862cd72bcbfc9a4a405929aa00622acbbf7c21d0d8fb691c185dff863e1d4cd16bef90c6b0019155b1804b21c987daf6ecefe2509f7c16291ecc8434678bb4d100086c6c4438279c2c33242f82fdd55e6f0ed3320470a57e361170844843124c0f3a61a833d6e749d99753a439f0848566fc0b7e1dbc2075aa851c1ee17f54f9b2d8efbcac89141ab6425286a22570a4e72fb298cc31b55aaba97681caefffc18ee6344ae1235a8633e70a9e26baa13d5dce8e0e361028c6b2b46f4eb9654baa616df62e142aef3d520b0ed59d3bcbf3bc4aba19817aa30d90dcc6cbb5e8d43c501c6a002c3e03b420581cbaf597e3ab9d020b9fb1c8233afff9c897760a3ed645778655bb525067ac6fe4255e0c771733f4036b981b49e1b749e3d597f9eb1e4d1c18b988bdce888</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    
+    <summary type="html">
+    
+      密码等级 0
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
+    
+      <category term="palio" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/palio/"/>
+    
+    
+      <category term="palio" scheme="http://benpaodewoniu.github.io/tags/palio/"/>
+    
+  </entry>
   
   <entry>
     <title>ssh | 更换 22 端口</title>
@@ -460,123 +579,6 @@
     
     
       <category term="nginx" scheme="http://benpaodewoniu.github.io/tags/nginx/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>nginx | 安装等基础解答</title>
-    <link href="http://benpaodewoniu.github.io/2024/03/22/nginx6/"/>
-    <id>http://benpaodewoniu.github.io/2024/03/22/nginx6/</id>
-    <published>2024-03-22T08:36:17.000Z</published>
-    <updated>2024-03-22T09:06:32.117Z</updated>
-    
-    <content type="html"><![CDATA[<p>我的环境是</p><ul><li><code>ubuntu20.04</code></li></ul><a id="more"></a><h2 id="更新操作系统"><a href="#更新操作系统" class="headerlink" title="更新操作系统"></a>更新操作系统</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="builtin-name">get</span> update</span><br><span class="line">sudo apt-<span class="builtin-name">get</span><span class="built_in"> upgrade </span>-y</span><br></pre></td></tr></table></figure><h2 id="安装-nginx"><a href="#安装-nginx" class="headerlink" title="安装 nginx"></a>安装 nginx</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get <span class="keyword">install</span> nginx -y <span class="comment"># 安装</span></span><br><span class="line">sudo systemctl <span class="keyword">status</span> nginx <span class="comment"># nginx 运行状态</span></span><br><span class="line">sudo systemctl <span class="keyword">start</span> nginx <span class="comment"># 启动</span></span><br><span class="line">sudo systemctl <span class="keyword">enable</span> nginx <span class="comment"># 开机自启动</span></span><br></pre></td></tr></table></figure><p>这安装的是 ubuntu20.04 默认的 nginx，我的版本是 1.18.0</p><h2 id="配置介绍"><a href="#配置介绍" class="headerlink" title="配置介绍"></a>配置介绍</h2><p>主配置在</p><ul><li><code>/etc/nginx/nginx.conf</code></li></ul><p>主配置里面有两句话</p><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="regexp">/etc/</span>nginx<span class="regexp">/conf.d/</span>*.conf;</span><br><span class="line"><span class="keyword">include</span> <span class="regexp">/etc/</span>nginx<span class="regexp">/sites-enabled/</span>*;</span><br></pre></td></tr></table></figure><p>说明配置也包含上述的路径。</p><p>其中，<code>/etc/nginx/sites-enabled/*;</code> 存储的其实是软链接。</p><p>里面包含一个 default 文件，它其实是 <code>/etc/nginx/sites-available/*;</code> 里面的软链接。</p><p>默认的 <code>nginx</code> 配置为</p><ul><li><code>/etc/nginx/nginx.conf</code></li><li><code>/etc/nginx/sites-available/default</code></li></ul><p>如果你想创立一个站点，比如，site，我是这样建议的</p><ul><li>删除 <code>/etc/nginx/sites-available/default</code></li><li>删除 <code>/etc/nginx/sites-enabled/default</code></li><li>在 <code>/etc/nginx/sites-available/</code> 添加 <code>site.conf</code></li><li>创造软链接<ul><li><code>sudo ln -s /etc/nginx/sites-available/site.conf /etc/nginx/sites-enabled/site.conf</code></li></ul></li><li>修改 <code>/etc/nginx/sites-available/site.conf</code></li></ul><p>一个经典案例来自于</p><ul><li><a href="/2024/02/28/wordpress3/">wordpress | wordpress 搭建(包含多站点)</a></li></ul><p><code>nginx</code> 的日志在</p><ul><li><code>/var/log/nginx</code></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;我的环境是&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;ubuntu20.04&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
-    
-      <category term="服务端" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/%E6%9C%8D%E5%8A%A1%E7%AB%AF/"/>
-    
-      <category term="nginx" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/%E6%9C%8D%E5%8A%A1%E7%AB%AF/nginx/"/>
-    
-    
-      <category term="nginx" scheme="http://benpaodewoniu.github.io/tags/nginx/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ok | oklink 链上数据以及基本用法</title>
-    <link href="http://benpaodewoniu.github.io/2024/03/21/ok0/"/>
-    <id>http://benpaodewoniu.github.io/2024/03/21/ok0/</id>
-    <published>2024-03-21T07:25:47.000Z</published>
-    <updated>2024-03-24T04:45:57.129Z</updated>
-    
-    <content type="html"><![CDATA[<p><code>OK</code> 将链上数据进行了整理，非常牛逼。</p><a id="more"></a><ul><li><a href="https://www.oklink.com/docs/zh/#explorer-api-nft">oklink</a></li></ul><p>免费 <code>api</code> 有 <code>100万</code>额度，非常良心。</p><p>这里主要介绍 <code>3</code> 种 <code>api</code> 用法</p><ul><li>持币 <code>holders</code></li><li><code>nft</code> 地板价</li><li><code>nft</code> 具体细节获取</li></ul><h2 id="基础代码运行"><a href="#基础代码运行" class="headerlink" title="基础代码运行"></a>基础代码运行</h2><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">import</span> requests</span><br><span class="line"></span><br><span class="line"><span class="attr">url</span> = <span class="string">"https://www.oklink.com/api/v5/explorer/nft/nft-listing-list?chainShortName=ARBITRUM&amp;tokenContractAddress=0xcf8b334f02ad9c80dc6a2db8191983acbeebac83&amp;tokenId=1&amp;marketplace=OpenSea&amp;limit=100"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">payload</span> = <span class="string">""</span></span><br><span class="line"><span class="attr">headers</span> = &#123;</span><br><span class="line">    <span class="comment"># apiKey</span></span><br><span class="line">    'Ok-Access-Key': '*****'</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">response</span> = requests.request(<span class="string">"GET"</span>, url, <span class="attr">headers=headers,</span> <span class="attr">data=payload)</span></span><br><span class="line"></span><br><span class="line">print(response.text)</span><br></pre></td></tr></table></figure><h2 id="持币-holders"><a href="#持币-holders" class="headerlink" title="持币 holders"></a>持币 holders</h2><p><code>ok</code> 的持币 <code>page</code> 是从 <code>1</code> 开始的，不是从 <code>0</code> 开始的。</p><p>即</p><figure class="highlight sas"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://www.oklink.com/api/v5/explorer/token/position-<span class="meta">list</span>?chainShortName=eth<span class="variable">&amp;tokenContractAddress</span>=0xa8218CBDb4Accce36EE92874Fe34a999abC30A7a<span class="variable">&amp;limit</span>=100<span class="variable">&amp;page</span>=1</span><br><span class="line"></span><br><span class="line">https://www.oklink.com/api/v5/explorer/token/position-<span class="meta">list</span>?chainShortName=eth<span class="variable">&amp;tokenContractAddress</span>=0xa8218CBDb4Accce36EE92874Fe34a999abC30A7a<span class="variable">&amp;limit</span>=100<span class="variable">&amp;page</span>=0</span><br></pre></td></tr></table></figure><p>这两个是没区别的。</p><h2 id="nft-地板价"><a href="#nft-地板价" class="headerlink" title="nft 地板价"></a>nft 地板价</h2><p>以 lumi box nft 为例。</p><p><img src="/images/ok/0_0.png" alt=""></p><p>这里面有 <code>4</code> 种 <code>nft</code>，点进去就发现，<code>4</code> 个 <code>url</code> 分别是</p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">https:<span class="regexp">//</span>opensea.io<span class="regexp">/assets/</span>arbitrum<span class="regexp">/0xcf8b334f02ad9c80dc6a2db8191983acbeebac83/</span><span class="number">1</span></span><br><span class="line">https:<span class="regexp">//</span>opensea.io<span class="regexp">/assets/</span>arbitrum<span class="regexp">/0xcf8b334f02ad9c80dc6a2db8191983acbeebac83/</span><span class="number">2</span></span><br><span class="line">https:<span class="regexp">//</span>opensea.io<span class="regexp">/assets/</span>arbitrum<span class="regexp">/0xcf8b334f02ad9c80dc6a2db8191983acbeebac83/</span><span class="number">3</span></span><br><span class="line">https:<span class="regexp">//</span>opensea.io<span class="regexp">/assets/</span>arbitrum<span class="regexp">/0xcf8b334f02ad9c80dc6a2db8191983acbeebac83/</span><span class="number">4</span></span><br></pre></td></tr></table></figure><p>如果，你使用 <code>/api/v5/explorer/nft/collection-floor-price</code>，只能得到 <code>1</code> 的地板价，<code>2，3，4</code>是得不到的。</p><p>如何得到 <code>1，2，3，4</code> 的出售单呢？</p><h2 id="nft-具体细节获取"><a href="#nft-具体细节获取" class="headerlink" title="nft 具体细节获取"></a>nft 具体细节获取</h2><p>要想获取 1，2，3，4分别的最低价，就需要借助</p><p><code>/api/v5/explorer/nft/nft-listing-list</code> 参数 <code>tokenId</code> 分别传入 <code>1，2，3，4</code> 即可。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;code&gt;OK&lt;/code&gt; 将链上数据进行了整理，非常牛逼。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="项目经历" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/"/>
-    
-      <category term="大型" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/"/>
-    
-      <category term="quantify" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/"/>
-    
-      <category term="gateway" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/gateway/"/>
-    
-      <category term="ok" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/gateway/ok/"/>
-    
-      <category term="oklink" scheme="http://benpaodewoniu.github.io/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%A4%A7%E5%9E%8B/quantify/gateway/ok/oklink/"/>
-    
-    
-      <category term="oklink" scheme="http://benpaodewoniu.github.io/tags/oklink/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>python | mac 和 ubuntu 上的最佳实践</title>
-    <link href="http://benpaodewoniu.github.io/2024/03/20/python202/"/>
-    <id>http://benpaodewoniu.github.io/2024/03/20/python202/</id>
-    <published>2024-03-19T16:34:32.000Z</published>
-    <updated>2024-03-19T16:55:09.563Z</updated>
-    
-    <content type="html"><![CDATA[<p>这里的最佳实践是 <code>python</code> + <code>chrome-headless-shell</code>。</p><a id="more"></a><p>在看之前一定要先看</p><ul><li><a href="/2024/03/20/python201/">python | chrome-headless-shell</a></li></ul><p>整个环境是</p><ul><li>python 3.7</li><li>chromedriver + chrome-headless-shell<ul><li>最新版本</li></ul></li><li>selenium<ul><li>3.141.0</li></ul></li><li>urllib3<ul><li>1.24.2</li></ul></li></ul><p>记住，上面那两个安装库的版本是实践过的，其他的版本可能会报错。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;这里的最佳实践是 &lt;code&gt;python&lt;/code&gt; + &lt;code&gt;chrome-headless-shell&lt;/code&gt;。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="python" scheme="http://benpaodewoniu.github.io/categories/python/"/>
-    
-      <category term="模块" scheme="http://benpaodewoniu.github.io/categories/python/%E6%A8%A1%E5%9D%97/"/>
-    
-      <category term="selenium" scheme="http://benpaodewoniu.github.io/categories/python/%E6%A8%A1%E5%9D%97/selenium/"/>
-    
-    
-      <category term="python" scheme="http://benpaodewoniu.github.io/tags/python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>python | chrome-headless-shell</title>
-    <link href="http://benpaodewoniu.github.io/2024/03/20/python201/"/>
-    <id>http://benpaodewoniu.github.io/2024/03/20/python201/</id>
-    <published>2024-03-19T16:34:30.000Z</published>
-    <updated>2024-03-19T16:51:35.247Z</updated>
-    
-    <content type="html"><![CDATA[<p>最佳爬虫浏览器。</p><a id="more"></a><p>访问 <a href="https://googlechromelabs.github.io/chrome-for-testing/">chrome-for-testing</a> 会发现有以下三种类型</p><ul><li>chrome<ul><li>正常的浏览器</li></ul></li><li><code>chrome-driver</code><ul><li><code>driver</code> 可以通过代码操作 <code>chrome</code> 和 <code>chrome-headless-shell</code></li></ul></li><li><code>chrome-headless-shell</code><ul><li><code>Chrome Headless Shell</code> 是 <code>Chrome</code> 浏览器的无界面版本，它提供了与标准 <code>Chrome</code> 浏览器相同的功能，但没有用户界面。</li><li><code>chrome</code> 也有无头模式，但是这个更好</li></ul></li></ul><h2 id="mac"><a href="#mac" class="headerlink" title="mac"></a>mac</h2><p>下载相关的 <code>mac</code> 包之后，基本上可以直接用 <code>driver</code> 操作 <code>chrome</code>。</p><p>代码如下</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> typing import Dict</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> selenium import webdriver</span><br><span class="line"></span><br><span class="line">chrome_options = webdriver.ChromeOptions()</span><br><span class="line">chrome_options.binary_location = <span class="string">"chrome-headless-shell 路径"</span></span><br><span class="line">driver = webdriver.Chrome(<span class="attribute">chrome_options</span>=chrome_options, <span class="attribute">executable_path</span>=<span class="string">"driver 路径"</span>)</span><br><span class="line">driver.<span class="builtin-name">get</span>(<span class="string">"https://baidu.com"</span>)</span><br><span class="line"><span class="comment"># 获取网页源代码</span></span><br><span class="line">page_source = driver.page_source</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出网页源代码</span></span><br><span class="line"><span class="builtin-name">print</span>(page_source)</span><br><span class="line">driver.close()</span><br></pre></td></tr></table></figure><h2 id="ubuntu"><a href="#ubuntu" class="headerlink" title="ubuntu"></a>ubuntu</h2><p>我的是 <code>ubuntu20.04</code>，并且我的是纯环境，所以有很多依赖没有装。</p><p>下载之后，你可以 <code>cd</code> 到解压目录，然后运行</p><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">./chrome-headless-shell</span> <span class="params">--disable-gpu</span> <span class="params">--dump-dom</span> https:<span class="string">//baidu.com</span></span><br></pre></td></tr></table></figure><p>看是否能把相关的页面打印出来。</p><p>我是缺少非常多的东西，我运行如下</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sudo apt <span class="keyword">install</span> -y gconf-service libasound2 libatk1<span class="number">.0</span><span class="number">-0</span> libcups2 libgconf<span class="number">-2</span><span class="number">-4</span> libgtk<span class="number">-3</span><span class="number">-0</span> libnspr4 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libxslt1<span class="number">.1</span> libnss3 libxss1 libappindicator3<span class="number">-1</span> libindicator7 fonts-liberation xdg-utils</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> libatk1<span class="number">.0</span><span class="number">-0</span></span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> libatk-bridge2<span class="number">.0</span><span class="number">-0</span></span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> libxcomposite1</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> libxdamage1</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> libxfixes3</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> libxrandr2</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> libgbm1</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> libxkbcommon0</span><br></pre></td></tr></table></figure><p>上面安装代码不需要全部都运行，可以安装一个就试试命令，直到成功，或者缺什么补什么（问 <code>chatgpt</code>）</p><p>但是，你运行 mac 中的代码，还是可能会报错</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">Traceback (most recent <span class="keyword">call</span> <span class="keyword">last</span>):</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"a.py"</span>, line <span class="number">11</span>, <span class="keyword">in</span> &lt;<span class="keyword">module</span>&gt;</span><br><span class="line">    driver = webdriver.Chrome(options=chrome_options, executable_path=db.get(<span class="string">"chrome_driver_path"</span>))</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/selenium/webdriver/chrome/webdriver.py"</span>, line <span class="number">81</span>, <span class="keyword">in</span> __init__</span><br><span class="line">    desired_capabilities=desired_capabilities)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/selenium/webdriver/remote/webdriver.py"</span>, line <span class="number">157</span>, <span class="keyword">in</span> __init__</span><br><span class="line">    self.start_session(capabilities, browser_profile)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/selenium/webdriver/remote/webdriver.py"</span>, line <span class="number">252</span>, <span class="keyword">in</span> start_session</span><br><span class="line">    response = self.execute(Command.NEW_SESSION, <span class="keyword">parameters</span>)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/selenium/webdriver/remote/webdriver.py"</span>, line <span class="number">319</span>, <span class="keyword">in</span> <span class="keyword">execute</span></span><br><span class="line">    response = self.command_executor.execute(driver_command, params)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/selenium/webdriver/remote/remote_connection.py"</span>, line <span class="number">374</span>, <span class="keyword">in</span> <span class="keyword">execute</span></span><br><span class="line">    <span class="keyword">return</span> self._request(command_info[<span class="number">0</span>], <span class="keyword">url</span>, <span class="keyword">body</span>=<span class="keyword">data</span>)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/selenium/webdriver/remote/remote_connection.py"</span>, line <span class="number">397</span>, <span class="keyword">in</span> _request</span><br><span class="line">    resp = self._conn.request(method, <span class="keyword">url</span>, <span class="keyword">body</span>=<span class="keyword">body</span>, headers=headers)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/_request_methods.py"</span>, line <span class="number">119</span>, <span class="keyword">in</span> request</span><br><span class="line">    method, <span class="keyword">url</span>, <span class="keyword">fields</span>=<span class="keyword">fields</span>, headers=headers, **urlopen_kw</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/_request_methods.py"</span>, line <span class="number">217</span>, <span class="keyword">in</span> request_encode_body</span><br><span class="line">    <span class="keyword">return</span> self.urlopen(method, <span class="keyword">url</span>, **extra_kw)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/poolmanager.py"</span>, line <span class="number">432</span>, <span class="keyword">in</span> urlopen</span><br><span class="line">    <span class="keyword">conn</span> = self.connection_from_host(u.host, port=u.port, scheme=u.scheme)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/poolmanager.py"</span>, line <span class="number">303</span>, <span class="keyword">in</span> connection_from_host</span><br><span class="line">    <span class="keyword">return</span> self.connection_from_context(request_context)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/poolmanager.py"</span>, line <span class="number">328</span>, <span class="keyword">in</span> connection_from_context</span><br><span class="line">    <span class="keyword">return</span> self.connection_from_pool_key(pool_key, request_context=request_context)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/poolmanager.py"</span>, line <span class="number">351</span>, <span class="keyword">in</span> connection_from_pool_key</span><br><span class="line">    pool = self._new_pool(scheme, host, port, request_context=request_context)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/poolmanager.py"</span>, line <span class="number">265</span>, <span class="keyword">in</span> _new_pool</span><br><span class="line">    <span class="keyword">return</span> pool_cls(host, port, **request_context)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/connectionpool.py"</span>, line <span class="number">197</span>, <span class="keyword">in</span> __init__</span><br><span class="line">    <span class="keyword">timeout</span> = Timeout.from_float(<span class="keyword">timeout</span>)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/util/timeout.py"</span>, line <span class="number">190</span>, <span class="keyword">in</span> from_float</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">Timeout</span>(<span class="keyword">read</span>=<span class="keyword">timeout</span>, <span class="keyword">connect</span>=<span class="keyword">timeout</span>)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/util/timeout.py"</span>, line <span class="number">119</span>, <span class="keyword">in</span> __init__</span><br><span class="line">    self._connect = self._validate_timeout(<span class="keyword">connect</span>, <span class="string">"connect"</span>)</span><br><span class="line">  <span class="keyword">File</span> <span class="string">"/usr/local/src/python37/lib/python3.7/site-packages/urllib3/util/timeout.py"</span>, line <span class="number">159</span>, <span class="keyword">in</span> _validate_timeout</span><br><span class="line">    ) <span class="keyword">from</span> <span class="keyword">None</span></span><br><span class="line">ValueError: <span class="keyword">Timeout</span> <span class="keyword">value</span> <span class="keyword">connect</span> was &lt;<span class="keyword">object</span> <span class="keyword">object</span> <span class="keyword">at</span> <span class="number">0x7f5a37a17070</span>&gt;, but it must be an <span class="built_in">int</span>, <span class="built_in">float</span> <span class="keyword">or</span> None.</span><br></pre></td></tr></table></figure><p>这个报错请参考</p><ul><li><a href="/2024/03/20/python202/">python | mac 和 ubuntu 上的最佳实践</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;最佳爬虫浏览器。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="应用" scheme="http://benpaodewoniu.github.io/categories/%E5%BA%94%E7%94%A8/"/>
-    
-      <category term="python" scheme="http://benpaodewoniu.github.io/categories/python/"/>
-    
-      <category term="chrome" scheme="http://benpaodewoniu.github.io/categories/%E5%BA%94%E7%94%A8/chrome/"/>
-    
-      <category term="模块" scheme="http://benpaodewoniu.github.io/categories/python/%E6%A8%A1%E5%9D%97/"/>
-    
-      <category term="selenium" scheme="http://benpaodewoniu.github.io/categories/python/%E6%A8%A1%E5%9D%97/selenium/"/>
-    
-    
-      <category term="python" scheme="http://benpaodewoniu.github.io/tags/python/"/>
     
   </entry>
   
