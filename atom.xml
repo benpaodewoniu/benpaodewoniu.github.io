@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://benpaodewoniu.github.io/"/>
-  <updated>2024-04-14T04:50:54.249Z</updated>
+  <updated>2024-04-15T16:46:53.088Z</updated>
   <id>http://benpaodewoniu.github.io/</id>
   
   <author>
@@ -15,6 +15,38 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>evm | 获取历史区块数据</title>
+    <link href="http://benpaodewoniu.github.io/2024/04/15/evm6/"/>
+    <id>http://benpaodewoniu.github.io/2024/04/15/evm6/</id>
+    <published>2024-04-15T09:27:18.000Z</published>
+    <updated>2024-04-15T16:46:53.088Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文章可以做到</p><ul><li>通过回溯区块来获取信息</li><li>根据条件来过滤杂讯</li></ul><a id="more"></a><p>我现在的需求是，我要获取 <code>0xa8218CBDb4Accce36EE92874Fe34a999abC30A7a</code> 代币，向 <code>0x000000000000000000000000ba97a5f7b8b662dc5b34a283fad741ddc615e690</code> 地址转账的所有记录。</p><p>这里用的是 <code>get_logs</code> 方法，参考</p><ul><li><a href="https://ethereum.org/zh/developers/docs/apis/json-rpc/#eth_getlogs">eth_getlogs</a></li></ul><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> web3 import Web3</span><br><span class="line"></span><br><span class="line"><span class="comment"># 连接到以太坊节点（可以使用Infura提供的节点）</span></span><br><span class="line">web3 = Web3(Web3.HTTPProvider(<span class="string">'https://eth-mainnet.nodereal.io/v1/****'</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 代币合约地址和ABI</span></span><br><span class="line">token_contract_address = <span class="string">'0xa8218CBDb4Accce36EE92874Fe34a999abC30A7a'</span>  # 你要查询的代币合约地址</span><br><span class="line">token_abi = [</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">"constant"</span>: <span class="literal">True</span>,</span><br><span class="line">        <span class="string">"inputs"</span>: [&#123;<span class="string">"name"</span>: <span class="string">"_owner"</span>, <span class="string">"type"</span>: <span class="string">"address"</span>&#125;],</span><br><span class="line">        <span class="string">"name"</span>: <span class="string">"balanceOf"</span>,</span><br><span class="line">        <span class="string">"outputs"</span>: [&#123;<span class="string">"name"</span>: <span class="string">"balance"</span>, <span class="string">"type"</span>: <span class="string">"uint256"</span>&#125;],</span><br><span class="line">        <span class="string">"payable"</span>: <span class="literal">False</span>,</span><br><span class="line">        <span class="string">"stateMutability"</span>: <span class="string">"view"</span>,</span><br><span class="line">        <span class="string">"type"</span>: <span class="string">"function"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    # 添加其他你需要的代币合约方法的ABI</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载代币合约</span></span><br><span class="line">token_contract = web3.eth.contract(<span class="attribute">address</span>=token_contract_address, <span class="attribute">abi</span>=token_abi)</span><br><span class="line"></span><br><span class="line">topics = [</span><br><span class="line">    <span class="string">"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"</span>,</span><br><span class="line">    None,</span><br><span class="line">    <span class="string">"0x000000000000000000000000ba97a5f7b8b662dc5b34a283fad741ddc615e690"</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取交易历史</span></span><br><span class="line">transactions = web3.eth.get_logs(&#123;</span><br><span class="line">    <span class="string">'fromBlock'</span>: 19275036,</span><br><span class="line">    <span class="string">'toBlock'</span>: <span class="string">'latest'</span>,</span><br><span class="line">    <span class="string">'address'</span>: token_contract_address,</span><br><span class="line">    <span class="string">'topics'</span>: topics</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印交易信息</span></span><br><span class="line"><span class="keyword">for</span> tx <span class="keyword">in</span> transactions:</span><br><span class="line">    <span class="builtin-name">print</span>(tx)</span><br></pre></td></tr></table></figure><p>这里有几个亮点</p><ul><li><code>topics</code><ul><li>过滤条件</li></ul></li><li><code>get_logs</code> 最多能回溯 <code>50000</code> 个区块。即 <code>toBlock - fromBlock &lt;= 50000</code></li></ul><p>这里说一下 <code>topics</code></p><p>他的过滤条件是 <code>Transfer</code> 事件，并且，接收地址是 <code>0x000000000000000000000000ba97a5f7b8b662dc5b34a283fad741ddc615e690</code></p><p>关于为什么，是因为 <code>Topics</code> 参照</p><ul><li><a href="https://etherscan.io/tx/0x86473ed88028f25eeb8bfb8ce910d7979a7c5f577d5243b39d91edcfd38c208e#eventlog">0x86473ed88028f25eeb8bfb8ce910d7979a7c5f577d5243b39d91edcfd38c208e</a></li></ul><p><img src="/images/evm/6_0.png" alt=""></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文章可以做到&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;通过回溯区块来获取信息&lt;/li&gt;
+&lt;li&gt;根据条件来过滤杂讯&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="平台 &amp;&amp; 公链 &amp;&amp; 项目 &amp;&amp; 方向" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/"/>
+    
+      <category term="evm" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/evm/"/>
+    
+      <category term="进阶" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/evm/%E8%BF%9B%E9%98%B6/"/>
+    
+    
+      <category term="eth" scheme="http://benpaodewoniu.github.io/tags/eth/"/>
+    
+  </entry>
   
   <entry>
     <title>aion | 永恒之塔</title>
@@ -258,9 +290,9 @@
     
       <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/"/>
     
-      <category term="v3" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/v3/"/>
-    
       <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/dex/uniswap/%E5%9F%BA%E7%A1%80/v3/%E5%9F%BA%E7%A1%80/"/>
+    
+      <category term="v3" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/v3/"/>
     
       <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/v3/%E5%9F%BA%E7%A1%80/"/>
     
@@ -332,9 +364,9 @@
     
       <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/"/>
     
-      <category term="v3" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/v3/"/>
-    
       <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/dex/uniswap/%E5%9F%BA%E7%A1%80/v3/%E5%9F%BA%E7%A1%80/"/>
+    
+      <category term="v3" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/v3/"/>
     
       <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/v3/%E5%9F%BA%E7%A1%80/"/>
     
@@ -588,32 +620,6 @@
     
     
       <category term="https" scheme="http://benpaodewoniu.github.io/tags/https/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>wordpress | 多目录转向多域名</title>
-    <link href="http://benpaodewoniu.github.io/2024/03/29/wordpress17/"/>
-    <id>http://benpaodewoniu.github.io/2024/03/29/wordpress17/</id>
-    <published>2024-03-29T12:35:13.000Z</published>
-    <updated>2024-03-31T09:22:41.551Z</updated>
-    
-    <content type="html"><![CDATA[<p>如何将 <code>wordpress</code> 多站点下子目录模式变为子域名模式。</p><a id="more"></a><p>编辑 <code>wp-config.php</code> 修改配置</p><figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">define</span></span>( <span class="string">'SUBDOMAIN_INSTALL'</span>, <span class="literal">false</span> );</span><br></pre></td></tr></table></figure><p>变成</p><figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">define</span></span>( <span class="string">'SUBDOMAIN_INSTALL'</span>, <span class="literal">true</span> );</span><br></pre></td></tr></table></figure><p>然后，找到之前的站点的设置。</p><p><img src="/images/wordpress/17_0.png" alt=""></p><p>然后修改相关的 <code>url</code> 就好了。</p><p><img src="/images/wordpress/17_1.png" alt=""></p><p>之前是 <code>thlm.com/lumi</code> 现在改成了 <code>lumi.thlm.com</code>。</p><p>一般来说，信息里面改完后，设置里面会自动修改，但是，还是建议你检查一下。</p><p>一共修改 <code>3</code> 处地方，信息一处，设置两处。</p><p>一般来说，这样改完就没问题了，当然有的时候会出现缓存问题。</p><ul><li>登录账号后，有的主题不能显示后端</li><li>…</li></ul><p>这里建议，先用其他浏览器用户或者清除完全部缓存后，尝试。</p><p>这里说一下，需要对 <code>nginx</code> 进行二级域名配置吗？</p><p>我尝试的情况是，不需要专门配置，保留原来的就行。</p><p>从子目录转向子域名的话，会出现之前的链接不能用，比如 <code>thlm.com/lumi</code> 变成了 <code>lumi.thlm.com</code> ，就会出现 <code>404</code> 或者其他页面（我在使用 <code>onenav</code> 主题作为主站的时候，出现访问之前的页面被主题劫持的现象）。</p><p>所以，这里用到了一个方案。</p><ul><li>在 <code>wordpress</code> 中存放一个跳转页面</li><li>修改 <code>nginx</code></li></ul><h2 id="跳转页面"><a href="#跳转页面" class="headerlink" title="跳转页面"></a>跳转页面</h2><p>我是在 /var/www/wordpress/Static/tmp 放了一个叫做 lumi.html 的页面，内容是</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>lumi 主题站<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>你好，lumi 主题站已经迁移到 https://lumi.thlm.com<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>页面自动跳转，请等待...<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="actionscript">    <span class="comment">// 获取当前 URL</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> currentUrl = <span class="built_in">window</span>.location.href;</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">    <span class="comment">// 使用正则表达式提取非域名部分</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> path = currentUrl.replace(<span class="regexp">/^.*\/\/[^\/]+/</span>, <span class="string">''</span>).replace(<span class="regexp">/^\/lumi/</span>, <span class="string">''</span>);</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">    <span class="comment">// 新域名</span></span></span><br><span class="line"><span class="actionscript">    <span class="keyword">var</span> newDomain = <span class="string">'lumi.thlm.com'</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">    <span class="comment">// 拼接新的 URL</span></span></span><br><span class="line"><span class="actionscript">    <span class="keyword">var</span> newUrl = <span class="string">'https://'</span> + newDomain + path;</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">    <span class="comment">// 进行跳转</span></span></span><br><span class="line"><span class="javascript">    <span class="built_in">window</span>.location.href = newUrl;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure><h2 id="nginx-配置"><a href="#nginx-配置" class="headerlink" title="nginx 配置"></a>nginx 配置</h2><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">       <span class="string">...</span></span><br><span class="line">      location <span class="string">/lumi</span> &#123;</span><br><span class="line">        <span class="keyword">alias</span> <span class="string">/var/www/wordpress/Static/tmp</span>;</span><br><span class="line">        index lumi.html;</span><br><span class="line">        <span class="keyword">try</span>_files $uri $uri/ <span class="string">/lumi/lumi.html</span>;</span><br><span class="line">      &#125;       </span><br><span class="line"></span><br><span class="line">      <span class="string">...</span></span><br><span class="line">      rewrite ^/<span class="params">(?!lumi)</span><span class="params">(.*)</span>$ <span class="string">/index.php</span>?$1 last;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>关于为什么修改成这个样子，请参考</p><ul><li><a href="/2024/03/11/wordpress14/">wordpress | 多站点模式下访问某一文件夹文件返回 404</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;如何将 &lt;code&gt;wordpress&lt;/code&gt; 多站点下子目录模式变为子域名模式。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/"/>
-    
-      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E5%9F%BA%E7%A1%80/"/>
-    
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/tags/WordPress/"/>
     
   </entry>
   
