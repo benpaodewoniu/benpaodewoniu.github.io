@@ -29,8 +29,9 @@
 <meta property="og:description" content="该路已经走通，效果非常舒爽。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://benpaodewoniu.github.io/images/cunning/14_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/cunning/14_1.png">
 <meta property="article:published_time" content="2021-05-29T06:46:35.000Z">
-<meta property="article:modified_time" content="2022-01-15T16:15:47.925Z">
+<meta property="article:modified_time" content="2024-04-27T03:58:46.680Z">
 <meta property="article:author" content="犀牛">
 <meta property="article:tag" content="奇淫巧技">
 <meta name="twitter:card" content="summary">
@@ -249,7 +250,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-16 00:15:47" itemprop="dateModified" datetime="2022-01-16T00:15:47+08:00">2022-01-16</time>
+                <time title="修改时间：2024-04-27 11:58:46" itemprop="dateModified" datetime="2024-04-27T11:58:46+08:00">2024-04-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -375,6 +376,32 @@
 <pre><code>A    mx     6x.216.2xx.1xx</code></pre><p>加入一条 <code>MX</code> 记录，指向上面配置的收邮件的域名地址。</p>
 <pre><code>MX    *    mx.sayhiai.com</code></pre><p>注意 <code>*</code> 号，意思是所有的域名包括二级域名等，都会被收到。比如<code>xxxx@sayhiai.com</code> 、 <code>xjksfdsf@dfjsdlfjsd.sayhiai.com</code>。 是不是无穷无尽？</p>
 <p>ps: 服务商要开启 <code>25</code> 端口的入方向。</p>
+<h2 id="2024-4-27"><a href="#2024-4-27" class="headerlink" title="2024-4-27"></a>2024-4-27</h2><p>上面说的非常笼统，这里我再说一下怎么完整的构建。</p>
+<p>我在 <code>aws</code> 上购买了服务器，用的是 <code>ubuntu 22.04</code>。</p>
+<p>这个系统自带 <code>python3.10</code>，但是 <code>pip</code> 需要我们自己装</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt <span class="keyword">install</span> python3-pip</span><br></pre></td></tr></table></figure>
+
+<p>在安装的过程中可以跳出弹框让我们选择，我们直接 <code>enter</code> 就好了。</p>
+<p>因为，我们要绑定 <code>25</code> 端口，所以，我们需要 <code>sudo</code> 权限。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo pip3 <span class="keyword">install</span> flask</span><br><span class="line">sudo pip3 <span class="keyword">install</span> aiosmtpd</span><br></pre></td></tr></table></figure>
+
+<p>进入项目，修改 <code>cfg.ini</code>，将 <code>127.0.0.1</code> 改成 <code>0.0.0.0</code></p>
+<p>然后运行</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">sudo</span> <span class="selector-tag">nohup</span> <span class="selector-tag">python3</span><span class="selector-class">.10</span> <span class="selector-tag">main</span><span class="selector-class">.py</span> &amp;</span><br></pre></td></tr></table></figure>
+
+<p>即可。</p>
+<p>使用 <code>http://ip:14000</code></p>
+<p>访问。</p>
+<p>记住，服务器的入站规则必须开启 <code>14000</code> 和 <code>25</code>。</p>
+<p>另外，我再贴一下域名解析的规则，感觉比上面简单一些。</p>
+<p><img src="/images/cunning/14_1.png" alt=""></p>
+<p>当然，这个网站也有 <code>api</code> ，请查看 <code>web.py</code>。</p>
+<h2 id="源码修改"><a href="#源码修改" class="headerlink" title="源码修改"></a>源码修改</h2><h3 id="我接不到某一网站发的特定邮件怎么办？"><a href="#我接不到某一网站发的特定邮件怎么办？" class="headerlink" title="我接不到某一网站发的特定邮件怎么办？"></a>我接不到某一网站发的特定邮件怎么办？</h3><p>说明这个网站发送的内容不符合这份代码的解析。主要修改 <code>smtpx.py</code> 的 <code>handle_DATA</code> 函数。</p>
+<p>比如，我将某一个修改成</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">async def handle<span class="constructor">_DATA(<span class="params">self</span>, <span class="params">server</span>, <span class="params">session</span>, <span class="params">envelope</span>)</span>:</span><br><span class="line">    mail_from = envelope.mail_from</span><br><span class="line">    rcpt_tos = envelope.rcpt_tos</span><br><span class="line">    message = email.message<span class="constructor">_from_bytes(<span class="params">envelope</span>.<span class="params">content</span>)</span></span><br><span class="line">    content = print<span class="constructor">_info(<span class="params">message</span>)</span></span><br><span class="line">    subject = decode<span class="constructor">_str(<span class="params">message</span>['Subject'])</span></span><br><span class="line"></span><br><span class="line">    obj = &#123;</span><br><span class="line">        <span class="string">"from"</span>: mail_from,</span><br><span class="line">        <span class="string">"to"</span>: rcpt_tos,</span><br><span class="line">        <span class="string">"subject"</span>: subject,</span><br><span class="line">        <span class="string">"content"</span>: content</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    self.dao.store<span class="constructor">_msg(<span class="params">obj</span>)</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">"***"</span> <span class="keyword">in</span> mail_from:</span><br><span class="line">        print(<span class="string">"success record msg:"</span> + mail_from + <span class="string">"-&gt;"</span> + str(rcpt_tos) + <span class="string">"|"</span> + str(subject))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">"success record msg:"</span> + mail_from + <span class="string">"-&gt;"</span> + str(rcpt_tos) + <span class="string">"|"</span> + str(subject) + <span class="string">"content"</span> + content)</span><br><span class="line"></span><br><span class="line">    return '<span class="number">250</span> Message accepted for delivery'</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改接收邮件的大小"><a href="#修改接收邮件的大小" class="headerlink" title="修改接收邮件的大小"></a>修改接收邮件的大小</h3><p>如果 <code>100</code> 封非常多，可以将这个数值改小。</p>
+<p>主要是 <code>data.py</code> 的 <code>limit</code> 大小。</p>
 
     </div>
 
@@ -480,7 +507,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前构知识"><span class="nav-number">2.</span> <span class="nav-text">前构知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#达到的效果"><span class="nav-number">3.</span> <span class="nav-text">达到的效果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#依靠的开源项目"><span class="nav-number">4.</span> <span class="nav-text">依靠的开源项目</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前构知识"><span class="nav-number">2.</span> <span class="nav-text">前构知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#达到的效果"><span class="nav-number">3.</span> <span class="nav-text">达到的效果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#依靠的开源项目"><span class="nav-number">4.</span> <span class="nav-text">依靠的开源项目</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2024-4-27"><span class="nav-number">4.1.</span> <span class="nav-text">2024-4-27</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码修改"><span class="nav-number">4.2.</span> <span class="nav-text">源码修改</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#我接不到某一网站发的特定邮件怎么办？"><span class="nav-number">4.2.1.</span> <span class="nav-text">我接不到某一网站发的特定邮件怎么办？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改接收邮件的大小"><span class="nav-number">4.2.2.</span> <span class="nav-text">修改接收邮件的大小</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -495,20 +522,20 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">2073</span>
+          <span class="site-state-item-count">2076</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1111</span>
+        <span class="site-state-item-count">1113</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">610</span>
+        <span class="site-state-item-count">612</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
