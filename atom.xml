@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://benpaodewoniu.github.io/"/>
-  <updated>2024-05-04T07:06:35.755Z</updated>
+  <updated>2024-05-18T16:41:00.670Z</updated>
   <id>http://benpaodewoniu.github.io/</id>
   
   <author>
@@ -15,6 +15,117 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>服务端 | 服务商的安全组「出入站规则」</title>
+    <link href="http://benpaodewoniu.github.io/2024/05/19/nginx11/"/>
+    <id>http://benpaodewoniu.github.io/2024/05/19/nginx11/</id>
+    <published>2024-05-18T16:32:32.000Z</published>
+    <updated>2024-05-18T16:41:00.670Z</updated>
+    
+    <content type="html"><![CDATA[<p>这里说一下场景。</p><ul><li>页面 <code>vip.cc.com</code></li><li>有一个请求，<code>mm.aa.com/test</code></li><li>在 <code>mm.aa.com</code> 域名指向的服务器，要把相关请求代理到 <code>xxx.xxx.xxx.xxx:15120</code> 上</li></ul><a id="more"></a><p>所以，这里涉及到跨域和反向代理。</p><p>这里把 mm.aa.com 指向的服务器称之为 A。</p><h2 id="安全组"><a href="#安全组" class="headerlink" title="安全组"></a>安全组</h2><p><code>A</code> 服务器，由于要请求 <code>15120</code> 端口，所以，他的出规则需要打开 <code>15120</code>，入规则不用。</p><h2 id="nginx-配置"><a href="#nginx-配置" class="headerlink" title="nginx 配置"></a>nginx 配置</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">        <span class="comment">## Your website name goes here.</span></span><br><span class="line">        <span class="attribute">server_name</span> mm.aa.bond;</span><br><span class="line">        <span class="attribute">listen</span> <span class="number">443</span> ssl;</span><br><span class="line">        <span class="comment">#listen [::]:443 ssl default_server;</span></span><br><span class="line">        <span class="attribute">ssl_certificate</span> /home/ubuntu/https/fullchain.crt;</span><br><span class="line">        <span class="attribute">ssl_certificate_key</span> /home/ubuntu/https/private.pem;</span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 允许所有来源的跨域请求</span></span><br><span class="line">            <span class="attribute">if</span> (<span class="variable">$http_origin</span> <span class="regexp">~* (https?://(.+\.)?(cc.com|vip.cc.com)$))</span> &#123;</span><br><span class="line">                  <span class="attribute">add_header</span> <span class="string">'Access-Control-Allow-Origin'</span> <span class="variable">$http_origin</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="attribute">add_header</span> <span class="string">'Access-Control-Allow-Methods'</span> <span class="string">'GET, POST, OPTIONS'</span>;</span><br><span class="line">            <span class="attribute">add_header</span> <span class="string">'Access-Control-Allow-Headers'</span> <span class="string">'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'</span>;</span><br><span class="line">            <span class="attribute">add_header</span> <span class="string">'Access-Control-Expose-Headers'</span> <span class="string">'Content-Length,Content-Range'</span>;                              </span><br><span class="line"><span class="comment">#           # 如果你的应用需要发送身份验证信息（如 cookie 或 HTTP 认证），你需要将 Access-Control-Allow-Credentials 设置为 true</span></span><br><span class="line">             <span class="attribute">add_header</span> <span class="string">'Access-Control-Allow-Credentials'</span> <span class="string">'true'</span>;</span><br><span class="line">             <span class="attribute">proxy_pass</span> http://xxx.xxx.xxx.xxx:15120/;</span><br><span class="line">       &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;这里说一下场景。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;页面 &lt;code&gt;vip.cc.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;有一个请求，&lt;code&gt;mm.aa.com/test&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;在 &lt;code&gt;mm.aa.com&lt;/code&gt; 域名指向的服务器，要把相关请求代理到 &lt;code&gt;xxx.xxx.xxx.xxx:15120&lt;/code&gt; 上&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
+    
+      <category term="服务端" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/%E6%9C%8D%E5%8A%A1%E7%AB%AF/"/>
+    
+      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%9F%BA%E7%A1%80/"/>
+    
+    
+      <category term="服务端" scheme="http://benpaodewoniu.github.io/tags/%E6%9C%8D%E5%8A%A1%E7%AB%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ink | ink</title>
+    <link href="http://benpaodewoniu.github.io/2024/05/09/ink0/"/>
+    <id>http://benpaodewoniu.github.io/2024/05/09/ink0/</id>
+    <published>2024-05-08T16:59:43.000Z</published>
+    <updated>2024-05-28T03:34:43.082Z</updated>
+    
+    <content type="html"><![CDATA[<ul><li><a href="https://beta.app.inkfinance.xyz/">ink</a></li></ul><a id="more"></a><ul><li><a href="https://testnet.snowtrace.io/token/0x38fEBf8bE6b47d82029178A5f4017c145541F703?chainId=43113">0x38fEBf8bE6b47d82029178A5f4017c145541F703</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://beta.app.inkfinance.xyz/&quot;&gt;ink&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
+    
+      <category term="ink" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/ink/"/>
+    
+    
+      <category term="ink" scheme="http://benpaodewoniu.github.io/tags/ink/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>harborgate | harborgate</title>
+    <link href="http://benpaodewoniu.github.io/2024/05/08/harborgate0/"/>
+    <id>http://benpaodewoniu.github.io/2024/05/08/harborgate0/</id>
+    <published>2024-05-07T16:22:24.000Z</published>
+    <updated>2024-05-07T16:26:40.441Z</updated>
+    
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="ebeaf770c320db8e5a5229c9e4bbc99034cf6d29762dbd04c2bcb12033637537">bd1d2830f69e943285edbee96d112d5c07e0d0d13ca5dbfcd55ede1dfc7a2e44750e17a9e29d09b28fee7ca90a390625ed69d917cf475de580be69c4fec143b7657e8b4d51ad3cf9e56e97569f5e6be6986aa52f7eec7f0af873734a455268bd924248441ce05156a6be0826d12c571d3f049b59e6c4076165f3d28b6260bd20ba6580b86d92421863ae36304fd6b5f3327b23b2f5511ed3fb8d6dd86879e089229ba1223c8ebccaa5f662b3b661afe0c13f76554112d63984737045c249c543df4b495ca97b40c241e408bf7559c669fa7f654561489c1266f87b1730af3158eacc0735010070c1f01d33a65b70a87d0a62990ec60265834f9b5a901351267d855f6ed35311e0a03aebead195415a1a91e54a44388f83d858c4ff0c2697afb57cda48c07b30cf925ef8a6c683cf0a9f1a84a1d20dc9122aac801615cc557a6663784b7a23df103e353e57b4fc25c0f682748c1d9e86e58c0cd7300f263747dd96d9c3602ff06fd6b3bc8706a052c183c27b80569c83da811f88bd5124a2b592407805fc65b2d24320147754d5f8dc3e95477720546b3222bb960f5cc3d4d328329956713cb7d1ad881d2e7b6b54e2d5859f8be8c4f97d2f74b2559d3f8f7e683d34797a26d6950cc0d9b9fc39748b77f1aa872aed14b1fdb6f98fa5f7fbd8c6f1c57126c5022596e6d65873e186e1ac78455a27587ccd965466d546a68133bb7d8c039ee4f1a498d60aef7d005aef87790c9e3bc71c07a7b914481c645ddcf5c3563f2b444474847540ba384716818a66a0961669e7fdf070a74e0b3a56540fa0265435ab3b7cd2d2807688960bff0f243b33191383a1c637008acaf413e293c5b0ce2ca835549ee67684ce9a64da2e3becb379ac86d784e6cfed9aa06d9a9b2984e70aa9e53cb83d266f60b2e4a83bd1aad314e023f25a471ab1dd22b81c6f288197f0bec09b6461f9e87e858ba82cc50a7b0b515e547a0ecc87a7ee6bf3e149bf5daef757b6e9da381d55f1d8ef8b46768ef89374ec485d5c3c225f31d6c1b1d3e61ddb035a8d840556947d68ee0fbcc8f5f718793896beb662840103c6e7eb216c457762068a1b0cb9f0404cb6fa96ea51e9d3a867b16ad4480b2dfdfaebf21b1103e38207a450a441c289ccdeee794c3bf832e1708a4b3b24b5ebf7517e2a67ef4bd90715200519f6d902873ae609dcee1f825edcef0acdf4ddceb60b744da5fc8facc7a70076fc886bc1d051fccaa2df6465427bfc387692c1993daa1859e43bbd805de65751e1644b2d984b26ba54bce1092f22cb76833f4a886fac4d87a20feda876e8cac60c4cdb43b46e9039602cc9d44275e5344c49253d70ec17ebee2c861ff4f1d9183b48e1079c0321390634dc8830b1e3c1d5b48b56170b3a15bea2cf327f75b9ee8dcf26b47419fbfcb961721c41f66c6859ae605ce7772c9591923e581ce87c368f0feb1ae2affbc0ae35e6ece442f6308bf89802fdc971d1362e23e1e3a6f14b36d994de6d8de25f1e08c0042ca4e918f34814c4cba299adff61bdfc16de32773db27b22d321a9c35c486664388125036eb4e09f4917e6365c9d20e41b1750c40d805d4f02d8143eba8d56316e9cf10e9ef63bae5e1cb7f3afa332769604acd494e1ca614da31a03d9273f1ae24a97cac0fe1365431de65fbbae68b493090858c406b96c1fe04991138b321fc629e2094d8628df45b719b07cb80b06bae4729d2e84df5096b40d085e3ca6d9f2bc032cafb57f66050ae40552283e557ec7f056a558205dffc11bcb286db40d2eb75cecf952faf81aa21452dfcf62e7114d78ae0d69c5948bd8aca76d06402b5d4f0a60410f93182a15db0e353a47c771714414e8a3d06e641bfbc1b5d2123863db07fb0f0ba053f48b5540291ff9188985f83c9a25569e1cd61e7314d5ffdf7642db698c5d6e1848003bb80991473a539311ea24b5c7875dd08581fad10ea767f45ba729a763f7c602a8c1d4c15aadf9236bd77518db747011de2e18641ab5c48e3e21930fbc28525201599ae00890827fc69e43ffbb746c07523f352b0d3466753e596b4588f53b035fee4b34d3f95a33699393740314b9cf813461e1e93c2c5f76ec31602629e4672909cd2e3bca40f907f78de745fc04240d6e4baa8cd40fd08405de45de94f57b546914dd691beb55b0f4205a5d4890d2702b3dc62ca90e47658347188d0b5d8bd18ad3a9580b62106d3ed90119d6cd85a4f7e7d53c01c1593e799e320c89592c8111664babc480d89e488b716ba2649c6d234db5b35d33316343c622a5f1cc0c5fdd2094cdfdd84c30f26b21786b67fa0d2701c2707082eb31ea5b01695d1fb298217fa6bff6dcc0863d7725bd3a2f9b239d7aa3dffd99c76a901f56e255da7f34fb5dc247ac5064ff710064777d0431755c215f884bcb5e41586d9dc6a012c6b776da42600f2e17a42b4948fd6247bfd8649e84ce6855c41e964d9a682d911c5034b04bc83eb5534dbf3d9a24e085efee3d5e99530af26fe44c31e777f59d47db5501d1952cf298674e67a49c322f2aa31a473efc81a0845b7ca2492968156d0de5daf77744a48801ad25151219c3b9b3f21d15ebac42f54f828b63f280797eb13f8a47cc34cab8b5a74c546cdc12855e40f67bdf76d25150c20749e38dc1d77c462fbc9780f39bf1575a2ca3a5c288ebb3fe223d79ac28394911a03c6ed95034988006e4b7be02002d3809239aa1b636667684a724d257b9a01de7163946a641fd8ae6f5bdc3838a08ee98904ffe0baef9b75ddfd154fbd8cc02af52a666026ca0f8d8ffa7c0cf9e98b4f0bfe848c71fb90fe9ff1a368e4cfbde747ac7c6cddfe7e0bbb68f9b74c28e6f93b5f4307f7895526f677ac0357fa7e00ae9703c8bab67ac394870bd9c26038983c780b3252bffcc2dab15af7e123113e7d6627be87db1a91cf17e12452d9525560981866a7a98c351f9ac00f9180488667d6e2fbad87b538a293332cc715aaa1db0adb79db2ed700b1de277d0cabbb53c0031fc2536f50195735e9fa4fbfa006771ad04692ced95e575797dbd557af9c5017784e2153908344a7f225bf5342cbd4e0bb6eced4f26ee4da0eed338722d86e49330257d4db80e080433702b62ddbf76e454d7beea12f7f68ae01da32aa218362350381b432cc5bfcb18784d8df6a8a1bf6ca954a22eddc8ea188294c1c9a4900242d2ade938bbd8191084c695b557eafcb8bf87aac101e4b29a51dda7433bfc24cc2e9bfbc555a57d4d4297264c979b7375776f1cc9b61c39c83a6f06244a2df5f2d592ec0e19d2e85fad867d08f143ee5a2d101d0888383fc4b42fec2f7b66c70e5fc99aa5b79b1fa3f6539dcabf67ae073625e2596cb946b2dd1fca00d4f9008f1f80f80db93fe43436585243fc9e4ba0dec6e508da9064b37f42a2802aba642f015b02d30c78661c2260a766792010966be2cd4483d027577ee196304992838d8a793a9d683e938d7ac304f1867a2bd5294d31ea0d60dc2e0772931cc196f6480199742faf535eca00416a767bbb0ec262cbd6f99c7610272ea402ccb3a6c20a29a2a0ca574bebfda7f5f1948dcd90759a8e0545b6aaa4f6b6de471422368c64c5628010367ee7232f250c0b8e796bc7a67ee59d966ed862577642dd6358cd12cac2820d5d861fee9d4e82cf118624e553eead17fb066d325ed639d8dab9df2f789be26f6dba253ae1207d1ec6f26d4162d9f63f382199ddfb085e425bedc412badcd6e3794c90665ea047ea1452fb526e56a3ce6f587d1915825a3da4c681ee4555e980a14f39738eaf599a6dd4df50b4bcd95304dba2347749ce6eb190a4ef10bd7ecde3f1970498b23609816d3d5d2cf42a402bf4b0edcff316c4a221ae1947df9d5ec7718901f7e8d4093d55a35995917b83790c38e1a340d811ab92eb9dd870d88a37b2fa6f580eaa1368a18b4c0c6a3f655e74a8eae0124bfd29e804070ad87543604c5afcc05fac657f2f4c423136804011d67076d6ede6dcdd637fa4b4d44681a829f56b642e5609e93dfb4d1eddea6a34536e7681ba491ecacbd14773a75da43998ed7398a853d2d88e206cacdb2f2a14e51f306cd1a4decfcdb889fcaa191e09d2b404f6cc1c38cee895b2bf5401a61c3ef3b3fd49638b267bfe1965a7f2737e9c16f35c4f9c755645250257eae25957fdeec95170b384f718152d015fb18568e2418cd3b3ee321e4df0d52c7eb6b6b593d056ee2a2d1fddde6a2ce0d294f8f822c954d6c084f6597a4bf14ef099e8f49cb9567734820adf6f0b004948ff4ef76b51e8687a9072db65df232f342bd7ee8213f5c3c4df431bd22cec5aa76bd3d0cf36febe544b6a3a28ed4cb429d60df0489cc2551eb41b27e2c0c1732670dc7dfd5e440bf41b7c219b3a4cc558573d70fda1777b837c710951c29796710be81dba3d51974dbeb4ae9aa34ba0d662bc3b0619aff9ba8c746abe15024c3da2430238cf3cf851332f71e1bc0daa3b8b52f35151a1a946948144696ce4117b4c9784c42758ada83580b844205bae12ffdb9219a775517a65a4a5dbf7f05b9f84091327b111e9d967ee9e1af67b9b57e83fd3e014089e7c439af03dd5c677205f8758042e4e4985d02af4bd41b72ce907afc194d45292a118b4a5a417ab076dd65cb2f668b6258aa4a3a5051d4ffe7459f1eaeb8dc165659cdf71d1bbac7256ea2aaf6145bee9b597fd102ed9d9db4108e4e76dfad130b0a276344838890042e5e32b1a75eee09b79d8c850608d38421b5659de9879c4d92e66a4d701ab8e66e274494574b312411313ddfdf252d6b0eebbc0fe86a95556706bffbf716658829c49f8b1f322ef64ea2e8638034f2f35719510af51a374c8e220743d275d5b29d184632db88b24f0e8e6035be3f1e376272d408a8a371420aa352b1a8726a61dce1d4e5d049c555c5ea990ac42c69c564cae68b93c6f84acda3cf34347f19dfa3967feaf97268e3ea0d4b93976c25605a499f6eb3944fe9e8f2bbd6a8bcd10ad02babc094ae1f3b1128a7825d38d8f9fd01246ac632baccb4ede504ac17fbaf2888eca075da71b085bcd494c2f51d9542c9c1ea357e42d65c2ed7f0465f1301b490e10a550fe600aa1e3fad4467223a776703ceaf3d86cd04d35b32732dab4dada9e54ac966c3c441710200ce7976d2d3b37baa66ba01595f9ce48bcdbbbd7b48d6d557f576d8e74df33d53ad701e830eaccb1f241568f915afad476f65c7abffe09771468e58df2724be8ab8ec44d45a5ff5953b575724753046a5de92d97cdacb123cf3f13a9a6947f6cf5474d890f8a109f59bda45e524276df7444e48f7de91e019c9355d737964baf1c8eadd9479dab8fa8159281d15f382fbbacfdae16ed4b0eb0a9e473558f66f22c24d68526a292a3b11cba20b758131cb0499f164797568b8c8cc2119f5cfaa1f2689e7753e10d23ba4baecb09093a6cff11e16e06c458cc8f30b655ddde44635ef98cb519359f8d490dfc313ab6588364048c1fb4fb5d1ac733ccc8f69b105c7eafd2e40b219c68242289aa4bc08e708292daf94ce3aa00d1e9109333d04a23ebfe15c72196e402f2fca49d2bdfa4524042074f01162b6611883111313693833e050e4e9f20c54e8aae967f2172123bb1d8cc0f50089afe33e2cc06b9b93ff5b46a961f82931fadc6b94f11237a01235b925286d528b64848d0644d9358352f4a98a9bd8e02eb86ea70d29aed657aa2176d26f6705b77f0cc2cef60f0b3244026311e846e05fa58f22fde72dae7d19e09f3a8b9cfa5722351a46720bb3d1c9ee45369a80a2bcb3b97177e8ebee533c8e1b7255fd5b5bf178d0c778e9e0f5785dd4ac409d78c18bf1f113fd0f66585857ed6c9cdc6fd101d144a4568a28537a8eb66b561514cac84f28c918ab746d650f2979ff44ad257d6e31fb4d630e283c8cb33ca1c4c8e2289088ad86066e374599cfa1848ff77eab25d459e3630a6a95fd5126a476f80fa0f0107b9695c93f7f69832eff97ae341c7e89911ff24e336b519ec66a796e05328e4d5e1a1518afe4807129ce8013c7ad6c07e07b92fff4cb524622d5cf34ce515b7078c4bd299fc1583f9f34c0ee908dea6098d594b706478c245086afa9e6339fff946e432b2fe722defc2c034a56b9058b67ef7b61820592bcce1ef48e34036b12849d067768335ccb8c16bd4c9d52ae21060718767805706d3f8546025566a6f6ef0ccdd25404527079c594ddb6a8ea610b98fd4cd6e586367cc45069db67383db8faac8360350424a24d5694f3bcc6f679419f69a7fb9ef96dbba112f2f77d559f9ac2471a67e57475c4a00a324743f4b2dd7a89c793046ed0f26c794aa164310e0b16130b55d0662152c07aec9efa9a1bacd9afcf06d92245ac74e18ab3fc9442d441bbf5f21d35919d956b11868cde17c8dd0c9d5bb8b9fe3ddf312c2adf74c35d9a8acb42af80997e5222f6a4891cbf83d0a430f84f0dc17bea679e6b9fe0d0565823d0a13340eaf2bc495291ef311793c8de9eea898a49847444343f03ccb880348c6bb7ed3dc9678fdaa16f22cb9bd534a36efff88951850ad8d352a63d84ccf0e7a2287b97380a1f2ed07dad2663c654dc2741c676b57044d95b5d51522f91c3eb7aca1b23df5d342c26699177daf6780d5e835d0ffd2f1cb03235c41c6d818ed887573a1db2bb1837f4affc612f7e498d29881bda0f62972dd6344a32918568772d3a31580f5d58b6b967aea643ff7ae0de1471946153b52ad75ee6a493a28f1361ec0f603e8adea6a7b60dc55f31d5958dfe6b6f103a0cc3ba01f16d3341907f1503693f3af8768e1e4b526a2e01f012298328711a2b5b966b7e9bd08d78ae96f4c3dd4007799b774ad6e733713752c1fa6de45b0200a714cb44fa8753cd3adfdf5b342b707a141244326581b2e4780c0624f2bf57d63ce75ad8cc3f9b0d6c16eef88976eede2c8</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    
+    <summary type="html">
+    
+      密码等级 0
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
+    
+      <category term="harborgate" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/harborgate/"/>
+    
+    
+      <category term="harborgate" scheme="http://benpaodewoniu.github.io/tags/harborgate/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>中国日报 | 数藏 chinese fu</title>
+    <link href="http://benpaodewoniu.github.io/2024/05/05/fu0/"/>
+    <id>http://benpaodewoniu.github.io/2024/05/05/fu0/</id>
+    <published>2024-05-05T13:09:57.000Z</published>
+    <updated>2024-05-07T10:02:10.684Z</updated>
+    
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="aba5dcc1cf7c9889b4ab477440156d229d971f7759095bb1328ccfce4334e3b3">916b73f8ff8fb09a905bb4f5b4483f66c256cae8300d956dbfbbf8164c46ff59585187d1db56383d694cb4edea286c1e633943281842d60c3e633930352b8f5d0a3acd8d0ff29e542af26619171af31ef52d4d4e1934b103ac295e32dfe8baeacc48f568fbc28bf25d0b44f56b07632f090cca17b7050ea4d96983c43c14429bda5d5ce981eca5b1c53ff9798e272ca628a30240049cba1a960b1083d4cbd685b3842e13d056864318ee9bb67d711f8ff3eaecb3f8ef1f93639045d1251e553da445967000e515f092cd31169a825abe15ea4f19520e60487307c6fa18fa1c4a510885b85cd1424143e901083558aee0dee584ae7586ae1465494045840b843e6c42df7723a5c59aa524b4b222b7fb053833c04e9effb67db913340759d0e1008dd9ab4916ebb7313e5cb54c7e913707548e4502bb5319cd7a731beb30d2bccb20e3ddec7f2ddbd3500a46026491fa1ce040b2b9a211bddcc44ca005ac9ab08b805af1f2c2079744af1b9168ffe3b4637df7ec19dca9ed236511d703dbf639993c243270b7a7c47d1f161666b2ebc1ff2d4da675a4336479a9faafecac4c4a38e36ea919076ca2df08635a7b906e05a8068f315cb832d6fca43e39c0a23de3233e5e048592cf7f9bcfd55aef8bccf80413ac0157424b1311ca41504d68a0c63ce81b715091fe149f2009634b22fade646de44799855bb2d2d2604df2bc2500ebefca404fd1a8b500480bd75561c72e8399ae31c442135d008c3e40226c93da1f4840c6a07364e50ac8b758877eca1a39dc29912a8a27a3116cc31366f588a2ef8f834bd23f29ce3ddb3d4a111db9ccaf8275f5cb8d24266d2201f0a595f2371142b0c9f833ae9308c7af45263ac3abadff33bede35c91fd3835740cc8bb4dcc1f80d8feaa3ba01cb6dacda23055cdedbcaaaef692ca91d608e9feec15671d3f7f30feae68c25286a0f655932628ad359e2e061dad61234bda02674227bf8ad8431291210417c8b74c11a041cacc918cba7bb27307fdbec5bdc0130faa90c4f43cc6b6803e32bcff7b6c257796fda6804b8ffcd30133c83d59ab881629e2107d0e06d409415bfedfd1fc4aa5d401df5f6a3ddeef68a9bef9a67d12c1614419cffdcee4ef24b41c5ae8dbed516cabbc3148dcb5498126c448ffc420818024a17b5c9417c79aaf8d82a29f0a0041160e13a17ba007549c727ca219d0bd3fd65be5fbb290d670fe453600c4c1bffbf02a4a6d01327f6fb1fad434b118a67b956fa83</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    
+    <summary type="html">
+    
+      密码等级 0
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
+    
+      <category term="中国日报" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/%E4%B8%AD%E5%9B%BD%E6%97%A5%E6%8A%A5/"/>
+    
+    
+      <category term="中国日报" scheme="http://benpaodewoniu.github.io/tags/%E4%B8%AD%E5%9B%BD%E6%97%A5%E6%8A%A5/"/>
+    
+  </entry>
   
   <entry>
     <title>evm | 一个合约的测试案例</title>
@@ -173,9 +284,9 @@
     <link href="http://benpaodewoniu.github.io/2024/04/14/aion0/"/>
     <id>http://benpaodewoniu.github.io/2024/04/14/aion0/</id>
     <published>2024-04-14T03:52:52.000Z</published>
-    <updated>2024-04-16T08:58:06.509Z</updated>
+    <updated>2024-05-15T15:14:57.990Z</updated>
     
-    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="4a29a686832f93cea8770cf4dbedbe48334095c7a4cf6d6e8f1c8c60b462bb89">45d35ca90ec555698c4c83a04c83e283ce4a4e454f610cccc00903092617200fdd9d3ed2873593efeef9c8a6411fe82e9518d0a75b16d7d6bd0b698de20a699ec960015c7ac75d742cc6b33a5f4eb9f47fd156c6c6e018e02187c5c7885abad40240e581e462204b4b245a29a97e1291ef2f145f23bbda74eb5d2b4d768f6bf174a2f8cf7c9a03227067e144a2bf3f7b05c7d269595b60f324464f6ddd709b7764ffe44e3d9499a869f3edbf73b6815326c38f61219832aa12511d1f42d5ebc9d6ab9249b22c7e5213312823e6f6e0939aea8a69837e7c72cd0556133242b18f3e7ab5d0cc26ea790d5c3bd0115719c6651959994cc2933615e96056f6bb6023d78ca142cb720ad0cb68809fea6aa13b74524e478c12db54f1c0941a7593508bbc6de0581c38bf29182e557b64968a27e469e31f9a53ab06e3f1159cf0c8f2373a97565b471d1a22f133f93fda6e95546a9104fe07d308d4e514ff050695191f993337d6b3814f3b1c575b9084ec36a598ed55dc483fa4ec1aeb98d15e0cbca98ccd2ace83acbd1e8cd29fe2e619c32028a3370390b211ec67e370e9cea5ca604b6c8ed5d744de30ce8dacd9ffab6e74b8024da1b9ba8f871cd0e6e05204d7510adbc4329f264561a1eecde458ec24c696301d93bb133300a7989b0faaab5d82a5efaa86020c6c602c4f7e3c7258af4d69ce85b318855375274b6f8044163971be96fa22b91dac9e00cc21adf8fa0677a758b68e9bf14a60897f509f3deffc68572f9142378b7fc32ce5c69035c99d7e521c48cf401033663e5011abe1d624dbe64b3f2a96bd51160b1dc4796d678503a6b327f3a48204c8a4e9f016a3e976da96e90d54a1133f16b24c0fc0bb57d41cf7bcfa399d8d55812260064f901eb2a6fcd50d43e06eade9bc4176b2a1461cbbb7240f66d7c38cba99cf7c7e7c41acee2f59d719c22965f8bf619bb8181ceca1a1fcd00a9bf887fcb2a1550aee4cb7abca68ab231134de76bacee6f456fe5570c0bb17778a0c48b3a0b0bd18cf428114d491e912ecdb7533ae2d8155a5d9a8589861a207fdb8355450f36edfc258345dacb93f0cd53988b3cd1c2c8612ba65140930e35ddccf487e6d060d52d90688b0c6e7a4744f4ac41f08dce047a3890477aee31d78234b1f6803456bcb87776fab6887683f1e942a54ebb56eb50069a86d0250583650aad76feb3137e9e8c4d0aedb9de342b1e5b5d1d500fc22e30045ca44eaa2e8a0e3cc3dba3604453e8931c2ebcdabab77d3e031cdf8ef2d683bec972b01e94ce219731387227744310b143e7a7f204800eb336d2856d54b9b8b63e857cc3b2067ba44e785cecb20bad1fb14b8fe755921394dd83f89e861307900a98b3fb0cf56a5d36f869906fde9ab47cf78adb55f132a818cb939e8fc1de44e19951e4c2bad9c40ed1ea4314b9b08accd19d54fadcdc1cdbaf6957a38a4e1f6e1363c8c2ebc563ff2a6b534ad249857238a1f25b5c3b0dda0f14531fb1338f2b41e50eda9aec7d2870422e19740f4f386f1e3f1e128e3f4046f67e252d1071d714a9d1cf6573e38f0834270a9c06f5bccf4b789be65e09425fd21e0c4b180a4ad9d6936bc6e1cde207243c32bce0c0eeb9bfae01f2a0ea4905446d875d5f77ee12d41305308d4fdb66e33396e1c3a51d9e7a6f549acbbb7d6c047c82c7e11b6d425a83647375d58b861511d2582d275432e924796e0e07fc789837091f4121853db42ca499198337a2380a1a8651d595838a7d72229c73c8fec2f85b30ad77aa0eb0506f35e19e7408b47d4de8245638ddf8c0b1f30fc4ac86a8f67375a93e45900f6500df4592699cfb9df3ced3effac5990a6466771237a696543061fbcafe1b28b2f83b66eca8a5b8e9d536e088231386c7e5d78515505f4024c70aef706b295ced852c6ea41a8fa53db8eed9310e99fb550e0352ddd0357d77ef05cef6eff9d51907bb98eb6c873de3504b613d902610320c2634f5bf3d90e6514dba233f7656bb7ef66c9909df7817b4e5aea364b589c616fa105199b24fb0c62189fd282174b2034572bae6d685a410e086e54c236e2066d411b185eebeaea5e2bfa704744a2b36e42458c36cf100185bdee1fea38e24eaf44fcc59658b29285521b7f6433b5962992c11f1aca61dd159930cae9c0cecded4a57b77ae35f1e8bc36cb3b3d70d15e977b50ff3bc6fa9cfbb215dc583eaeb2ca44692dd1f02d7d748ea7d834815f907321d00b02ef2c152632f1f412c433ab66671283e046b40eea69c3e8a36fa6a47c876a41435864d50cb9bd4d725773f27bd55dfd6481f68002e3e795944ebc8a9794e227a48419610eebaa8bd</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="9aae94004c9dd4cf353f267561c87ce618b5869b133a7899282bb124706d2263">45d35ca90ec555698c4c83a04c83e283ce4a4e454f610cccc00903092617200fdd9d3ed2873593efeef9c8a6411fe82e9518d0a75b16d7d6bd0b698de20a699ec960015c7ac75d742cc6b33a5f4eb9f47fd156c6c6e018e02187c5c7885abad40240e581e462204b4b245a29a97e1291ef2f145f23bbda74eb5d2b4d768f6bf174a2f8cf7c9a03227067e144a2bf3f7b05c7d269595b60f324464f6ddd709b7764ffe44e3d9499a869f3edbf73b6815326c38f61219832aa12511d1f42d5ebc9d6ab9249b22c7e5213312823e6f6e0939aea8a69837e7c72cd0556133242b18f3e7ab5d0cc26ea790d5c3bd0115719c6651959994cc2933615e96056f6bb6023d78ca142cb720ad0cb68809fea6aa13b74524e478c12db54f1c0941a7593508bbc6de0581c38bf29182e557b64968a27e469e31f9a53ab06e3f1159cf0c8f2373a97565b471d1a22f133f93fda6e95546a9104fe07d308d4e514ff050695191f993337d6b3814f3b1c575b9084ec36a598ed55dc483fa4ec1aeb98d15e0cbca98ccd2ace83acbd1e8cd29fe2e619c32028a3370390b211ec67e370e9cea5ca604b6c8ed5d744de30ce8dacd9ffab6e74b8024da1b9ba8f871cd0e6e05204d7510adbc4329f264561a1eecde458ec24c696301d93bb133300a7989b0faaab5d82a5efaa86020c6c602c4f7e3c7258af4d69ce85b318855375274b6f8044163971be96fa22b91dac9e00cc21adf8fa0677a758b68e9bf14a60897f509f3deffc68572f9142378b7fc32ce5c69035c99d7e521c48cf401033663e5011abe1d624dbe64b3f2a96bd51160b1dc4796d678503a6b327f3a48204c8a4e9f016a3e976da96e90d54a1133f16b24c0fc0bb57d41cf7bcfa399d8d55812260064f901eb2a6fcd50d43e06eade9bc4176b2a1461cbbb7240f66d7c38cba99cf7c7e7c41acee2f59d719c22965f8bf619bb8181ceca1a1fcd00a9bf887fcb2a1550aee4cb7abca68ab231134de76bacee6f456fe5570c0bb17778a0c48b3a0b0bd18cf428114d491e912ecdb7533ae2d8155a5d9a8589861a207fdb8355450f36edfc258345dacb93f0cd53988b3cd1c2c8612ba65140930e35ddccf487e6d060d52d90688b0c6e7a4744f4ac41f08dce047a3890477aee31d78234b1f6803456bcb87776fab6887683f1e942a54ebb56eb50069a86d0250583650aad76feb3137e9e8c4d0aedb9de342b1e5b5d1d500fc22e30045ca44eaa2e8a0e3cc3dba3604453e8931c2ebcdabab77d3e031cdf8ef2d683bec972b01e94ce219731387227744310b143e7a7f204800eb336d2856d54b9b8b63e857cc3b2067ba44e785cecb20bad1fb14b8fe755921394dd83f89e861307900a98b3fb0cf56a5d36f869906fde9ab47cf78adb55f132a818cb939e8fc1de44e19951e4c2bad9c40ed1ea4314b9b08accd19d54fadcdc1cdbaf6957a38a4e1f6e1363c8c2ebc563ff2a6b534ad249857238a1f25b5c3b0dda0f14531fb1338f2b41e50eda9aec7d2870422e19740f4f386f1e3f1e128e3f4046f67e252d1071d714a9d1cf6573e38f0834270a9c06f5bccf4b789be65e09425fd21e0c4b180a4ad9d6936bc6e1cde207243c32bce0c0eeb9bfae01f2a0ea4905446d875d5f77ee12d41305308d4fdb66e33396e1c3a51d9e7a6f549acbbb7d6c047c82c7e11b6d425a83647375d58b861511d2582d275432e924796e0e07fc789837091f4121853db42ca499198337a2380a1a8651d595838a7d72229c73c8fec2f85b30ad77aa0eb0506f35e19e7408b47d4de8245638ddf8c0b1f30fc4ac86a8f67375a93e45900f6500df4592699cfb9df3ced3effac5990a6466771237a696543061fbcafe1b28b2f83b66eca8a5b8e9d536e088231386c7e5d78515505f4024c70aef706b295ced852c6ea41a8fa53db8eed9310e99fb550e0352ddd0357d77ef05cef6eff9d51907bb98eb6c873de3504b613d902610320c2634f5bf3d90e6514dba233f7656bb7ef66c9909df7817b4e5aea364b589c616fa105199b24fb0c62189fd282174b2034572bae6d685a410e086e54c236e2066d411b185eebeaea5e2bfa704744a2b36e42458c36cf100185bdee1fea38e24eaf44fcc59658b29285521b7f6433b5962992c11f1aca61dd159930cae9c0cecded4a57b77ae35f1e8bc36cb3b3d70d15e977b50ff3bc6fa9cfbb215dc583eaeb2ca44692dd1f02d7d748ea7d834815f907321d00b02ef2c152632f1f412c433ab66671283e046b40eea69c3e8a36fa6a47c876a41435864d50cb9bd4d725773f27bd55dfd6481f68002e3e795967f3720326de3d9673c00984d3b0f7cf39cb9e7570d538003b0eeae32c6122c4ae6100a1ab9473bd7e6d9b226e8a1b86335b79f25ec0971e202b9c7df103211fc2ba7aa2b20cadcfacaf5a229f03d61148b78915e96c2e8c6c74cc4d937c2da1560779ab99f2dab93837a950d52fb2fccdcf5bf18a3cbeff8eaee947a4499c9c509fc8311aa3b3a8cff6d3d6b02e3091be1a23ed9f21a66e509e4a76764615363ab465443f12a87f47475243c2c3e3fd1e62336e70f227b667a113deb0cd44fc94f44c7a02e7371c3015b912c609c287fc6767f5168386d3adb8b5f9265c25e768a0b73697b904df1f53a9a75a92036df8e1cdb672cc5380e21d7595b07ecb868194cef1310ffa70f683e47936751fce88915e5dea4c66cc9cea8f78b8a4885c515aa2be4c867a7f685abecdd10faf5b7bb372ed6b5a1ac0661b90a73d62d39d725a41aed97df9ea2ad05c2e344b144242b3a2f64e9da55d72da9a68333fa9a82babb77efde6ab8ab74d51340a401a332c5656e0b4ab795da0aa63d7d589f3895d0b43f6970df945abba17a9753f083c7560223cf420e5fd5be9bdb78ff2b89af840c43fff73657ccccbc6380e8a1cbff099b03b78b72940a671095609368b8b71e6e0bf74f3d8b1648a808af62fd10fd80438f0ef9a98b16c4cdc6f414ed8e1ba4e001326df30da5ea9a2a59ed6e5584bbeaacee19dd0e5195b6e2ffb5e3aeed43291cad6ac9a758541af4244749f5cda091683e5a8ae330d0f1fe8ecbf12eab7e0f6027646b7b4e4e077acf8e70187efac559c674ca8659460eff6f528e8cd22b602a279f1bfd600c3ba8d202fad8db370cf2a4461e734906d020f3f1fd84f</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
     
     <summary type="html">
     
@@ -492,125 +603,6 @@
     
     
       <category term="uniswap" scheme="http://benpaodewoniu.github.io/tags/uniswap/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>solidity | 分发代币</title>
-    <link href="http://benpaodewoniu.github.io/2024/04/04/solidity78/"/>
-    <id>http://benpaodewoniu.github.io/2024/04/04/solidity78/</id>
-    <published>2024-04-04T14:57:55.000Z</published>
-    <updated>2024-05-01T05:26:26.628Z</updated>
-    
-    <content type="html"><![CDATA[<p>分发代币的合约。</p><a id="more"></a><p>已经经过测试了。</p><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span>.<span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">interface Token &#123;</span><br><span class="line">    <span class="keyword">function</span> transfer(address recipient, uint256 amount) external returns (<span class="built_in">bool</span>);</span><br><span class="line">    <span class="keyword">function</span> balance<span class="constructor">Of(<span class="params">address</span> <span class="params">account</span>)</span> external view returns (uint256);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract BatchTokenDistribution &#123;</span><br><span class="line"></span><br><span class="line">    receive<span class="literal">()</span> external payable &#123;&#125;</span><br><span class="line"></span><br><span class="line">    mapping(address =&gt; uint) public sign;</span><br><span class="line"></span><br><span class="line">    constructor<span class="literal">()</span> &#123;</span><br><span class="line">        sign<span class="literal">[<span class="identifier">msg</span>.<span class="identifier">sender</span>]</span> = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> add<span class="constructor">Sign(<span class="params">address</span> <span class="params">signaddress</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        sign<span class="literal">[<span class="identifier">signaddress</span>]</span> = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> delete<span class="constructor">Sign(<span class="params">address</span> <span class="params">signaddress</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        sign<span class="literal">[<span class="identifier">signaddress</span>]</span> = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    modifier only<span class="constructor">Sign(<span class="params">address</span> <span class="params">checkaddress</span>)</span>&#123;</span><br><span class="line">        require(sign<span class="literal">[<span class="identifier">checkaddress</span>]</span><span class="operator"> == </span><span class="number">1</span>, 'ns');</span><br><span class="line">        _;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> batch<span class="constructor">_transfer(<span class="params">address</span> <span class="params">_token</span>, <span class="params">address</span>[] <span class="params">memory</span> <span class="params">to</span>, <span class="params">uint</span> <span class="params">amount</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        Token token = <span class="constructor">Token(<span class="params">_token</span>)</span>;</span><br><span class="line">        for (uint i = <span class="number">0</span>; i &lt; <span class="keyword">to</span>.length; i++) &#123;</span><br><span class="line">            require(token.transfer(<span class="keyword">to</span><span class="literal">[<span class="identifier">i</span>]</span>, amount), <span class="string">"amount is not enough"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> batch<span class="constructor">_transfer_amount(<span class="params">address</span> <span class="params">_token</span>, <span class="params">address</span>[] <span class="params">memory</span> <span class="params">_recipients</span>, <span class="params">uint256</span>[] <span class="params">memory</span> <span class="params">_amounts</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        require(<span class="module-access"><span class="module"><span class="identifier">_recipients</span>.</span></span>length<span class="operator"> == </span><span class="module-access"><span class="module"><span class="identifier">_amounts</span>.</span></span>length, <span class="string">"Recipient and amount arrays must have same length"</span>);</span><br><span class="line">        Token token = <span class="constructor">Token(<span class="params">_token</span>)</span>;</span><br><span class="line">        <span class="comment">// 循环遍历所有地址，分发代币</span></span><br><span class="line">        for (uint256 i = <span class="number">0</span>; i &lt; <span class="module-access"><span class="module"><span class="identifier">_recipients</span>.</span></span>length; i++) &#123;</span><br><span class="line">            require(token.transfer(_recipients<span class="literal">[<span class="identifier">i</span>]</span>, _amounts<span class="literal">[<span class="identifier">i</span>]</span>),<span class="string">"amount is not enough"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> distribute<span class="constructor">ETH(<span class="params">address</span>[] <span class="params">memory</span> <span class="params">addresses</span>, <span class="params">uint</span> <span class="params">amount</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        uint256 total = <span class="number">0</span>;</span><br><span class="line">        for (uint i; i &lt; addresses.length; i++) &#123;</span><br><span class="line">            total = address(this).balance;</span><br><span class="line">            payable(addresses<span class="literal">[<span class="identifier">i</span>]</span>).transfer(amount);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> transfer<span class="constructor">AllETH()</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span> &#123;</span><br><span class="line">        uint256 total = address(this).balance;</span><br><span class="line">        payable(msg.sender).transfer(total);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> transfer<span class="constructor">AllToken(<span class="params">address</span> <span class="params">_token</span>)</span> public only<span class="constructor">Sign(<span class="params">msg</span>.<span class="params">sender</span>)</span>&#123;</span><br><span class="line">        Token token = <span class="constructor">Token(<span class="params">_token</span>)</span>;</span><br><span class="line">        token.transfer(msg.sender,token.balance<span class="constructor">Of(<span class="params">address</span>(<span class="params">this</span>)</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><code>ETH</code> 中使用该合约进行分发。</p><ul><li><a href="https://etherscan.io/tx/0x67051de366fbcf01abdb46ce00791fb4c4be59dd28eda65d652b9e18f9b7bac3">0x67051de366fbcf01abdb46ce00791fb4c4be59dd28eda65d652b9e18f9b7bac3</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;分发代币的合约。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    
-      <category term="平台 &amp;&amp; 公链 &amp;&amp; 项目 &amp;&amp; 方向" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/"/>
-    
-      <category term="eth" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/"/>
-    
-      <category term="solidity" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/"/>
-    
-      <category term="应用" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%BA%94%E7%94%A8/"/>
-    
-      <category term="分发代币" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%BA%94%E7%94%A8/%E5%88%86%E5%8F%91%E4%BB%A3%E5%B8%81/"/>
-    
-    
-      <category term="eth" scheme="http://benpaodewoniu.github.io/tags/eth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>solidity | 从部署到测试</title>
-    <link href="http://benpaodewoniu.github.io/2024/04/04/solidity77/"/>
-    <id>http://benpaodewoniu.github.io/2024/04/04/solidity77/</id>
-    <published>2024-04-04T14:24:23.000Z</published>
-    <updated>2024-04-04T14:56:03.575Z</updated>
-    
-    <content type="html"><![CDATA[<p>我们经常会有合约进行测试，一般来说，我的流程都是</p><ul><li>remix 部署</li><li>代币部署用于测试</li><li>合约编写</li></ul><a id="more"></a><h2 id="remix-编写"><a href="#remix-编写" class="headerlink" title="remix 编写"></a>remix 编写</h2><ul><li><a href="/categories/区块链/平台-公链-项目-方向/eth/solidity/remix/">remix</a></li></ul><h2 id="代币部署用于测试"><a href="#代币部署用于测试" class="headerlink" title="代币部署用于测试"></a>代币部署用于测试</h2><ul><li><a href="/2023/02/15/solidity49/">solidity | 再次探究 ERC20</a></li></ul><p>直接复制代码到 <code>remix</code> 就行。</p><h2 id="合约编写"><a href="#合约编写" class="headerlink" title="合约编写"></a>合约编写</h2><p>这个就个人各异吧。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;我们经常会有合约进行测试，一般来说，我的流程都是&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;remix 部署&lt;/li&gt;
-&lt;li&gt;代币部署用于测试&lt;/li&gt;
-&lt;li&gt;合约编写&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    
-      <category term="平台 &amp;&amp; 公链 &amp;&amp; 项目 &amp;&amp; 方向" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/"/>
-    
-      <category term="eth" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/"/>
-    
-      <category term="solidity" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/"/>
-    
-      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%9F%BA%E7%A1%80/"/>
-    
-    
-      <category term="eth" scheme="http://benpaodewoniu.github.io/tags/eth/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>rgb | rgb</title>
-    <link href="http://benpaodewoniu.github.io/2024/04/04/rgb0/"/>
-    <id>http://benpaodewoniu.github.io/2024/04/04/rgb0/</id>
-    <published>2024-04-03T16:40:38.000Z</published>
-    <updated>2024-04-07T09:36:29.011Z</updated>
-    
-    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="07d60585367fdcc616cda643991dfa3dbe50563e1abd8e93faed858b7e50885b">03ce5089e88b9b98a224bb37ad5ba21174148dd21d380f5df7c68a321713d0d50e823ee732c6163e0e90ac3d6cc06f0003587bddd7b55fd019971830134c2173b727c2942fc13849ea4d66797e6e07d68028e577f02396db0879a5fe0d94e7e8a324b4162c1a8054f191a6d78a9186ad33b2bea10b41117d2125da3ae3b90dbe48be173db225aed60985a54248e41d844767cca6e707030019023b81b64e989e403b95a5906e2effffcd6cd04c23a87286f1f09ec2b968b04f9f22a8533b1b7627f751bfb68312f3d748625405712ae82a313e4d930782169a23ecaf713a1d97eed441ece9eeccf7a37d83d87d444d00343fe379fa6ee161a348415b2aedfad40d658ec221289c7d02b35dafb214f7e4b1f79c474875d54e5a0fa7ce3716e99123ddde98a92520557c5b0564a901e7aec49236cbea9b838a1d51108058eadf539050708b5c04a00c8c4c07a35be4b686316f6773cee083612247bdb5f2e6592fc10d789106fbd8ea1105f4b6e7648987efa81c22026e01dece9d5f88cb932b842773dcc58e748389540036d7df8bdd806216915aefc473ed10fb40728a7150a31a4ea9ad83a099cb6fd9ff2346432cf095d91cc010046bc1ad1e450379a03702c50bc1403dc8b9366cfeb7fa5b641c85dff22a7100363d263f7626d32ff7b5ee</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
-    
-    <summary type="html">
-    
-      密码等级 0
-    
-    </summary>
-    
-      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    
-      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
-    
-      <category term="rgb" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/rgb/"/>
-    
-    
-      <category term="rgb" scheme="http://benpaodewoniu.github.io/tags/rgb/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>palio | palio</title>
-    <link href="http://benpaodewoniu.github.io/2024/04/03/palio0/"/>
-    <id>http://benpaodewoniu.github.io/2024/04/03/palio0/</id>
-    <published>2024-04-03T06:30:29.000Z</published>
-    <updated>2024-04-03T07:16:54.081Z</updated>
-    
-    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="4a875788e9429edfed966267f1420dd2ffadbe4412a7cad66201532c1148f6f9">4d3f0653d14f3c2f193bc612a5f620994bc8363757440e5588c1f2ce7dc59ac0b99d7c75f9702ef862cd72bcbfc9a4a405929aa00622acbbf7c21d0d8fb691c185dff863e1d4cd16bef90c6b0019155b1804b21c987daf6ecefe2509f7c16291ecc8434678bb4d100086c6c4438279c2c33242f82fdd55e6f0ed3320470a57e361170844843124c0f3a61a833d6e749d99753a439f0848566fc0b7e1dbc2075aa851c1ee17f54f9b2d8efbcac89141ab6425286a22570a4e72fb298cc31b55aaba97681caefffc18ee6344ae1235a8633e70a9e26baa13d5dce8e0e361028c6b2b46f4eb9654baa616df62e142aef3d520b0ed59d3bcbf3bc4aba19817aa30d90dcc6cbb5e8d43c501c6a002c3e03b420581cbaf597e3ab9d020b9fb1c8233afff9c897760a3ed645778655bb525067ac6fe4255e0c771733f4036b981b49e1b749e3d597f9eb1e4d1c18b988bdce888</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
-    
-    <summary type="html">
-    
-      密码等级 0
-    
-    </summary>
-    
-      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    
-      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
-    
-      <category term="palio" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/palio/"/>
-    
-    
-      <category term="palio" scheme="http://benpaodewoniu.github.io/tags/palio/"/>
     
   </entry>
   
