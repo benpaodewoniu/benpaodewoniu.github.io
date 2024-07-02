@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://benpaodewoniu.github.io/"/>
-  <updated>2024-06-27T07:14:04.425Z</updated>
+  <updated>2024-07-02T05:41:16.666Z</updated>
   <id>http://benpaodewoniu.github.io/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>aws | 使用 IAM 开启他人管理</title>
+    <link href="http://benpaodewoniu.github.io/2024/07/02/aws6/"/>
+    <id>http://benpaodewoniu.github.io/2024/07/02/aws6/</id>
+    <published>2024-07-02T04:54:17.000Z</published>
+    <updated>2024-07-02T05:41:16.666Z</updated>
+    
+    <content type="html"><![CDATA[<p>如果你的账户下面有一个实例想和别人共享管理，可以使用 IAM 方式。</p><p>原理是，创建一个新的 IAM 账户（带有用户名和密码），然后这账户发送给需要的人，别人登录这个账户，就能看到要管理的实例了。</p><p>这里用 <code>EC2</code> 的实例作一个例子，其他的产品原理一样。</p><a id="more"></a><h2 id="创建-IAM-账户"><a href="#创建-IAM-账户" class="headerlink" title="创建 IAM 账户"></a>创建 IAM 账户</h2><p>登陆控制台后，搜索 <code>IAM</code>。</p><p><img src="/images/aws/6_0.png" alt=""></p><h2 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h2><p><img src="/images/aws/6_1.png" alt=""></p><p>如果你想要多个人一起共享账户，那么，红框中就不要选。</p><p>另外，用户名就是登录名。</p><p><img src="/images/aws/6_2.png" alt=""></p><h2 id="创建策略"><a href="#创建策略" class="headerlink" title="创建策略"></a>创建策略</h2><p>所谓的策略就是，让 <code>IAM</code> 对什么资源有什么权限访问。</p><p><img src="/images/aws/6_3.png" alt=""></p><p>编辑权限。</p><p><img src="/images/aws/6_4.png" alt=""></p><p>一般的语法是这样的，以 <code>EC2</code> 为例</p><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"Version"</span>: <span class="string">"2012-10-17"</span>,</span><br><span class="line">    <span class="attr">"Statement"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"Effect"</span>: <span class="string">"Allow"</span>,</span><br><span class="line">            <span class="attr">"Action"</span>: [</span><br><span class="line">                <span class="string">"ec2:DescribeInstances"</span>,</span><br><span class="line">                <span class="string">"ec2:StartInstances"</span>,</span><br><span class="line">                <span class="string">"ec2:StopInstances"</span>,</span><br><span class="line">                <span class="string">"ec2:TerminateInstances"</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">"Resource"</span>: [</span><br><span class="line">                <span class="string">"arn:aws:ec2:region:account-id:instance/instance-id"</span></span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li><code>region</code><ul><li>区域代码</li><li>每个区域都有自己的代码，比如香港就是 <code>ap-east-1</code></li></ul></li><li><code>account-id</code><ul><li>账户的 <code>12</code> 位 <code>ID</code></li></ul></li><li><code>instance-id</code><ul><li>实例 <code>ID</code></li></ul></li></ul><p>一个例子如 <code>&quot;arn:aws:ec2:ap-east-1:5901837****:instance/i-0ea0611***4748&quot;</code></p><ul><li><code>Action</code><ul><li>赋予什么权限</li></ul></li></ul><p>如果是全权限，全实例可以这样子</p><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"Version"</span>: <span class="string">"2012-10-17"</span>,</span><br><span class="line">    <span class="attr">"Statement"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"Effect"</span>: <span class="string">"Allow"</span>,</span><br><span class="line">            <span class="attr">"Action"</span>: <span class="string">"*"</span>,</span><br><span class="line">            <span class="attr">"Resource"</span>: <span class="string">"*"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>下面进行保存和创建策略就好了。「创建策略的时候，记得取一个好事识别的名字，后面要继续用」</p><h2 id="加载策略"><a href="#加载策略" class="headerlink" title="加载策略"></a>加载策略</h2><p><img src="/images/aws/6_5.png" alt=""></p><p>红框刷新，绿框搜索，选择刚才弄好的策略就好了。</p><h2 id="登陆"><a href="#登陆" class="headerlink" title="登陆"></a>登陆</h2><p>创建好之后，会给你一个登录地址，还有登录名和密码。</p><p><img src="/images/aws/6_6.png" alt=""></p><p>如果忘记了登录地址，可以查看下面的图片。</p><p><img src="/images/aws/6_7.png" alt=""></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;如果你的账户下面有一个实例想和别人共享管理，可以使用 IAM 方式。&lt;/p&gt;
+&lt;p&gt;原理是，创建一个新的 IAM 账户（带有用户名和密码），然后这账户发送给需要的人，别人登录这个账户，就能看到要管理的实例了。&lt;/p&gt;
+&lt;p&gt;这里用 &lt;code&gt;EC2&lt;/code&gt; 的实例作一个例子，其他的产品原理一样。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
+    
+      <category term="服务商" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/%E6%9C%8D%E5%8A%A1%E5%95%86/"/>
+    
+      <category term="AWS" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/%E6%9C%8D%E5%8A%A1%E5%95%86/AWS/"/>
+    
+    
+      <category term="aws" scheme="http://benpaodewoniu.github.io/tags/aws/"/>
+    
+  </entry>
   
   <entry>
     <title>tcp | 防御 TCP/IP 的攻击</title>
@@ -545,32 +573,6 @@
     </summary>
     
       <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    
-      <category term="webhook" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/webhook/"/>
-    
-    
-      <category term="webhook" scheme="http://benpaodewoniu.github.io/tags/webhook/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>blockchain | 监控链上数据平台</title>
-    <link href="http://benpaodewoniu.github.io/2024/06/03/blockchain17/"/>
-    <id>http://benpaodewoniu.github.io/2024/06/03/blockchain17/</id>
-    <published>2024-06-03T15:25:41.000Z</published>
-    <updated>2024-06-10T06:53:00.634Z</updated>
-    
-    <content type="html"><![CDATA[<p>监控链上数据平台。</p><a id="more"></a><h2 id="dbotx"><a href="#dbotx" class="headerlink" title="dbotx"></a>dbotx</h2><ul><li><a href="https://dbotx.com/zh/webhooks/nft">dbotx</a></li></ul><h2 id="chainbot"><a href="#chainbot" class="headerlink" title="chainbot"></a>chainbot</h2><ul><li><a href="https://chainbot.io/">chainbot</a></li></ul><h2 id="tokenview"><a href="#tokenview" class="headerlink" title="tokenview"></a>tokenview</h2><ul><li><a href="https://services.tokenview.io/cn">tokenview</a></li></ul><h2 id="nftscan"><a href="#nftscan" class="headerlink" title="nftscan"></a>nftscan</h2><ul><li><a href="https://www.nftscan.com/">nftscan</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;监控链上数据平台。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    
-      <category term="基础" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%9F%BA%E7%A1%80/"/>
     
       <category term="webhook" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/webhook/"/>
     
