@@ -344,7 +344,7 @@
 
 <h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
 
-<p><a href="https://www.zhihu.com/question/52668301/answer/131573702">CNN(卷积神经网络)是什么</a></p>
+<p><a href="https://www.zhihu.com/question/52668301/answer/131573702" rel="external nofollow noreferrer">CNN(卷积神经网络)是什么</a></p>
 <br/>
 
 <h1 id="原文内容，大段-copy"><a href="#原文内容，大段-copy" class="headerlink" title="原文内容，大段 copy"></a>原文内容，大段 copy</h1><br/>
@@ -360,7 +360,7 @@
 <h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p>回到细节上来。更为详细的 CNN 工作概述指的是你挑一张图像，让它历经一系列卷积层、非线性层、池化（下采样（downsampling））层和完全连接层，最终得到输出。正如之前所说，输出可以是最好地描述了图像内容的一个单独分类或一组分类的概率。如今，难点在于理解其中每一层的工作方法。我们先来看最重要的部分。</p>
 <h2 id="第一层——数学部分"><a href="#第一层——数学部分" class="headerlink" title="第一层——数学部分"></a>第一层——数学部分</h2><p>CNN 的第一层通常是卷积层（Convolutional Layer）。首先需要了解卷积层的输入内容是什么。如上所述，输入内容为一个 32 x 32 x 3 的像素值数组。现在，解释卷积层的最佳方法是想象有一束手电筒光正从图像的左上角照过。假设手电筒光可以覆盖 5 x 5 的区域，想象一下手电筒光照过输入图像的所有区域。在机器学习术语中，这束手电筒被叫做过滤器（filter，有时候也被称为神经元（neuron）或核（kernel）），被照过的区域被称为感受野（receptive field）。过滤器同样也是一个数组（其中的数字被称作权重或参数）。重点在于过滤器的深度必须与输入内容的深度相同（这样才能确保可以进行数学运算），因此过滤器大小为 5 x 5 x 3。现在，以过滤器所处在的第一个位置为例，即图像的左上角。当筛选值在图像上滑动（卷积运算）时，过滤器中的值会与图像中的原始像素值相乘（又称为计算点积）。这些乘积被加在一起（从数学上来说，一共会有 75 个乘积）。现在你得到了一个数字。切记，该数字只是表示过滤器位于图片左上角的情况。我们在输入内容上的每一位置重复该过程。（下一步将是将过滤器右移 1 单元，接着再右移 1 单元，以此类推。）输入内容上的每一特定位置都会产生一个数字。过滤器滑过所有位置后将得到一个 28 x 28 x 1 的数组，我们称之为激活映射（activation map）或特征映射（feature map）。之所以得到一个 28 x 28 的数组的原因在于，在一张 32 x 32 的输入图像上，5 x 5 的过滤器能够覆盖到 784 个不同的位置。这 784 个位置可映射为一个 28 x 28 的数组。</p>
 <p><img src="/images/deeplearning/3_2.jpg" alt=""></p>
-<p>（注意：包括上图在内的一些图片来自于 Micheal Nielsen ）的 「神经网络与深度学习（ Neural Networks and Deep Learning）」一书。我强烈推荐这本书。这本书可免费在线浏览：<a href="http://neuralnetworksanddeeplearning.com/">书籍</a></p>
+<p>（注意：包括上图在内的一些图片来自于 Micheal Nielsen ）的 「神经网络与深度学习（ Neural Networks and Deep Learning）」一书。我强烈推荐这本书。这本书可免费在线浏览：<a href="http://neuralnetworksanddeeplearning.com/" rel="external nofollow noreferrer">书籍</a></p>
 <p>当我们使用两个而不是一个 5 x 5 x 3 的过滤器时，输出总量将会变成 28 x 28 x 2。采用的过滤器越多，空间维度（ spatial dimensions）保留得也就越好。数学上而言，这就是卷积层上发生的事情。</p>
 <h2 id="第一层——高层次角度"><a href="#第一层——高层次角度" class="headerlink" title="第一层——高层次角度"></a>第一层——高层次角度</h2><p>不过，从高层次角度而言卷积是如何工作的？每个过滤器可以被看成是特征标识符（ feature identifiers）。这里的特征指的是例如直边缘、原色、曲线之类的东西。想一想所有图像都共有的一些最简单的特征。假设第一组过滤器是 7 x 7 x 3 的曲线检测器。（在这一节，为了易于分析，暂且忽略该过滤器的深度为 3 个单元，只考虑过滤器和图像的顶层层面。）作为曲线过滤器，它将有一个像素结构，在曲线形状旁时会产生更高的数值（切记，我们所讨论的过滤器不过是一组数值！）</p>
 <p><img src="/images/deeplearning/3_3.png" alt=""></p>
@@ -375,7 +375,7 @@
 <p>这个值小了很多！这是因为图像的这一部分和曲线检测器过滤器不存在对应。记住，这个卷积层的输出是一个激活映射（activation map）。因此，在这个带有一个过滤器卷积的例子里（当筛选值为曲线检测器），激活映射将会显示出图像里最像曲线的区域。在该例子中，28 x 28 x 1 的激活映射的左上角的值为 6600。高数值意味着很有可能是输入内容中的曲线激活了过滤器。激活地图右上角的值将会是 0，因为输入内容中没有任何东西能激活过滤器（更简单地说，原始图片中的这一区域没有任何曲线）。这仅仅是一组检测右弯曲线的过滤器。还有其它检测左弯曲线或直线边缘的过滤器。过滤器越多，激活映射的深度越大，我们对输入内容的了解也就越多。</p>
 <p>声明：我在本小节中描绘的过滤器（filter）只是为了描述卷积中的数学过程。在下图中你可以看到训练后的网络中第一个卷积层的过滤器的实际可视化。尽管如此，主要观点仍旧不变。当在输入内容中寻找特定特征时，第一层上的过滤器在输入图像上进行卷积运算和「激活」（即计算高数值）。</p>
 <p><img src="/images/deeplearning/3_7.jpg" alt=""></p>
-<p>上图来自于斯坦福大学由 Andrej Karpathy 和 Justin Johnson 授课的 CS 231N 课程，推荐给渴望更深层理解 CNN 的人们：<a href="http://cs231n.stanford.edu/">CS231n: Convolutional Neural Networks for Visual Recognition</a></p>
+<p>上图来自于斯坦福大学由 Andrej Karpathy 和 Justin Johnson 授课的 CS 231N 课程，推荐给渴望更深层理解 CNN 的人们：<a href="http://cs231n.stanford.edu/" rel="external nofollow noreferrer">CS231n: Convolutional Neural Networks for Visual Recognition</a></p>
 <h2 id="网络中的更深处"><a href="#网络中的更深处" class="headerlink" title="网络中的更深处"></a>网络中的更深处</h2><p>在传统卷积神经网络架构中，卷积层之间还有其它类型的层。我强烈建议有兴趣的人阅读和它们有关的材料，并理解相应的功能和作用；但总的来说，它们提供的非线性和维度保留有助于提高网络的稳健性（robustness）并控制过拟合。一个典型的 CNN 结构看起来是这样的：</p>
 <p><img src="/images/deeplearning/3_8.png" alt=""></p>
 <p>输入→卷积→ReLU→卷积→ReLU→池化→ReLU→卷积→ReLU→池化→全连接</p>
@@ -442,7 +442,7 @@
 <p>Yoshua Bengio （另外一个深度学习先驱 ）论文：How transferable are features in deep neural networks?<br>Ali Sharif Razavian 论文：CNN Features off-the-shelf: an Astounding Baseline for Recognition<br>Jeff Donahue 论文：DeCAF: A Deep Convolutional Activation Feature for Generic Visual Recognition</p>
 </blockquote>
 <h2 id="数据增强技术"><a href="#数据增强技术" class="headerlink" title="数据增强技术"></a>数据增强技术</h2><p>现在我们对卷积网络中数据的重要性可能已经感到有些麻木了，所以我们来谈下如何利用一些简单的转换方法将你现有的数据集变得更大。正如我们之前所提及的，当计算机将图片当作输入时，它将用一个包含一列像素值的数组描述（这幅图）。若是图片左移一个像素。对你和我来说，这种变化是微不可察的。然而对计算机而已，这种变化非常显著：这幅图的类别和标签保持不变，数组却变化了。这种改变训练数据的数组表征而保持标签不变的方法被称作数据增强技术。这是一种人工扩展数据集的方法。人们经常使用的增强方法包括灰度变化、水平翻转、垂直翻转、随机编组、色值跳变、翻译、旋转等其他多种方法。通过利用这些训练数据的转换方法，你将获得两倍甚至三倍于原数据的训练样本。</p>
-<p><a href="https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650717691&idx=2&sn=3f0b66aa9706aae1a30b01309aa0214c#rd">深度 | 从入门到精通：卷积神经网络初学者指南（附论文）</a></p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650717691&idx=2&sn=3f0b66aa9706aae1a30b01309aa0214c#rd" rel="external nofollow noreferrer">深度 | 从入门到精通：卷积神经网络初学者指南（附论文）</a></p>
 
     </div>
 
@@ -583,10 +583,10 @@
 </div>
   <div class="links-of-author motion-element">
       <span class="links-of-author-item">
-        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
-        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
       </span>
   </div>
 
@@ -615,10 +615,10 @@
   </span>
   <span class="author" itemprop="copyrightHolder">犀牛</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
   </div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
   </div>
 
         

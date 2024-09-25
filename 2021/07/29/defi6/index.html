@@ -339,15 +339,15 @@
 <h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
 
 <ul>
-<li><a href="https://www.chainnews.com/articles/983380972155.htm">图解 DeFi 闪电贷原理与常见用例</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/237656859">智能合约 + 闪电贷 初体验</a></li>
-<li><a href="http://blog.hubwiz.com/2021/01/23/flashloan-arbitrage-bot-tutorial/">闪电贷套利机器人开发教程（一）</a></li>
-<li><a href="http://blog.hubwiz.com/2021/01/29/flashloan-arbitrage-bot-tutorial-2/">闪电贷套利机器人开发教程（二）</a></li>
-<li><a href="https://learnblockchain.cn/article/2816">如何使用Aave进行闪电贷</a></li>
-<li><a href="https://www.youtube.com/watch?v=kDkehUi5MoU&t=168s">崔棉大师教你玩转闪电贷(上集)</a></li>
-<li><a href="https://www.youtube.com/watch?v=EItibs4sy8g">崔棉大师教你玩转闪电贷(下集)</a></li>
-<li><a href="https://github.com/Fankouzu/flashloan">flashloan</a></li>
-<li><a href="https://github.com/yuyasugano/pancake-bakery-arbitrage/tree/main/contracts">pancake-bakery-arbitrage</a></li>
+<li><a href="https://www.chainnews.com/articles/983380972155.htm" rel="external nofollow noreferrer">图解 DeFi 闪电贷原理与常见用例</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/237656859" rel="external nofollow noreferrer">智能合约 + 闪电贷 初体验</a></li>
+<li><a href="http://blog.hubwiz.com/2021/01/23/flashloan-arbitrage-bot-tutorial/" rel="external nofollow noreferrer">闪电贷套利机器人开发教程（一）</a></li>
+<li><a href="http://blog.hubwiz.com/2021/01/29/flashloan-arbitrage-bot-tutorial-2/" rel="external nofollow noreferrer">闪电贷套利机器人开发教程（二）</a></li>
+<li><a href="https://learnblockchain.cn/article/2816" rel="external nofollow noreferrer">如何使用Aave进行闪电贷</a></li>
+<li><a href="https://www.youtube.com/watch?v=kDkehUi5MoU&t=168s" rel="external nofollow noreferrer">崔棉大师教你玩转闪电贷(上集)</a></li>
+<li><a href="https://www.youtube.com/watch?v=EItibs4sy8g" rel="external nofollow noreferrer">崔棉大师教你玩转闪电贷(下集)</a></li>
+<li><a href="https://github.com/Fankouzu/flashloan" rel="external nofollow noreferrer">flashloan</a></li>
+<li><a href="https://github.com/yuyasugano/pancake-bakery-arbitrage/tree/main/contracts" rel="external nofollow noreferrer">pancake-bakery-arbitrage</a></li>
 </ul>
 <br/>
 
@@ -362,7 +362,7 @@
 <p>这里我们以 <code>pancakeswap</code> 作为例子。</p>
 <p>首先参考 <code>pair</code> 中的一段代码。</p>
 <h2 id="PancakePair-sol"><a href="#PancakePair-sol" class="headerlink" title="PancakePair.sol"></a>PancakePair.sol</h2><ul>
-<li><a href="https://github.com/pancakeswap/pancake-swap-core/blob/master/contracts/PancakePair.sol">PancakePair.sol</a></li>
+<li><a href="https://github.com/pancakeswap/pancake-swap-core/blob/master/contracts/PancakePair.sol" rel="external nofollow noreferrer">PancakePair.sol</a></li>
 </ul>
 <figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// this low-level function should be called from a contract which performs important safety checks</span></span><br><span class="line"><span class="keyword">function</span> swap(uint amount0Out, uint amount1Out, address <span class="keyword">to</span>, <span class="built_in">bytes</span> calldata data) external lock &#123;</span><br><span class="line">    require(amount0Out &gt; <span class="number">0</span><span class="operator"> || </span>amount1Out &gt; <span class="number">0</span>, 'Pancake: INSUFFICIENT_OUTPUT_AMOUNT');</span><br><span class="line">    (uint112 _reserve0, uint112 _reserve1,) = get<span class="constructor">Reserves()</span>; <span class="comment">// gas savings</span></span><br><span class="line">    require(amount0Out &lt; _reserve0<span class="operator"> &amp;&amp; </span>amount1Out &lt; _reserve1, 'Pancake: INSUFFICIENT_LIQUIDITY');</span><br><span class="line"></span><br><span class="line">    uint balance0;</span><br><span class="line">    uint balance1;</span><br><span class="line">    &#123; <span class="comment">// scope for _token&#123;0,1&#125;, avoids stack too deep errors</span></span><br><span class="line">    address _token0 = token0;</span><br><span class="line">    address _token1 = token1;</span><br><span class="line">    require(<span class="keyword">to</span> != _token0<span class="operator"> &amp;&amp; </span><span class="keyword">to</span> != _token1, 'Pancake: INVALID_TO');</span><br><span class="line">    <span class="keyword">if</span> (amount0Out &gt; <span class="number">0</span>) <span class="constructor">_safeTransfer(<span class="params">_token0</span>, <span class="params">to</span>, <span class="params">amount0Out</span>)</span>; <span class="comment">// optimistically transfer tokens</span></span><br><span class="line">    <span class="keyword">if</span> (amount1Out &gt; <span class="number">0</span>) <span class="constructor">_safeTransfer(<span class="params">_token1</span>, <span class="params">to</span>, <span class="params">amount1Out</span>)</span>; <span class="comment">// optimistically transfer tokens</span></span><br><span class="line">    <span class="keyword">if</span> (data.length &gt; <span class="number">0</span>) <span class="constructor">IPancakeCallee(<span class="params">to</span>)</span>.pancake<span class="constructor">Call(<span class="params">msg</span>.<span class="params">sender</span>, <span class="params">amount0Out</span>, <span class="params">amount1Out</span>, <span class="params">data</span>)</span>;</span><br><span class="line">    balance0 = <span class="constructor">IERC20(<span class="params">_token0</span>)</span>.balance<span class="constructor">Of(<span class="params">address</span>(<span class="params">this</span>)</span>);</span><br><span class="line">    balance1 = <span class="constructor">IERC20(<span class="params">_token1</span>)</span>.balance<span class="constructor">Of(<span class="params">address</span>(<span class="params">this</span>)</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    uint amount0In = balance0 &gt; _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : <span class="number">0</span>;</span><br><span class="line">    uint amount1In = balance1 &gt; _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : <span class="number">0</span>;</span><br><span class="line">    require(amount0In &gt; <span class="number">0</span><span class="operator"> || </span>amount1In &gt; <span class="number">0</span>, 'Pancake: INSUFFICIENT_INPUT_AMOUNT');</span><br><span class="line">    &#123; <span class="comment">// scope for reserve&#123;0,1&#125;Adjusted, avoids stack too deep errors</span></span><br><span class="line">    uint balance0Adjusted = balance0.mul(<span class="number">1000</span>).sub(amount0In.mul(<span class="number">2</span>));</span><br><span class="line">    uint balance1Adjusted = balance1.mul(<span class="number">1000</span>).sub(amount1In.mul(<span class="number">2</span>));</span><br><span class="line">    require(balance0Adjusted.mul(balance1Adjusted) &gt;= uint(_reserve0).mul(_reserve1).mul(<span class="number">1000</span>**<span class="number">2</span>), 'Pancake: K');</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="constructor">_update(<span class="params">balance0</span>, <span class="params">balance1</span>, <span class="params">_reserve0</span>, <span class="params">_reserve1</span>)</span>;</span><br><span class="line">    emit <span class="constructor">Swap(<span class="params">msg</span>.<span class="params">sender</span>, <span class="params">amount0In</span>, <span class="params">amount1In</span>, <span class="params">amount0Out</span>, <span class="params">amount1Out</span>, <span class="params">to</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -578,10 +578,10 @@ if (amount1Out &gt; 0) _safeTransfer(_token1, to, amount1Out); // optimistically
 </div>
   <div class="links-of-author motion-element">
       <span class="links-of-author-item">
-        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
-        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
       </span>
   </div>
 
@@ -610,10 +610,10 @@ if (amount1Out &gt; 0) _safeTransfer(_token1, to, amount1Out); // optimistically
   </span>
   <span class="author" itemprop="copyrightHolder">犀牛</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
   </div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
   </div>
 
         

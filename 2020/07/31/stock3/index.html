@@ -344,7 +344,7 @@ compile group: &apos;net.java.dev.jna&apos;, name: &apos;jna-platform&apos;, ver
 <p>另外，比较重要的一点是，<code>sample</code> 文件夹里面存着官方给的例子。</p>
 <p>在这里我们不直接看 <code>sample</code> 代码，而是，看一下官方文档中给的例子。</p>
 <h2 id="快速上手"><a href="#快速上手" class="headerlink" title="快速上手"></a>快速上手</h2><ul>
-<li><a href="https://futunnopen.github.io/futu-api-doc/java/start.html">快速上手</a></li>
+<li><a href="https://futunnopen.github.io/futu-api-doc/java/start.html" rel="external nofollow noreferrer">快速上手</a></li>
 </ul>
 <p>如果我们直接按照上面的环境配好，并且，将上面的代码都写好</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">package com.star;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.futu.openapi.*;</span><br><span class="line"><span class="keyword">import</span> com.futu.openapi.pb.*;</span><br><span class="line"></span><br><span class="line">public class FutuStart &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        FTAPI.init(); //初始化环境</span><br><span class="line">        FTAPI_Conn_Qot client = new FTAPI_Conn_Qot(); //创建行情对象</span><br><span class="line">        client.setConnSpi(new SampleQotCallback()); //创建连接回调类</span><br><span class="line">        client.setQotSpi(new SampleQotCallback()); //创建行情数据回调类</span><br><span class="line">        client.setClientInfo(<span class="string">"FTAPI4J_Sample"</span>, <span class="number">1</span>); //建立标识</span><br><span class="line">        client.initConnect(<span class="string">"127.0.0.1"</span>, (short)<span class="number">11111</span>, false); //开始连接</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class SampleQotCallback implements FTSPI_Qot, FTSPI_Conn</span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onInitConnect(FTAPI_Conn client, long errCode, String desc)</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Qot onInitConnect: ret=%b desc=%s connID=%d\n"</span>, errCode, desc, client.getConnectID());</span><br><span class="line">        //简单演示一下获取用户行情基本信息</span><br><span class="line">        FTAPI_Conn_Qot qot = (FTAPI_Conn_Qot)client;</span><br><span class="line">        &#123;</span><br><span class="line">            GetGlobalState.Request req = GetGlobalState.Request.newBuilder().setC2S(</span><br><span class="line">                    GetGlobalState.C2S.newBuilder().setUserID(<span class="number">15891586</span>)</span><br><span class="line">            ).build();</span><br><span class="line">            int seqNo = qot.getGlobalState(req);</span><br><span class="line">            System.out.printf(<span class="string">"Send GetGlobalState: %d\n"</span>, seqNo);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onDisconnect(FTAPI_Conn client, long errCode) &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Qot onDisConnect: %d\n"</span>, errCode);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onReply_GetGlobalState(FTAPI_Conn client, int nSerialNo, GetGlobalState.Response rsp) &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Reply: GetGlobalState: %d  %s\n"</span>, nSerialNo, rsp.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -374,7 +374,7 @@ public void onReply_GetGlobalState(FTAPI_Conn client, int nSerialNo, GetGlobalSt
 }</code></pre><p>那如何知道怎么调用接口，以及回调函数。</p>
 <p>这个时候，没有啥好办法，只能看文档和 <code>sample</code> 中的例子。</p>
 <ul>
-<li><a href="https://futunnopen.github.io/futu-api-doc/java/Quote_API.html">行情API</a></li>
+<li><a href="https://futunnopen.github.io/futu-api-doc/java/Quote_API.html" rel="external nofollow noreferrer">行情API</a></li>
 </ul>
 <p>不得不说，他们的文档写的非常烂，所以，只能结合 <code>sample</code> 中的例子看。</p>
 <h2 id="对接-websocket"><a href="#对接-websocket" class="headerlink" title="对接 websocket"></a>对接 websocket</h2><p>另外，这这里，我贴一下如何对接 <code>websocket</code> 的代码，供大家参考。</p>
@@ -559,10 +559,10 @@ optional int32 secType = 2; //Qot_Common.SecurityType,股票类型</code></pre><
 </div>
   <div class="links-of-author motion-element">
       <span class="links-of-author-item">
-        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
-        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
       </span>
   </div>
 
@@ -591,10 +591,10 @@ optional int32 secType = 2; //Qot_Common.SecurityType,股票类型</code></pre><
   </span>
   <span class="author" itemprop="copyrightHolder">犀牛</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
   </div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
   </div>
 
         

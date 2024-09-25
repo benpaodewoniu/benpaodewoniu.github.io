@@ -326,8 +326,8 @@
 
 <p>这里以人体关键点为例。</p>
 <ul>
-<li><a href="https://ai.baidu.com/">百度 AI</a></li>
-<li><a href="https://cloud.baidu.com/doc/BODY/s/0k3cpyxme">人体关键点识别</a></li>
+<li><a href="https://ai.baidu.com/" rel="external nofollow noreferrer">百度 AI</a></li>
+<li><a href="https://cloud.baidu.com/doc/BODY/s/0k3cpyxme" rel="external nofollow noreferrer">人体关键点识别</a></li>
 </ul>
 <br/>
 
@@ -338,7 +338,7 @@
 <p>然后进入应用管理界面，拿到相关的 key 和 secret。</p>
 <p>根据</p>
 <ul>
-<li><a href="https://ai.baidu.com/ai-doc/REFERENCE/Ck3dwjhhu">鉴权认证机制</a></li>
+<li><a href="https://ai.baidu.com/ai-doc/REFERENCE/Ck3dwjhhu" rel="external nofollow noreferrer">鉴权认证机制</a></li>
 </ul>
 <p>获得相应的 <code>access token</code>。</p>
 <p>相应的请求如下</p>
@@ -353,7 +353,7 @@
 <li><a href="/2021/01/12/nginx2/">nginx | 解决跨域问题</a></li>
 </ul>
 <h2 id="获取-关键点信息"><a href="#获取-关键点信息" class="headerlink" title="获取 关键点信息"></a>获取 关键点信息</h2><ul>
-<li><a href="https://cloud.baidu.com/doc/BODY/s/0k3cpyxme">人体关键点识别</a></li>
+<li><a href="https://cloud.baidu.com/doc/BODY/s/0k3cpyxme" rel="external nofollow noreferrer">人体关键点识别</a></li>
 </ul>
 <p>这里直接贴一下相关的代码。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">image2Base64</span>(<span class="params">img</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> canvas = <span class="built_in">document</span>.createElement(<span class="string">"canvas"</span>);</span><br><span class="line">    canvas.width = img.width;</span><br><span class="line">    canvas.height = img.height;</span><br><span class="line">    <span class="keyword">let</span> ctx = canvas.getContext(<span class="string">"2d"</span>);</span><br><span class="line">    ctx.drawImage(img, <span class="number">0</span>, <span class="number">0</span>, img.width, img.height);</span><br><span class="line">    <span class="keyword">return</span> canvas.toDataURL();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> img_pose <span class="keyword">from</span> <span class="string">"../../images/3.jpg"</span></span><br><span class="line"></span><br><span class="line">$(<span class="string">"#button"</span>).click(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> base64 = <span class="string">""</span>;</span><br><span class="line">    <span class="keyword">let</span> img = <span class="keyword">new</span> Image();</span><br><span class="line">    img.src = img_pose;</span><br><span class="line">    img.onload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        base64 = image2Base64(img).substring(<span class="number">22</span>,);</span><br><span class="line"></span><br><span class="line">        $.ajax(&#123;</span><br><span class="line">            url: <span class="string">"/api/rest/2.0/image-classify/v1/body_analysis?access_token=你的token"</span>,</span><br><span class="line">            type: <span class="string">"POST"</span>,</span><br><span class="line">            contentType: <span class="string">"application/x-www-form-urlencoded"</span>,</span><br><span class="line">            data: &#123;</span><br><span class="line">                image: base64,</span><br><span class="line">            &#125;,</span><br><span class="line">            success: <span class="function"><span class="keyword">function</span> (<span class="params">res</span>) </span>&#123;</span><br><span class="line">                <span class="built_in">console</span>.log(res[<span class="string">"person_info"</span>][<span class="number">0</span>][<span class="string">"body_parts"</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
@@ -505,10 +505,10 @@
 </div>
   <div class="links-of-author motion-element">
       <span class="links-of-author-item">
-        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
-        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
       </span>
   </div>
 
@@ -537,10 +537,10 @@
   </span>
   <span class="author" itemprop="copyrightHolder">犀牛</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
   </div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
   </div>
 
         

@@ -321,7 +321,7 @@
       
         <p>参考资料</p>
 <ul>
-<li><a href="https://wtf.academy/solidity-application/Airdrop/">发送空投</a></li>
+<li><a href="https://wtf.academy/solidity-application/Airdrop/" rel="external nofollow noreferrer">发送空投</a></li>
 </ul>
 <a id="more"></a>
 
@@ -335,14 +335,14 @@
 <p>关于 ERC20 请参考</p>
 <ul>
 <li><a href="/2023/02/15/solidity49/">solidity | 再次探究 ERC20</a><ul>
-<li><a href="https://testnet.bscscan.com/address/0xd1693560A107B2E12F32e925FDe1867EC38FA3c6">0xd1693560A107B2E12F32e925FDe1867EC38FA3c6</a></li>
+<li><a href="https://testnet.bscscan.com/address/0xd1693560A107B2E12F32e925FDe1867EC38FA3c6" rel="external nofollow noreferrer">0xd1693560A107B2E12F32e925FDe1867EC38FA3c6</a></li>
 </ul>
 </li>
 </ul>
 <p>空投合约如下</p>
 <figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span>.<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">import <span class="string">"@openzeppelin/contracts/token/ERC20/IERC20.sol"</span>;</span><br><span class="line">import <span class="string">"@openzeppelin/contracts/utils/math/SafeMath.sol"</span>;</span><br><span class="line"></span><br><span class="line">pragma solidity ^<span class="number">0.8</span>.<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">contract airdrop &#123;</span><br><span class="line"></span><br><span class="line">    using SafeMath <span class="keyword">for</span> uint256;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 数组求和函数</span></span><br><span class="line">    function getSum(uint256[] calldata <span class="variable">_arr</span>) public pure returns (uint sum)</span><br><span class="line">    &#123;</span><br><span class="line">        bool state;</span><br><span class="line">        <span class="keyword">for</span> (uint i = <span class="number">0</span>; i &lt; <span class="variable">_arr</span>.length; i++) &#123;</span><br><span class="line">            (state, sum) = sum.tryAdd(<span class="variable">_arr</span>[i]);</span><br><span class="line">            require(state == <span class="literal">true</span>, <span class="string">"over max"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function multiTransferToken(</span><br><span class="line">        address <span class="variable">_token</span>,</span><br><span class="line">        address[] calldata <span class="variable">_addresses</span>,</span><br><span class="line">        uint256[] calldata <span class="variable">_amounts</span></span><br><span class="line">    ) external &#123;</span><br><span class="line">        <span class="comment">// 检查：_addresses和_amounts数组的长度相等</span></span><br><span class="line">        require(<span class="variable">_addresses</span>.length == <span class="variable">_amounts</span>.length, <span class="string">"Lengths of Addresses and Amounts NOT EQUAL"</span>);</span><br><span class="line">        IERC20 token = IERC20(<span class="variable">_token</span>);</span><br><span class="line">        <span class="comment">// 声明IERC合约变量</span></span><br><span class="line">        uint <span class="variable">_amountSum</span> = getSum(<span class="variable">_amounts</span>);</span><br><span class="line">        <span class="comment">// 计算空投代币总量</span></span><br><span class="line">        <span class="comment">// 检查：授权代币数量 &gt;= 空投代币总量</span></span><br><span class="line">        require(token.allowance(msg.sender, address(this)) &gt;= <span class="variable">_amountSum</span>, <span class="string">"Need Approve ERC20 token"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// for循环，利用transferFrom函数发送空投</span></span><br><span class="line">        <span class="keyword">for</span> (uint8 i; i &lt; <span class="variable">_addresses</span>.length; i++) &#123;</span><br><span class="line">            token.transferFrom(msg.sender, <span class="variable">_addresses</span>[i], <span class="variable">_amounts</span>[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/// 向多个地址转账ETH</span></span><br><span class="line">    function multiTransferETH(</span><br><span class="line">        address payable[] calldata <span class="variable">_addresses</span>,</span><br><span class="line">        uint256[] calldata <span class="variable">_amounts</span></span><br><span class="line">    ) public payable &#123;</span><br><span class="line">        <span class="comment">// 检查：_addresses和_amounts数组的长度相等</span></span><br><span class="line">        require(<span class="variable">_addresses</span>.length == <span class="variable">_amounts</span>.length, <span class="string">"Lengths of Addresses and Amounts NOT EQUAL"</span>);</span><br><span class="line">        uint <span class="variable">_amountSum</span> = getSum(<span class="variable">_amounts</span>);</span><br><span class="line">        <span class="comment">// 计算空投ETH总量</span></span><br><span class="line">        <span class="comment">// 检查转入ETH等于空投总量</span></span><br><span class="line">        require(msg.value == <span class="variable">_amountSum</span>, <span class="string">"Transfer amount error"</span>);</span><br><span class="line">        <span class="comment">// for循环，利用transfer函数发送ETH</span></span><br><span class="line">        <span class="keyword">for</span> (uint256 i = <span class="number">0</span>; i &lt; <span class="variable">_addresses</span>.length; i++) &#123;</span><br><span class="line">            <span class="variable">_addresses</span>[i].transfer(<span class="variable">_amounts</span>[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>部署在 <code>bsc</code> 测试网 <a href="https://testnet.bscscan.com/address/0x2062359C43E6B14E0E752a13034df1c21a514Adb">0x2062359C43E6B14E0E752a13034df1c21a514Adb</a></p>
+<p>部署在 <code>bsc</code> 测试网 <a href="https://testnet.bscscan.com/address/0x2062359C43E6B14E0E752a13034df1c21a514Adb" rel="external nofollow noreferrer">0x2062359C43E6B14E0E752a13034df1c21a514Adb</a></p>
 <p>借用</p>
 <ul>
 <li><a href="/2023/02/15/solidity49/">solidity | 再次探究 ERC20</a></li>
@@ -357,15 +357,15 @@
 
 <ul>
 <li><code>mint</code><ul>
-<li><a href="https://testnet.bscscan.com/tx/0xc3a875ddff5e4ce3951943d4c9b99a19b627553deeb915a29a177d88becea012">0xc3a875ddff5e4ce3951943d4c9b99a19b627553deeb915a29a177d88becea012</a></li>
+<li><a href="https://testnet.bscscan.com/tx/0xc3a875ddff5e4ce3951943d4c9b99a19b627553deeb915a29a177d88becea012" rel="external nofollow noreferrer">0xc3a875ddff5e4ce3951943d4c9b99a19b627553deeb915a29a177d88becea012</a></li>
 </ul>
 </li>
 <li><code>approve</code><ul>
-<li><a href="https://testnet.bscscan.com/tx/0xd93b57af30cf168acfe5f443d1170b250f63a3ae4443939eb0ee591362f3cfa2">0xd93b57af30cf168acfe5f443d1170b250f63a3ae4443939eb0ee591362f3cfa2</a></li>
+<li><a href="https://testnet.bscscan.com/tx/0xd93b57af30cf168acfe5f443d1170b250f63a3ae4443939eb0ee591362f3cfa2" rel="external nofollow noreferrer">0xd93b57af30cf168acfe5f443d1170b250f63a3ae4443939eb0ee591362f3cfa2</a></li>
 </ul>
 </li>
 <li><code>airdrop</code><ul>
-<li><a href="https://testnet.bscscan.com/tx/0xfa8dcd42df5da39e3a0e9eee1ba21e4b8a805eedae3d7c79b12e663fd231cabb">0xfa8dcd42df5da39e3a0e9eee1ba21e4b8a805eedae3d7c79b12e663fd231cabb</a></li>
+<li><a href="https://testnet.bscscan.com/tx/0xfa8dcd42df5da39e3a0e9eee1ba21e4b8a805eedae3d7c79b12e663fd231cabb" rel="external nofollow noreferrer">0xfa8dcd42df5da39e3a0e9eee1ba21e4b8a805eedae3d7c79b12e663fd231cabb</a></li>
 </ul>
 </li>
 </ul>
@@ -508,10 +508,10 @@
 </div>
   <div class="links-of-author motion-element">
       <span class="links-of-author-item">
-        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
-        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
       </span>
   </div>
 
@@ -540,10 +540,10 @@
   </span>
   <span class="author" itemprop="copyrightHolder">犀牛</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
   </div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
   </div>
 
         
