@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://benpaodewoniu.github.io/"/>
-  <updated>2024-09-26T16:25:50.138Z</updated>
+  <updated>2024-10-01T18:08:37.552Z</updated>
   <id>http://benpaodewoniu.github.io/</id>
   
   <author>
@@ -15,6 +15,61 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>qq | QQ 机器人</title>
+    <link href="http://benpaodewoniu.github.io/2024/10/02/qq0/"/>
+    <id>http://benpaodewoniu.github.io/2024/10/02/qq0/</id>
+    <published>2024-10-01T17:35:02.000Z</published>
+    <updated>2024-10-01T18:08:37.552Z</updated>
+    
+    <content type="html"><![CDATA[<p>目前，很多想要开发一个 <code>QQ机器人</code> ，最好的就是申请 <code>QQ</code> 官方的开发平台，但是，需要企业资质。</p><p>现在很多第三方都已经被封了，比如 </p><ul><li><code>go-cqhttp</code></li><li><code>Shamrock</code></li></ul><a id="more"></a><h2 id="NapCatQQ"><a href="#NapCatQQ" class="headerlink" title="NapCatQQ"></a>NapCatQQ</h2><p>这个的原理是，登陆 <code>linux</code> 的 <code>QQ 客户端</code>，然后通过 <code>NapCatQQ</code> 做一个中间信息传递，把消息传递给你写的信息处理客户端中。</p><p>环境 <code>ubuntu</code>。</p><ul><li><a href="https://napneko.github.io/zh-CN/guide/getting-started" rel="external nofollow noreferrer">doc</a></li></ul><p>使用的方法是命令行启动。</p><p><img src="/images/qq/1.png" alt=""></p><p>复制命令行，会下载一个 docker 镜像。</p><figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">root@</span>iZj6c1u8nkwmm3oqxczwozZ:~# docker images -a</span><br><span class="line">REPOSITORY                                 TAG       IMAGE ID       CREATED        SIZE</span><br><span class="line">docker<span class="number">.1</span>panel.dev/mlikiowa/napcat-docker   latest    cce21218ad8b   <span class="number">33</span> hours ago   <span class="number">1.36</span>GB</span><br><span class="line">mlikiowa/napcat-docker                     latest    cce21218ad8b   <span class="number">33</span> hours ago   <span class="number">1.36</span>GB</span><br></pre></td></tr></table></figure><p>上面两个镜像哪个都行。</p><p>上面的命令执行完毕后，会主动启动一个镜像，类似</p><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root<span class="variable">@iZj6c1u8nkwmm3oqxczwozZ</span><span class="symbol">:~</span><span class="comment"># docker ps -a</span></span><br><span class="line">CONTAINER ID   IMAGE                           COMMAND                CREATED          STATUS          PORTS     NAMES</span><br><span class="line">c1d94098cb9f   mlikiowa/napcat-<span class="symbol">docker:</span>latest   <span class="string">"bash entrypoint.sh"</span>   <span class="number">39</span> minutes ago   Up <span class="number">39</span> minutes             napcat</span><br></pre></td></tr></table></figure><p>ps： 我修改了网络桥接模式，所以，这里显示和你有出入。</p><p>另外，我现在开始说一些常备的命令。</p><h3 id="关闭容器运行"><a href="#关闭容器运行" class="headerlink" title="关闭容器运行"></a>关闭容器运行</h3><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">stop</span> napcat</span><br></pre></td></tr></table></figure><h3 id="删除结束的容器"><a href="#删除结束的容器" class="headerlink" title="删除结束的容器"></a>删除结束的容器</h3><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker rm napcat</span></span><br></pre></td></tr></table></figure><h3 id="启动-QQ-或者新的-QQ"><a href="#启动-QQ-或者新的-QQ" class="headerlink" title="启动 QQ 或者新的 QQ"></a>启动 QQ 或者新的 QQ</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="builtin-name">run</span> -d -e <span class="attribute">ACCOUNT</span>=&lt;QQ号&gt; -e <span class="attribute">WS_ENABLE</span>=<span class="literal">true</span> -e <span class="attribute">NAPCAT_GID</span>=$(id -g) -e <span class="attribute">NAPCAT_UID</span>=$(id -u) --network host --name napcat <span class="attribute">--restart</span>=always mlikiowa/napcat-docker:latest</span><br></pre></td></tr></table></figure><p>这里用的网络模式是 host 模式，因为，我想把对接脚本放在宿主机上。</p><h3 id="查看-QQ-码"><a href="#查看-QQ-码" class="headerlink" title="查看 QQ 码"></a>查看 QQ 码</h3><p>这是扫码登录。</p><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker logs napcat</span></span><br></pre></td></tr></table></figure><p>进行扫码登录。</p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">exit</span></span><br></pre></td></tr></table></figure><p>退出容器。</p><h3 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h3><p>默认对外是 <code>6099</code> 端口，所以，你的服务器也要开启这个端口的访问。</p><p>使用 <code>docker exec -it napcat /bin/bash</code> 进入运行的容器中。</p><p>在 <code>/app/napcat/config</code> 中 <code>webui.json</code> 记录了登录用的 <code>token</code>。</p><p>访问 <code>http://IP:6099/webui/login.html</code>，输入 <code>token</code> 就进入了配置界面。</p><p>每次重新启动 <code>docker</code> ，这个 <code>token</code> 都会变。</p><p><img src="/images/qq/1_1.png" alt=""></p><p>红框要设置一下，这里就是接收事件的 <code>url</code>。</p><ul><li><a href="https://napneko.github.io/zh-CN/develop/compatibility/event" rel="external nofollow noreferrer">事件</a></li></ul><p>我把对接脚本放在了物理机上，举一个简单的例子。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># main.py</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/', methods=['POST'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">receive_event</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 指定群聊 = 1234567</span></span><br><span class="line">    data = request.json</span><br><span class="line">    print(<span class="string">"Received event:"</span>, data)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"OK"</span>, <span class="number">200</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(host=<span class="string">'0.0.0.0'</span>, port=<span class="number">5007</span>)</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;目前，很多想要开发一个 &lt;code&gt;QQ机器人&lt;/code&gt; ，最好的就是申请 &lt;code&gt;QQ&lt;/code&gt; 官方的开发平台，但是，需要企业资质。&lt;/p&gt;
+&lt;p&gt;现在很多第三方都已经被封了，比如 &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;go-cqhttp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Shamrock&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="平台" scheme="http://benpaodewoniu.github.io/categories/%E5%B9%B3%E5%8F%B0/"/>
+    
+      <category term="QQ" scheme="http://benpaodewoniu.github.io/categories/%E5%B9%B3%E5%8F%B0/QQ/"/>
+    
+    
+      <category term="QQ" scheme="http://benpaodewoniu.github.io/tags/QQ/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>tugou | 冲土狗记录</title>
+    <link href="http://benpaodewoniu.github.io/2024/10/01/tugou0/"/>
+    <id>http://benpaodewoniu.github.io/2024/10/01/tugou0/</id>
+    <published>2024-09-30T16:06:10.000Z</published>
+    <updated>2024-10-01T10:00:37.883Z</updated>
+    
+    <content type="html"><![CDATA[<div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">  <div class="hbe-input-container">  <input type="password" id="hbePass" placeholder="" />    <label for="hbePass">密码等级 0 ！！！</label>    <div class="bottom-line"></div>  </div>  <script id="hbeData" type="hbeData" data-hmacdigest="506d7d4a3c3c6117b07b1417ca4a670d455fb7ef77df8ec4ff36ce5a79f8b55e">23925b0e8ea1ed9cd9ade517107da5f27c5af80436205a609703a5605bff3a42a30f0e227274fec0d7d5449f890d77db30f967a7f7fb2deea05b9891d158d444f0516b28fbda1501f7abcfaa65b94dd9e184467458fbe973ec5a69c3e7ba15d6dd5ef095e5169daaac58f04f9f1c3bd194386142885059be0d7be3b47b4cf4c9ae264720c3270996c915f52bba50b915fe406854675f39ee1294360a0e7b93f2172921081e7808b3b9b43ce0a445c4d6878de5c528a7c10e6fd522031b6865ce3a4d11e662a9935f0d2c39f7dffe4e1193e4dcb84a516719670d7dfcaf81d34ef7ddae3fa995f637a4c097269427b48a0ec9b332cb6361e139b4b06e207fb2051463e7e952ca04999697540f65dd97ef76b684705cf5f96b9b6c464d8e036cafd14df558288867a0de0c217662b9efde56091bb731f1e077a624b845c4e620240e7af976122e5d11542e5a2f30e13bbd677d0863489fedbcb0bbbb56db9cae1934aae3d38dd360ff67b29a840a01dabc25503ba2c9e3a8b52fb4c7e432d91f44bf7139dc06743b2568330783b6db2e6555e859cbb1047ea7ff83041a730fa4c0087048a0dbcb130f9139c44cdc294ea91cf0a53317b149ae2f38588001798ecf929040688f991632feeb84062409c6556fd0f7a367f0dcbef2158b9d25f80ed981f8818d1e7191b849ede184e96914b5d125a437c822f7e0188990d434a63119417e665d7ccedc8bd0e1736929c2768b09456cbca9c4ae1a608bdbdf7b7ae79b91ac120ca30c242d6f6024edcd48a1e29e95dfbecce11155cad7fd2241eec7b9174ea3b2c90515a95677d1bfc609affadb84a41ef5bce5f66085e5e2377a69a50eaf2ecabb1e9ae4acbb39ab36b0f566603ffa988bd1eb40dd6219de749723299c5795583c73974ab23fe0a0c6c7541a7e940ce652451ae85091223e5fe6878252c6a08ab2c4e9a137d5945476f5865b81c51422dc5502e6dee6400b8bb1b0c5325f9fd86cf9055d6f9024d712fcff3f258fc3556badd71761426a030c7bf5dfdcb97a7c767a70c928794b656a74e0a408fdad9206ad05bb29c88a935fcfd89c32cc639e78b4fc32ab37f98069ffde93665edc95b9ff947526a137a760bd7c583cdbbad7e466aa86f062e283e34f466fb476bd98e30dd16f2e79c959d7429608c7275a9e1091d609cbf3b59b588b6a50468a99c75e957de2d8e600fd76739249af156ebaeb94218f8811cb7613b945868f06c6caaebf73261ccad03acbe9b130</script></div><script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">]]></content>
+    
+    <summary type="html">
+    
+      密码等级 0
+    
+    </summary>
+    
+      <category term="区块链" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    
+      <category term="dapp" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/"/>
+    
+      <category term="土狗" scheme="http://benpaodewoniu.github.io/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/dapp/%E5%9C%9F%E7%8B%97/"/>
+    
+    
+      <category term="土狗" scheme="http://benpaodewoniu.github.io/tags/%E5%9C%9F%E7%8B%97/"/>
+    
+  </entry>
   
   <entry>
     <title>python | 安装自己的包</title>
@@ -502,62 +557,6 @@
     <summary type="html">
     
       &lt;p&gt;这个属于一个比较简单的。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/"/>
-    
-      <category term="插件" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E6%8F%92%E4%BB%B6/"/>
-    
-      <category term="elementor" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E6%8F%92%E4%BB%B6/elementor/"/>
-    
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/tags/WordPress/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>wordpress | 对布局的调整</title>
-    <link href="http://benpaodewoniu.github.io/2024/09/08/wordpress27/"/>
-    <id>http://benpaodewoniu.github.io/2024/09/08/wordpress27/</id>
-    <published>2024-09-08T03:49:50.000Z</published>
-    <updated>2024-09-08T04:01:10.121Z</updated>
-    
-    <content type="html"><![CDATA[<p>如果只是添加布局的话，你只能看到几个特定的样式「以弹性盒子为例子」。</p><a id="more"></a><p><img src="/images/wordpress/27_0.png" alt=""></p><p>我们选择那 4 列模式。</p><p>选择内部容器，进行右键然后选择「添加同层容器」，就能添加了，具体样子可以自己调整。</p><p><img src="/images/wordpress/27_1.png" alt=""></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;如果只是添加布局的话，你只能看到几个特定的样式「以弹性盒子为例子」。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="网站设计" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/"/>
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/"/>
-    
-      <category term="插件" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E6%8F%92%E4%BB%B6/"/>
-    
-      <category term="elementor" scheme="http://benpaodewoniu.github.io/categories/%E7%BD%91%E7%AB%99%E8%AE%BE%E8%AE%A1/WordPress/%E6%8F%92%E4%BB%B6/elementor/"/>
-    
-    
-      <category term="WordPress" scheme="http://benpaodewoniu.github.io/tags/WordPress/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>wordpress | 简介</title>
-    <link href="http://benpaodewoniu.github.io/2024/09/08/wordpress26/"/>
-    <id>http://benpaodewoniu.github.io/2024/09/08/wordpress26/</id>
-    <published>2024-09-08T03:49:48.000Z</published>
-    <updated>2024-09-08T03:55:01.279Z</updated>
-    
-    <content type="html"><![CDATA[<p><code>elementor</code> 专注于网站的页面设计，提供拖拉拽的效果。</p><a id="more"></a><p><img src="/images/wordpress/26_0.png" alt=""></p><p>可以理解为通过低代码平台绘制网页，整体体验下来还可以。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;code&gt;elementor&lt;/code&gt; 专注于网站的页面设计，提供拖拉拽的效果。&lt;/p&gt;
     
     </summary>
     
