@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="如题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python threading 多线程">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/12/20/python42/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="如题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/42_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/42_1.jpg">
+<meta property="article:published_time" content="2018-12-20T01:44:41.000Z">
+<meta property="article:modified_time" content="2022-10-06T13:13:32.220Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="python 第三方库">
+<meta property="article:tag" content="threading">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/python/42_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/12/20/python42/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python threading 多线程 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/12/20/python42/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python threading 多线程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-20 09:44:41" itemprop="dateCreated datePublished" datetime="2018-12-20T09:44:41+08:00">2018-12-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-06 21:13:32" itemprop="dateModified" datetime="2022-10-06T21:13:32+08:00">2022-10-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多进程 & 多线程</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多线程</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/12/20/python42/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/12/20/python42/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如题。</p>
+<a id="more"></a>
+
+<h2 id="基础用法"><a href="#基础用法" class="headerlink" title="基础用法"></a>基础用法</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    print(threading.active_count())</span><br><span class="line">		<span class="comment"># 输出有多少个进程被激活</span></span><br><span class="line">			<span class="comment"># 1</span></span><br><span class="line">    print(threading.enumerate())</span><br><span class="line">		<span class="comment"># 输出被激活进程的名字</span></span><br><span class="line">			<span class="comment"># [&lt;_MainThread(MainThread, started 11792)&gt;]</span></span><br><span class="line">    print(threading.current_thread())</span><br><span class="line">		<span class="comment"># 输出当前正在使用哪个进程</span></span><br><span class="line">			<span class="comment"># &lt;_MainThread(MainThread, started 11792)&gt;</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br></pre></td></tr></table></figure>
+
+<h2 id="定义一个线程"><a href="#定义一个线程" class="headerlink" title="定义一个线程"></a>定义一个线程</h2><pre><code>added_thread = threading.Thread(target=thread_job)</code></pre><p>这段代码是讲，这是定义一个线程，里面的参数 target 就是要执行的代码段，也就是我们定义的那个线程要执行的内容</p>
+<p>定义完之后，我们还得要执行</p>
+<pre><code>added_thread.start()</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">thread_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"this is a test %s"</span> % threading.current_thread())</span><br><span class="line">		<span class="comment"># this is a test &lt;Thread(Thread-1, started 7412)&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    added_thread = threading.Thread(target=thread_job)</span><br><span class="line">    added_thread.start()</span><br><span class="line">    print(threading.active_count())</span><br><span class="line">		<span class="comment"># 2</span></span><br><span class="line">    print(threading.enumerate())</span><br><span class="line">		<span class="comment"># [&lt;_MainThread(MainThread, started 2396)&gt;, &lt;Thread(Thread-1, started 7412)&gt;]</span></span><br><span class="line">    print(threading.current_thread())</span><br><span class="line">		<span class="comment"># &lt;_MainThread(MainThread, started 2396)&gt;</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br></pre></td></tr></table></figure>
+
+<h2 id="join-功能"><a href="#join-功能" class="headerlink" title="join 功能"></a>join 功能</h2><p>演示一下线程间的异步</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">thread_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T1 START"</span>)</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">"T1 END"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    added_thread = threading.Thread(target=thread_job,name=<span class="string">"T1"</span>)</span><br><span class="line">    added_thread.start()</span><br><span class="line">    print(<span class="string">"all done"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># 输出结果如下</span></span><br><span class="line">	<span class="comment"># T1 START</span></span><br><span class="line">	<span class="comment"># all done</span></span><br><span class="line">	<span class="comment"># T1 END</span></span><br></pre></td></tr></table></figure>
+
+<p>join 的作用，是必须先把目标线程运行完之后，再运行下面的代码，这个可多用于数据之间的传输等待</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">thread_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T1 START"</span>)</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">"T1 END"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    added_thread = threading.Thread(target=thread_job,name=<span class="string">"T1"</span>)</span><br><span class="line">    added_thread.start()</span><br><span class="line">    added_thread.join()</span><br><span class="line">    print(<span class="string">"all done"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># T1 START</span></span><br><span class="line">	<span class="comment"># T1 END</span></span><br><span class="line">	<span class="comment"># all done</span></span><br></pre></td></tr></table></figure>
+
+<p>多个线程间的演示</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">thread_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T1 START"</span>)</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">"T1 END"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">T2_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T2 START"</span>)</span><br><span class="line">    print(<span class="string">"T2 END"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    added_thread = threading.Thread(target=thread_job,name=<span class="string">"T1"</span>)</span><br><span class="line">    thread2 = threading.Thread(target=T2_job,name=<span class="string">"T2"</span>)</span><br><span class="line">    added_thread.start()</span><br><span class="line">    thread2.start()</span><br><span class="line">    print(<span class="string">"all done"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># T1 START</span></span><br><span class="line">	<span class="comment"># T2 START</span></span><br><span class="line">	<span class="comment"># all done</span></span><br><span class="line">	<span class="comment"># T2 END</span></span><br><span class="line">	<span class="comment"># T1 END</span></span><br></pre></td></tr></table></figure>
+
+<p>三种加 join 的表现方式</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">thread_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T1 START"</span>)</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">"T1 END"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">T2_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T2 START"</span>)</span><br><span class="line">    print(<span class="string">"T2 END"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    added_thread = threading.Thread(target=thread_job,name=<span class="string">"T1"</span>)</span><br><span class="line">    thread2 = threading.Thread(target=T2_job,name=<span class="string">"T2"</span>)</span><br><span class="line">    added_thread.start()</span><br><span class="line">    thread2.start()</span><br><span class="line">    added_thread.join()</span><br><span class="line">    print(<span class="string">"all done"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br><span class="line"></span><br><span class="line">	<span class="comment"># T1 START</span></span><br><span class="line">	<span class="comment"># T2 START</span></span><br><span class="line">	<span class="comment"># T2 END</span></span><br><span class="line">	<span class="comment"># T1 END</span></span><br><span class="line">	<span class="comment"># all done</span></span><br></pre></td></tr></table></figure>
+
+<p>在这个 join 中，我们给时间最长的线程加上 join 后，只是影响了主线程，而没有影响其他的另添加线程。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">thread_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T1 START"</span>)</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">"T1 END"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">T2_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T2 START"</span>)</span><br><span class="line">    print(<span class="string">"T2 END"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    added_thread = threading.Thread(target=thread_job,name=<span class="string">"T1"</span>)</span><br><span class="line">    thread2 = threading.Thread(target=T2_job,name=<span class="string">"T2"</span>)</span><br><span class="line">    added_thread.start()</span><br><span class="line">    thread2.start()</span><br><span class="line">    thread2.join()</span><br><span class="line">    print(<span class="string">"all done"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br><span class="line"></span><br><span class="line">	<span class="comment"># T1 START</span></span><br><span class="line">	<span class="comment"># T2 START</span></span><br><span class="line">	<span class="comment"># T2 END</span></span><br><span class="line">	<span class="comment"># all done</span></span><br><span class="line">	<span class="comment"># T1 END</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">thread_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T1 START"</span>)</span><br><span class="line">    time.sleep(<span class="number">1</span>)</span><br><span class="line">    print(<span class="string">"T1 END"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">T2_job</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"T2 START"</span>)</span><br><span class="line">    print(<span class="string">"T2 END"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    added_thread = threading.Thread(target=thread_job,name=<span class="string">"T1"</span>)</span><br><span class="line">    thread2 = threading.Thread(target=T2_job,name=<span class="string">"T2"</span>)</span><br><span class="line">    added_thread.start()</span><br><span class="line">    thread2.start()</span><br><span class="line">    added_thread.join()</span><br><span class="line">    thread2.join()</span><br><span class="line">    print(<span class="string">"all done"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br><span class="line">	<span class="comment"># T1 START</span></span><br><span class="line">	<span class="comment"># T2 START</span></span><br><span class="line">	<span class="comment"># T2 END</span></span><br><span class="line">	<span class="comment"># T1 END</span></span><br><span class="line">	<span class="comment"># all done</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Queue-功能"><a href="#Queue-功能" class="headerlink" title="Queue 功能"></a>Queue 功能</h2><p>多线程那些功能是没有返回值的，所以我们要将它运算的结果放在队列中，然后在主线程中拿出来再进行加工。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> queue <span class="keyword">import</span> Queue</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job</span><span class="params">(l,q)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(l)):</span><br><span class="line">        l[i] = l[i] ** <span class="number">2</span></span><br><span class="line">    q.put(l)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">multithreading</span><span class="params">(data)</span>:</span></span><br><span class="line">    q = Queue()</span><br><span class="line">    threads = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">        t = threading.Thread(target=job,args=(data[i],q))</span><br><span class="line">        t.start()</span><br><span class="line">        threads.append(t)</span><br><span class="line">    results = []</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">        results.append(q.get())</span><br><span class="line">        <span class="comment"># q.get()  q 只能拿出一个，还是按照顺序拿出</span></span><br><span class="line">    print(results)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    data = [[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>],[<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>],[<span class="number">4</span>,<span class="number">4</span>,<span class="number">4</span>],[<span class="number">5</span>,<span class="number">5</span>,<span class="number">5</span>]]</span><br><span class="line">    multithreading(data)</span><br></pre></td></tr></table></figure>
+
+<h2 id="不一定有效果"><a href="#不一定有效果" class="headerlink" title="不一定有效果"></a>不一定有效果</h2><p>python 的多线程并不是一个工作同时给很多个线程同时做，而是，python 有一个自带的程序，这个程序叫做 GIL ，GIL 可以将某一个线程锁住，然后，达到多线程的效果。只能让同一时间同一线程运行，通过不断的切换，让你看见多线程的效果。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">from</span> queue <span class="keyword">import</span> Queue</span><br><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job</span><span class="params">(l, q)</span>:</span></span><br><span class="line">    res = sum(l)</span><br><span class="line">    q.put(res)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">multithreading</span><span class="params">(l)</span>:</span></span><br><span class="line">    q = Queue()</span><br><span class="line">    threads = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">        t = threading.Thread(target=job, args=(copy.copy(l), q), name=<span class="string">'T%i'</span> % i)</span><br><span class="line">        t.start()</span><br><span class="line">        threads.append(t)</span><br><span class="line">    [t.join() <span class="keyword">for</span> t <span class="keyword">in</span> threads]</span><br><span class="line">    total = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">        total += q.get()</span><br><span class="line">    print(total)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">normal</span><span class="params">(l)</span>:</span></span><br><span class="line">    total = sum(l)</span><br><span class="line">    print(total)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    l = list(range(<span class="number">1000000</span>))</span><br><span class="line">    s_t = time.time()</span><br><span class="line">    normal(l*<span class="number">4</span>)</span><br><span class="line">    print(<span class="string">'normal: '</span>,time.time()-s_t)</span><br><span class="line">    s_t = time.time()</span><br><span class="line">    multithreading(l)</span><br><span class="line">    print(<span class="string">'multithreading: '</span>, time.time()-s_t)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment"># 1999998000000</span></span><br><span class="line">	<span class="comment"># normal:  0.12218308448791504</span></span><br><span class="line">	<span class="comment"># 1999998000000</span></span><br><span class="line">	<span class="comment"># multithreading:  0.20545268058776855</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="lock"><a href="#lock" class="headerlink" title="lock"></a>lock</h2><p>如果第一个线程的处理结果是第二个线程的参数，所以，我们需要一个锁，来锁住第一个线程，然后等第一个线程处理完之后，在开始第二个。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        A += <span class="number">1</span></span><br><span class="line">        print(<span class="string">'job1'</span>, A)</span><br><span class="line">        time.sleep(<span class="number">0.1</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        A += <span class="number">10</span></span><br><span class="line">        print(<span class="string">'job2'</span>, A)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    A = <span class="number">0</span></span><br><span class="line">    t1 = threading.Thread(target=job1)</span><br><span class="line">    t2 = threading.Thread(target=job2)</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br><span class="line">	<span class="comment"># job1 1</span></span><br><span class="line">	<span class="comment"># job2 11</span></span><br><span class="line">	<span class="comment"># job2 21</span></span><br><span class="line">	<span class="comment"># job2 31</span></span><br><span class="line">	<span class="comment"># job2 41</span></span><br><span class="line">	<span class="comment"># job2 51</span></span><br><span class="line">	<span class="comment"># job2 61</span></span><br><span class="line">	<span class="comment"># job2 71</span></span><br><span class="line">	<span class="comment"># job2 81</span></span><br><span class="line">	<span class="comment"># job2 91</span></span><br><span class="line">	<span class="comment"># job2 101</span></span><br><span class="line">	<span class="comment"># job1 102</span></span><br><span class="line">	<span class="comment"># job1 103</span></span><br><span class="line">	<span class="comment"># job1 104</span></span><br><span class="line">	<span class="comment"># job1 105</span></span><br><span class="line">	<span class="comment"># job1 106</span></span><br><span class="line">	<span class="comment"># job1 107</span></span><br><span class="line">	<span class="comment"># job1 108</span></span><br><span class="line">	<span class="comment"># job1 109</span></span><br><span class="line">	<span class="comment"># job1 110</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    lock.acquire()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        A += <span class="number">1</span></span><br><span class="line">        print(<span class="string">'job1'</span>, A)</span><br><span class="line">        time.sleep(<span class="number">0.1</span>)</span><br><span class="line">    lock.release()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    lock.acquire()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        A += <span class="number">10</span></span><br><span class="line">        print(<span class="string">'job2'</span>, A)</span><br><span class="line">    lock.release()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    lock = threading.Lock()</span><br><span class="line">    A = <span class="number">0</span></span><br><span class="line">    t1 = threading.Thread(target=job1)</span><br><span class="line">    t2 = threading.Thread(target=job2)</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br><span class="line">	</span><br><span class="line">	<span class="comment"># job1 1</span></span><br><span class="line">	<span class="comment"># job1 2</span></span><br><span class="line">	<span class="comment"># job1 3</span></span><br><span class="line">	<span class="comment"># job1 4</span></span><br><span class="line">	<span class="comment"># job1 5</span></span><br><span class="line">	<span class="comment"># job1 6</span></span><br><span class="line">	<span class="comment"># job1 7</span></span><br><span class="line">	<span class="comment"># job1 8</span></span><br><span class="line">	<span class="comment"># job1 9</span></span><br><span class="line">	<span class="comment"># job1 10</span></span><br><span class="line">	<span class="comment"># job2 20</span></span><br><span class="line">	<span class="comment"># job2 30</span></span><br><span class="line">	<span class="comment"># job2 40</span></span><br><span class="line">	<span class="comment"># job2 50</span></span><br><span class="line">	<span class="comment"># job2 60</span></span><br><span class="line">	<span class="comment"># job2 70</span></span><br><span class="line">	<span class="comment"># job2 80</span></span><br><span class="line">	<span class="comment"># job2 90</span></span><br><span class="line">	<span class="comment"># job2 100</span></span><br><span class="line">	<span class="comment"># job2 110</span></span><br></pre></td></tr></table></figure>
+
+<p><code>lock</code> 除了</p>
+<ul>
+<li><code>lock.acquire()</code></li>
+<li><code>lock.release()</code></li>
+</ul>
+<p>可以加上、解开锁之外还可以用</p>
+<pre><code>with lock</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">            A += <span class="number">10</span></span><br><span class="line">            print(<span class="string">'job2'</span>, A)</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码和下面的代码是一个效果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    lock.acquire()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        A += <span class="number">10</span></span><br><span class="line">        print(<span class="string">'job2'</span>, A)</span><br><span class="line">    lock.release()</span><br></pre></td></tr></table></figure>
+
+<p>但是有的时候，由于相互之间的跳转，会导致出现死锁。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">            A += <span class="number">1</span></span><br><span class="line">            print(<span class="string">'job1'</span>, A)</span><br><span class="line">            time.sleep(<span class="number">0.1</span>)</span><br><span class="line">            <span class="keyword">if</span> i == <span class="number">5</span>:</span><br><span class="line">                test()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">            A += <span class="number">10</span></span><br><span class="line">            print(<span class="string">'job2'</span>, A)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        print(<span class="number">123</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    lock = threading.Lock()</span><br><span class="line">    A = <span class="number">0</span></span><br><span class="line">    t1 = threading.Thread(target=job1)</span><br><span class="line">    t2 = threading.Thread(target=job2)</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br></pre></td></tr></table></figure>
+
+<p>可以看到在 <code>job1</code> 中，我们直接跳到了 <code>test</code> 由于锁没有解开，所以导致，出现了死锁等待。</p>
+<p>我们使用 pycharm debug 一下。</p>
+<p>我们在 job1 中的 with lock 中打第一个断点，在 job1 的 test() 前面打第二个端点。在 test() 函数中的 with lock 打第三个端点</p>
+<h3 id="第一个断点"><a href="#第一个断点" class="headerlink" title="第一个断点"></a>第一个断点</h3><p><code>lock</code> 的状态为</p>
+<pre><code>&lt;unlocked _thread.lock object at 0x1074adb98&gt;</code></pre><h3 id="第二个断点"><a href="#第二个断点" class="headerlink" title="第二个断点"></a>第二个断点</h3><p><code>lock</code> 的状态为</p>
+<pre><code>&lt;locked _thread.lock object at 0x10abe6b98&gt;</code></pre><h3 id="第三个断点"><a href="#第三个断点" class="headerlink" title="第三个断点"></a>第三个断点</h3><p>因为 lock 的状态依然是 locked ，所以，即便是跳转到 test() 中，状态依然没有改变，出现死锁。</p>
+<p><code>lock</code> 的状态为</p>
+<pre><code>&lt;locked _thread.lock object at 0x10abe6b98&gt;</code></pre><p>并且，内存地址一样，证明了这是同一个锁。</p>
+<p>那么，什么时候跳出是安全的呢？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">            A += <span class="number">1</span></span><br><span class="line">            print(<span class="string">'job1'</span>, A)</span><br><span class="line">            time.sleep(<span class="number">0.1</span>)</span><br><span class="line">    test()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">            A += <span class="number">10</span></span><br><span class="line">            print(<span class="string">'job2'</span>, A)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        print(<span class="number">123</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    lock = threading.Lock()</span><br><span class="line">    A = <span class="number">0</span></span><br><span class="line">    t1 = threading.Thread(target=job1)</span><br><span class="line">    t2 = threading.Thread(target=job2)</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br></pre></td></tr></table></figure>
+
+<p>让跳出函数和 with 平级就好。</p>
+<p>或者</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    lock.acquire()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        A += <span class="number">1</span></span><br><span class="line">        print(<span class="string">'job1'</span>, A)</span><br><span class="line">        time.sleep(<span class="number">0.1</span>)</span><br><span class="line">        <span class="keyword">if</span> i == <span class="number">5</span>:</span><br><span class="line">            lock.release()</span><br><span class="line">            test()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">job2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">            A += <span class="number">10</span></span><br><span class="line">            print(<span class="string">'job2'</span>, A)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">global</span> A, lock</span><br><span class="line">    <span class="keyword">with</span> lock:</span><br><span class="line">        print(<span class="number">123</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    lock = threading.Lock()</span><br><span class="line">    A = <span class="number">0</span></span><br><span class="line">    t1 = threading.Thread(target=job1)</span><br><span class="line">    t2 = threading.Thread(target=job2)</span><br><span class="line">    t1.start()</span><br><span class="line">    t2.start()</span><br><span class="line">    t1.join()</span><br><span class="line">    t2.join()</span><br></pre></td></tr></table></figure>
+
+<h2 id="对-python-多线程的理解"><a href="#对-python-多线程的理解" class="headerlink" title="对 python 多线程的理解"></a>对 python 多线程的理解</h2><h3 id="回答一"><a href="#回答一" class="headerlink" title="回答一"></a>回答一</h3><p>首先，我们需要知道的是，python 的多线程是假的！！！</p>
+<p>如果你的代码是CPU密集型，多个线程的代码很有可能是线性执行的。所以这种情况下多线程是鸡肋，效率可能还不如单线程因为有context switch但是：如果你的代码是IO密集型，多线程可以明显提高效率。例如制作爬虫（我就不明白为什么Python总和爬虫联系在一起…不过也只想起来这个例子…），绝大多数时间爬虫是在等待socket返回数据。这个时候C代码里是有release GIL的，最终结果是某个线程等待IO的时候其他线程可以继续执行。反过来讲：你就不应该用Python写CPU密集型的代码…效率摆在那里…</p>
+<p>如果确实需要在CPU密集型的代码里用concurrent，就去用multiprocessing库。这个库是基于multi process实现了类multi thread的API接口，并且用pickle部分地实现了变量共享。</p>
+<h3 id="回答二"><a href="#回答二" class="headerlink" title="回答二"></a>回答二</h3><p>在介绍Python中的线程之前，先明确一个问题，Python中的多线程是假的多线程！ </p>
+<p>为什么这么说，我们先明确一个概念，全局解释器锁（GIL）。Python代码的执行由Python虚拟机（解释器）来控制。Python在设计之初就考虑要在主循环中，同时只有一个线程在执行，就像单CPU的系统中运行多个进程那样，内存中可以存放多个程序，但任意时刻，只有一个程序在CPU中运行。同样地，虽然Python解释器可以运行多个线程，只有一个线程在解释器中运行。对Python虚拟机的访问由全局解释器锁（GIL）来控制，正是这个锁能保证同时只有一个线程在运行。</p>
+<p>在多线程环境中，Python虚拟机按照以下方式执行。</p>
+<pre><code>1.设置GIL。
+2.切换到一个线程去执行。
+3.运行。
+4.把线程设置为睡眠状态。
+5.解锁GIL。
+6.再次重复以上步骤。</code></pre><p>对所有面向I/O的（会调用内建的操作系统C代码的）程序来说，GIL会在这个I/O调用之前被释放，以允许其他线程在这个线程等待I/O的时候运行。</p>
+<p>如果某线程并未使用很多I/O操作，它会在自己的时间片内一直占用处理器和GIL。</p>
+<p>也就是说，I/O密集型的Python程序比计算密集型的Python程序更能充分利用多线程的好处。</p>
+<p>我们都知道，比方我有一个4核的CPU，那么这样一来，在单位时间内每个核只能跑一个线程，然后时间片轮转切换。但是Python不一样，它不管你有几个核，单位时间多个核只能跑一个线程，然后时间片轮转。看起来很不可思议？但是这就是GIL搞的鬼。任何Python线程执行前，必须先获得GIL锁，然后，每执行100条字节码，解释器就自动释放GIL锁，让别的线程有机会执行。这个GIL全局锁实际上把所有线程的执行代码都给上了锁，所以，多线程在Python中只能交替执行，即使100个线程跑在100核CPU上，也只能用到1个核。通常我们用的解释器是官方实现的CPython，要真正利用多核，除非重写一个不带GIL的解释器。我们不妨做个试验：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Pool</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Process</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loop</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        t = Thread(target=loop)</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p>我的电脑是4核，所以我开了4个线程，看一下CPU资源占有率：</p>
+<p><img src="/images/python/42_0.jpg" alt=""></p>
+<p>我们发现CPU利用率并没有占满，大致相当于单核水平。</p>
+<p>而如果我们变成进程呢？</p>
+<p>我们改一下代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Pool</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Process</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loop</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        t = Process(target=loop)</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/42_1.jpg" alt=""></p>
+<p>结果直接飙到了100%，说明进程是可以利用多核的！</p>
+<p>难道就如此？我们没有办法在Python中利用多核？当然可以！刚才的多进程算是一种解决方案，还有一种就是调用C语言的链接库。</p>
+<p>对所有面向I/O的（会调用内建的操作系统C代码的）程序来说，GIL会在这个I/O调用之前被释放，以允许其他线程在这个线程等待I/O的时候运行。我们可以把一些 计算密集型任务用C语言编写，然后把.so链接库内容加载到Python中，因为执行C代码，GIL锁会释放，这样一来，就可以做到每个核都跑一个线程的目的！</p>
+<p>可能有的小伙伴不太理解什么是计算密集型任务，什么是I/O密集型任务？计算密集型任务的特点是要进行大量的计算，消耗CPU资源，比如计算圆周率、对视频进行高清解码等等，全靠CPU的运算能力。这种计算密集型任务虽然也可以用多任务完成，但是任务越多，花在任务切换的时间就越多，CPU执行任务的效率就越低，所以，要最高效地利用CPU，计算密集型任务同时进行的数量应当等于CPU的核心数。计算密集型任务由于主要消耗CPU资源，因此，代码运行效率至关重要。</p>
+<p>Python这样的脚本语言运行效率很低，完全不适合计算密集型任务。对于计算密集型任务，最好用C语言编写。第二种任务的类型是IO密集型，涉及到网络、磁盘IO的任务都是IO密集型任务，这类任务的特点是CPU消耗很少，任务的大部分时间都在等待IO操作完成（因为IO的速度远远低于CPU和内存的速度）。</p>
+<p>对于IO密集型任务，任务越多，CPU效率越高，但也有一个限度。常见的大部分任务都是IO密集型任务，比如Web应用。IO密集型任务执行期间，99%的时间都花在IO上，花在CPU上的时间很少，因此，用运行速度极快的C语言替换用Python这样运行速度极低的脚本语言，完全无法提升运行效率。对于IO密集型任务，最合适的语言就是开发效率最高（代码量最少）的语言，脚本语言是首选，C语言最差。综上，Python多线程相当于单核多线程，多线程有两个好处：CPU并行，IO并行，单核多线程相当于自断一臂。所以，在Python中，可以使用多线程，但不要指望能有效利用多核。如果一定要通过多线程利用多核，那只能通过C扩展来实现，不过这样就失去了Python简单易用的特点。不过，也不用过于担心，Python虽然不能利用多线程实现多核任务，但可以通过多进程实现多核任务。多个Python进程有各自独立的GIL锁，互不影响。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/python-%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/" rel="tag"># python 第三方库</a>
+              <a href="/tags/threading/" rel="tag"># threading</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/19/python41/" rel="prev" title="python multiprocessing 多进程">
+      <i class="fa fa-chevron-left"></i> python multiprocessing 多进程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/20/python100/" rel="next" title="python | Python互斥锁（Lock）：解决多线程安全问题">
+      python | Python互斥锁（Lock）：解决多线程安全问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础用法"><span class="nav-number">1.</span> <span class="nav-text">基础用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义一个线程"><span class="nav-number">2.</span> <span class="nav-text">定义一个线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#join-功能"><span class="nav-number">3.</span> <span class="nav-text">join 功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Queue-功能"><span class="nav-number">4.</span> <span class="nav-text">Queue 功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不一定有效果"><span class="nav-number">5.</span> <span class="nav-text">不一定有效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lock"><span class="nav-number">6.</span> <span class="nav-text">lock</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一个断点"><span class="nav-number">6.1.</span> <span class="nav-text">第一个断点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二个断点"><span class="nav-number">6.2.</span> <span class="nav-text">第二个断点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三个断点"><span class="nav-number">6.3.</span> <span class="nav-text">第三个断点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对-python-多线程的理解"><span class="nav-number">7.</span> <span class="nav-text">对 python 多线程的理解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#回答一"><span class="nav-number">7.1.</span> <span class="nav-text">回答一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#回答二"><span class="nav-number">7.2.</span> <span class="nav-text">回答二</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

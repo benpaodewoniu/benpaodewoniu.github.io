@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="比特币三大体系支撑之一就是 hash cash。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="区块链 | hashcash">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/26/blockchain6/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="比特币三大体系支撑之一就是 hash cash。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-26T06:19:35.000Z">
+<meta property="article:modified_time" content="2021-02-27T06:22:05.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="区块链">
+<meta property="article:tag" content="blockchain">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/26/blockchain6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>区块链 | hashcash | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/26/blockchain6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          区块链 | hashcash
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-26 14:19:35" itemprop="dateCreated datePublished" datetime="2020-04-26T14:19:35+08:00">2020-04-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-27 14:22:05" itemprop="dateModified" datetime="2021-02-27T14:22:05+08:00">2021-02-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%AF%86%E7%A0%81%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">密码学</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%AF%86%E7%A0%81%E5%AD%A6/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/26/blockchain6/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/26/blockchain6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>比特币三大体系支撑之一就是 hash cash。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<p><a href="https://www.chainnews.com/articles/607483180485.htm" rel="external nofollow noreferrer">hashcash 算法：从你最熟悉的「验证码」来解释区块链的意义</a><br><a href="https://www.ibm.com/developerworks/cn/linux/l-hashcash.html" rel="external nofollow noreferrer">用 hashcash 打击垃圾邮件</a></p>
+<br/>
+
+<h1 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h1><br/>
+
+<p>比特币并不是一种新技术。</p>
+<p>但比特币绝对是一款创新的产品。在中本聪提出比特币的构想之前，有很多相关的密码学技术已经完成了不少的积累。中本聪的厉害之处在于，他把这几种不同的技术结合起来，针对 P2P 电子现金系统的需求创造出了一款新的产品。从这个意义上来说，中本聪是一个天才的设计师。他是区块链行业里第一个、也是最出名的产品经理。</p>
+<p>比特币借鉴了很多现有技术。其中，<code>POW</code> （工作量证明）代表的共识机制，借鉴的是 hashcash 算法。<code>hashcash</code> 是一种很有趣的设计，从 hashcash 本身的设计结构来看，我们还可以瞥见比特币很多的思想和理念。在这篇文章里，会先稍微介绍下 <code>hashcash</code> 的原理，然后从技术的角度来讨论下 <code>hashcash</code> 代表了比特币之于传统互联网的意义。</p>
+<br/>
+
+<h1 id="从验证码开始谈起"><a href="#从验证码开始谈起" class="headerlink" title="从验证码开始谈起"></a>从验证码开始谈起</h1><br/>
+
+<p>在解释 <code>hashcash</code> 是什么东西之前，我们先来聊点群众们比较熟悉的东西，一个你每天上网都会碰到的、有时还挺招人烦的——验证码。</p>
+<p>在我们进行一些安全性比较高的操作时，比如账号登陆、移动支付、购买车票，系统会通过手机短信等验证方式，确认当前操作者的真实身份。</p>
+<p>而在另一些安全性不那么高的操作时，比如在贴吧里发个帖子、查询某个数据，有时候也会出现一个验证码。这个验证码通常是一个模糊的图片，让你识别图片里的字母或者汉字，也有技术复杂一点的，可以通过鼠标横滑、鼠标单击的方式来验证。</p>
+<p>这种验证码最主要的目的，是判定你是人还是机器。</p>
+<p>虽然发帖、查询这些操作本身不具备高安全性要求，但是系统不希望这些操作被不怀好意的人利用，通过大量机器代理账号进行批量操作，发动 <code>DDoS 攻击</code>，或者<code>爬虫</code>等等。</p>
+<p>通过验证码，你把每次操作的成本都往上增加了 1%，这对单个用户来说虽然有点不方便，但总体上还是可以忍受的，但对机器来说，想要进行批量操作，每次识别验证码都要浪费一些时间，这样每次操作叠加起来，想在短时间内批量完成就不可能了。</p>
+<p>但读到这里，你可能会跟我有同一种想法：</p>
+<p>有人会利用机器批量干坏事，但那是他们的问题，为什么我作为一个遵守规则的用户要为此支付额外的成本？</p>
+<p>为什么人们需要因为机器的原因承担验证码的操作成本呢？即使这个操作成本对用户体验的影响很小，但本质上，这还是一个系统设计的问题。</p>
+<p>再换个方式想，如果直接让机器像人一样，在每次操作前都进行验证码识别，判断它自己是合法的机器还是非法的机器，这样一来，机器产生的问题不就由机器自己解决了吗？人们完全可以省去验证码的烦恼。</p>
+<br/>
+
+<h1 id="hashcash-的设计原理，简单点说就是这样干的"><a href="#hashcash-的设计原理，简单点说就是这样干的" class="headerlink" title="hashcash 的设计原理，简单点说就是这样干的"></a><code>hashcash</code> 的设计原理，简单点说就是这样干的</h1><br/>
+
+<p>为了判断进行操作的机器究竟是合法的还是非法的，最直接的做法，就是让机器自己证明自己的身份。</p>
+<p>机器要怎么证明自己呢？</p>
+<p>很简单，通过付出一定的成本，来表示自己的可信度。</p>
+<p>我们可以认为，如果一个机器愿意付出多少级别的成本，那么它就是真心想进行多少级别的操作。不怀好意的攻击者则会因为机器进行这项操作的成本与收益不合算，从而放弃利用机器进行批量操作的意图。</p>
+<p>这个想法应该是可行的。但可行还不够，这套验明机器真身的系统，它的运作效率还应该尽可能更高一些。</p>
+<p>所以，如果我们让每台机器在进行操作前都需要计算一个非常复杂的数学问题，通过算力作为机器付出的成本，算出答案的就可以证明自己，那么，系统检验这台机器提交的答案是不是正确答案，这个验证的过程应该尽可能高效。</p>
+<p>有什么数学问题是「计算的时候非常麻烦、但是验证的时候非常简单」的？</p>
+<p>因数分解算一个。如果你要因数分解一个很大的数字，你可能要花上不少时间去找到它的一组因数。但如果你想知道这组因数是不是正确的答案，把这组数字相乘一下就行了。</p>
+<br/>
+
+<h1 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h1><br/>
+
+<p><code>hash</code> （哈希）函数的作用，跟因数分解是差不多的。</p>
+<p><code>hash</code> 是一种映射函数，简单来说，它把输入转换成一串特定 ID 输出，这个过程是不可逆的。</p>
+<p>比如，如果你用的是比特币的 <code>SHA-256</code> 哈希函数，输入「dog」这个单词，就会输出：</p>
+<pre><code>cd6357efdd966de8c0cb2f876cc89ec74ce35f0968e11743987084bd42fb8944</code></pre><p>但如果你把这个单词稍微改成「doge」, 那么哈希的结果就会变成：</p>
+<pre><code>c4e793c81ee40370d827d0cbe748d246cffca2cbe959383edf0976d041ece9e5</code></pre><p>输入数据即使只改变一个字节，它的 hash 值也会大不相同。</p>
+<p>对于一个数据来说，它的 <code>hash</code> 值是唯一的，最重要的是，你没有办法从输出的这串数字里面推导破解出原始的输入值。</p>
+<p>这样一来，如果给定一台机器一串哈希值，让这台机器去找出符合某些特点的哈希值的原始输入值，你手工计算的话估计找一辈子也找不出来，机器也只能一个值一个值反复去试。如果机器不断穷举，最终碰运气试到了正确答案，那么，机器提交答案时，我想知道你这个答案是不是正确的，只要把这个答案 <code>hash</code> 一下，看输出值是不是和要求的一样就行了。也就是说，检验的过程是很简单的。</p>
+<p><code>hashcash</code> 就利用了 <code>hash</code> 函数的这些特点，让机器不断地尝试不同的数字，找出题目要求的那个值。在实际应用中，我们不需要机器找出某一个特定的哈希值，因为这是不可能的事情（从概率上来说），我们只要求机器找出符合某些条件的哈希值就行，比如，这个条件可以是：哈希值的前二十位都是零。</p>
+<p>在比特币里，这个条件则是不断动态变化的，随着时间和矿工的增多，算力要求也越来越多，通过调整题目的难度，我们可以控制机器找到答案的速度，最终保持平均每 10 分钟产出一个区块的速度。</p>
+<br/>
+
+<h1 id="hashcash"><a href="#hashcash" class="headerlink" title="hashcash"></a>hashcash</h1><br/>
+
+<p><code>hashcash</code> 的基本原理，抽象出来就是上面所说的那套做法。</p>
+<p>在比特币之前，<code>hashcash</code> 最广泛的应用是反垃圾邮件。</p>
+<p>我们希望，如果需要的话，每个人只要知道 email 地址，就可以直接方便地给我们发邮件。但同时，我们又不希望，一旦自己的 email 地址暴露出去，会被坏人拿去群发垃圾邮件和广告邮件。</p>
+<p>如果能让机器在发邮件之前，都需要付出一定的算力来找到正确的哈希数字，那么，每个人依然可以自由的通过 email 发邮件，但那些想用机器批量发垃圾广告的人，就得付出不少代价了。</p>
+<p>你可能会问，如果一旦找到正确的哈希数字，机器不就可以一直使用这个数字来群发邮件了？</p>
+<p>为了防止这个问题，<code>hashcash</code> 要求哈希数字必须包含一个时间戳。</p>
+<p>时间戳就像邮戳一样，它代表了这个答案是在什么时候被计算出来的，如果超过一定的时限，这个答案将过期作废。</p>
+<p><code>hashcash</code> 让机器在发邮件的时候，需要在发送邮件的数据头部里加入一个字符串 <code>X-Hashcash</code> ，这个字符串长这个样子：</p>
+<pre><code>1:bits:date:resource:ext:salt:suffix</code></pre><p><code>X-Hashcash</code> 其实就是提交答案的戳记，它包括 7 个域：</p>
+<ul>
+<li>版本号（版本 0 更简单，但是有一些局限性）。</li>
+<li>声明的比特值。如果戳记没有真正地使用声明的前导零比特进行散列，那么它就是非法的。</li>
+<li>生成戳记的日期（和时间）。可以认为当前时间之后的戳记以及那些在很久以前的戳记是非法的。</li>
+<li>戳记为哪个资源而生成。可能是一个电子邮件地址，但是也可能是一个 URI 或者其他命名的资源。</li>
+<li>特定应用程序可能需要的扩展。任何附加的数据都可以放置在这里，但是，在到目前为止的使用中， 这个域通常是空的。</li>
+<li>将该戳记与其他所有人为相同的资源在同一日期生成的戳记区别开来的随机因子（salt）。例如，两个不同的人可以合情合理地在同一天向我的同一个地址发送电子邮件。他们不应该由于我使用了 <code>double spend</code> 数据库而无法发送成功。但是，如果他们每个人都使用一个随机因子，那么完整戳记将是不同的。</li>
+<li>后缀是算法真正起作用的部分。假定给出了前 6 个域，为了生成一个通过期望数目的前导零进行散列的的戳记，<code>minter</code> 必须尝试很多连续的后缀值。</li>
+</ul>
+<p>我们让邮件加上了证明机器合法性的戳记，这样别人想给你发邮件，他只要像以前那样正常写邮件就行了，机器会自动在后台生成一个戳记附在邮件上，对方接收时只要检查这个戳记是不是合法的，就能决定要不要接收这封邮件了。</p>
+<p>这里我解释一下，上面的定义：</p>
+<ul>
+<li><code>bits</code> 这个是宣称前置 0 是多少的，一般使用 16 进制，其中 1 个十六进制代表 4 个 <code>bit</code>，假如说， bits = 20 ，那么，前置 0 的数目应该是 5 位</li>
+<li><code>suffix</code> 是计算机计算的概念，我们把前六个域叫做 front ，那么 hash(front + suffix) = info。 而， <code>info</code> 的前几位应该是 bits 所宣称的 0。比如，根据上面得到， info 的前 5 位应该是 0。</li>
+</ul>
+<p>计算机通过计算 <code>suffix</code> ，来使得最后的 <code>hash</code> 值符合要求。</p>
+<br/>
+
+<h1 id="为什么-hash-cash-会起作用"><a href="#为什么-hash-cash-会起作用" class="headerlink" title="为什么 hash cash 会起作用"></a>为什么 hash cash 会起作用</h1><br/>
+
+<p>例如，某个想给我发送消息的人可能会 在消息中包含一个与示例 rfc2822 头文件类似的头文件：</p>
+<pre><code>X-Hashcash: 1:20:040927:mertz@gnosis.cx::odVZhQMP:7ca28</code></pre><p>显然，应该由 MUA（邮件用户代理，mail user agents）、过滤器或者 MTA（邮件传输代理，mail transport agents） 来做这件事情，而不是要求用户手工完成。不过，手工完成也不太难，至少实验时如此。首先，通过查看戳记的散列来 校验它，如下所示：</p>
+<pre><code>$ echo -n 1:20:040927:mertz@gnosis.cx::odVZhQMP:7ca28 | sha
+00000b50b85a61e7ba8ac4d5fed317c737706ae5</code></pre><p>注意前导零（每一个十六进制数是 4 个比特）。当然，还需要校验哪个资源是您识别出来的那个资源（比如您的收件人地址之一）， 那个戳记还没有被使用过，日期是当前日期。另外，一个合法的戳记拥有的前导零的数目应该与其声明要拥有的数目相同（不过您可以决定强制实行您自己的允许邮件通过的最小代价：20 比特是一个不完全标准（semi-standard），它最终可能会随着 Moore 定律而发生改变）。</p>
+<p>生成一个 20-比特的戳记只需要几秒钟的时间。当您一天中只发送几十封电子邮件时，这个代价并不大。但是，对那些 想要发送数百万消息的垃圾邮件制造者来说，不能容忍每条消息使用额外几秒的 CPU 时间。一天之中只有 86,400 秒。即使垃圾邮件制造者利用植入木马（trojans）的僵尸（zombies）的技术，需要使用具体的 hashcash 戳记至少也会减少那些僵尸进程的发出量。 当然，校验一个戳记所需的时间只是一秒的一小部分。</p>
+<p>另一方面，向您自己的 MUA 添加 hashcash 生成和校验对其他所有人没有任何负面影响（不像其他一些反垃圾邮件方法）。对那些不使用该协议的接收者而言，这些只是一个他们很容易忽略的附加头文件。对那些没有 添加 hashcash 戳记的发送者而言，检验 X-Hashcash: 的接收者不用校验任何内容。 如果发送者没有添加戳记，那么您的境况不会因为进行检验而变得更糟；也不会因此变得更好。</p>
+<p>一个好的 <code>MUA</code> 或者垃圾邮件过滤系统可以将拥有合法 hashcash 戳记的电子邮件列入白名单（whitelist）。<code>SpamAssassin</code> 甚至更巧妙地为更多合法 <code>hashcash</code> 比特提供了更高的 +ve 分数。 我认为，将基于 <code>bashcash</code> 的方法应用于白名单是对 <code>TMDA</code> 等交互式质询系统的改进 —— 质询消息在返回时不会丢失，发送者不会忘记响应质询。质询响应就在原始消息之中（作为一个 hashcash 戳记）。</p>
+<br/>
+
+<h1 id="hashcash-的意义"><a href="#hashcash-的意义" class="headerlink" title="hashcash 的意义"></a><code>hashcash</code> 的意义</h1><br/>
+
+<p><code>hashcash</code> 能让我们知道发送邮件的是一个真实的用户、还是一个群发邮件的广告营销机器。这套方法扩展开来，不止可以应用在反垃圾邮件里，同样，它也可以用在服务器的应答机制里。</p>
+<p>我们知道，你通过浏览器输入一串地址，之所以能返回一个固定的网页，得益于 <code>http</code> 通信协议的设计。<code>http</code> 规定，浏览器发起一个请求，那么服务器就响应这个请求，返回浏览器指定的内容。这个协议本质上非常简单，它不做太多的额外的状态判断，只遵循简单的「一问一答」。</p>
+<p>因为 <code>http</code> 协议设计太简单，服务器就像一个 email 地址一样，一旦我们知道输入一个网址就可以返回某个资源或者对服务器进行某项操作，我们就可以利用机器批量地给一台服务器连续不断地「写信」。服务器对每个请求都做出回应，最终会消耗大量的服务器资源，从而影响正常用户的访问。这就是 <code>DDoS 攻击</code>。</p>
+<p>在现实生活中，我们花费了大量的力气来修补类似 <code>DDoS 攻击</code>这样的安全问题。我们发明了各种各样的服务器防御机制来判断请求的合法性。但这些方法，都是通过封装一些其他层面的数据和函数来保护服务器，比如反爬虫可能会通过判断短时间内连续访问的 IP 是不是同一个、每次请求的时间是不是小于人们肉身可以操作的速度，从而判定是不是有人借助机器进行批量操作。</p>
+<p>这些方法，相当于额外在 <code>http</code> 这层协议上再造了一个「安检通道」， <code>http</code> 协议本身并不具备「安检」的能力。如果我们能通过 <code>hashcash</code>，让 <code>http</code> 请求本身自带机器自我证明的信息，这样一来，我们就可以在协议本身的设计上避免类似 <code>DDoS</code> 这样的漏洞和攻击。</p>
+<p>而这也是区块链技术相比于传统互联网技术最重要的不同点之一。通过区块链、通过 hashcash、通过比特币的共识机制，我们让机器在底层传输协议上活动时都附带上了一些额外的信息，这些额外的信息将被用来证明机器自身的合法性，从而在协议层创造出一个机器与机器之间可以彼此信任的网络环境。</p>
+<p>一旦机器与机器之间是可信的，我们就将创造出一个新的互联网。</p>
+<p>在这个新的互联网里，机器可以判断其他机器进行请求是否合法，从而使得服务器懂得如何更合理地分配资源。</p>
+<p>在这个新的互联网里，我们可以编写新的应用，也就是智能合约，然后把智能合约放心地交给机器自动执行。这套智能合约可以稳定地运作下去，而不必担心网络中有机器不执行智能合约、或者对智能合约进行篡改、出现机器叛徒。这是以太坊诞生的基础。</p>
+<br/>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><br/>
+
+<p>总而言之，从 <code>hashcash</code> 的设计原理出发，我们拥有了另一种对区块链的见解：</p>
+<p>比特币和区块链本质上是为了解决机器与机器之间的信任问题。通过保证机器是可信的，从而保证网络的可信度；通过保证网络的可信度，从而使得加入网络的人们能在互信的环境里共同遵守规则，借助 token 和激励机制的设计，最终让人们的个人利益与群体共同利益贴合在一起，最终使得网络的群体都往同一个方向发展。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/" rel="tag"># 区块链</a>
+              <a href="/tags/blockchain/" rel="tag"># blockchain</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/docker13/" rel="prev" title="nvidia-docker | 简介和扫盲">
+      <i class="fa fa-chevron-left"></i> nvidia-docker | 简介和扫盲
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/26/market2/" rel="next" title="市场 | 08 年金融危机">
+      市场 | 08 年金融危机 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#写在前面"><span class="nav-number">2.</span> <span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#从验证码开始谈起"><span class="nav-number">3.</span> <span class="nav-text">从验证码开始谈起</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hashcash-的设计原理，简单点说就是这样干的"><span class="nav-number">4.</span> <span class="nav-text">hashcash 的设计原理，简单点说就是这样干的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hash"><span class="nav-number">5.</span> <span class="nav-text">hash</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hashcash"><span class="nav-number">6.</span> <span class="nav-text">hashcash</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么-hash-cash-会起作用"><span class="nav-number">7.</span> <span class="nav-text">为什么 hash cash 会起作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hashcash-的意义"><span class="nav-number">8.</span> <span class="nav-text">hashcash 的意义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

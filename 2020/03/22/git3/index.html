@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="在这一节，我将介绍 GIT 的工作区、暂存区、版本库、远程仓库的知识。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GIT | 区域知识">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/03/22/git3/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="在这一节，我将介绍 GIT 的工作区、暂存区、版本库、远程仓库的知识。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/git/3_0.png">
+<meta property="article:published_time" content="2020-03-22T03:46:14.000Z">
+<meta property="article:modified_time" content="2020-03-22T07:08:16.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/git/3_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/03/22/git3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>GIT | 区域知识 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/03/22/git3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GIT | 区域知识
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-22 11:46:14 / 修改时间：15:08:16" itemprop="dateCreated datePublished" datetime="2020-03-22T11:46:14+08:00">2020-03-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/22/git3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/22/git3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在这一节，我将介绍 GIT 的工作区、暂存区、版本库、远程仓库的知识。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="图片说明"><a href="#图片说明" class="headerlink" title="图片说明"></a>图片说明</h1><br/>
+
+<p><img src="/images/git/3_0.png" alt=""></p>
+<br/>
+
+<h1 id="工作区"><a href="#工作区" class="headerlink" title="工作区"></a>工作区</h1><br/>
+
+<p>工作区就是我们写代码的地方。</p>
+<p>当我们修改代码之后，没有做任何 git 操作，那么，我们的所有修改都在 工作区 内。工作区你也可以认为是一个公共的区域。</p>
+<p>这个所谓的公共是因为，即便是你在当前分支做了修改，那么你的这些修改也是可以移动到其他分支的。</p>
+<h2 id="工作区内容移动到其他的分支的例子修改"><a href="#工作区内容移动到其他的分支的例子修改" class="headerlink" title="工作区内容移动到其他的分支的例子修改"></a>工作区内容移动到其他的分支的例子修改</h2><p>假设有两个分支</p>
+<ul>
+<li>master</li>
+<li>dev</li>
+</ul>
+<p>我们修改了 master 分支的 t.txt 这个文件，如果想要把这份修改转到 dev 可以使用下面的命令</p>
+<pre><code>git switch dev</code></pre><p>就可以了。</p>
+<p>当然，有些情况下，我们 switch 的时候会出错，所以，我们可以这样</p>
+<pre><code>git stash
+git switch dev
+git stash pop</code></pre><h2 id="丢弃修改"><a href="#丢弃修改" class="headerlink" title="丢弃修改"></a>丢弃修改</h2><p>如果你突然想放弃工作区的修改，你可以使用下面的命令</p>
+<pre><code>git checkout -- filename</code></pre><p>我的 git 版本比较新，我可以使用下面的命令</p>
+<pre><code>git restore filenme</code></pre><br/>
+
+<h1 id="暂存区"><a href="#暂存区" class="headerlink" title="暂存区"></a>暂存区</h1><br/>
+
+<p>我们可以将工作区的内容提交到暂存区。暂存区是一个公共的区域，这个区域存放着是将要提交的版本库的代码。</p>
+<p>为什么会有暂存区呢？</p>
+<p>我们可以想象一下这样一个场景，我们在修改一些文件的时候，不可避免的写多余的代码，比如，打印一下日志等。</p>
+<p>当我们同时修改分多文件的时候，假设部分文件已经成熟了，那么我们可以使用</p>
+<pre><code>git add filename</code></pre><p>来把那些文件提交到暂存区，而不成熟的文件就可以不提交。同时，暂存区可以多次提交。</p>
+<p>比如，我们可以多次 git add 某一个文件。</p>
+<h2 id="暂存区内容移动到其他的分支的例子修改"><a href="#暂存区内容移动到其他的分支的例子修改" class="headerlink" title="暂存区内容移动到其他的分支的例子修改"></a>暂存区内容移动到其他的分支的例子修改</h2><p>假设有两个分支</p>
+<ul>
+<li>master</li>
+<li>dev</li>
+</ul>
+<p>我们修改了 master 分支的 t.txt 这个文件，然后，我们使用了</p>
+<pre><code>git add t.txt</code></pre><p>如果想要把这个暂存区内容转到 dev 可以使用下面的命令</p>
+<pre><code>git switch dev</code></pre><p>就可以了。</p>
+<p>当然，有些情况下，我们 switch 的时候会出错，所以，我们可以这样</p>
+<pre><code>git stash
+git switch dev
+git stash pop</code></pre><h2 id="小技巧"><a href="#小技巧" class="headerlink" title="小技巧"></a>小技巧</h2><p>如果，我们的文件非常多，git add 的话，会非常麻烦，那么我们可以使用</p>
+<pre><code>git add .</code></pre><p>这样就可以提交所有的工作区修改了。</p>
+<p>如果，我们的修改都是在 ant/ dev/ 这两个文件夹内，假设，我们只想提交 ant 里面修改的内容，我们可以在后面直接写目录</p>
+<pre><code>git add ant/</code></pre><h2 id="从暂存区回归到工作区"><a href="#从暂存区回归到工作区" class="headerlink" title="从暂存区回归到工作区"></a>从暂存区回归到工作区</h2><p>有时候，我们 add 完文件之后，后悔了，想要把暂存区的内容再放回工作区，可以使用</p>
+<pre><code>git reset HEAD filename</code></pre><p>上面的命令就等同于</p>
+<pre><code>git reset filename</code></pre><p>事实上这个完整的命令是</p>
+<pre><code>git reset --mixed filenames</code></pre><p>我的 git 版本比较新，我也可以使用下面的命令达到效果</p>
+<pre><code>git restore --staged filename</code></pre><br/>
+
+<h1 id="版本库"><a href="#版本库" class="headerlink" title="版本库"></a>版本库</h1><br/>
+
+<p>版本库最好应该称为特定分支的版本库。即，每一个分支都会有自己的版本库。使用</p>
+<pre><code>git commit -m &apos;info&apos;</code></pre><p>假设我们在 master 分支，那么运行这个，就推送到 master 的版本库，如果在 dev 分支，那么运行这个，就推送到 dev 的版本库。</p>
+<p>版本库是特定的不是公共的。</p>
+<p>我们每次 commit 会得到一个 十六进制 的版本号。</p>
+<p>假设，我们后悔 commit 了某一个版本，可以使用下面的命令将版本库的修改回退到暂存区。</p>
+<pre><code>git reset --soft HEAD^</code></pre><p>在Git中，用HEAD表示当前版本，也就是最新的提交1094adb…（注意我的提交ID和你的肯定不一样），上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。</p>
+<p>这个特地说一下 git reset 的三种模式。</p>
+<ul>
+<li>--soft</li>
+<li>--mixed</li>
+<li>--hard</li>
+</ul>
+<h2 id="soft"><a href="#soft" class="headerlink" title="--soft"></a>--soft</h2><p>保留源码,只回退到 commit 信息到某个版本.不涉及暂存区 （index） 的回退。</p>
+<p>假设我们修改了 t.txt</p>
+<p>并且执行了</p>
+<pre><code>git add .
+git commit -m &apos;info&apos;</code></pre><p>我们如果执行</p>
+<pre><code>git reset --soft HEAD~1</code></pre><p>我们使用</p>
+<pre><code>git status</code></pre><p>显示</p>
+<pre><code>On branch test
+Changes to be committed:
+  (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)
+    modified:   t.txt</code></pre><p>这表明 git reset --soft 是将对 t.txt 的修改回退到暂存区。</p>
+<h2 id="mixed"><a href="#mixed" class="headerlink" title="--mixed"></a>--mixed</h2><p>这个是 git reset 的默认模式。</p>
+<p>会保留源码,只是将 git commit 和 index 信息回退到了工作区。</p>
+<p>还是上面的情景，执行</p>
+<pre><code>git reset --mixed HEAD~1</code></pre><p>然后使用 git status</p>
+<pre><code>On branch test
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+    modified:   t.txt</code></pre><p>说明这个将 commit 的东西回退到了工作区。</p>
+<h2 id="soft-1"><a href="#soft-1" class="headerlink" title="--soft"></a>--soft</h2><p>回退到commit 信息到某个版本。</p>
+<p>这个回退的比较彻底，是版本回退，不是 commit 撤销回退。</p>
+<p>比如，我们现在有</p>
+<pre><code>latest:65231q...
+7365a3...</code></pre><p>这两个版本，假设，我们现在最新版使用</p>
+<pre><code>git reset --soft HEAD~1</code></pre><p>那么，我们现在的版本就是 7365a3，在 7365a3 之后的修改都会不见。</p>
+<br/>
+
+<h1 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h1><br/>
+
+<h2 id="推送到远程仓库"><a href="#推送到远程仓库" class="headerlink" title="推送到远程仓库"></a>推送到远程仓库</h2><pre><code>git push origin master</code></pre><h2 id="线上代码拉到工作区"><a href="#线上代码拉到工作区" class="headerlink" title="线上代码拉到工作区"></a>线上代码拉到工作区</h2><pre><code>git pull origin master</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"># git</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/21/hexo24/" rel="prev" title="hexo | 多级分类">
+      <i class="fa fa-chevron-left"></i> hexo | 多级分类
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/22/git4/" rel="next" title="GIT | 指针 HEAD">
+      GIT | 指针 HEAD <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#图片说明"><span class="nav-number">1.</span> <span class="nav-text">图片说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#工作区"><span class="nav-number">2.</span> <span class="nav-text">工作区</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#工作区内容移动到其他的分支的例子修改"><span class="nav-number">2.1.</span> <span class="nav-text">工作区内容移动到其他的分支的例子修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#丢弃修改"><span class="nav-number">2.2.</span> <span class="nav-text">丢弃修改</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#暂存区"><span class="nav-number">3.</span> <span class="nav-text">暂存区</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#暂存区内容移动到其他的分支的例子修改"><span class="nav-number">3.1.</span> <span class="nav-text">暂存区内容移动到其他的分支的例子修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小技巧"><span class="nav-number">3.2.</span> <span class="nav-text">小技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从暂存区回归到工作区"><span class="nav-number">3.3.</span> <span class="nav-text">从暂存区回归到工作区</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#版本库"><span class="nav-number">4.</span> <span class="nav-text">版本库</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#soft"><span class="nav-number">4.1.</span> <span class="nav-text">--soft</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mixed"><span class="nav-number">4.2.</span> <span class="nav-text">--mixed</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#soft-1"><span class="nav-number">4.3.</span> <span class="nav-text">--soft</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#远程仓库"><span class="nav-number">5.</span> <span class="nav-text">远程仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#推送到远程仓库"><span class="nav-number">5.1.</span> <span class="nav-text">推送到远程仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线上代码拉到工作区"><span class="nav-number">5.2.</span> <span class="nav-text">线上代码拉到工作区</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

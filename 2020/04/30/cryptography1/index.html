@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="咱们作为非计算机专业的人去看一些区块链相关的技术资料的时候，经常会被一些讨厌的术语挡在门外。这次咱们聊的哈希就是非常重要的一个。哈希是密码学的基础，理解哈希是理解数字签名和加密通信等技术的必要前提。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="密码学 | 哈希算法「转载」">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/30/cryptography1/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="咱们作为非计算机专业的人去看一些区块链相关的技术资料的时候，经常会被一些讨厌的术语挡在门外。这次咱们聊的哈希就是非常重要的一个。哈希是密码学的基础，理解哈希是理解数字签名和加密通信等技术的必要前提。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/cryptography/1_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/cryptography/1_1.jpg">
+<meta property="article:published_time" content="2020-04-30T10:47:49.000Z">
+<meta property="article:modified_time" content="2021-02-27T06:21:20.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="hash">
+<meta property="article:tag" content="密码学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/cryptography/1_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/30/cryptography1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>密码学 | 哈希算法「转载」 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/30/cryptography1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          密码学 | 哈希算法「转载」
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-30 18:47:49" itemprop="dateCreated datePublished" datetime="2020-04-30T18:47:49+08:00">2020-04-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-27 14:21:20" itemprop="dateModified" datetime="2021-02-27T14:21:20+08:00">2021-02-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%AF%86%E7%A0%81%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">密码学</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%AF%86%E7%A0%81%E5%AD%A6/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/30/cryptography1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/30/cryptography1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>咱们作为非计算机专业的人去看一些区块链相关的技术资料的时候，经常会被一些讨厌的术语挡在门外。这次咱们聊的哈希就是非常重要的一个。哈希是密码学的基础，理解哈希是理解数字签名和加密通信等技术的必要前提。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://learning.nervos.org/crypto-block/3-hash.html#%E5%9F%BA%E6%9C%AC%E5%90%AB%E4%B9%89" rel="external nofollow noreferrer">哈希算法</a></li>
+</ul>
+<br/>
+
+<h1 id="基本含义"><a href="#基本含义" class="headerlink" title="基本含义"></a>基本含义</h1><br/>
+
+<p>先来从基本定义入手。哈希，英文是 hash ，本来意思是”切碎并搅拌“，有一种食物就叫 Hash ，就是把食材切碎并搅拌一下做成的。哈希函数的运算结果就是哈希值，通常简称为哈希。哈希函数有时候也翻译做散列函数。</p>
+<p><img src="/images/cryptography/1_0.jpg" alt=""></p>
+<p>根据维基百科的定义，哈希函数要做的事情是给一个任意大小的数据生成出一个固定长度的数据，作为它的映射。所谓映射就是一一对应。一个可靠的哈希算法要满足三点。第一是安全，给定数据 M 容易算出哈希值 X ，而给定 X 不能算出 M ，或者说哈希算法应该是一个单向算法。第二是独一无二，两个不同的数据，要拥有不相同的哈希。第三是长度固定，给定一种哈希算法，不管输入是多大的数据，输出长度都是固定的。但是仔细想一下，如果哈希的长度是固定的，也就是取值范围是有限的，而输入数据的取值范围是无限的，所以总会找到两个不同的输入拥有相同的哈希。所以，哈希函数的安全性肯定是个相对概念。如果出现了两个不同输入有相同输出的情况，就叫碰撞，collision 。不同的哈希算法，哈希位数越多，也就基本意味着安全级别越高，或者说它的”抗碰撞性“就越好。</p>
+<p>再来说说哈希函数的主要作用。哈希的独一无二性，保证了如果数据在存储或者传输过程中有丝毫损坏，那么它的哈希就会变。哈希函数的最常见的一个作用就是进行完整性校验（ Integrity Check ），完整的意思是数据无损坏。哈希有很多不同的称呼，有时候叫 Digest 摘要，有时候叫 Checksum 校验值，有时候叫 Fingerprint 指纹，其实说的意思差不多，也就是说哈希可以用来代表数据本身。例如朋友给我传递一份数据，传完之后，我有一份，他手里也有一份，如果两份数据的哈希值是一样的，那么这两份数据的内容就是一样的，或者说可以认为传递过程中数据没有损坏，我手里拿到的数据是完整的。</p>
+<p>所以说，哈希函数的基本作用就是给大数据算出一个摘要性的长度固定的字符串，也就是所谓的哈希。哈希的作用主要是进行完整性校验。</p>
+<br/>
+
+<h1 id="哈希算法的分类"><a href="#哈希算法的分类" class="headerlink" title="哈希算法的分类"></a>哈希算法的分类</h1><br/>
+
+<p>下一步我们把哈希函数分类，更细致的聊聊哈希算法的特点。首先说哈希算法有很多种，例如 md5 ，sha256 等等，但是它们总体上可以分为两大类，一类是普通哈希，另外一类是加密哈希，cryptographic hash function 。</p>
+<p>业界可以找到的哈希算法是有很多种的。我们可以大致按照输出的哈希的长度来聊，虽然哈希算法的安全性也不单单是跟哈希长度有关，但是一般哈希值越长也就是越安全。例如 CRC-32 的输出是32 bit，也就是32位的二进制数，表示成十六进制就是8位。MD5 算法的哈希是32位16进制数，比较常见。SHA-256是256个 Bit ，十六进制表示就是64位。这些算法可以分成普通哈希和加密哈希算法，两种算法之间没有特别明显的区别。例如本来 MD5 就是设计出来做加密哈希的，但是后来由于计算机的发展 MD5 出现碰撞的可能性就很大了，所以目前 MD5 只能当普通哈希用，用来做数据校验。加密哈希跟普通哈希的区别就是安全性，一般原则是只要一种哈希算法出现过碰撞，就会不被推荐成为加密哈希了，只有安全度高的哈希算法才能用作加密哈希。同时加密哈希其实也能当普通哈希来用，Git 版本控制工具就是用 SHA-1 这个加密哈希算法来做完整性校验的。一般来讲越安全的哈希算法，处理速度也就越慢，所以并不是所有的场合都适合用加密哈希来替代普通哈希。</p>
+<p><img src="/images/cryptography/1_1.jpg" alt=""></p>
+<p>在密码学领域，有两个算法都是把数据做输入，而输出是一段谁也看不懂的数据。其中一个就是哈希算法，另外一个是加密算法。注意，哈希算法和加密算法是完全不同的。首先哈希算法的输出长度是固定的，而加密算法的输出长度是跟数据本身长度直接相关的，第二，哈希是不可以逆向运算出数据的，而加密算法的输出是要能够逆向运算出数据的。关于加密算法，我们这里就不展开聊了。Peter 这里主要是强调加密哈希算法只是被用在加密过程中，但是它本身不是加密算法。</p>
+<p>总之，哈希算法有很多种，长度越长的算法基本认为越安全。安全度低的哈希算法被认为是普通哈希算法，主要用来做完整性校验。安全度高的被称为加密哈希算法，会被用在加密算法中。所谓的高低都是相对概念，例如 MD5 曾经属于加密哈希，但是目前只能用来做安全校验了。而从2017年开始，SHA-1 算法生成的加密证书也会被各大浏览器拒绝了。目前最流行的加密算法是 SHA-2 ，但是跟 SHA-1 不同，SHA-2 不是一种算法，而是一系列算法的统称，其中就包括咱们之前提过的 SHA-256 。</p>
+<br/>
+
+<h1 id="实用例子"><a href="#实用例子" class="headerlink" title="实用例子"></a>实用例子</h1><br/>
+
+<p>说了这么多基础知识，最后一部分咱们聊聊哈希在现实中的应用。</p>
+<p>首先一个场景是网站注册。当我们提交用户名密码的时候，用户名被会直接保存到网站的数据库中，但是密码却不是直接保存的，而是先把密码转换成哈希，保存到数据库中的其实是哈希。所以，即使是公司后台管理人员，也拿不到用户的密码。这样，如果万一公司数据库泄露了，用户的密码依然是安全的。而当用户自己登录网站的时候，输入密码提交到服务器，服务器上进行相同的哈希运算，因为输入数据没变，所以哈希也不会变，登录也就成功了。</p>
+<p>另外一个场景是区块链和加密货币中。比特币地址生成的时候，就用到了 SHA-256 算法，POW 也就是工作量证明，用的也是这个算法。</p>
+<p>基本上凡是涉及到密码学的地方，都会或多或少的用到哈希函数。</p>
+<br/>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><br/>
+
+<p>关于哈希和哈希函数，我们就聊到这里，下面来总结几句。哈希的基本作用就是提供一个数据的摘要或者指纹，通常的使用场景就是完整性校验。哈希算法有很多种，一般来讲哈希越长的算法，安全性也就越高，安全度足够高的哈希，或者说没有任何人能够成功实现碰撞的哈希，才有资格被考虑用在加密场合，而这类的哈希算法也被叫做加密哈希算法。实际中常见的哈希算法有 MD5 ，SHA-1 ，和 SHA-256 等等，其中 MD5 通常用来进行数据校验，SHA-1 曾经是加密哈希算法，但是目前已经被除名，也只能做为一种安全度更高的校验算法了。SHA-256 依然是广泛使用的加密哈希算法，在比特币生成地址以及 POW 工作量证明算法中都会用到。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/hash/" rel="tag"># hash</a>
+              <a href="/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/" rel="tag"># 密码学</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/30/network1/" rel="prev" title="网络 | 当你 ping 的时候，你知道背后发生了什么吗？「转载」">
+      <i class="fa fa-chevron-left"></i> 网络 | 当你 ping 的时候，你知道背后发生了什么吗？「转载」
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/30/cryptography2/" rel="next" title="密码学 | 公开密钥加密「转载」">
+      密码学 | 公开密钥加密「转载」 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基本含义"><span class="nav-number">2.</span> <span class="nav-text">基本含义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#哈希算法的分类"><span class="nav-number">3.</span> <span class="nav-text">哈希算法的分类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实用例子"><span class="nav-number">4.</span> <span class="nav-text">实用例子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

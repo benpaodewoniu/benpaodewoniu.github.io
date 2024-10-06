@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这一章讲一下 solidity 的数组。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="solidity | 数组">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/12/24/solidity9/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这一章讲一下 solidity 的数组。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/solidity/9_0.png">
+<meta property="article:published_time" content="2021-12-24T08:34:15.000Z">
+<meta property="article:modified_time" content="2023-02-19T11:19:41.797Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="eth">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/solidity/9_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/12/24/solidity9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>solidity | 数组 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/12/24/solidity9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          solidity | 数组
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-24 16:34:15" itemprop="dateCreated datePublished" datetime="2021-12-24T16:34:15+08:00">2021-12-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-02-19 19:19:41" itemprop="dateModified" datetime="2023-02-19T19:19:41+08:00">2023-02-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/" itemprop="url" rel="index"><span itemprop="name">平台 && 公链 && 项目 && 方向</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/" itemprop="url" rel="index"><span itemprop="name">eth</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/" itemprop="url" rel="index"><span itemprop="name">solidity</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%9F%BA%E7%A1%80/%E7%B1%BB%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">类型</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%9F%BA%E7%A1%80/%E7%B1%BB%E5%9E%8B/%E6%95%B0%E7%BB%84/" itemprop="url" rel="index"><span itemprop="name">数组</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/12/24/solidity9/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/12/24/solidity9/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这一章讲一下 <code>solidity</code> 的数组。</p>
+<a id="more"></a>
+
+<h2 id="声明-T-K"><a href="#声明-T-K" class="headerlink" title="声明 T[K]"></a>声明 T[K]</h2><ul>
+<li><code>T</code> 元素类型</li>
+<li><code>K</code> 数组长度「可选」<ul>
+<li><code>uint [10] tens</code></li>
+<li><code>uint [] us</code></li>
+<li><code>uint [] public c = [1,2,3]</code> // public 数组状态会自动生成一个对应变量的函数</li>
+</ul>
+</li>
+<li>使用 <code>new</code> 关键字<ul>
+<li><code>uint [] c = new uint[](7);</code> // storage</li>
+<li>这种方式必须要指定长度</li>
+</ul>
+</li>
+</ul>
+<h2 id="通过下标访问"><a href="#通过下标访问" class="headerlink" title="通过下标访问"></a>通过下标访问</h2><ul>
+<li><code>tens[0] = 10</code></li>
+</ul>
+<h2 id="多维数组"><a href="#多维数组" class="headerlink" title="多维数组"></a>多维数组</h2><ul>
+<li><a href="https://blog.csdn.net/shshanling/article/details/120465130" rel="external nofollow noreferrer">Solidity笔记5：2维数组</a></li>
+</ul>
+<p>solidity 多维数组和其他数组不一样的是</p>
+<pre><code>- solidity:uint[2][3] 它是列前行后，即是 3 行 2 列的数组
+- python: [2][3] 是 2 行 3 列</code></pre><ul>
+<li><code>uint[][5] a</code> // 5 个数组都是变长数组</li>
+</ul>
+<h2 id="数组成员"><a href="#数组成员" class="headerlink" title="数组成员"></a>数组成员</h2><ul>
+<li><code>.length</code><ul>
+<li>数组长度</li>
+<li><code>storage</code> 的变长数组，可以通过 <code>.length</code> 赋值调整数组长度</li>
+<li><code>memory</code> 数组一旦创建，无法改变长度</li>
+</ul>
+</li>
+<li><code>push()</code><ul>
+<li>添加新元素，返回新长度</li>
+<li>仅针对变长数组</li>
+<li><code>memory</code> 数组不支持</li>
+</ul>
+</li>
+</ul>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><h3 id="基本功能"><a href="#基本功能" class="headerlink" title="基本功能"></a>基本功能</h3><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SPDX-License-Identifier: MIT</span></span><br><span class="line">pragma solidity ^<span class="number">0.8</span><span class="number">.4</span>;</span><br><span class="line"></span><br><span class="line">contract Test &#123;</span><br><span class="line"></span><br><span class="line">    constructor() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">uint</span>[<span class="number">2</span>][<span class="number">3</span>] T =[[<span class="number">1</span>,<span class="number">2</span>],[<span class="number">3</span>,<span class="number">4</span>],[<span class="number">5</span>,<span class="number">6</span>]];</span><br><span class="line">    <span class="keyword">uint</span>[][] B;</span><br><span class="line">    <span class="comment">// new的方式第一个参数(列)必须指定。</span></span><br><span class="line">    <span class="keyword">uint</span>[<span class="number">2</span>][] twoArray2 = <span class="keyword">new</span> <span class="keyword">uint</span>[<span class="number">2</span>][](<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// error, 其它方式不支持 </span></span><br><span class="line">    <span class="comment">// uint[][2] twoArray2 = new uint[][2](4);</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getList</span><span class="params">(uint i)</span><span class="title">public</span> <span class="title">view</span> <span class="title">returns</span><span class="params">(uint[<span class="number">2</span>] memory)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> T[i];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getLength</span><span class="params">()</span> <span class="title">public</span> <span class="title">view</span> <span class="title">returns</span><span class="params">(uint)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> T.length;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getListLength</span><span class="params">(uint i)</span><span class="title">public</span> <span class="title">view</span> <span class="title">returns</span><span class="params">(uint)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> T[i].length;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getElement</span><span class="params">(uint i,uint j)</span> <span class="title">public</span> <span class="title">view</span> <span class="title">returns</span><span class="params">(uint)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> T[i][j];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">initB</span><span class="params">()</span> <span class="title">public</span> </span>&#123;</span><br><span class="line">        B = [[<span class="number">1</span>,<span class="number">2</span>],[<span class="number">2</span>,<span class="number">3</span>]];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getB</span><span class="params">()</span> <span class="title">public</span> <span class="title">view</span> <span class="title">returns</span><span class="params">(uint[][] memory)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> B;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">add</span><span class="params">()</span> <span class="title">public</span> <span class="title">returns</span><span class="params">(uint[][] memory)</span> </span>&#123;</span><br><span class="line">        B.push([<span class="number">1</span>,<span class="number">2</span>]);</span><br><span class="line">        B.push([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]);</span><br><span class="line">        <span class="keyword">return</span> B;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>getList<ul>
+<li>getList(1)<ul>
+<li>[3,4]</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>getLength<ul>
+<li>3</li>
+</ul>
+</li>
+<li>getListLength<ul>
+<li>getListLength(1)<ul>
+<li>2</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>getElement<ul>
+<li>getElement(2,1)<ul>
+<li>6</li>
+</ul>
+</li>
+<li>getElement(0,1)<ul>
+<li>2</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>initB<ul>
+<li>这个是变长初始化，如果要给定具体的数值，那么，必须都是定长的，下面这个是错误的</li>
+<li>B = [[1],[2,3]]</li>
+</ul>
+</li>
+<li>综合状态<ul>
+<li>initB() -&gt; getB()<ul>
+<li>[[1,2],[2,3]]</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>add<ul>
+<li>add() -&gt; getB()<ul>
+<li>[[1,2],[1,2,3]]</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>综合操作<ul>
+<li>initB() -&gt; add() -&gt; getB()<ul>
+<li>[[1,2],[2,3],[1,2],[1,2,3]]</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>上面总结了定长、变长等数组的初始化以及返回。</p>
+<h4 id="互动"><a href="#互动" class="headerlink" title="互动"></a>互动</h4><p><code>ganache</code> 的启动方式是</p>
+<ul>
+<li><code>ganache-cli --fork.url wss://bsc-mainnet.nodereal.io/ws/v1/63ef*** --miner.blockTime 1</code></li>
+</ul>
+<p>必须要加 <code>miner.blockTime</code> 让其自动出块，否则进行写区块操作的时候，会出现</p>
+<pre><code>transaction can&apos;t be replaced, mining has already started</code></pre><p><code>python</code> 代码</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> web3 import Web3</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> Constant.Strategy.StrategyConstant import StrategyType</span><br><span class="line"></span><br><span class="line">abi = <span class="string">""</span><span class="string">"[</span></span><br><span class="line"><span class="string">	&#123;</span></span><br><span class="line"><span class="string">		"</span>inputs<span class="string">": [],</span></span><br><span class="line"><span class="string">		"</span>name<span class="string">": "</span>add<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>outputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256[][]<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span><span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256[][]<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>stateMutability<span class="string">": "</span>nonpayable<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>type<span class="string">": "</span>function<span class="string">"</span></span><br><span class="line"><span class="string">	&#125;,</span></span><br><span class="line"><span class="string">	&#123;</span></span><br><span class="line"><span class="string">		"</span>inputs<span class="string">": [],</span></span><br><span class="line"><span class="string">		"</span>name<span class="string">": "</span>initB<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>outputs<span class="string">": [],</span></span><br><span class="line"><span class="string">		"</span>stateMutability<span class="string">": "</span>nonpayable<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>type<span class="string">": "</span>function<span class="string">"</span></span><br><span class="line"><span class="string">	&#125;,</span></span><br><span class="line"><span class="string">	&#123;</span></span><br><span class="line"><span class="string">		"</span>inputs<span class="string">": [],</span></span><br><span class="line"><span class="string">		"</span>stateMutability<span class="string">": "</span>nonpayable<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>type<span class="string">": "</span>constructor<span class="string">"</span></span><br><span class="line"><span class="string">	&#125;,</span></span><br><span class="line"><span class="string">	&#123;</span></span><br><span class="line"><span class="string">		"</span>inputs<span class="string">": [],</span></span><br><span class="line"><span class="string">		"</span>name<span class="string">": "</span>getB<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>outputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256[][]<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span><span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256[][]<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>stateMutability<span class="string">": "</span>view<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>type<span class="string">": "</span>function<span class="string">"</span></span><br><span class="line"><span class="string">	&#125;,</span></span><br><span class="line"><span class="string">	&#123;</span></span><br><span class="line"><span class="string">		"</span>inputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span>i<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;,</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span>j<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>name<span class="string">": "</span>getElement<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>outputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span><span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>stateMutability<span class="string">": "</span>view<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>type<span class="string">": "</span>function<span class="string">"</span></span><br><span class="line"><span class="string">	&#125;,</span></span><br><span class="line"><span class="string">	&#123;</span></span><br><span class="line"><span class="string">		"</span>inputs<span class="string">": [],</span></span><br><span class="line"><span class="string">		"</span>name<span class="string">": "</span>getLength<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>outputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span><span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>stateMutability<span class="string">": "</span>view<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>type<span class="string">": "</span>function<span class="string">"</span></span><br><span class="line"><span class="string">	&#125;,</span></span><br><span class="line"><span class="string">	&#123;</span></span><br><span class="line"><span class="string">		"</span>inputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span>i<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>name<span class="string">": "</span>getList<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>outputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256[2]<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span><span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256[2]<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>stateMutability<span class="string">": "</span>view<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>type<span class="string">": "</span>function<span class="string">"</span></span><br><span class="line"><span class="string">	&#125;,</span></span><br><span class="line"><span class="string">	&#123;</span></span><br><span class="line"><span class="string">		"</span>inputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span>i<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>name<span class="string">": "</span>getListLength<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>outputs<span class="string">": [</span></span><br><span class="line"><span class="string">			&#123;</span></span><br><span class="line"><span class="string">				"</span>internalType<span class="string">": "</span>uint256<span class="string">",</span></span><br><span class="line"><span class="string">				"</span>name<span class="string">": "</span><span class="string">",</span></span><br><span class="line"><span class="string">				"</span>type<span class="string">": "</span>uint256<span class="string">"</span></span><br><span class="line"><span class="string">			&#125;</span></span><br><span class="line"><span class="string">		],</span></span><br><span class="line"><span class="string">		"</span>stateMutability<span class="string">": "</span>view<span class="string">",</span></span><br><span class="line"><span class="string">		"</span>type<span class="string">": "</span>function<span class="string">"</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">]"</span><span class="string">""</span></span><br><span class="line"></span><br><span class="line">private = <span class="string">"***"</span></span><br><span class="line">address = <span class="string">"***"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Test:</span><br><span class="line"></span><br><span class="line">    def __init__(self, strategyEngine):</span><br><span class="line">        self.web3 = Web3(Web3.HTTPProvider(<span class="string">'http://127.0.0.1:8545'</span>))</span><br><span class="line">        self.strategyEngine = strategyEngine</span><br><span class="line">        self.test = self.web3.eth.contract(</span><br><span class="line">            <span class="attribute">address</span>=Web3.toChecksumAddress("0xe109458c765fb5dc0f3fbf60e0e07656981b2a2f"), <span class="attribute">abi</span>=abi)</span><br><span class="line"></span><br><span class="line">    def <span class="builtin-name">add</span>(self):</span><br><span class="line">        # add</span><br><span class="line">        tx_dic = self.test.functions.<span class="builtin-name">add</span>().buildTransaction(</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">'gas'</span>: 4000000,</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">        tx_dic[<span class="string">"nonce"</span>] = self.web3.eth.getTransactionCount(Web3.toChecksumAddress(address))</span><br><span class="line">        tx_dic[<span class="string">'gasPrice'</span>] = self.web3.toWei(5, <span class="string">'gwei'</span>)</span><br><span class="line">        sign_tx = self.web3.eth.account.signTransaction(tx_dic, <span class="attribute">private_key</span>=private)</span><br><span class="line">        txn_hash = self.web3.eth.sendRawTransaction(sign_tx.rawTransaction)</span><br><span class="line">        tx = Web3.toHex(txn_hash)</span><br><span class="line">        ## get</span><br><span class="line">        data = self.web3.eth.get_transaction_receipt(tx)</span><br><span class="line">        <span class="builtin-name">print</span>(data)</span><br><span class="line"></span><br><span class="line">    def getB(self):</span><br><span class="line">        data = self.test.functions.getB().call()</span><br><span class="line">        <span class="builtin-name">print</span>(data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    l = Test(None)</span><br><span class="line">    l.<span class="builtin-name">add</span>()</span><br><span class="line">    l.getB()</span><br></pre></td></tr></table></figure>
+
+<p>上面的输出</p>
+<ul>
+<li>add<ul>
+<li>data<ul>
+<li>就是 tx 获取，没什么可以用的</li>
+<li>可能是目前我还不知道怎么读取</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>getB<ul>
+<li>data<ul>
+<li>就是 2 维数组</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SPDX-License-Identifier: MIT</span></span><br><span class="line"><span class="keyword">pragma</span> solidity ^<span class="number">0.8</span><span class="number">.4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 合约调用 pancakeswap</span></span><br><span class="line"><span class="comment">// 合约转出任意代币</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">contract MultiTrade &#123;</span><br><span class="line"></span><br><span class="line">    constructor() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">function</span> get(<span class="built_in">uint</span> index,<span class="built_in">uint</span>[][] calldata test) <span class="keyword">public</span> view returns(<span class="built_in">uint</span>[] calldata)&#123;</span><br><span class="line">        <span class="keyword">return</span> test[index];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>进行浏览器部署后</p>
+<ul>
+<li>get<ul>
+<li>1,[[1,2],[3,4,5],[7]]</li>
+<li>返回 [3,4,5]</li>
+</ul>
+</li>
+</ul>
+<h3 id="数组间的传值"><a href="#数组间的传值" class="headerlink" title="数组间的传值"></a>数组间的传值</h3><figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span><span class="number">.4</span>;</span><br><span class="line"></span><br><span class="line">contract Test &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">uint</span>[] aStorage = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getStorage</span><span class="params">()</span> <span class="title">public</span> <span class="title">view</span> <span class="title">returns</span><span class="params">(uint[] memory)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> aStorage;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">storage2Memory</span><span class="params">()</span> <span class="title">public</span> <span class="title">view</span> </span>&#123;</span><br><span class="line">        <span class="keyword">uint</span>[] memory b = aStorage; <span class="comment">// 值传递</span></span><br><span class="line">        b[<span class="number">0</span>] = <span class="number">100</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">memory2Storage</span><span class="params">()</span> <span class="title">public</span> </span>&#123;</span><br><span class="line">        <span class="keyword">uint</span>[<span class="number">3</span>] memory m = [<span class="keyword">uint</span>(<span class="number">10</span>), <span class="number">20</span>, <span class="number">30</span>];</span><br><span class="line">        aStorage = m;  <span class="comment">// 值传递</span></span><br><span class="line">        m[<span class="number">0</span>] = <span class="number">77</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">storage2Storage</span><span class="params">()</span> <span class="title">public</span> </span>&#123;</span><br><span class="line">        <span class="comment">// storage定义的局部变量不能使用数组字面量进行赋值</span></span><br><span class="line">        <span class="comment">// uint[] storage s = [uint(22),33,44];  // error</span></span><br><span class="line">        <span class="keyword">uint</span>[] storage s = aStorage;  <span class="comment">// 引用传递</span></span><br><span class="line">        s[<span class="number">0</span>] = <span class="number">99</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">memory2Memory</span><span class="params">()</span> <span class="title">public</span> <span class="title">pure</span> <span class="title">returns</span><span class="params">(uint8[<span class="number">3</span>] memory)</span> </span>&#123;</span><br><span class="line">        uint8[<span class="number">3</span>] memory m1 = [<span class="number">11</span>,<span class="number">12</span>,<span class="number">13</span>];</span><br><span class="line">        uint8[<span class="number">3</span>] memory m2 = m1;  <span class="comment">// 引用传递</span></span><br><span class="line">        m2[<span class="number">0</span>] = <span class="number">20</span>;</span><br><span class="line">        <span class="keyword">return</span> m1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分别进行运行，「下面函数，每运行一次，都要重新部署一次，用来隔离参数，防止被污染」</p>
+<ul>
+<li>getStorage()<ul>
+<li>[1,2,3]</li>
+</ul>
+</li>
+<li>storage2Memory() -&gt; getStorage()<ul>
+<li>[1,2,3] # 不变</li>
+</ul>
+</li>
+<li>memory2Storage() -&gt; getStorage()<ul>
+<li>[10,20,30] # 变化</li>
+</ul>
+</li>
+<li>storage2Storage() -&gt; getStorage()<ul>
+<li>[99,2,3] # 变化</li>
+</ul>
+</li>
+<li>memory2Memory() -&gt; getStorage()<ul>
+<li>[1,2,3] # 不变</li>
+</ul>
+</li>
+</ul>
+<h2 id="字节数组"><a href="#字节数组" class="headerlink" title="字节数组"></a>字节数组</h2><p>字节数组 <code>bytes</code> 类似 <code>byte[]</code> ，不过 <code>bytes</code> 作为外部函数的参数空间更小，所以，优先使用 bytes</p>
+<ul>
+<li><code>bytes bs;</code></li>
+<li><code>bytes bs = &quot;123bh&quot;;</code></li>
+</ul>
+<h2 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h2><p>字符串也是数组</p>
+<ul>
+<li><code>string st0;</code></li>
+<li><code>string st1 = &quot;等链学院&quot;</code></li>
+<li>没有 <code>.length</code> 属性<ul>
+<li>通过 <code>bytes(s).length</code> 获得字节数组</li>
+<li><code>bytes(s)[k]</code> 获取下标 <code>K</code> 的 <code>utf-8</code> 的编码</li>
+</ul>
+</li>
+<li><code>bytes</code> 存储任意长度的字节数据 「<code>utf-8</code> 编码」</li>
+<li><code>string</code> 用来存储 <code>utf-8</code> 编码的字符串数据</li>
+</ul>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.4</span><span class="number">.18</span>;</span><br><span class="line"></span><br><span class="line">contract Test&#123;</span><br><span class="line"></span><br><span class="line">    string <span class="keyword">public</span> st1 = <span class="string">"犀牛"</span>;</span><br><span class="line">    bytes <span class="keyword">public</span> st2 = <span class="string">"犀牛"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">get_len</span><span class="params">()</span> <span class="title">constant</span> <span class="title">returns</span><span class="params">(uint)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> bytes(st1).length;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>get_len</code><ul>
+<li>获得的是 <code>6</code> ，因为，一个汉字有 <code>3</code> 个字节</li>
+</ul>
+</li>
+<li>如果要获取下标，那么，获取的也是编码</li>
+</ul>
+<h3 id="stringutils"><a href="#stringutils" class="headerlink" title="stringutils"></a>stringutils</h3><p>这个是第三方库，用来处理字符串。</p>
+<ul>
+<li><a href="https://github.com/Arachnid/solidity-stringutils" rel="external nofollow noreferrer">地址</a></li>
+</ul>
+<p>使用前需要把字符串转化成一个个切片，再进行使用</p>
+<p>主要功能有</p>
+<ul>
+<li>字符长度</li>
+<li>匹配字符串<ul>
+<li><code>find()</code></li>
+<li><code>startsWith()</code></li>
+<li><code>endsWith()</code></li>
+<li>…</li>
+</ul>
+</li>
+<li>字符串拼接</li>
+<li>…</li>
+</ul>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.4</span><span class="number">.18</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta"><span class="meta-keyword">import</span> "github.com/Arachnid/solidity-stringutils/strings.sol";</span></span><br><span class="line"></span><br><span class="line">contract Test&#123;</span><br><span class="line"></span><br><span class="line">    using strings <span class="keyword">for</span> *; <span class="comment">// 意思是 strings 适用于所有的类型</span></span><br><span class="line">    </span><br><span class="line">    string <span class="keyword">public</span> st1 = <span class="string">"犀牛"</span>;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">get_len</span><span class="params">()</span> <span class="title">constant</span> <span class="title">returns</span><span class="params">(uint len)</span></span>&#123;</span><br><span class="line">        len = st1.toSlice().len();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里说一下几点要注意的</p>
+<ul>
+<li>我是 <code>remix</code> 编写的代码<ul>
+<li><code>import &quot;github.com/Arachnid/solidity-stringutils/strings.sol&quot;;</code></li>
+<li>会在线上目录中，创建相应的文件夹，会把 <code>github</code> 中的 <code>strings.sol</code> 文件内容 <code>copy</code> 到这个文件中</li>
+<li>但是，<code>github</code> 线上的这个文件是一个路径，而不是 <code>strings.sol</code> 的内容，于是，我把 <code>strings.sol</code> 的内容直接 <code>copy</code> 到 <code>remix</code> 创建的文件中</li>
+<li>就可以正常运行了</li>
+</ul>
+</li>
+<li>如果是本地<ul>
+<li>建议 <code>copy</code> 上面第三方库的合约内容到本地文件，然后引用</li>
+</ul>
+</li>
+</ul>
+<div style="width: 50%;padding-left: 25%">
+
+<p><img src="/images/solidity/9_0.png" alt=""></p>
+</div>
+
+<p>上面的图是你引入 <code>import</code> 后 <code>remix</code> 自己创建的。</p>
+<p>因为，该库 <code>github</code> 的文件内容是一个引用「现在可能已经修改了」，所以，我们需要自己把该库的 <code>strings.sol</code> 内容 <code>copy</code> 到 <code>remix</code> 的 <code>string.sol</code> 里面。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/eth/" rel="tag"># eth</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/23/eth40/" rel="prev" title="eth | 解析 bsc 和 eth 的 pending 数据">
+      <i class="fa fa-chevron-left"></i> eth | 解析 bsc 和 eth 的 pending 数据
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/12/26/solidity10/" rel="next" title="solidity ｜ 映射">
+      solidity ｜ 映射 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#声明-T-K"><span class="nav-number">1.</span> <span class="nav-text">声明 T[K]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过下标访问"><span class="nav-number">2.</span> <span class="nav-text">通过下标访问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多维数组"><span class="nav-number">3.</span> <span class="nav-text">多维数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数组成员"><span class="nav-number">4.</span> <span class="nav-text">数组成员</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例"><span class="nav-number">5.</span> <span class="nav-text">案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本功能"><span class="nav-number">5.1.</span> <span class="nav-text">基本功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#互动"><span class="nav-number">5.1.1.</span> <span class="nav-text">互动</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他"><span class="nav-number">5.2.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组间的传值"><span class="nav-number">5.3.</span> <span class="nav-text">数组间的传值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字节数组"><span class="nav-number">6.</span> <span class="nav-text">字节数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串"><span class="nav-number">7.</span> <span class="nav-text">字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#stringutils"><span class="nav-number">7.1.</span> <span class="nav-text">stringutils</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

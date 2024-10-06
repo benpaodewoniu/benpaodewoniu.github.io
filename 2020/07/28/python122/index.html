@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="有的时候， python 的基础数据结构并不够用，这个时候，可以使用自带的 collections 里面的数据结构。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python | collections">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/07/28/python122/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="有的时候， python 的基础数据结构并不够用，这个时候，可以使用自带的 collections 里面的数据结构。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-28T15:06:19.000Z">
+<meta property="article:modified_time" content="2020-08-03T02:26:01.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="collections">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/07/28/python122/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python | collections | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/07/28/python122/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python | collections
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-28 23:06:19" itemprop="dateCreated datePublished" datetime="2020-07-28T23:06:19+08:00">2020-07-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-03 10:26:01" itemprop="dateModified" datetime="2020-08-03T10:26:01+08:00">2020-08-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/" itemprop="url" rel="index"><span itemprop="name">模块</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/collections/" itemprop="url" rel="index"><span itemprop="name">collections</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/28/python122/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/28/python122/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>有的时候， python 的基础数据结构并不够用，这个时候，可以使用自带的 collections 里面的数据结构。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h1><br/>
+
+<h2 id="deque-双端队列"><a href="#deque-双端队列" class="headerlink" title="deque 双端队列"></a>deque 双端队列</h2><p>deque 是一个双端队列, 如果要经常从两端append 的数据, 选择这个数据结构就比较好了, 如果要实现随机访问,不建议用这个,请用列表.</p>
+<p>deque 优势就是可以从两边append ,appendleft 数据. 这一点list 是没有的.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"><span class="comment">#  可以指定 队列的长度</span></span><br><span class="line">mydeque = deque(maxlen=<span class="number">10</span>)</span><br><span class="line">print(mydeque.maxlen)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 默认从右边加入</span></span><br><span class="line">mydeque.append(<span class="number">10</span>)</span><br><span class="line">mydeque.append(<span class="number">12</span>)</span><br><span class="line">print(mydeque)</span><br><span class="line">    <span class="comment"># deque([10, 12], maxlen=10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 也可以从左边加入</span></span><br><span class="line">mydeque.appendleft(<span class="string">'a'</span>)</span><br><span class="line">mydeque.appendleft(<span class="string">'b'</span>)</span><br><span class="line">print(mydeque)</span><br><span class="line">    <span class="comment"># deque(['b', 'a', 10, 12], maxlen=10)</span></span><br><span class="line"></span><br><span class="line">mylist = range(<span class="number">5</span>, <span class="number">8</span>)</span><br><span class="line"><span class="comment"># 也可以加入一个列表，默认从右边加入</span></span><br><span class="line">mydeque.extend(mylist)</span><br><span class="line"><span class="comment"># deque(['b', 'a', 10, 12, 5, 6, 7], maxlen=10)</span></span><br><span class="line"><span class="comment"># 也可以从左边加入</span></span><br><span class="line">mydeque.extendleft(mylist)</span><br><span class="line">print(mydeque)</span><br><span class="line">    <span class="comment"># deque([7, 6, 5, 'b', 'a', 10, 12, 5, 6, 7], maxlen=10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 出队列,返回出队列的元素</span></span><br><span class="line"><span class="comment"># 可以从左边也可以从右边 出队列</span></span><br><span class="line">mydeque.pop()</span><br><span class="line">mydeque.popleft()</span><br><span class="line">    <span class="comment"># 其 popleft() 方法可达到 O(1) 时间复杂度；列表 list 的 pop(0) 方法时间复杂度为 O(N)。</span></span><br><span class="line">print(mydeque)</span><br><span class="line">    <span class="comment"># deque([6, 5, 'b', 'a', 10, 12, 5, 6], maxlen=10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看 队列里面元素个数</span></span><br><span class="line">print(len(mydeque))</span><br><span class="line"><span class="comment"># 8</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 统计元素的个数</span></span><br><span class="line"><span class="comment"># 统计a 有几个</span></span><br><span class="line">print(mydeque.count(<span class="string">'a'</span>))</span><br><span class="line">    <span class="comment"># 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 在某个位置insert 一个元素</span></span><br><span class="line"><span class="comment"># insert(i, x)</span></span><br><span class="line"><span class="comment"># Insert x into the deque at position i.</span></span><br><span class="line">mydeque.insert(<span class="number">2</span>, <span class="string">'frank'</span>)</span><br><span class="line">print(mydeque)</span><br><span class="line">    <span class="comment"># deque([6, 5, 'frank', 'b', 'a', 10, 12, 5, 6], maxlen=10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#翻转操作</span></span><br><span class="line">mydeque.reverse()</span><br><span class="line">print(mydeque)</span><br><span class="line">    <span class="comment"># deque([6, 5, 12, 10, 'a', 'b', 'frank', 5, 6], maxlen=10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># remove 移除某个元素</span></span><br><span class="line">mydeque.remove(<span class="number">10</span>)</span><br><span class="line">print(mydeque)</span><br><span class="line">    <span class="comment"># deque([6, 5, 12, 'a', 'b', 'frank', 5, 6], maxlen=10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 清空队列元素 clear</span></span><br><span class="line">mydeque.clear()</span><br><span class="line">print(mydeque)</span><br><span class="line">    <span class="comment"># deque([], maxlen=10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># copy 浅拷贝</span></span><br><span class="line">mydeque.copy()</span><br></pre></td></tr></table></figure>
+
+<p><code>rotate</code> 方法移动到最后一个，占用第一个位置，循环移动， <code>value</code> 是步长<code>rotate（value)</code> 对队列实行旋转操作（每个元素依次向后移动<code>value</code>步，最后一个移动到第一个算一步）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">d = deque()</span><br><span class="line">d.extend([<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="string">'d'</span>, <span class="string">'e'</span>])</span><br><span class="line">d.rotate(<span class="number">2</span>)  <span class="comment"># 指定次数，默认1次</span></span><br><span class="line">print(d) </span><br><span class="line">	<span class="comment"># deque(['d', 'e', 'a', 'b', 'c'])</span></span><br><span class="line">	<span class="comment"># 解读</span></span><br><span class="line">	<span class="comment"># d 下标是 3 向后移动两个，由于是循环，所以，下标为 0</span></span><br><span class="line">	<span class="comment"># a 下标是 0 向后移动两个，所以，下标变成 2</span></span><br></pre></td></tr></table></figure>
+
+<p><code>maxlen</code> 要说明一下, 如果指定了 <code>maxlen</code> 如果构建<code>deque</code> 的时候,指定了<code>maxlen</code>, 则可以通过 <code>d.maxlen</code> 来获得dueue的最大长度.</p>
+<p>如果插入的数据大于 <code>maxlen</code> 则会自动删除旧的元素.删除 什么元素,取决于, 从哪边添加数据.</p>
+<p>来看一下例子.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">d = deque(list(range(<span class="number">5</span>)),maxlen=<span class="number">5</span>)</span><br><span class="line">d.maxlen</span><br><span class="line">	<span class="comment"># 5</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从左边添加元素, # 元素4 被挤出 队列</span></span><br><span class="line"></span><br><span class="line">d.appendleft(<span class="string">'frank'</span>)</span><br><span class="line">	<span class="comment"># deque(['frank', 0, 1, 2, 3])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从右边添加元素, 元素 'frank'  被挤出队列.</span></span><br><span class="line">deque([<span class="string">'frank'</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])</span><br><span class="line">d.append(<span class="string">'xiaoming'</span>)</span><br><span class="line">	<span class="comment"># deque([0, 1, 2, 3, 'xiaoming'])</span></span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h1><br/>
+
+<h2 id="OrderedDict-有序字典"><a href="#OrderedDict-有序字典" class="headerlink" title="OrderedDict 有序字典"></a>OrderedDict 有序字典</h2><ul>
+<li>在<code>Python 3.5</code>（含）以前，字典是不能保证顺序的，所以，要用 <code>OrderedDict</code> 。</li>
+<li>但是从<code>Python 3.6</code>开始，字典是变成有顺序的了。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict</span><br><span class="line"></span><br><span class="line">dic = OrderedDict()</span><br><span class="line">dic[<span class="string">'k1'</span>] = <span class="string">'v1'</span></span><br><span class="line">dic[<span class="string">'k2'</span>] = <span class="string">'v2'</span></span><br><span class="line">dic[<span class="string">'k3'</span>] = <span class="string">'v3'</span></span><br><span class="line">print(dic)</span><br><span class="line">    <span class="comment"># OrderedDict([('k1', 'v1'), ('k2', 'v2'), ('k3', 'v3')])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 清空</span></span><br><span class="line">dic.clear()</span><br><span class="line">print(dic)</span><br><span class="line"><span class="comment"># OrderedDict()</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 浅拷贝</span></span><br><span class="line">dic.copy()</span><br><span class="line"></span><br><span class="line"><span class="comment"># fromkeys(指定一个列表，把列表中的值作为字典的key,生成一个字典)</span></span><br><span class="line">name = [<span class="string">'tom'</span>, <span class="string">'lucy'</span>, <span class="string">'sam'</span>]</span><br><span class="line">a = dic.fromkeys(name)</span><br><span class="line">d = dic.fromkeys(name, <span class="string">'2'</span>)</span><br><span class="line">print(a)</span><br><span class="line">    <span class="comment"># OrderedDict([('tom', None), ('lucy', None), ('sam', None)])</span></span><br><span class="line">print(d)</span><br><span class="line">    <span class="comment"># OrderedDict([('tom', '2'), ('lucy', '2'), ('sam', '2')])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># items(返回由“键值对组成元素“的列表)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> key, item <span class="keyword">in</span> d.items():</span><br><span class="line">    print(key)</span><br><span class="line">    print(item)</span><br><span class="line">    <span class="comment"># tom</span></span><br><span class="line">    <span class="comment"># 2</span></span><br><span class="line">    <span class="comment"># lucy</span></span><br><span class="line">    <span class="comment"># 2</span></span><br><span class="line">    <span class="comment"># sam</span></span><br><span class="line">    <span class="comment"># 2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># keys(获取字典所有的key)</span></span><br><span class="line">print(d.keys())</span><br><span class="line">    <span class="comment"># odict_keys(['tom', 'lucy', 'sam'])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># move_to_end(指定一个key，把对应的key-value移到最后)</span></span><br><span class="line">d.move_to_end(<span class="string">'lucy'</span>)</span><br><span class="line">print(d)</span><br><span class="line">    <span class="comment"># OrderedDict([('tom', '2'), ('sam', '2'), ('lucy', '2')])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># pop(获取指定key的value，并在字典中删除)</span></span><br><span class="line">print(d.pop(<span class="string">'lucy'</span>))</span><br><span class="line"><span class="comment"># 2</span></span><br><span class="line">print(d)</span><br><span class="line">    <span class="comment"># OrderedDict([('tom', '2'), ('sam', '2')])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># popitem(按照后进先出原则，删除最后加入的元素，返回key-value)</span></span><br><span class="line">print(d)</span><br><span class="line"><span class="comment"># OrderedDict([('tom', '2'), ('sam', '2')])</span></span><br><span class="line">print(d.popitem())</span><br><span class="line"><span class="comment"># ('sam', '2')</span></span><br><span class="line">print(d)</span><br><span class="line">    <span class="comment"># OrderedDict([('tom', '2')])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># setdefault(获取指定key的value，如果key不存在，则创建)</span></span><br><span class="line">d.setdefault(<span class="string">'l'</span>, <span class="number">5</span>)</span><br><span class="line">print(d)</span><br><span class="line">    <span class="comment"># OrderedDict([('tom', '2'), ('l', 5)])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># values(获取字典所有的value，返回一个列表)</span></span><br><span class="line">print(d.values())</span><br><span class="line">    <span class="comment"># odict_values(['2', 5])</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="defaultdict-默认返回字典"><a href="#defaultdict-默认返回字典" class="headerlink" title="defaultdict 默认返回字典"></a>defaultdict 默认返回字典</h2><ul>
+<li><a href="https://blog.csdn.net/u010700415/article/details/17919289" rel="external nofollow noreferrer">python中defaultdict方法的使用</a></li>
+</ul>
+<h3 id="默认值可以很方便"><a href="#默认值可以很方便" class="headerlink" title="默认值可以很方便"></a>默认值可以很方便</h3><p>众所周知，在<code>Python</code>中如果访问字典中不存在的键，会引发<code>KeyError</code>异常（JavaScript中如果对象中不存在某个属性，则返回undefined）。但是有时候，字典中的每个键都存在默认值是非常方便的。例如下面的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">strings = (<span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>, <span class="string">'puppy'</span>,</span><br><span class="line">           <span class="string">'weasel'</span>, <span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>)</span><br><span class="line">counts = &#123;&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> kw <span class="keyword">in</span> strings:</span><br><span class="line">    counts[kw] += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>该例子统计<code>strings</code>中某个单词出现的次数，并在<code>counts</code>字典中作记录。单词每出现一次，在<code>count</code>相对应的键所存的值数字加1。但是事实上，运行这段代码会抛出<code>KeyError</code>异常，出现的时机是每个单词第一次统计的时候，因为<code>Python</code>的<code>dict</code>中不存在默认值的说法，可以在<code>Python</code>命令行中验证：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>counts = dict()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>counts</span><br><span class="line">&#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>counts[<span class="string">'puppy'</span>] += <span class="number">1</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">KeyError: <span class="string">'puppy'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="使用判断语句检查"><a href="#使用判断语句检查" class="headerlink" title="使用判断语句检查"></a>使用判断语句检查</h3><p>既然如此，首先可能想到的方法是在单词第一次统计的时候，在<code>counts</code>中相应的键存下默认值<code>1</code>。这需要在处理的时候添加一个判断语句：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">strings = (<span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>, <span class="string">'puppy'</span>,</span><br><span class="line">           <span class="string">'weasel'</span>, <span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>)</span><br><span class="line">counts = &#123;&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> kw <span class="keyword">in</span> strings:</span><br><span class="line">    <span class="keyword">if</span> kw <span class="keyword">not</span> <span class="keyword">in</span> counts:</span><br><span class="line">        counts[kw] = <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        counts[kw] += <span class="number">1</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># counts:</span></span><br><span class="line"><span class="comment"># &#123;'puppy': 5, 'weasel': 1, 'kitten': 2&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="使用dict-setdefault-方法"><a href="#使用dict-setdefault-方法" class="headerlink" title="使用dict.setdefault()方法"></a>使用dict.setdefault()方法</h3><p>也可以通过<code>dict.setdefault()</code>方法来设置默认值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">strings = (<span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>, <span class="string">'puppy'</span>,</span><br><span class="line">           <span class="string">'weasel'</span>, <span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>)</span><br><span class="line">counts = &#123;&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> kw <span class="keyword">in</span> strings:</span><br><span class="line">    counts.setdefault(kw, <span class="number">0</span>)</span><br><span class="line">    counts[kw] += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p><code>dict.setdefault()</code>方法接收两个参数，第一个参数是健的名称，第二个参数是默认值。假如字典中不存在给定的键，则返回参数中提供的默认值；反之，则返回字典中保存的值。利用<code>dict.setdefault()</code>方法的返回值可以重写<code>for</code>循环中的代码，使其更加简洁：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">strings = (<span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>, <span class="string">'puppy'</span>,</span><br><span class="line">           <span class="string">'weasel'</span>, <span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>)</span><br><span class="line">counts = &#123;&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> kw <span class="keyword">in</span> strings:</span><br><span class="line">    counts[kw] = counts.setdefault(kw, <span class="number">0</span>) + <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="使用collections-defaultdict类"><a href="#使用collections-defaultdict类" class="headerlink" title="使用collections.defaultdict类"></a>使用collections.defaultdict类</h3><p>以上的方法虽然在一定程度上解决了dict中不存在默认值的问题，但是这时候我们会想，有没有一种字典它本身提供了默认值的功能呢？答案是肯定的，那就是<code>collections.defaultdict</code>。</p>
+<p><code>defaultdict</code>类就好像是一个<code>dict</code>，但是它是使用一个类型来初始化的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd = defaultdict(list)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd</span><br><span class="line">defaultdict(&lt;type <span class="string">'list'</span>&gt;, &#123;&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><code>defaultdict</code>类的初始化函数接受一个类型作为参数，当所访问的键不存在的时候，可以实例化一个值作为默认值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd[<span class="string">'foo'</span>]</span><br><span class="line">[]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd</span><br><span class="line">defaultdict(&lt;type <span class="string">'list'</span>&gt;, &#123;<span class="string">'foo'</span>: []&#125;)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd[<span class="string">'bar'</span>].append(<span class="string">'quux'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd</span><br><span class="line">defaultdict(&lt;type <span class="string">'list'</span>&gt;, &#123;<span class="string">'foo'</span>: [], <span class="string">'bar'</span>: [<span class="string">'quux'</span>]&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，这种形式的默认值只有在通过<code>dict[key]</code>或者<code>dict.__getitem__(key)</code>访问的时候才有效，这其中的原因在下文会介绍。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd = defaultdict(list)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">'something'</span> <span class="keyword">in</span> dd</span><br><span class="line"><span class="literal">False</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd.pop(<span class="string">'something'</span>)</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">KeyError: <span class="string">'pop(): dictionary is empty'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd.get(<span class="string">'something'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd[<span class="string">'something'</span>]</span><br><span class="line">[]</span><br></pre></td></tr></table></figure>
+
+<p><code>defaultdict</code>类除了接受类型名称作为初始化函数的参数之外，还可以使用任何不带参数的可调用函数，到时该函数的返回结果作为默认值，这样使得默认值的取值更加灵活。下面用一个例子来说明，如何用自定义的不带参数的函数<code>zero()</code>作为<code>defaultdict</code>类的初始化函数的参数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">zero</span><span class="params">()</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd = defaultdict(zero)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd</span><br><span class="line">defaultdict(&lt;function zero at <span class="number">0xb7ed2684</span>&gt;, &#123;&#125;)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd[<span class="string">'foo'</span>]</span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dd</span><br><span class="line">defaultdict(&lt;function zero at <span class="number">0xb7ed2684</span>&gt;, &#123;<span class="string">'foo'</span>: <span class="number">0</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>利用<code>collections.defaultdict</code>来解决最初的单词统计问题，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"> </span><br><span class="line">strings = (<span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>, <span class="string">'puppy'</span>,</span><br><span class="line">           <span class="string">'weasel'</span>, <span class="string">'puppy'</span>, <span class="string">'kitten'</span>, <span class="string">'puppy'</span>)</span><br><span class="line">counts = defaultdict(<span class="keyword">lambda</span>: <span class="number">0</span>)  <span class="comment"># 使用lambda来定义简单的函数</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> s <span class="keyword">in</span> strings:</span><br><span class="line">    counts[s] += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="defaultdict类是如何实现的"><a href="#defaultdict类是如何实现的" class="headerlink" title="defaultdict类是如何实现的"></a>defaultdict类是如何实现的</h3><p>通过上面的内容，想必大家已经了解了<code>defaultdict</code>类的用法，那么在<code>defaultdict</code>类中又是如何来实现默认值的功能呢？这其中的关键是使用了看<code>__missing__()</code>这个方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">print</span> defaultdict.__missing__.__doc__</span><br><span class="line">__missing__(key) <span class="comment"># Called by __getitem__ for missing key; pseudo-code:</span></span><br><span class="line">  <span class="keyword">if</span> self.default_factory <span class="keyword">is</span> <span class="literal">None</span>: <span class="keyword">raise</span> KeyError(key)</span><br><span class="line">  self[key] = value = self.default_factory()</span><br><span class="line">  <span class="keyword">return</span> value</span><br></pre></td></tr></table></figure>
+
+<p>通过查看<code>__missing__()</code>方法的<code>docstring</code>，可以看出当使用<code>__getitem__()</code>方法访问一个不存在的键时(<code>dict[key]</code>这种形式实际上是<code>__getitem__()</code>方法的简化形式)，会调用<code>__missing__()</code>方法获取默认值，并将该键添加到字典中去。</p>
+<p>关于<code>__missing__()</code>方法的具体介绍可以参考<code>Python</code>官方文档中的”<code>Mapping Types — dict</code>“一节。</p>
+<p>文档中介绍，从2.5版本开始，如果派生自dict的子类定义了<code>__missing__()</code>方法，当访问不存在的键时，<code>dict[key]</code>会调用<code>__missing__()</code>方法取得默认值。</p>
+<p>从中可以看出，虽然dict支持<code>__missing__()</code>方法，但是在dict本身是不存在这个方法的，而是需要在派生的子类中自行实现这个方法。可以简单的验证这一点：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">print</span> dict.__missing__.__doc__</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">AttributeError: type object <span class="string">'dict'</span> has no attribute <span class="string">'__missing__'</span></span><br><span class="line">同时，我们可以进一步的做实验，定义一个子类Missing并实现__missing__()方法:</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Missing</span><span class="params">(dict)</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__missing__</span><span class="params">(self, key)</span>:</span></span><br><span class="line"><span class="meta">... </span>        <span class="keyword">return</span> <span class="string">'missing'</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = Missing()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'foo'</span>]</span><br><span class="line"><span class="string">'missing'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>返回结果反映了<code>__missing__()</code>方法确实发挥了作用。在此基础上，我们稍许修改<code>__missing__()</code>方法,使得该子类同<code>defautldict</code>类一样为不存在的键设置一个默认值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Defaulting</span><span class="params">(dict)</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__missing__</span><span class="params">(self, key)</span>:</span></span><br><span class="line"><span class="meta">... </span>        self[key] = <span class="string">'default'</span></span><br><span class="line"><span class="meta">... </span>        <span class="keyword">return</span> <span class="string">'default'</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d = Defaulting()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d[<span class="string">'foo'</span>]</span><br><span class="line"><span class="string">'default'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d</span><br><span class="line">&#123;<span class="string">'foo'</span>: <span class="string">'default'</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在旧版本的Python中实现类defaultdict的功能"><a href="#在旧版本的Python中实现类defaultdict的功能" class="headerlink" title="在旧版本的Python中实现类defaultdict的功能"></a>在旧版本的Python中实现类defaultdict的功能</h3><p><code>defaultdict</code>类是从<code>2.5</code>版本之后才添加的，在一些旧版本中并不支持它，因此为旧版本实现一个兼容的<code>defaultdict</code>类是必要的。这其实很简单，虽然性能可能未必如<code>2.5</code>版本中自带的<code>defautldict</code>类好，但在功能上是一样的。</p>
+<p>首先，<code>__getitem__()</code>方法需要在访问键失败时，调用<code>__missing__()</code>方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">defaultdict</span><span class="params">(dict)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, key)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> dict.__getitem__(self, key)</span><br><span class="line">        <span class="keyword">except</span> KeyError:</span><br><span class="line">            <span class="keyword">return</span> self.__missing__(key)</span><br></pre></td></tr></table></figure>
+
+<p>其次，需要实现<code>__missing__()</code>方法用来设置默认值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">defaultdict</span><span class="params">(dict)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, key)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> dict.__getitem__(self, key)</span><br><span class="line">        <span class="keyword">except</span> KeyError:</span><br><span class="line">            <span class="keyword">return</span> self.__missing__(key)</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__missing__</span><span class="params">(self, key)</span>:</span></span><br><span class="line">        self[key] = value = self.default_factory()</span><br><span class="line">        <span class="keyword">return</span> value</span><br></pre></td></tr></table></figure>
+
+<p>然后，<code>defaultdict</code>类的初始化函数<code>__init__()</code>需要接受类型或者可调用函数参数:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">defaultdict</span><span class="params">(dict)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, default_factory=None, *a, **kw)</span>:</span></span><br><span class="line">        dict.__init__(self, *a, **kw)</span><br><span class="line">        self.default_factory = default_factory</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, key)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> dict.__getitem__(self, key)</span><br><span class="line">        <span class="keyword">except</span> KeyError:</span><br><span class="line">            <span class="keyword">return</span> self.__missing__(key)</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__missing__</span><span class="params">(self, key)</span>:</span></span><br><span class="line">        self[key] = value = self.default_factory()</span><br><span class="line">        <span class="keyword">return</span> value</span><br></pre></td></tr></table></figure>
+<p>最后，综合以上内容，通过以下方式完成兼容新旧Python版本的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"><span class="keyword">except</span> ImportError:</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">defaultdict</span><span class="params">(dict)</span>:</span></span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, default_factory=None, *a, **kw)</span>:</span></span><br><span class="line">          dict.__init__(self, *a, **kw)</span><br><span class="line">          self.default_factory = default_factory</span><br><span class="line"> </span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, key)</span>:</span></span><br><span class="line">          <span class="keyword">try</span>:</span><br><span class="line">              <span class="keyword">return</span> dict.__getitem__(self, key)</span><br><span class="line">          <span class="keyword">except</span> KeyError:</span><br><span class="line">              <span class="keyword">return</span> self.__missing__(key)</span><br><span class="line"> </span><br><span class="line">      <span class="function"><span class="keyword">def</span> <span class="title">__missing__</span><span class="params">(self, key)</span>:</span></span><br><span class="line">          self[key] = value = self.default_factory()</span><br><span class="line">          <span class="keyword">return</span> value</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/collections/" rel="tag"># collections</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/28/leetcode4/" rel="prev" title="Offer 32 - I. 从上到下打印二叉树">
+      <i class="fa fa-chevron-left"></i> Offer 32 - I. 从上到下打印二叉树
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/29/leetcode5/" rel="next" title="Offer 16. 数值的整数次方">
+      Offer 16. 数值的整数次方 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数组"><span class="nav-number">1.</span> <span class="nav-text">数组</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#deque-双端队列"><span class="nav-number">1.1.</span> <span class="nav-text">deque 双端队列</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字典"><span class="nav-number">2.</span> <span class="nav-text">字典</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#OrderedDict-有序字典"><span class="nav-number">2.1.</span> <span class="nav-text">OrderedDict 有序字典</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defaultdict-默认返回字典"><span class="nav-number">2.2.</span> <span class="nav-text">defaultdict 默认返回字典</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#默认值可以很方便"><span class="nav-number">2.2.1.</span> <span class="nav-text">默认值可以很方便</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用判断语句检查"><span class="nav-number">2.2.2.</span> <span class="nav-text">使用判断语句检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用dict-setdefault-方法"><span class="nav-number">2.2.3.</span> <span class="nav-text">使用dict.setdefault()方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用collections-defaultdict类"><span class="nav-number">2.2.4.</span> <span class="nav-text">使用collections.defaultdict类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#defaultdict类是如何实现的"><span class="nav-number">2.2.5.</span> <span class="nav-text">defaultdict类是如何实现的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在旧版本的Python中实现类defaultdict的功能"><span class="nav-number">2.2.6.</span> <span class="nav-text">在旧版本的Python中实现类defaultdict的功能</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

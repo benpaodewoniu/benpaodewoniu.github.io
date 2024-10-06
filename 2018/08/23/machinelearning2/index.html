@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这篇文章可以算是机器学习的入门课程，全篇不会写一点代码，完全就是将大致的思路写一遍。 如果可以比拟的话，我想这篇就好像我们写程序时候的 “hello world”。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习入门-MNIST全过程">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/08/23/machinelearning2/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这篇文章可以算是机器学习的入门课程，全篇不会写一点代码，完全就是将大致的思路写一遍。 如果可以比拟的话，我想这篇就好像我们写程序时候的 “hello world”。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_5.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_6.png">
+<meta property="article:published_time" content="2018-08-23T06:06:46.000Z">
+<meta property="article:modified_time" content="2021-02-17T14:45:53.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="MNIST">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/machinelearning/2_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/08/23/machinelearning2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>机器学习入门-MNIST全过程 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/08/23/machinelearning2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          机器学习入门-MNIST全过程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-08-23 14:06:46" itemprop="dateCreated datePublished" datetime="2018-08-23T14:06:46+08:00">2018-08-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-17 22:45:53" itemprop="dateModified" datetime="2021-02-17T22:45:53+08:00">2021-02-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%95%B0%E6%8D%AE%E9%9B%86/" itemprop="url" rel="index"><span itemprop="name">数据集</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/08/23/machinelearning2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/08/23/machinelearning2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这篇文章可以算是机器学习的入门课程，全篇不会写一点代码，完全就是将大致的思路写一遍。</p>
+<p>如果可以比拟的话，我想这篇就好像我们写程序时候的 “hello world”。</p>
+<a id="more"></a>
+
+<p><a href="http://wiki.jikexueyuan.com/project/tensorflow-zh/tutorials/mnist_beginners.html" rel="external nofollow noreferrer">文章参考：MNIST机器学习入门</a></p>
+<p>其实上面的链接已经讲得很清楚了，之所以写这篇还是为了以后装逼。</p>
+<p>万一哪天有人问起：丛哥，机器学习怎么入门？</p>
+<p>我就可以把手一挥，冲他神气的说道：看看我写的文章。QvQ。</p>
+<p>很期待这一天，哈哈。</p>
+<h2 id="什么是-MNIST？"><a href="#什么是-MNIST？" class="headerlink" title="什么是 MNIST？"></a>什么是 MNIST？</h2><p>MNIST 就是一个手写数字的数据集。我们都知道，机器中只有 0 和 1，但是要表现电脑中的图像，汉子，也只不过是特定的像素点是 0 还是 1 而已。</p>
+<p>当然，MNIST 只是个数据集，就是你自己也可以创造，所以，假定每个数字都由 28 * 28 个像素点组成，每一个为 1 的像素点组成一个数字。如下图：</p>
+<p><img src="/images/machinelearning/2_0.png" alt=""></p>
+<p>当然，这个数据集中不仅仅只是包含像素数字而已，还包含数字的标签，因为电脑看过去只是 0 或者 1，所以我们要对每一个像素数字贴上一个标签，讲述它到底是数字几。</p>
+<p>比如，标签0将表示成([1,0,0,0,0,0,0,0,0,0])。</p>
+<p>所以，现在 MINST 就有两个数据包了，一个是像素数字，另一个是标签数字。</p>
+<p>假如像素数字有 6000 个，即二维数组 6000 * 784 ，那么数字标签则是 6000 * 10。</p>
+<p>但是，但凡有点逻辑思维的人都知道，测试一个东西要用新的测试，而不是用旧的测试。</p>
+<p>所以，数据集又可以再分为训练数据集和测试数据集，这两个数据集应该是没有交集的。</p>
+<p>训练数据集用来训练出函数，而测试数据集则用来检测函数的拟合程度。</p>
+<h2 id="训练数据的原理"><a href="#训练数据的原理" class="headerlink" title="训练数据的原理"></a>训练数据的原理</h2><p>如果，一个对机器学习毫无接触的人来想象如何训练电脑认识书写数字，我想他的第一反应是懵逼。</p>
+<p>毕竟，电脑只是机器而已，又不是人类，能都逻辑判断。</p>
+<p>其实相较于人类的逻辑判断，电脑更适合计算。</p>
+<p>我们人类在看见抛出去的东西都再次坠落到地面后，当我们判断一个物体脱离手之后，那一定会想到它最后会回到地面。当然，这里面有一定的大数据的思想，但是，多次观看物体坠落地面，我们人类也自然懂得了这个常识。</p>
+<p>如果变成机器来学习，就会成为，给出重力加速度，高度，时间等相关参数，在进行函数运算后，得到会回到地面的结果。</p>
+<p>其实，机器学习和人类学习并没有绝对的界限，只不过是看问题的角度不同。</p>
+<p>就好比，生物认为人类是细胞组成，化学认为人类是元素组成，哲学认为我思故我在，物理主张粒子，数学主张计算。虽然，各有各的说法，但是人类是所有学科的综合。</p>
+<p>所以，机器学习也是在学习人类的一部分，就是数学，只不过，电脑的计算能力表面上比人类强。（实际上，计算能力连一个单细胞生物都比不上）</p>
+<p>额，说了这么多的废话。</p>
+<p>当机器在学习数据的时候，就会分辨出数据中蕴含的重力加速度，高度，时间等参数，再根据相应的函数来判断是否落到地面。</p>
+<p>那么机器如何推导出参数？</p>
+<p>当你看见 1 的时候，你的大脑会 100 % 确定是 1。这里的重点在于，你判断一个数是什么的概率，如果有人写字很丑，将 6 和 8 写的差不多，你的判断就不会这么迅速，就会想，这个到底像 6 还是像 8。</p>
+<p>换成计算机来看就是，这个数到底是 6 的概率大，还是 8 的概率大。</p>
+<p>计算机通过我们给的数据，经过函数计算得到最终谁的概率大。</p>
+<h2 id="如何计算函数"><a href="#如何计算函数" class="headerlink" title="如何计算函数"></a>如何计算函数</h2><p>我们再看一下这个图：</p>
+<p><img src="/images/machinelearning/2_0.png" alt=""></p>
+<p>当像素点为 1 的时候，这个点的比重或者说权重就大，毕竟这个像素点是组成数字的一部分。</p>
+<p>当数以万计的相同数字集合，即便是同一数字，因为每个数字因为长得不一样，导致相同数字最后的样子集合变的更为臃肿，如下图：</p>
+<p><img src="/images/machinelearning/2_1.png" alt=""></p>
+<p>红色代表负数权值，蓝色代表正数权值。</p>
+<p>我们对同一个数字分析，因为每一点的权重不一样，所以我们将每一点对应的权重设为 Wi ，那个像素点就代表 Xi。</p>
+<p>所以，计算综合在一起，一个图片的权重和为：</p>
+<pre><code>Y = Wi * Xi (i = 0,1....783)
+
+但是，函数本身存在偏差，所以引入一个常数项减小偏差
+
+Y = Wi * Xi + b (i = 0,1....783)</code></pre><p>最后的结果是：</p>
+<p><img src="/images/machinelearning/2_2.png" alt=""></p>
+<p>但是，我们计算的这个数值，肯定不是概率数值，甚至有可能数值会达到万级以上，所以，我们需要再次进行包装，让最后的数字以概率的形式出现。</p>
+<p><img src="/images/machinelearning/2_3.png" alt=""></p>
+<p>其中， softmax 就是包装，在机器学习中又叫激活函数。（完全不懂为什么叫这个破名字？抖机灵？？？）</p>
+<p>所以，计算这些数的概率就如下图所示：</p>
+<p><img src="/images/machinelearning/2_4.png" alt=""></p>
+<p>将其写成一个等式：</p>
+<p><img src="/images/machinelearning/2_5.png" alt=""></p>
+<p>让我们继续装逼，写成向量的形式：</p>
+<p><img src="/images/machinelearning/2_6.png" alt=""></p>
+<p>最终，哪个数的的概率大就是哪个数。</p>
+<p>好了，装逼结束，打完收工。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MNIST/" rel="tag"># MNIST</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/08/21/thought15/" rel="prev" title="看问题的角度">
+      <i class="fa fa-chevron-left"></i> 看问题的角度
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/08/24/tensorflow0/" rel="next" title="tensorflow 基础">
+      tensorflow 基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是-MNIST？"><span class="nav-number">1.</span> <span class="nav-text">什么是 MNIST？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练数据的原理"><span class="nav-number">2.</span> <span class="nav-text">训练数据的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何计算函数"><span class="nav-number">3.</span> <span class="nav-text">如何计算函数</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

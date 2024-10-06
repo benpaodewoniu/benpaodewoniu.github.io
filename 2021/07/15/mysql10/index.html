@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="先说明一下，最终，该机器下的 mysql 还是没有修复成功。但是，里面经历了很多我个人觉得颇具直到意义，所以，在此记录一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql | 记录一次 ubuntu 下 mysql 的修复">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/07/15/mysql10/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="先说明一下，最终，该机器下的 mysql 还是没有修复成功。但是，里面经历了很多我个人觉得颇具直到意义，所以，在此记录一下。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/mysql/10_0.png">
+<meta property="article:published_time" content="2021-07-15T02:22:03.000Z">
+<meta property="article:modified_time" content="2021-07-15T06:31:16.965Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/mysql/10_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/07/15/mysql10/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>mysql | 记录一次 ubuntu 下 mysql 的修复 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/07/15/mysql10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql | 记录一次 ubuntu 下 mysql 的修复
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-07-15 10:22:03 / 修改时间：14:31:16" itemprop="dateCreated datePublished" datetime="2021-07-15T10:22:03+08:00">2021-07-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sql/" itemprop="url" rel="index"><span itemprop="name">sql</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sql/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/07/15/mysql10/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/07/15/mysql10/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>先说明一下，最终，该机器下的 mysql 还是没有修复成功。但是，里面经历了很多我个人觉得颇具直到意义，所以，在此记录一下。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="环境说明"><a href="#环境说明" class="headerlink" title="环境说明"></a>环境说明</h1><br/>
+
+<ul>
+<li>ubuntu 18.04</li>
+</ul>
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://blog.csdn.net/zhj082/article/details/80783883" rel="external nofollow noreferrer">ubuntu下mysql服务重启失败解决思路</a></li>
+<li><a href="https://www.php.cn/mysql-tutorials-414809.html" rel="external nofollow noreferrer">如何在Ubuntu 18.04中安装MySQL 8.0</a></li>
+<li><a href="https://blog.csdn.net/qq_42468130/article/details/88595418" rel="external nofollow noreferrer">ubuntu18.04安装mysql8.0详细教程及踩坑解决方法(包含删除Mysql5.7版本方法)</a></li>
+<li><a href="https://blog.csdn.net/yinjianxiang/article/details/76861719" rel="external nofollow noreferrer">ubuntu彻底卸载mysql并且重新安装</a></li>
+<li><a href="https://www.cnblogs.com/hyace/p/3722632.html" rel="external nofollow noreferrer">ubuntu 下mysql异常修复 完全卸载与重装</a></li>
+<li><a href="https://blog.csdn.net/qinxiandiqi/article/details/43270147" rel="external nofollow noreferrer">Ubuntu下迁移MySQL数据库文件目录</a></li>
+<li><a href="https://blog.csdn.net/younger_to_older/article/details/109053821" rel="external nofollow noreferrer">解决 apt-get remove和dpkg删除出现 E: 无法定位软件包 XXXX</a></li>
+</ul>
+<br/>
+
+<h1 id="错误说明"><a href="#错误说明" class="headerlink" title="错误说明"></a>错误说明</h1><br/>
+
+<p>有一天，链接 <code>mysql</code> 的时候突然出现下面错误</p>
+<pre><code>ERROR 2002 (HY000): Can&apos;t connect to local MySQL server through socket &apos;/var/run/mysqld/mysqld.sock&apos; (2)</code></pre><p>经过检查得知， <code>/var/run/mysqld/</code> 下面确实没有 <code>sock</code> 文件。</p>
+<p>尝试过，自己生成、开启和关闭等。</p>
+<p>表现的情况如下</p>
+<ul>
+<li>自己生成「<code>touch</code>」<ul>
+<li>毫无作用</li>
+</ul>
+</li>
+<li>重启 <code>mysql</code><ul>
+<li>可以关闭，但是，重启的时候出现错误</li>
+</ul>
+</li>
+</ul>
+<p>因为无法 <code>start mysql</code> ，所以，使用</p>
+<pre><code>systemctl status mysql.service</code></pre><p>但是，没啥用处。</p>
+<p>这个时候就要检查一下 <code>mysql</code> 的日志文件。你可以通过 <code>mysql</code> 的配置文件来查看日志放在哪里，一般在</p>
+<pre><code>/etc/mysql/
+/etc/mysql/conf.d</code></pre><p>可能还有其他路径，看一下 <code>/etc/mysql/my.cnf</code> 的配置。</p>
+<p>其中，mysql 的日志文件放在</p>
+<pre><code>/var/log/mysql/error.log</code></pre><p>我看了一下没有有用信息，就看了一下系统的日志，在</p>
+<pre><code>/var/log/syslog
+tail -300f syslog</code></pre><p>发现，<code>mysql</code> 在不断的重启，也就是，<code>mysql</code> 确实是坏了，现阶段，我唯一想到的办法就是重装 <code>mysql</code> 。</p>
+<br/>
+
+<h1 id="卸载-mysql"><a href="#卸载-mysql" class="headerlink" title="卸载 mysql"></a>卸载 mysql</h1><br/>
+
+<p>在卸载前，首先应该备份 <code>mysql</code> 的数据。并且，查明 <code>mysql</code> 的版本</p>
+<pre><code>mysql --version</code></pre><p>但是，因为 <code>mysql</code> 进不去，导致 <code>mysqldump</code> 用不了，所以，使用网上教授的方法，备份 <code>/var/lib/mysql</code></p>
+<p>新建一个文件夹，进入后</p>
+<pre><code>cp -ar /var/lib/mysql ./</code></pre><p>加上 <code>a</code> 的目的是，把文件的所属关系之类的一并复制过来。</p>
+<p>备份好后，开始卸载 <code>mysql</code>。</p>
+<p>对了，在卸载之前，我先是局部卸载，比如 </p>
+<pre><code>sudo apt-get remove mysql-server</code></pre><p>接着</p>
+<pre><code>sudo apt-get install mysql-server</code></pre><p>发现不行，于是打算全部卸载。</p>
+<pre><code>sudo apt-get remove mysql-*</code></pre><p>但是，有时候会遇到使用这个命令依然不能卸载的情况，这个时候，就要用</p>
+<pre><code>dpkg --list|grep mysql</code></pre><p>来查看，具体叫什么。然后使用</p>
+<pre><code>sudo apt-get remove 跟具体的名字
+sudo apt-get autoremove 具体名字</code></pre><p>来单独卸载，直到</p>
+<pre><code>dpkg --list|grep mysql</code></pre><p>没有显示东西。接着卸载用户文件</p>
+<pre><code>dpkg -l |grep ^rc|awk &apos;{print $2}&apos; |sudo xargs dpkg -P</code></pre><p>会弹出一个对话框，让你是否卸载数据库，这里选择 <code>yes</code> 。</p>
+<br/>
+
+<h1 id="安装-mysql"><a href="#安装-mysql" class="headerlink" title="安装 mysql"></a>安装 mysql</h1><br/>
+
+<p>我上面查到的 <code>mysql</code> 的版本是 <code>8.0</code> ，但是，如果直接 <code>apt-get</code> 安装的话，安装的版本是 <code>5.7</code> 。</p>
+<p>使用命令下载存储库软件包：</p>
+<pre><code>wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb</code></pre><p>使用命令安装上边下载的安装包：</p>
+<pre><code>sudo dpkg -i mysql-apt-config_0.8.10-1_all.deb</code></pre><p>安装过程中提示选择安装版本，默认安装的就是<code>8.0</code>版本，所以直接选择 <code>OK</code> 确认即可；</p>
+<p>从所有已配置的存储库（包括最近添加的MySQL存储库）下载最新的包信息。</p>
+<pre><code>sudo apt update</code></pre><p>然后运行以下命令为MySQL社区服务器，客户端和数据库公共文件安装软件包。</p>
+<pre><code>sudo apt-get install mysql-server</code></pre><p>安装过程中会让你输入密码。</p>
+<p>输入之后会出现选择加密方式的提示界面，我在网上的教程中看到默认的<code>mysql8.0</code>的加密方式与<code>ubuntu18.04</code> 不兼容，所以选择<code>5.x</code>的加密方式；建议选择下边的那个：</p>
+<p><img src="/images/mysql/10_0.png" alt=""></p>
+<p>不出意外，应该是安装好了。</p>
+<br/>
+
+<h1 id="迁移数据库"><a href="#迁移数据库" class="headerlink" title="迁移数据库"></a>迁移数据库</h1><br/>
+
+<p>这里可以把数据库进行重新指向，也可以把备份数据 copy 过来。</p>
+<p>但是，我 <code>copy</code> 之后，发现，又出现了</p>
+<pre><code>ERROR 2002 (HY000): Can&apos;t connect to local MySQL server through socket &apos;/var/run/mysqld/mysqld.sock&apos; (2)</code></pre><p>经过，长时间的解决，发现最终无法解决，不得已，开始重装系统。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/02/eth18/" rel="prev" title="eth | 打包成 exe 文件">
+      <i class="fa fa-chevron-left"></i> eth | 打包成 exe 文件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/15/ubuntu9/" rel="next" title="ubuntu | 定制化镜像安装">
+      ubuntu | 定制化镜像安装 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#环境说明"><span class="nav-number">1.</span> <span class="nav-text">环境说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#错误说明"><span class="nav-number">3.</span> <span class="nav-text">错误说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#卸载-mysql"><span class="nav-number">4.</span> <span class="nav-text">卸载 mysql</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装-mysql"><span class="nav-number">5.</span> <span class="nav-text">安装 mysql</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#迁移数据库"><span class="nav-number">6.</span> <span class="nav-text">迁移数据库</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

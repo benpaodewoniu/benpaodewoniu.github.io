@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这次介绍一下经典的 UNet 网络模型。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UNet | Unet 网络讲解">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/01/26/UNet2/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这次介绍一下经典的 UNet 网络模型。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/unet/2_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/unet/2_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/unet/2_2.png">
+<meta property="article:published_time" content="2021-01-26T10:21:49.000Z">
+<meta property="article:modified_time" content="2021-02-17T14:43:07.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="UNet">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/unet/2_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/01/26/UNet2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>UNet | Unet 网络讲解 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/01/26/UNet2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          UNet | Unet 网络讲解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-26 18:21:49" itemprop="dateCreated datePublished" datetime="2021-01-26T18:21:49+08:00">2021-01-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-17 22:43:07" itemprop="dateModified" datetime="2021-02-17T22:43:07+08:00">2021-02-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">网络结构</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/pytorch/" itemprop="url" rel="index"><span itemprop="name">pytorch</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84/UNet/" itemprop="url" rel="index"><span itemprop="name">UNet</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84/UNet/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/pytorch/UNet/" itemprop="url" rel="index"><span itemprop="name">UNet</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/26/UNet2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/26/UNet2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这次介绍一下经典的 <code>UNet</code> 网络模型。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://cuijiahua.com/blog/2019/12/dl-15.html" rel="external nofollow noreferrer">UNet语义分割网络</a></li>
+<li><a href="https://blog.csdn.net/jiangpeng59/article/details/80189889" rel="external nofollow noreferrer">UNet网络简单实现</a></li>
+<li><a href="https://arxiv.org/pdf/1505.04597.pdf" rel="external nofollow noreferrer">2015 Unet 论文</a></li>
+</ul>
+<p>先看一张图片</p>
+<p><img src="/images/unet/2_0.png" alt=""></p>
+<p><code>UNet</code>是一个对称的网络结构，左侧为下采样，右侧为上采样。</p>
+<p>按照功能可以将左侧的一系列下采样操作称为<code>encoder</code>，将右侧的一系列上采样操作称为<code>decoder</code>。</p>
+<p><code>Skip Connection</code>中间四条灰色的平行线，<code>Skip Connection</code>就是在上采样的过程中，融合下采样过过程中的<code>feature map</code>。</p>
+<br/>
+
+<h1 id="单元组件"><a href="#单元组件" class="headerlink" title="单元组件"></a>单元组件</h1><br/>
+
+<h2 id="DoubleConv-模块"><a href="#DoubleConv-模块" class="headerlink" title="DoubleConv 模块"></a>DoubleConv 模块</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#把常用的2个卷积操作简单封装下</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DoubleConv</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_ch, out_ch)</span>:</span></span><br><span class="line">        super(DoubleConv, self).__init__()</span><br><span class="line">        self.conv = nn.Sequential(</span><br><span class="line">            nn.Conv2d(in_ch, out_ch, <span class="number">3</span>, padding=<span class="number">1</span>),</span><br><span class="line">            nn.BatchNorm2d(out_ch), <span class="comment">#添加了BN层</span></span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.Conv2d(out_ch, out_ch, <span class="number">3</span>, padding=<span class="number">1</span>),</span><br><span class="line">            nn.BatchNorm2d(out_ch),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, input)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.conv(input)</span><br></pre></td></tr></table></figure>
+
+<p><code>DoubleConv</code>模块的</p>
+<ul>
+<li>in_ch</li>
+<li>out_ch</li>
+</ul>
+<p>可以灵活设定，以便扩展使用。</p>
+<p>如上图中，左上角所示的网络，<code>in_ch</code> 设为 <code>1</code> ，<code>out_ch</code>a为<code>64</code>。</p>
+<p>输入图片大小为<code>572*572</code>，经过步长为<code>1</code>，<code>padding</code>为<code>0</code>的<code>3*3</code>卷积，得到<code>570*570</code>的<code>feature map</code>，再经过一次卷积得到<code>568*568</code>的<code>feature map</code>。</p>
+<p>相关的公式为</p>
+<ul>
+<li><a href="/2021/02/02/CNN1/">CNN | 关于 CNN 的计算公式</a></li>
+</ul>
+<h2 id="Down模块"><a href="#Down模块" class="headerlink" title="Down模块"></a>Down模块</h2><div style="width: 20%;padding-left: 40%">
+
+<p><img src="/images/unet/2_1.png" alt=""></p>
+</div>
+
+<p><code>UNet</code>网络一共有<code>4</code>次下采样过程，模块化代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Down</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">"""Downscaling with maxpool then double conv"""</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_channels, out_channels)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.maxpool_conv = nn.Sequential(</span><br><span class="line">            nn.MaxPool2d(<span class="number">2</span>),</span><br><span class="line">            DoubleConv(in_channels, out_channels)</span><br><span class="line">        )</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.maxpool_conv(x)</span><br></pre></td></tr></table></figure>
+
+<p>这里的代码很简单，就是一个<code>maxpool</code>池化层，进行下采样，然后接一个<code>DoubleConv</code>模块。</p>
+<p>至此，<code>UNet</code>网络的左半部分的下采样过程的代码都写好了，接下来是右半部分的上采样过程。</p>
+<h2 id="Up模块"><a href="#Up模块" class="headerlink" title="Up模块"></a>Up模块</h2><p>上采样过程用到的最多的当然就是上采样了，除了常规的上采样操作，还有进行特征的融合。</p>
+<p><img src="/images/unet/2_2.png" alt=""></p>
+<p>这块的代码实现起来也稍复杂一些：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Up</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">"""Upscaling then double conv"""</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_channels, out_channels)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.up = nn.ConvTranspose2d(in_channels, in_channels // <span class="number">2</span>, kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>)</span><br><span class="line">        self.conv = DoubleConv(in_channels, out_channels)</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x1, x2)</span>:</span></span><br><span class="line">        x1 = self.up(x1)</span><br><span class="line">        <span class="comment"># input is CHW</span></span><br><span class="line">        diffY = torch.tensor([x2.size()[<span class="number">2</span>] - x1.size()[<span class="number">2</span>]])</span><br><span class="line">        diffX = torch.tensor([x2.size()[<span class="number">3</span>] - x1.size()[<span class="number">3</span>]])</span><br><span class="line"> </span><br><span class="line">        x1 = F.pad(x1, [diffX // <span class="number">2</span>, diffX - diffX // <span class="number">2</span>,</span><br><span class="line">                        diffY // <span class="number">2</span>, diffY - diffY // <span class="number">2</span>])</span><br><span class="line">        <span class="comment"># if you have padding issues, see</span></span><br><span class="line">        <span class="comment"># https://github.com/HaiyongJiang/U-Net-Pytorch-Unstructured-Buggy/commit/0e854509c2cea854e247a9c615f175f76fbb2e3a</span></span><br><span class="line">        <span class="comment"># https://github.com/xiaopeng-liao/Pytorch-UNet/commit/8ebac70e633bac59fc22bb5195e513d5832fb3bd</span></span><br><span class="line">        x = torch.cat([x2, x1], dim=<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> self.conv(x)</span><br></pre></td></tr></table></figure>
+
+<p>这里面既有上采样，又有特征融合。</p>
+<h3 id="上采样"><a href="#上采样" class="headerlink" title="上采样"></a>上采样</h3><p>上采样使用的是反卷积。</p>
+<p>可以参考</p>
+<ul>
+<li><a href="/2020/12/06/CNN0/">CNN | 反卷积</a></li>
+</ul>
+<p>上采样主要是针对 <code>x1</code>。</p>
+<h3 id="特征融合"><a href="#特征融合" class="headerlink" title="特征融合"></a>特征融合</h3><p>特征融合主要是灰线的代码。有一点残差网络的概念。</p>
+<p><code>Skip Connection</code>「灰线」用到的融合的操作也很简单，就是将<code>feature map</code>的通道进行叠加，俗称<code>Concat</code>。</p>
+<p><code>Concat</code>操作也很好理解，举个例子：一本大小为<code>10cm*10</code>cm，厚度为<code>3cm</code>的<code>书A</code>，和一本大小为<code>10cm*10cm</code>，厚度为<code>4cm</code>的<code>书B</code>。</p>
+<p>将<code>书A</code>和<code>书B</code>，边缘对齐地摞在一起。这样就得到了，大小为<code>10cm*10cm</code>厚度为<code>7cm</code>的一摞书，类似这种：</p>
+<p>这种“摞在一起”的操作，就是<code>Concat</code>。</p>
+<p>同样道理，对于<code>feature map</code>，一个大小为<code>256*256*64</code>的<code>feature map</code>，即<code>feature map</code>的<code>w</code>（宽）为<code>256</code>，<code>h</code>（高）为<code>256</code>，<code>c</code>（通道数）为<code>64</code>。和一个大小为<code>256*256*32</code>的<code>feature map</code>进行<code>Concat</code>融合，就会得到一个大小为<code>256*256*96</code>的<code>feature map</code>。</p>
+<p>在实际使用中，<code>Concat</code>融合的两个<code>feature map</code>的大小不一定相同，例如<code>256*256*64</code>的<code>feature map</code>和<code>240*240*32</code>的<code>feature map</code>进行<code>Concat</code>。</p>
+<p>这种时候，就有两种办法：</p>
+<p>第一种：将大<code>256*256*64</code>的<code>feature map</code>进行裁剪，裁剪为<code>240*240*64</code>的<code>feature map</code>，比如上下左右，各舍弃<code>8 pixel</code>，裁剪后再进行<code>Concat</code>，得到<code>240*240*96</code>的<code>feature map</code>。</p>
+<p>第二种：将小<code>240*240*32</code>的<code>feature map</code>进行<code>padding</code>操作，<code>padding</code>为<code>256*256*32</code>的<code>feature map</code>，比如上下左右，各补<code>8 pixel</code>，<code>padding</code>后再进行<code>Concat</code>，得到<code>256*256*96</code>的<code>feature map</code>。</p>
+<p>UNet采用的Concat方案就是第二种，将小的feature map进行padding，padding的方式是补0，一种常规的常量填充。</p>
+<br/>
+
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><br/>
+
+<h2 id="unet-parts-py"><a href="#unet-parts-py" class="headerlink" title="unet_parts.py"></a>unet_parts.py</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">""" Parts of the U-Net model """</span></span><br><span class="line"><span class="string">"""https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_parts.py"""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DoubleConv</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">"""(convolution =&gt; [BN] =&gt; ReLU) * 2"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_channels, out_channels)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.double_conv = nn.Sequential(</span><br><span class="line">            nn.Conv2d(in_channels, out_channels, kernel_size=<span class="number">3</span>, padding=<span class="number">0</span>),</span><br><span class="line">            nn.BatchNorm2d(out_channels),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>),</span><br><span class="line">            nn.Conv2d(out_channels, out_channels, kernel_size=<span class="number">3</span>, padding=<span class="number">0</span>),</span><br><span class="line">            nn.BatchNorm2d(out_channels),</span><br><span class="line">            nn.ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.double_conv(x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Down</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">"""Downscaling with maxpool then double conv"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_channels, out_channels)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.maxpool_conv = nn.Sequential(</span><br><span class="line">            nn.MaxPool2d(<span class="number">2</span>),</span><br><span class="line">            DoubleConv(in_channels, out_channels)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.maxpool_conv(x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Up</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">"""Upscaling then double conv"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_channels, out_channels)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line"></span><br><span class="line">        self.up = nn.ConvTranspose2d(in_channels, in_channels // <span class="number">2</span>, kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>)</span><br><span class="line">        self.conv = DoubleConv(in_channels, out_channels)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x1, x2)</span>:</span></span><br><span class="line">        x1 = self.up(x1)</span><br><span class="line">        <span class="comment"># input is CHW</span></span><br><span class="line">        diffY = torch.tensor([x2.size()[<span class="number">2</span>] - x1.size()[<span class="number">2</span>]])</span><br><span class="line">        diffX = torch.tensor([x2.size()[<span class="number">3</span>] - x1.size()[<span class="number">3</span>]])</span><br><span class="line"></span><br><span class="line">        x1 = F.pad(x1, [diffX // <span class="number">2</span>, diffX - diffX // <span class="number">2</span>,</span><br><span class="line">                        diffY // <span class="number">2</span>, diffY - diffY // <span class="number">2</span>])</span><br><span class="line">        x = torch.cat([x2, x1], dim=<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> self.conv(x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OutConv</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_channels, out_channels)</span>:</span></span><br><span class="line">        super(OutConv, self).__init__()</span><br><span class="line">        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.conv(x)</span><br></pre></td></tr></table></figure>
+
+<h2 id="unet-model-py"><a href="#unet-model-py" class="headerlink" title="unet_model.py"></a>unet_model.py</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">""" Full assembly of the parts to form the complete network """</span></span><br><span class="line"><span class="string">"""Refer https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_model.py"""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> unet_parts <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UNet</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, n_channels, n_classes)</span>:</span></span><br><span class="line">        super(UNet, self).__init__()</span><br><span class="line">        self.n_channels = n_channels</span><br><span class="line">        self.n_classes = n_classes</span><br><span class="line">        self.bilinear = bilinear</span><br><span class="line"></span><br><span class="line">        self.inc = DoubleConv(n_channels, <span class="number">64</span>)</span><br><span class="line">        self.down1 = Down(<span class="number">64</span>, <span class="number">128</span>)</span><br><span class="line">        self.down2 = Down(<span class="number">128</span>, <span class="number">256</span>)</span><br><span class="line">        self.down3 = Down(<span class="number">256</span>, <span class="number">512</span>)</span><br><span class="line">        self.down4 = Down(<span class="number">512</span>, <span class="number">1024</span>)</span><br><span class="line">        self.up1 = Up(<span class="number">1024</span>, <span class="number">512</span>)</span><br><span class="line">        self.up2 = Up(<span class="number">512</span>, <span class="number">256</span>)</span><br><span class="line">        self.up3 = Up(<span class="number">256</span>, <span class="number">128</span>)</span><br><span class="line">        self.up4 = Up(<span class="number">128</span>, <span class="number">64</span>)</span><br><span class="line">        self.outc = OutConv(<span class="number">64</span>, n_classes)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        x1 = self.inc(x)</span><br><span class="line">        x2 = self.down1(x1)</span><br><span class="line">        x3 = self.down2(x2)</span><br><span class="line">        x4 = self.down3(x3)</span><br><span class="line">        x5 = self.down4(x4)</span><br><span class="line">        x = self.up1(x5, x4)</span><br><span class="line">        x = self.up2(x, x3)</span><br><span class="line">        x = self.up3(x, x2)</span><br><span class="line">        x = self.up4(x, x1)</span><br><span class="line">        logits = self.outc(x)</span><br><span class="line">        <span class="keyword">return</span> logits</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    net = UNet(n_channels=<span class="number">3</span>, n_classes=<span class="number">1</span>)</span><br><span class="line">    print(net)</span><br></pre></td></tr></table></figure>
+
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">self.inc = DoubleConv(n_channels, <span class="number">64</span>)</span><br><span class="line">self.down1 = Down(<span class="number">64</span>, <span class="number">128</span>)</span><br><span class="line">self.down2 = Down(<span class="number">128</span>, <span class="number">256</span>)</span><br><span class="line">self.down3 = Down(<span class="number">256</span>, <span class="number">512</span>)</span><br><span class="line">self.down4 = Down(<span class="number">512</span>, <span class="number">1024</span>)</span><br><span class="line">self.up1 = Up(<span class="number">1024</span>, <span class="number">512</span>)</span><br><span class="line">self.up2 = Up(<span class="number">512</span>, <span class="number">256</span>)</span><br><span class="line">self.up3 = Up(<span class="number">256</span>, <span class="number">128</span>)</span><br><span class="line">self.up4 = Up(<span class="number">128</span>, <span class="number">64</span>)</span><br><span class="line">self.outc = OutConv(<span class="number">64</span>, n_classes)</span><br></pre></td></tr></table></figure>
+
+<p>假设输入数据为 <code>256 * 256 * 3</code> 的图片，所以，转化为 <code>tensor</code> 为 <code>1 * 3 * 512 * 512</code></p>
+<p>我们假设这是一个图片去噪的 <code>unet</code> ，所以，我们的输入还是输出的通道都是 <code>3</code>。</p>
+<p>即</p>
+<pre><code>UNet(3,3)</code></pre><ul>
+<li>第一步操作</li>
+</ul>
+<br/>
+
+<pre><code>self.inc = DoubleConv(n_channels, 64) # n_channels = 3</code></pre><p>在这一步中在 <code>DoubleConv</code> 中，先是转化为 <code>1 * 64 * 254 * 254</code> 再次转化为 <code>1 * 64 * 252 * 252</code></p>
+<ul>
+<li>第二步操作</li>
+</ul>
+<br/>
+
+<pre><code>self.down1 = Down(64, 128)</code></pre><p>先是最大池化变为 <code>1 * 64 * 126 * 126</code> ，然后在 <code>DoubleConv</code> 先是转化为 <code>1 * 128 * 124 * 124</code> 再次转化为 <code>1 * 128 * 122 * 122</code></p>
+<ul>
+<li>第三步操作</li>
+</ul>
+<br/>
+
+<pre><code>self.down2 = Down(128, 256)</code></pre><p>先是最大池化变为 <code>1 * 256 * 61 * 61</code> ，然后在 <code>DoubleConv</code> 先是转化为 <code>1 * 256 * 59 * 59</code> 再次转化为 <code>1 * 256 * 57 * 57</code></p>
+<ul>
+<li>第四步操作</li>
+</ul>
+<br/>
+
+<pre><code>self.down3 = Down(256, 512)</code></pre><p>先是最大池化变为 <code>1 * 512 * 28 * 28</code> ，然后在 <code>DoubleConv</code> 先是转化为 <code>1 * 512 * 26 * 26</code> 再次转化为 <code>1 * 512 * 24 * 24</code></p>
+<p>第五步操作</p>
+<br/>
+
+<pre><code>self.down4 = Down(512, 1024)</code></pre><p>先是最大池化变为 <code>1 * 1024 * 12 * 12</code> ，然后在 <code>DoubleConv</code> 先是转化为 <code>1 * 1024 * 10 * 10</code> 再次转化为 <code>1 * 1024 * 8 * 8</code></p>
+<p>第六步操作</p>
+<br/>
+
+<pre><code>self.up1 = Up(1024, 512)
+在 forward 中
+x = self.up1(x5, x4)</code></pre><p>这个对应的是使用左边的 <code>x4</code> 也就是 第四步操作 的值进行 <code>concat</code></p>
+<p>首先 <code>x4</code> 是 <code>1 * 512 * 24 * 24</code></p>
+<p>在这里 <code>x5</code> 是 <code>1 * 1024 * 8 * 8</code> 经过 反卷积放大后，通道缩放，变成 <code>1 * 512 * 16 * 16</code> 根据运算，将 <code>x5</code> 扩成 <code>1 * 512 * 24 * 24</code></p>
+<p>接着 <code>x4</code> 和 <code>x5</code> 进行 <code>concat</code> 变成 <code>1 * 1024 * 24 * 24</code></p>
+<p>接着再次进行一个 <code>DoubleConv</code> 第一步是将 <code>1 * 1024 * 24 * 24</code></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/UNet/" rel="tag"># UNet</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/26/python133/" rel="prev" title="python | numpy 的 random">
+      <i class="fa fa-chevron-left"></i> python | numpy 的 random
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/27/ResNet1/" rel="next" title="ResNet | 认识残差网络">
+      ResNet | 认识残差网络 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单元组件"><span class="nav-number">2.</span> <span class="nav-text">单元组件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DoubleConv-模块"><span class="nav-number">2.1.</span> <span class="nav-text">DoubleConv 模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Down模块"><span class="nav-number">2.2.</span> <span class="nav-text">Down模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Up模块"><span class="nav-number">2.3.</span> <span class="nav-text">Up模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#上采样"><span class="nav-number">2.3.1.</span> <span class="nav-text">上采样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特征融合"><span class="nav-number">2.3.2.</span> <span class="nav-text">特征融合</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码"><span class="nav-number">3.</span> <span class="nav-text">代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#unet-parts-py"><span class="nav-number">3.1.</span> <span class="nav-text">unet_parts.py</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#unet-model-py"><span class="nav-number">3.2.</span> <span class="nav-text">unet_model.py</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析"><span class="nav-number">3.3.</span> <span class="nav-text">分析</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

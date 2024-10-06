@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这里讲一下 uniswap v2 core 核心库的代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="defi | uniswap v2 uniswap-v2-core 工厂合约">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2022/01/06/defi16/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里讲一下 uniswap v2 core 核心库的代码。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-06T15:52:01.000Z">
+<meta property="article:modified_time" content="2022-01-15T06:11:09.617Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="uniswap">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2022/01/06/defi16/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>defi | uniswap v2 uniswap-v2-core 工厂合约 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2022/01/06/defi16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          defi | uniswap v2 uniswap-v2-core 工厂合约
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-01-06 23:52:01" itemprop="dateCreated datePublished" datetime="2022-01-06T23:52:01+08:00">2022-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-01-15 14:11:09" itemprop="dateModified" datetime="2022-01-15T14:11:09+08:00">2022-01-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/" itemprop="url" rel="index"><span itemprop="name">平台 && 公链 && 项目 && 方向</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/" itemprop="url" rel="index"><span itemprop="name">defi</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/" itemprop="url" rel="index"><span itemprop="name">eth</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/" itemprop="url" rel="index"><span itemprop="name">平台</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/dex/" itemprop="url" rel="index"><span itemprop="name">dex</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/dex/uniswap/" itemprop="url" rel="index"><span itemprop="name">uniswap</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/dex/uniswap/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/dex/uniswap/%E5%9F%BA%E7%A1%80/v2/" itemprop="url" rel="index"><span itemprop="name">v2</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/" itemprop="url" rel="index"><span itemprop="name">uniswap</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/dex/uniswap/%E5%9F%BA%E7%A1%80/v2/%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" itemprop="url" rel="index"><span itemprop="name">代码阅读</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/v2/" itemprop="url" rel="index"><span itemprop="name">v2</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/defi/%E5%B9%B3%E5%8F%B0/uniswap/%E5%9F%BA%E7%A1%80/v2/%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/" itemprop="url" rel="index"><span itemprop="name">代码阅读</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/01/06/defi16/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/01/06/defi16/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里讲一下 <code>uniswap v2 core</code> 核心库的代码。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://github.com/Uniswap/v2-core/tree/master/contracts" rel="external nofollow noreferrer">github</a></li>
+</ul>
+<br/>
+
+<h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><br/>
+
+<h2 id="整体分析"><a href="#整体分析" class="headerlink" title="整体分析"></a>整体分析</h2><p><code>core</code> 核心主要有三个合约文件：</p>
+<ul>
+<li><code>UniswapV2ERC20.sol</code><ul>
+<li>LP Token 合约</li>
+</ul>
+</li>
+<li><code>UniswapV2Pair.sol</code><ul>
+<li>配对合约，部署一个 LP token</li>
+</ul>
+</li>
+<li><code>UniswapV2Factory.sol</code><ul>
+<li>工厂合约</li>
+</ul>
+</li>
+</ul>
+<h2 id="UniswapV2Factory-sol"><a href="#UniswapV2Factory-sol" class="headerlink" title="UniswapV2Factory.sol"></a>UniswapV2Factory.sol</h2><h3 id="创建-Pair"><a href="#创建-Pair" class="headerlink" title="创建 Pair"></a>创建 Pair</h3><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">function</span> createPair(<span class="keyword">address </span>tokenA, <span class="keyword">address </span>tokenB) external returns (<span class="keyword">address </span>pair) &#123;</span><br><span class="line">    <span class="meta">require</span>(tokenA != tokenB, <span class="string">'UniswapV2: IDENTICAL_ADDRESSES'</span>)<span class="comment">;</span></span><br><span class="line">    (<span class="keyword">address </span>token0, <span class="keyword">address </span>token1) = tokenA &lt; tokenB ? (tokenA, tokenB) : (tokenB, tokenA)<span class="comment">;</span></span><br><span class="line">    <span class="meta">require</span>(token0 != <span class="keyword">address(0), </span><span class="string">'UniswapV2: ZERO_ADDRESS'</span>)<span class="comment">;</span></span><br><span class="line">    <span class="meta">require</span>(getPair[token0][token1] == <span class="keyword">address(0), </span><span class="string">'UniswapV2: PAIR_EXISTS'</span>)<span class="comment">; // single check is sufficient</span></span><br><span class="line">    <span class="keyword">bytes </span>memory <span class="keyword">bytecode </span>= type(UniswapV2Pair).creationCode<span class="comment">;</span></span><br><span class="line">    <span class="keyword">bytes32 </span>salt = keccak256(abi.encodePacked(token0, token1))<span class="comment">;</span></span><br><span class="line">    assembly &#123;</span><br><span class="line">        pair := create2(<span class="number">0</span>, <span class="keyword">add(bytecode, </span><span class="number">32</span>), mload(<span class="keyword">bytecode), </span>salt)</span><br><span class="line">    &#125;</span><br><span class="line">    IUniswapV2Pair(pair).initialize(token0, token1)<span class="comment">;</span></span><br><span class="line">    getPair[token0][token1] = pair<span class="comment">;</span></span><br><span class="line">    getPair[token1][token0] = pair<span class="comment">; // populate mapping in the reverse direction</span></span><br><span class="line">    allPairs.<span class="keyword">push(pair);</span></span><br><span class="line"><span class="keyword"> </span>   emit PairCreated(token0, token1, pair, allPairs.length)<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>催眠大师的中文注释版本。</p>
+<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity =<span class="number">0.5</span><span class="number">.16</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">'./interfaces/IUniswapV2Factory.sol'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'./UniswapV2Pair.sol'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//uniswap工厂</span></span><br><span class="line">contract UniswapV2Factory is <span class="title">IUniswapV2Factory</span> &#123;</span><br><span class="line">	...</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">createPair</span>(<span class="params">address tokenA, address tokenB</span>) <span class="title">external</span> <span class="title">returns</span> (<span class="params">address pair</span>) </span>&#123;</span><br><span class="line">	    <span class="comment">//确认tokenA不等于tokenB</span></span><br><span class="line">	    <span class="built_in">require</span>(tokenA != tokenB, <span class="string">'UniswapV2: IDENTICAL_ADDRESSES'</span>);</span><br><span class="line">	    <span class="comment">//将tokenA和tokenB进行大小排序,确保tokenA小于tokenB</span></span><br><span class="line">	    (address token0, address token1) = tokenA &lt; tokenB ? (tokenA, tokenB) : (tokenB, tokenA);</span><br><span class="line">	    <span class="comment">//确认token0不等于0地址</span></span><br><span class="line">	    <span class="built_in">require</span>(token0 != address(<span class="number">0</span>), <span class="string">'UniswapV2: ZERO_ADDRESS'</span>);</span><br><span class="line">	    <span class="comment">//确认配对映射中不存在token0=&gt;token1</span></span><br><span class="line">	    <span class="built_in">require</span>(getPair[token0][token1] == address(<span class="number">0</span>), <span class="string">'UniswapV2: PAIR_EXISTS'</span>); <span class="comment">// single check is sufficient</span></span><br><span class="line">	    <span class="comment">//给bytecode变量赋值"UniswapV2Pair"合约的创建字节码</span></span><br><span class="line">	    bytes memory bytecode = type(UniswapV2Pair).creationCode;</span><br><span class="line">	    <span class="comment">//将token0和token1打包后创建哈希</span></span><br><span class="line">	    bytes32 salt = keccak256(abi.encodePacked(token0, token1));</span><br><span class="line">	    <span class="comment">//内联汇编</span></span><br><span class="line">	    <span class="comment">//solium-disable-next-line</span></span><br><span class="line">	    <span class="title">assembly</span> &#123;</span><br><span class="line">	        <span class="comment">//通过create2方法布署合约,并且加盐,返回地址到pair变量</span></span><br><span class="line">	        <span class="attribute">pair</span> := create2(<span class="number">0</span>, add(bytecode, <span class="number">32</span>), mload(bytecode), salt)</span><br><span class="line">	    &#125;</span><br><span class="line">	    <span class="comment">//调用pair地址的合约中的"initialize"方法,传入变量token0,token1</span></span><br><span class="line">	    IUniswapV2Pair(pair).initialize(token0, token1);</span><br><span class="line">	    <span class="comment">//配对映射中设置token0=&gt;token1=pair</span></span><br><span class="line">	    getPair[token0][token1] = pair;</span><br><span class="line">	    <span class="comment">//配对映射中设置token1=&gt;token0=pair</span></span><br><span class="line">	    getPair[token1][token0] = pair; <span class="comment">// populate mapping in the reverse direction</span></span><br><span class="line">	    <span class="comment">//配对数组中推入pair地址</span></span><br><span class="line">	    allPairs.push(pair);</span><br><span class="line">	    <span class="comment">//触发配对成功事件</span></span><br><span class="line">	    emit PairCreated(token0, token1, pair, allPairs.length);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码的重点在于</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bytes </span>memory <span class="keyword">bytecode </span>= type(UniswapV2Pair).creationCode<span class="comment">;</span></span><br><span class="line"><span class="keyword">bytes32 </span>salt = keccak256(abi.encodePacked(token0, token1))<span class="comment">;</span></span><br><span class="line"><span class="symbol">assembly</span> &#123;</span><br><span class="line">    pair := create2(<span class="number">0</span>, <span class="keyword">add(bytecode, </span><span class="number">32</span>), mload(<span class="keyword">bytecode), </span>salt)</span><br><span class="line">&#125;</span><br><span class="line"><span class="symbol">IUniswapV2Pair</span>(pair).initialize(token0, token1)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述代码可以参考</p>
+<ul>
+<li><a href="/2022/01/15/solidity28/">solidity | EVM 中的汇编</a></li>
+<li><a href="/2022/01/15/solidity29/">solidity | 通过CREATE2获得合约地址：解决交易所充值账号问题</a></li>
+</ul>
+<p>根据</p>
+<ul>
+<li><a href="https://learnblockchain.cn/article/2824" rel="external nofollow noreferrer">剖析DeFi交易产品之Uniswap：V2上篇</a></li>
+</ul>
+<p>里面创建合约采用了 <code>create2</code>，这是一个汇编 <code>opcode</code>，这是我要重点讲解的部分。</p>
+<p>很多小伙伴应该都知道，一般创建新合约可以使用 <code>new</code> 关键字，比如，创建一个新配对合约，也可以这么写：</p>
+<pre><code>UniswapV2Pair newPair = new UniswapV2Pair();</code></pre><p>那为什么不使用 <code>new</code> 的方式，而是调用 <code>create2</code> 操作码来新建合约呢？使用 <code>create2</code> 最大的好处其实在于：可以在部署智能合约前预先计算出合约的部署地址。最关键的就是以下这几行代码：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bytes </span>memory <span class="keyword">bytecode </span>= type(UniswapV2Pair).creationCode<span class="comment">;</span></span><br><span class="line"><span class="keyword">bytes32 </span>salt = keccak256(abi.encodePacked(token0, token1))<span class="comment">;</span></span><br><span class="line"><span class="symbol">assembly</span> &#123;</span><br><span class="line">  pair := create2(<span class="number">0</span>, <span class="keyword">add(bytecode, </span><span class="number">32</span>), mload(<span class="keyword">bytecode), </span>salt)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第一行获取 <code>UniswapV2Pair</code> 合约代码的创建字节码 <code>creationCode</code>，结果值一般是这样：</p>
+<pre><code>0x0cf061edb29fff92bda250b607ac9973edf2282cff7477decd42a678e4f9b868</code></pre><p>类似的，其实还有运行时的字节码 <code>runtimeCode</code>，但这里没有用到。</p>
+<p>这个创建字节码其实会在 <code>periphery</code> 项目中的 <code>UniswapV2Library</code> 库中用到，是被硬编码设置的值。所以为了方便，可以在工厂合约中添加一行代码保存这个创建字节码：</p>
+<pre><code>bytes32 public constant INIT_CODE_PAIR_HASH = keccak256(abi.encodePacked(type(UniswapV2Pair).creationCode));</code></pre><p>回到上面代码，第二行根据两个代币地址计算出一个盐值，对于任意币对，计算出的盐值也是固定的，所以也可以线下计算出该币对的盐值。</p>
+<p>接着就用 <code>assembly</code> 关键字包起一段内嵌汇编代码，里面调用 <code>create2</code> 操作码来创建新合约。因为 <code>UniswapV2Pair</code> 合约的创建字节码是固定的，两个币对的盐值也是固定的，所以最终计算出来的 <code>pair</code> 地址其实也是固定的。</p>
+<p>接下来，我们将在 <code>bsc testnet</code> 网络中实验一下。</p>
+<p>首先根据，下面的博客部署下面的合约。</p>
+<ul>
+<li><a href="/2022/01/02/truffle2/">truffle ｜ 编译、部署、互动</a></li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity &gt;=0.4.21 &lt;0.8.0;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">contract Hello &#123;</span><br><span class="line">    string public hello = <span class="string">"Hello World"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract ERC20PreContract &#123;</span><br><span class="line"></span><br><span class="line">   <span class="built_in"> address </span>public contract_address;</span><br><span class="line"></span><br><span class="line">    function createPair() external returns (address pair) &#123;</span><br><span class="line">        bytes memory bytecode = type(Hello).creationCode;</span><br><span class="line">        bytes32 salt = keccak256(abi.encodePacked(0x74d50FC654742e1B08c23B6B4De8BF471D426008, 0xD1B260aba3bA6f3D3099725b1b1C7cdD12581974));</span><br><span class="line">        assembly &#123;</span><br><span class="line">            pair := create2(0, <span class="builtin-name">add</span>(bytecode, 32), mload(bytecode), salt)</span><br><span class="line">        &#125;</span><br><span class="line">        contract_address = pair;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们使用 <code>web3.py</code> 进行链上互动。</p>
+<p>部署上面的合约，我们得到合约地址 <code>0xFc33320759b0B96EFe841D0ea090772715915AfF</code>。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> web3 <span class="keyword">import</span> Web3</span><br><span class="line"></span><br><span class="line">abi = """</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">      "inputs": [],</span><br><span class="line">      "stateMutability": "nonpayable",</span><br><span class="line">      "<span class="keyword">type</span>": "constructor"</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      "inputs": [],</span><br><span class="line">      "<span class="type">name</span>": "contract_address",</span><br><span class="line">      "outputs": [</span><br><span class="line">        &#123;</span><br><span class="line">          "internalType": "address",</span><br><span class="line">          "<span class="type">name</span>": "",</span><br><span class="line">          "<span class="keyword">type</span>": "address"</span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      "stateMutability": "<span class="keyword">view</span>",</span><br><span class="line">      "<span class="keyword">type</span>": "<span class="keyword">function</span>",</span><br><span class="line">      "<span class="keyword">constant</span>": true</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      "inputs": [],</span><br><span class="line">      "<span class="type">name</span>": "createPair",</span><br><span class="line">      "outputs": [</span><br><span class="line">        &#123;</span><br><span class="line">          "internalType": "address",</span><br><span class="line">          "<span class="type">name</span>": "pair",</span><br><span class="line">          "<span class="keyword">type</span>": "address"</span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      "stateMutability": "nonpayable",</span><br><span class="line">      "<span class="keyword">type</span>": "<span class="keyword">function</span>"</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">"""</span><br><span class="line"></span><br><span class="line">abi2 = """</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">      "inputs": [],</span><br><span class="line">      "<span class="type">name</span>": "hello",</span><br><span class="line">      "outputs": [</span><br><span class="line">        &#123;</span><br><span class="line">          "internalType": "string",</span><br><span class="line">          "<span class="type">name</span>": "",</span><br><span class="line">          "<span class="keyword">type</span>": "string"</span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      "stateMutability": "<span class="keyword">view</span>",</span><br><span class="line">      "<span class="keyword">type</span>": "<span class="keyword">function</span>"</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">"""</span><br><span class="line"></span><br><span class="line">wallet_address = ""</span><br><span class="line">wallet_private = ""</span><br><span class="line"></span><br><span class="line">w3 = Web3(Web3.HTTPProvider("https://bsc.getblock.io/testnet/?api_key=****"))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get_pair():</span><br><span class="line">    contract_coin = w3.eth.contract(</span><br><span class="line">        address=Web3.toChecksumAddress("0xFc33320759b0B96EFe841D0ea090772715915AfF"), abi=abi)</span><br><span class="line">    print(contract_coin.<span class="keyword">functions</span>.contract_address().<span class="keyword">call</span>())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def <span class="keyword">create</span>():</span><br><span class="line">    contract_coin = w3.eth.contract(</span><br><span class="line">        address=Web3.toChecksumAddress("0xFc33320759b0B96EFe841D0ea090772715915AfF"), abi=abi)</span><br><span class="line">    tx_dic = contract_coin.<span class="keyword">functions</span>.createPair().buildTransaction(</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">'gas'</span>: <span class="number">800000</span>,</span><br><span class="line">            <span class="string">'gasPrice'</span>: w3.eth.gasPrice,</span><br><span class="line">            <span class="string">'nonce'</span>: w3.eth.getTransactionCount(wallet_address),</span><br><span class="line">        &#125;)</span><br><span class="line">    sign_tx = w3.eth.account.signTransaction(tx_dic, wallet_private)</span><br><span class="line">    txn_hash = w3.eth.sendRawTransaction(sign_tx.rawTransaction)</span><br><span class="line">    print(Web3.toHex(txn_hash))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get_hello():</span><br><span class="line">    contract_coin = w3.eth.contract(</span><br><span class="line">        address=Web3.toChecksumAddress("0xB5DCf739515fd938b23d514E50F3C9317260d954"), abi=abi2)</span><br><span class="line">    print(contract_coin.<span class="keyword">functions</span>.hello().<span class="keyword">call</span>())</span><br></pre></td></tr></table></figure>
+
+<p>先调用 <code>get_pair()</code> 输出 <code>0x00</code>;</p>
+<p>再调用 <code>create()</code>。</p>
+<p>然后再调用 <code>get_pair()</code> 输出 <code>0xB5DCf739515fd938b23d514E50F3C9317260d954</code>。</p>
+<p>然后，我们调用 <code>get_hello()</code> 发现输出了 <code>hello world</code> 。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/uniswap/" rel="tag"># uniswap</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/01/06/defi15/" rel="prev" title="defi ｜ uniswap v2 整体架构">
+      <i class="fa fa-chevron-left"></i> defi ｜ uniswap v2 整体架构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/01/07/tomoon22/" rel="next" title="tomoon | 抹茶的高级进阶">
+      tomoon | 抹茶的高级进阶 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码解析"><span class="nav-number">2.</span> <span class="nav-text">代码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#整体分析"><span class="nav-number">2.1.</span> <span class="nav-text">整体分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UniswapV2Factory-sol"><span class="nav-number">2.2.</span> <span class="nav-text">UniswapV2Factory.sol</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Pair"><span class="nav-number">2.2.1.</span> <span class="nav-text">创建 Pair</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

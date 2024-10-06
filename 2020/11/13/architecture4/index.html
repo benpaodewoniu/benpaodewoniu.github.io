@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="以淘宝为例，对架构的发展做一个推演。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="架构 | 从一百个并发到千万级并发">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/11/13/architecture4/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="以淘宝为例，对架构的发展做一个推演。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_1.webp">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_2.webp">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_5.webp">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_7.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_8.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_9.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_10.webp">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_11.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_12.webp">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_13.webp">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/architecture/4_14.webp">
+<meta property="article:published_time" content="2020-11-13T13:03:34.000Z">
+<meta property="article:modified_time" content="2021-08-08T15:16:25.372Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="架构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/architecture/4_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/11/13/architecture4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>架构 | 从一百个并发到千万级并发 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/11/13/architecture4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          架构 | 从一百个并发到千万级并发
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-13 21:03:34" itemprop="dateCreated datePublished" datetime="2020-11-13T21:03:34+08:00">2020-11-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-08 23:16:25" itemprop="dateModified" datetime="2021-08-08T23:16:25+08:00">2021-08-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">架构算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">架构</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E6%9E%B6%E6%9E%84/%E7%BB%BC%E5%90%88/" itemprop="url" rel="index"><span itemprop="name">综合</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/11/13/architecture4/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/11/13/architecture4/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>以淘宝为例，对架构的发展做一个推演。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><br/>
+
+<p>在介绍架构之前，为了避免部分读者对架构设计中的一些概念不了解，下面对几个最基础的概念进行介绍。</p>
+<h2 id="什么是分布式？"><a href="#什么是分布式？" class="headerlink" title="什么是分布式？"></a>什么是分布式？</h2><p>系统中的多个模块在不同服务器上部署，即可称为分布式系统，如Tomcat和数据库分别部署在不同的服务器上，或两个相同功能的Tomcat分别部署在不同服务器上。</p>
+<h2 id="什么是高可用？"><a href="#什么是高可用？" class="headerlink" title="什么是高可用？"></a>什么是高可用？</h2><p>系统中部分节点失效时，其他节点能够接替它继续提供服务，则可认为系统具有高可用性。</p>
+<h2 id="什么是集群？"><a href="#什么是集群？" class="headerlink" title="什么是集群？"></a>什么是集群？</h2><p>一个特定领域的软件部署在多台服务器上并作为一个整体提供一类服务，这个整体称为集群。</p>
+<p>如<code>Zookeeper</code>中的<code>Master</code>和<code>Slave</code>分别部署在多台服务器上，共同组成一个整体提供集中配置服务。</p>
+<p>在常见的集群中，客户端往往能够连接任意一个节点获得服务，并且当集群中一个节点掉线时，其他节点往往能够自动的接替它继续提供服务，这时候说明集群具有高可用性。</p>
+<h2 id="什么是负载均衡？"><a href="#什么是负载均衡？" class="headerlink" title="什么是负载均衡？"></a>什么是负载均衡？</h2><p>请求发送到系统时，通过某些方式把请求均匀分发到多个节点上，使系统中每个节点能够均匀的处理请求负载，则可认为系统是负载均衡的。</p>
+<h2 id="什么是正向代理和反向代理？"><a href="#什么是正向代理和反向代理？" class="headerlink" title="什么是正向代理和反向代理？"></a>什么是正向代理和反向代理？</h2><p>系统内部要访问外部网络时，统一通过一个代理服务器把请求转发出去，在外部网络看来就是代理服务器发起的访问，此时代理服务器实现的是正向代理；</p>
+<p>当外部请求进入系统时，代理服务器把该请求转发到系统中的某台服务器上，对外部请求来说，与之交互的只有代理服务器，此时代理服务器实现的是反向代理。</p>
+<p>简单来说，正向代理是代理服务器代替系统内部来访问外部网络的过程，反向代理是外部请求访问系统时通过代理服务器转发到内部服务器的过程。</p>
+<br/>
+
+<h1 id="纯真年代：单机架构"><a href="#纯真年代：单机架构" class="headerlink" title="纯真年代：单机架构"></a>纯真年代：单机架构</h1><br/>
+
+<p><img src="/images/architecture/4_0.png" alt=""></p>
+<p>以淘宝作为例子：在网站最初时，应用数量与用户数都较少，可以把Tomcat和数据库部署在同一台服务器上。</p>
+<p>浏览器往 <code>www.taobao.com</code>发起请求时，首先经过DNS服务器（域名系统）把域名转换为实际IP地址<code>10.102.4.1</code>，浏览器转而访问该IP对应的Tomcat。</p>
+<p>架构瓶颈：随着用户数的增长，Tomcat和数据库之间竞争资源，单机性能不足以支撑业务。</p>
+<br/>
+
+<h1 id="第一次演进：Tomcat与数据库分开部署"><a href="#第一次演进：Tomcat与数据库分开部署" class="headerlink" title="第一次演进：Tomcat与数据库分开部署"></a>第一次演进：Tomcat与数据库分开部署</h1><br/>
+
+<p><img src="/images/architecture/4_1.webp" alt=""></p>
+<p>Tomcat和数据库分别独占服务器资源，显著提高两者各自性能。</p>
+<p>架构瓶颈：随着用户数的增长，并发读写数据库成为瓶颈。</p>
+<br/>
+
+<h1 id="第二次演进：引入本地缓存和分布式缓存"><a href="#第二次演进：引入本地缓存和分布式缓存" class="headerlink" title="第二次演进：引入本地缓存和分布式缓存"></a>第二次演进：引入本地缓存和分布式缓存</h1><br/>
+
+<p><img src="/images/architecture/4_2.webp" alt=""></p>
+<p>在Tomcat同服务器上或同JVM中增加本地缓存，并在外部增加分布式缓存，缓存热门商品信息或热门商品的html页面等。通过缓存能把绝大多数请求在读写数据库前拦截掉，大大降低数据库压力。</p>
+<p>其中涉及的技术包括：使用memcached作为本地缓存，使用Redis作为分布式缓存，还会涉及缓存一致性、缓存穿透/击穿、缓存雪崩、热点数据集中失效等问题。</p>
+<p>架构瓶颈：缓存抗住了大部分的访问请求，随着用户数的增长，并发压力主要落在单机的Tomcat上，响应逐渐变慢。</p>
+<br/>
+
+<h1 id="第三次演进：引入反向代理实现负载均衡"><a href="#第三次演进：引入反向代理实现负载均衡" class="headerlink" title="第三次演进：引入反向代理实现负载均衡"></a>第三次演进：引入反向代理实现负载均衡</h1><br/>
+
+<p><img src="/images/architecture/4_3.png" alt=""></p>
+<p>在多台服务器上分别部署Tomcat，使用反向代理软件（Nginx）把请求均匀分发到每个Tomcat中。</p>
+<p>此处假设Tomcat最多支持100个并发，Nginx最多支持50000个并发，那么理论上Nginx把请求分发到500个Tomcat上，就能抗住50000个并发。</p>
+<p>其中涉及的技术包括：Nginx、HAProxy，两者都是工作在网络第七层的反向代理软件，主要支持http协议，还会涉及session共享、文件上传下载的问题。</p>
+<p>架构瓶颈：反向代理使应用服务器可支持的并发量大大增加，但并发量的增长也意味着更多请求穿透到数据库，单机的数据库最终成为瓶颈。</p>
+<br/>
+
+<h1 id="第四次演进：数据库读写分离"><a href="#第四次演进：数据库读写分离" class="headerlink" title="第四次演进：数据库读写分离"></a>第四次演进：数据库读写分离</h1><br/>
+
+<p><img src="/images/architecture/4_4.png" alt=""></p>
+<p>把数据库划分为读库和写库，读库可以有多个，通过同步机制把写库的数据同步到读库，对于需要查询最新写入数据场景，可通过在缓存中多写一份，通过缓存获得最新数据。</p>
+<p>其中涉及的技术包括：Mycat，它是数据库中间件，可通过它来组织数据库的分离读写和分库分表，客户端通过它来访问下层数据库，还会涉及数据同步，数据一致性的问题。</p>
+<p>架构瓶颈：业务逐渐变多，不同业务之间的访问量差距较大，不同业务直接竞争数据库，相互影响性能。</p>
+<br/>
+
+<h1 id="第五次演进：数据库按业务分库"><a href="#第五次演进：数据库按业务分库" class="headerlink" title="第五次演进：数据库按业务分库"></a>第五次演进：数据库按业务分库</h1><br/>
+
+<p><img src="/images/architecture/4_5.webp" alt=""></p>
+<p>把不同业务的数据保存到不同的数据库中，使业务之间的资源竞争降低，对于访问量大的业务，可以部署更多的服务器来支撑。</p>
+<p>这样同时导致跨业务的表无法直接做关联分析，需要通过其他途径来解决，但这不是本文讨论的重点，有兴趣的可以自行搜索解决方案。</p>
+<p>架构瓶颈：随着用户数的增长，单机的写库会逐渐会达到性能瓶颈。</p>
+<br/>
+
+<h1 id="第六次演进：把大表拆分为小表"><a href="#第六次演进：把大表拆分为小表" class="headerlink" title="第六次演进：把大表拆分为小表"></a>第六次演进：把大表拆分为小表</h1><br/>
+
+<p><img src="/images/architecture/4_6.png" alt=""></p>
+<p>比如针对评论数据，可按照商品ID进行hash，路由到对应的表中存储；</p>
+<p>针对支付记录，可按照小时创建表，每个小时表继续拆分为小表，使用用户ID或记录编号来路由数据。</p>
+<p>只要实时操作的表数据量足够小，请求能够足够均匀的分发到多台服务器上的小表，那数据库就能通过水平扩展的方式来提高性能。其中前面提到的Mycat也支持在大表拆分为小表情况下的访问控制。</p>
+<p>这种做法显著的增加了数据库运维的难度，对DBA的要求较高。数据库设计到这种结构时，已经可以称为分布式数据库，但这只是一个逻辑的数据库整体，数据库里不同的组成部分是由不同的组件单独来实现的，如分库分表的管理和请求分发，由Mycat实现，SQL的解析由单机的数据库实现，读写分离可能由网关和消息队列来实现，查询结果的汇总可能由数据库接口层来实现等等，这种架构其实是MPP（大规模并行处理）架构的一类实现。</p>
+<p>目前开源和商用都已经有不少MPP数据库，开源中比较流行的有Greenplum、TiDB、Postgresql XC、HAWQ等，商用的如南大通用的GBase、睿帆科技的雪球DB、华为的LibrA等等。</p>
+<p>不同的MPP数据库的侧重点也不一样，如TiDB更侧重于分布式OLTP场景，Greenplum更侧重于分布式OLAP场景，这些MPP数据库基本都提供了类似Postgresql、Oracle、MySQL那样的SQL标准支持能力，能把一个查询解析为分布式的执行计划分发到每台机器上并行执行，最终由数据库本身汇总数据进行返回，也提供了诸如权限管理、分库分表、事务、数据副本等能力，并且大多能够支持100个节点以上的集群，大大降低了数据库运维的成本，并且使数据库也能够实现水平扩展。</p>
+<p>架构瓶颈：数据库和Tomcat都能够水平扩展，可支撑的并发大幅提高，随着用户数的增长，最终单机的Nginx会成为瓶颈。</p>
+<br/>
+
+<h1 id="第七次演进：使用LVS或F5来使多个Nginx负载均衡"><a href="#第七次演进：使用LVS或F5来使多个Nginx负载均衡" class="headerlink" title="第七次演进：使用LVS或F5来使多个Nginx负载均衡"></a>第七次演进：使用LVS或F5来使多个Nginx负载均衡</h1><br/>
+
+<p><img src="/images/architecture/4_7.png" alt=""></p>
+<p>由于瓶颈在Nginx，因此无法通过两层的Nginx来实现多个Nginx的负载均衡。</p>
+<p>图中的LVS和F5是工作在网络第四层的负载均衡解决方案，其中LVS是软件，运行在操作系统内核态，可对TCP请求或更高层级的网络协议进行转发，因此支持的协议更丰富，并且性能也远高于Nginx，可假设单机的LVS可支持几十万个并发的请求转发；</p>
+<p>F5是一种负载均衡硬件，与LVS提供的能力类似，性能比LVS更高，但价格昂贵。</p>
+<p>由于LVS是单机版的软件，若LVS所在服务器宕机则会导致整个后端系统都无法访问，因此需要有备用节点。</p>
+<p>可使用keepalived软件模拟出虚拟IP，然后把虚拟IP绑定到多台LVS服务器上，浏览器访问虚拟IP时，会被路由器重定向到真实的LVS服务器,当主LVS服务器宕机时，keepalived软件会自动更新路由器中的路由表，把虚拟IP重定向到另外一台正常的LVS服务器，从而达到LVS服务器高可用的效果。</p>
+<p>此处需要注意的是，上图中从Nginx层到Tomcat层这样画并不代表全部Nginx都转发请求到全部的Tomcat,在实际使用时，可能会是几个Nginx下面接一部分的Tomcat，这些Nginx之间通过keepalived实现高可用，其他的Nginx接另外的Tomcat，这样可接入的Tomcat数量就能成倍的增加。</p>
+<p>架构瓶颈：由于LVS也是单机的，随着并发数增长到几十万时，LVS服务器最终会达到瓶颈，此时用户数达到千万甚至上亿级别，用户分布在不同的地区，与服务器机房距离不同，导致了访问的延迟会明显不同。</p>
+<br/>
+
+<h1 id="第八次演进：通过DNS轮询实现机房间的负载均衡"><a href="#第八次演进：通过DNS轮询实现机房间的负载均衡" class="headerlink" title="第八次演进：通过DNS轮询实现机房间的负载均衡"></a>第八次演进：通过DNS轮询实现机房间的负载均衡</h1><br/>
+
+<p><img src="/images/architecture/4_8.png" alt=""></p>
+<p>在DNS服务器中可配置一个域名对应多个IP地址，每个IP地址对应到不同的机房里的虚拟IP。</p>
+<p>当用户访问 <code>www.taobao.com</code> 时，<code>DNS服务器</code>会使用轮询策略或其他策略，来选择某个IP供用户访问。此方式能实现机房间的负载均衡,至此，系统可做到机房级别的水平扩展，千万级到亿级的并发量都可通过增加机房来解决，系统入口处的请求并发量不再是问题。</p>
+<p>架构瓶颈：随着数据的丰富程度和业务的发展，检索、分析等需求越来越丰富，单单依靠数据库无法解决如此丰富的需求。</p>
+<br/>
+
+<h1 id="第九次演进：引入NoSQL数据库和搜索引擎等技术"><a href="#第九次演进：引入NoSQL数据库和搜索引擎等技术" class="headerlink" title="第九次演进：引入NoSQL数据库和搜索引擎等技术"></a>第九次演进：引入NoSQL数据库和搜索引擎等技术</h1><br/>
+
+<p><img src="/images/architecture/4_9.png" alt=""></p>
+<p>当数据库中的数据多到一定规模时，数据库就不适用于复杂的查询了，往往只能满足普通查询的场景。</p>
+<p>对于统计报表场景，在数据量大时不一定能跑出结果，而且在跑复杂查询时会导致其他查询变慢，对于全文检索、可变数据结构等场景，数据库天生不适用。因此需要针对特定的场景，引入合适的解决方案。</p>
+<p>如对于海量文件存储，可通过分布式文件系统HDFS解决，对于key value类型的数据，可通过HBase和Redis等方案解决，对于全文检索场景，可通过搜索引擎如ElasticSearch解决，对于多维分析场景，可通过Kylin或Druid等方案解决。</p>
+<p>当然，引入更多组件同时会提高系统的复杂度，不同的组件保存的数据需要同步，需要考虑一致性的问题，需要有更多的运维手段来管理这些组件等。</p>
+<p>架构瓶颈：引入更多组件解决了丰富的需求，业务维度能够极大扩充，随之而来的是一个应用中包含了太多的业务代码，业务的升级迭代变得困难。</p>
+<br/>
+
+<h1 id="第十次演进：大应用拆分为小应用"><a href="#第十次演进：大应用拆分为小应用" class="headerlink" title="第十次演进：大应用拆分为小应用"></a>第十次演进：大应用拆分为小应用</h1><br/>
+
+<p><img src="/images/architecture/4_10.webp" alt=""></p>
+<p>按照业务板块来划分应用代码，使单个应用的职责更清晰，相互之间可以做到独立升级迭代。这时候应用之间可能会涉及到一些公共配置，可以通过分布式配置中心Zookeeper来解决。</p>
+<p>架构瓶颈：不同应用之间存在共用的模块，由应用单独管理会导致相同代码存在多份，导致公共功能升级时全部应用代码都要跟着升级。</p>
+<br/>
+
+<h1 id="第十一次演进：复用的功能抽离成微服务"><a href="#第十一次演进：复用的功能抽离成微服务" class="headerlink" title="第十一次演进：复用的功能抽离成微服务"></a>第十一次演进：复用的功能抽离成微服务</h1><br/>
+
+<p><img src="/images/architecture/4_11.png" alt=""></p>
+<p>如用户管理、订单、支付、鉴权等功能在多个应用中都存在，那么可以把这些功能的代码单独抽取出来形成一个单独的服务来管理。</p>
+<p>这样的服务就是所谓的微服务，应用和服务之间通过HTTP、TCP或RPC请求等多种方式来访问公共服务，每个单独的服务都可以由单独的团队来管理。</p>
+<p>此外，可以通过Dubbo、SpringCloud等框架实现服务治理、限流、熔断、降级等功能，提高服务的稳定性和可用性。</p>
+<p>架构瓶颈：不同服务的接口访问方式不同，应用代码需要适配多种访问方式才能使用服务，此外，应用访问服务，服务之间也可能相互访问，调用链将会变得非常复杂，逻辑变得混乱。</p>
+<br/>
+
+<h1 id="第十二次演进：引入企业服务总线ESB屏蔽服务接口的访问差异"><a href="#第十二次演进：引入企业服务总线ESB屏蔽服务接口的访问差异" class="headerlink" title="第十二次演进：引入企业服务总线ESB屏蔽服务接口的访问差异"></a>第十二次演进：引入企业服务总线ESB屏蔽服务接口的访问差异</h1><br/>
+
+<p><img src="/images/architecture/4_12.webp" alt=""></p>
+<p>通过ESB统一进行访问协议转换，应用统一通过ESB来访问后端服务，服务与服务之间也通过ESB来相互调用，以此降低系统的耦合程度。</p>
+<p>这种单个应用拆分为多个应用，公共服务单独抽取出来来管理，并使用企业消息总线来解除服务之间耦合问题的架构，就是所谓的SOA（面向服务）架构，这种架构与微服务架构容易混淆，因为表现形式十分相似。</p>
+<p>个人理解，微服务架构更多是指把系统里的公共服务抽取出来单独运维管理的思想，而SOA架构则是指一种拆分服务并使服务接口访问变得统一的架构思想，SOA架构中包含了微服务的思想。</p>
+<p>架构瓶颈：业务不断发展，应用和服务都会不断变多，应用和服务的部署变得复杂，同一台服务器上部署多个服务还要解决运行环境冲突的问题，此外，对于如大促这类需要动态扩缩容的场景，需要水平扩展服务的性能，就需要在新增的服务上准备运行环境，部署服务等，运维将变得十分困难。</p>
+<br/>
+
+<h1 id="第十三次演进：引入容器化技术实现运行环境隔离与动态服务管理"><a href="#第十三次演进：引入容器化技术实现运行环境隔离与动态服务管理" class="headerlink" title="第十三次演进：引入容器化技术实现运行环境隔离与动态服务管理"></a>第十三次演进：引入容器化技术实现运行环境隔离与动态服务管理</h1><br/>
+
+<p><img src="/images/architecture/4_13.webp" alt=""></p>
+<p>目前最流行的容器化技术是Docker，最流行的容器管理服务是Kubernetes(K8S)，应用/服务可以打包为Docker镜像，通过K8S来动态分发和部署镜像。</p>
+<p>Docker镜像可理解为一个能运行你的应用/服务的最小的操作系统，里面放着应用/服务的运行代码，运行环境根据实际的需要设置好。</p>
+<p>把整个“操作系统”打包为一个镜像后，就可以分发到需要部署相关服务的机器上，直接启动Docker镜像就可以把服务起起来，使服务的部署和运维变得简单。</p>
+<p>在大促的之前，可以在现有的机器集群上划分出服务器来启动Docker镜像，增强服务的性能，大促过后就可以关闭镜像，对机器上的其他服务不造成影响（在第18节之前，服务运行在新增机器上需要修改系统配置来适配服务，这会导致机器上其他服务需要的运行环境被破坏）。</p>
+<p>架构瓶颈：使用容器化技术后服务动态扩缩容问题得以解决，但是机器还是需要公司自身来管理，在非大促的时候，还是需要闲置着大量的机器资源来应对大促，机器自身成本和运维成本都极高，资源利用率低。</p>
+<br/>
+
+<h1 id="第十四次演进：以云平台承载系统"><a href="#第十四次演进：以云平台承载系统" class="headerlink" title="第十四次演进：以云平台承载系统"></a>第十四次演进：以云平台承载系统</h1><br/>
+
+<p><img src="/images/architecture/4_14.webp" alt=""></p>
+<p>系统可部署到公有云上，利用公有云的海量机器资源，解决动态硬件资源的问题，在大促的时间段里，在云平台中临时申请更多的资源，结合Docker和K8S来快速部署服务，在大促结束后释放资源，真正做到按需付费，资源利用率大大提高，同时大大降低了运维成本。</p>
+<p>所谓的云平台，就是把海量机器资源，通过统一的资源管理，抽象为一个资源整体，在云平台上可按需动态申请硬件资源（如CPU、内存、网络等），并且之上提供通用的操作系统，提供常用的技术组件（如Hadoop技术栈，MPP数据库等）供用户使用，甚至提供开发好的应用，用户不需要关心应用内部使用了什么技术，就能够解决需求（如音视频转码服务、邮件服务、个人博客等）。</p>
+<p>在云平台中会涉及如下几个概念：</p>
+<ul>
+<li>IaaS：基础设施即服务。对应于上面所说的机器资源统一为资源整体，可动态申请硬件资源的层面；</li>
+<li>PaaS：平台即服务。对应于上面所说的提供常用的技术组件方便系统的开发和维护；</li>
+<li>SaaS：软件即服务。对应于上面所说的提供开发好的应用或服务，按功能或性能要求付费。</li>
+</ul>
+<p>至此：以上所提到的从高并发访问问题，到服务的架构和系统实施的层面都有了各自的解决方案。</p>
+<p>但同时也应该意识到，在上面的介绍中，其实是有意忽略了诸如跨机房数据同步、分布式事务实现等等的实际问题，这些问题以后有机会再拿出来单独讨论。</p>
+<br/>
+
+<h1 id="架构设计经验小结"><a href="#架构设计经验小结" class="headerlink" title="架构设计经验小结"></a>架构设计经验小结</h1><br/>
+
+<h2 id="架构的调整是否必须按照上述演变路径进行？"><a href="#架构的调整是否必须按照上述演变路径进行？" class="headerlink" title="架构的调整是否必须按照上述演变路径进行？"></a>架构的调整是否必须按照上述演变路径进行？</h2><p>不是的，以上所说的架构演变顺序只是针对某个侧面进行单独的改进。</p>
+<p>在实际场景中，可能同一时间会有几个问题需要解决，或者可能先达到瓶颈的是另外的方面，这时候就应该按照实际问题实际解决。</p>
+<p>如在政府类的并发量可能不大，但业务可能很丰富的场景，高并发就不是重点解决的问题，此时优先需要的可能会是丰富需求的解决方案。</p>
+<h2 id="对于将要实施的系统，架构应该设计到什么程度？"><a href="#对于将要实施的系统，架构应该设计到什么程度？" class="headerlink" title="对于将要实施的系统，架构应该设计到什么程度？"></a>对于将要实施的系统，架构应该设计到什么程度？</h2><p>对于单次实施并且性能指标明确的系统，架构设计到能够支持系统的性能指标要求就足够了，但要留有扩展架构的接口以便不备之需。</p>
+<p>对于不断发展的系统，如电商平台，应设计到能满足下一阶段用户量和性能指标要求的程度，并根据业务的增长不断的迭代升级架构，以支持更高的并发和更丰富的业务。</p>
+<h2 id="服务端架构和大数据架构有什么区别？"><a href="#服务端架构和大数据架构有什么区别？" class="headerlink" title="服务端架构和大数据架构有什么区别？"></a>服务端架构和大数据架构有什么区别？</h2><p>所谓的“大数据”其实是海量数据采集清洗转换、数据存储、数据分析、数据服务等场景解决方案的一个统称，在每一个场景都包含了多种可选的技术。</p>
+<p>如数据采集有Flume、Sqoop、Kettle等，数据存储有分布式文件系统HDFS、FastDFS，NoSQL数据库HBase、MongoDB等，数据分析有Spark技术栈、机器学习算法等。</p>
+<p>总的来说大数据架构就是根据业务的需求，整合各种大数据组件组合而成的架构，一般会提供分布式存储、分布式计算、多维分析、数据仓库、机器学习算法等能力。</p>
+<p>而服务端架构更多指的是应用组织层面的架构，底层能力往往是由大数据架构来提供。</p>
+<h2 id="有没有一些架构设计的原则？"><a href="#有没有一些架构设计的原则？" class="headerlink" title="有没有一些架构设计的原则？"></a>有没有一些架构设计的原则？</h2><ul>
+<li>N+1设计：系统中的每个组件都应做到没有单点故障；</li>
+<li>回滚设计：确保系统可以向前兼容，在系统升级时应能有办法回滚版本；</li>
+<li>禁用设计：应该提供控制具体功能是否可用的配置，在系统出现故障时能够快速下线功能；</li>
+<li>监控设计：在设计阶段就要考虑监控的手段；</li>
+<li>多活数据中心设计：若系统需要极高的高可用，应考虑在多地实施数据中心进行多活，至少在一个机房断电的情况下系统依然可用；</li>
+<li>采用成熟的技术：刚开发的或开源的技术往往存在很多隐藏的bug，出了问题没有商业支持可能会是一个灾难；</li>
+<li>资源隔离设计：应避免单一业务占用全部资源；</li>
+<li>架构应能水平扩展：系统只有做到能水平扩展，才能有效避免瓶颈问题；</li>
+<li>非核心则购买：非核心功能若需要占用大量的研发资源才能解决，则考虑购买成熟的产品；</li>
+<li>使用商用硬件：商用硬件能有效降低硬件故障的机率；</li>
+<li>快速迭代：系统应该快速开发小功能模块，尽快上线进行验证，早日发现问题大大降低系统交付的风险；</li>
+<li>无状态设计：服务接口应该做成无状态的，当前接口的访问不依赖于接口上次访问的状态。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/13/thought30/" rel="prev" title="90 后群体的聪明">
+      <i class="fa fa-chevron-left"></i> 90 后群体的聪明
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/15/p50/" rel="next" title="p5.js | 简介">
+      p5.js | 简介 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本概念"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是分布式？"><span class="nav-number">1.1.</span> <span class="nav-text">什么是分布式？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是高可用？"><span class="nav-number">1.2.</span> <span class="nav-text">什么是高可用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是集群？"><span class="nav-number">1.3.</span> <span class="nav-text">什么是集群？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是负载均衡？"><span class="nav-number">1.4.</span> <span class="nav-text">什么是负载均衡？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是正向代理和反向代理？"><span class="nav-number">1.5.</span> <span class="nav-text">什么是正向代理和反向代理？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#纯真年代：单机架构"><span class="nav-number">2.</span> <span class="nav-text">纯真年代：单机架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第一次演进：Tomcat与数据库分开部署"><span class="nav-number">3.</span> <span class="nav-text">第一次演进：Tomcat与数据库分开部署</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第二次演进：引入本地缓存和分布式缓存"><span class="nav-number">4.</span> <span class="nav-text">第二次演进：引入本地缓存和分布式缓存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第三次演进：引入反向代理实现负载均衡"><span class="nav-number">5.</span> <span class="nav-text">第三次演进：引入反向代理实现负载均衡</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第四次演进：数据库读写分离"><span class="nav-number">6.</span> <span class="nav-text">第四次演进：数据库读写分离</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第五次演进：数据库按业务分库"><span class="nav-number">7.</span> <span class="nav-text">第五次演进：数据库按业务分库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第六次演进：把大表拆分为小表"><span class="nav-number">8.</span> <span class="nav-text">第六次演进：把大表拆分为小表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第七次演进：使用LVS或F5来使多个Nginx负载均衡"><span class="nav-number">9.</span> <span class="nav-text">第七次演进：使用LVS或F5来使多个Nginx负载均衡</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第八次演进：通过DNS轮询实现机房间的负载均衡"><span class="nav-number">10.</span> <span class="nav-text">第八次演进：通过DNS轮询实现机房间的负载均衡</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第九次演进：引入NoSQL数据库和搜索引擎等技术"><span class="nav-number">11.</span> <span class="nav-text">第九次演进：引入NoSQL数据库和搜索引擎等技术</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第十次演进：大应用拆分为小应用"><span class="nav-number">12.</span> <span class="nav-text">第十次演进：大应用拆分为小应用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第十一次演进：复用的功能抽离成微服务"><span class="nav-number">13.</span> <span class="nav-text">第十一次演进：复用的功能抽离成微服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第十二次演进：引入企业服务总线ESB屏蔽服务接口的访问差异"><span class="nav-number">14.</span> <span class="nav-text">第十二次演进：引入企业服务总线ESB屏蔽服务接口的访问差异</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第十三次演进：引入容器化技术实现运行环境隔离与动态服务管理"><span class="nav-number">15.</span> <span class="nav-text">第十三次演进：引入容器化技术实现运行环境隔离与动态服务管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第十四次演进：以云平台承载系统"><span class="nav-number">16.</span> <span class="nav-text">第十四次演进：以云平台承载系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#架构设计经验小结"><span class="nav-number">17.</span> <span class="nav-text">架构设计经验小结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#架构的调整是否必须按照上述演变路径进行？"><span class="nav-number">17.1.</span> <span class="nav-text">架构的调整是否必须按照上述演变路径进行？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对于将要实施的系统，架构应该设计到什么程度？"><span class="nav-number">17.2.</span> <span class="nav-text">对于将要实施的系统，架构应该设计到什么程度？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端架构和大数据架构有什么区别？"><span class="nav-number">17.3.</span> <span class="nav-text">服务端架构和大数据架构有什么区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有没有一些架构设计的原则？"><span class="nav-number">17.4.</span> <span class="nav-text">有没有一些架构设计的原则？</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

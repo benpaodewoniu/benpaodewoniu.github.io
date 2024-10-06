@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="常见方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java | 多线程的常见方法">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2022/12/11/java79/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="常见方法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-12-11T15:50:20.000Z">
+<meta property="article:modified_time" content="2022-12-13T09:25:27.288Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2022/12/11/java79/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>java | 多线程的常见方法 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2022/12/11/java79/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java | 多线程的常见方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-12-11 23:50:20" itemprop="dateCreated datePublished" datetime="2022-12-11T23:50:20+08:00">2022-12-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-13 17:25:27" itemprop="dateModified" datetime="2022-12-13T17:25:27+08:00">2022-12-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多线程</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/12/11/java79/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/12/11/java79/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>常见方法。</p>
+<a id="more"></a>
+
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>功能说明</th>
+<th>注意</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>start()</td>
+<td>启动新线程<br/>在新线程中运行 run 方法</td>
+<td>start 方法只是让线程进入就绪状态，里面的代码不一定立刻执行。<br/>每一个线程对象的 start 只能调一次，否则会报错。</td>
+</tr>
+<tr>
+<td>run()</td>
+<td>新线程启动后调用的方法</td>
+<td>如果在构造 Thread 对象时传递了 Runnable 参数，则线程启动后会调用 Runnable 中的 run 方法。<br/>否则默认不执行任何操作</td>
+</tr>
+<tr>
+<td>join()</td>
+<td>等待线程结束</td>
+<td></td>
+</tr>
+<tr>
+<td>join(long n)</td>
+<td>等待线程运行结束<br/>最多等待 n 毫秒</td>
+<td></td>
+</tr>
+<tr>
+<td>getId()</td>
+<td>获取线程长整型的 id</td>
+<td>id 唯一</td>
+</tr>
+<tr>
+<td>getName()</td>
+<td>获取线程名</td>
+<td></td>
+</tr>
+<tr>
+<td>setName(String)</td>
+<td>修改线程名</td>
+<td></td>
+</tr>
+<tr>
+<td>getPriority()</td>
+<td>获取线程优先级</td>
+<td></td>
+</tr>
+<tr>
+<td>setPriority(int)</td>
+<td>修改线程优先级</td>
+<td>java 中规定线程优先级是 1 - 10<br/>较大的优先级能提高该线程被 CPU 调度的几率</td>
+</tr>
+<tr>
+<td>getState()</td>
+<td>获取线程状态</td>
+<td>Java 中线程状态用 6 个 enum 表示<br/>NEW、RUNNABLE、BLOCKRD、WAITING、TIMED_WAITING、TERMINATED</td>
+</tr>
+<tr>
+<td>isInterrupted()</td>
+<td>判断线程是否被打断</td>
+<td>不会清楚打断标记</td>
+</tr>
+<tr>
+<td>isAlive()</td>
+<td>线程是否存活(还没有运行完毕)</td>
+<td></td>
+</tr>
+<tr>
+<td>interrupt()</td>
+<td>打断线程</td>
+<td>如果打断的线程正在<br/>sleep、wait、join<br/>会导致被打断的线程抛出 InterruptedException，并清除打断标记<br/>如果打断的正在运行的线程，则会设置打断标记<br/>park 的线程被打断，也会设置打断标记</td>
+</tr>
+<tr>
+<td>interrupted()</td>
+<td>static 判断当前线程是否被打断</td>
+<td>会清除打断标记</td>
+</tr>
+<tr>
+<td>currentThread()</td>
+<td>static 获取当前正在执行的线程</td>
+<td></td>
+</tr>
+<tr>
+<td>sleep(long n)</td>
+<td>static 让当前线程休眠 n 毫秒</td>
+<td></td>
+</tr>
+<tr>
+<td>yield()</td>
+<td>static 提示线程调度器让出当前线程对 CPU 的使用</td>
+<td>主要是为了测试和调试</td>
+</tr>
+<tr>
+<td>stop()</td>
+<td>过时方法 停止线程运行</td>
+<td></td>
+</tr>
+<tr>
+<td>suspend()</td>
+<td>过时方法 挂起（暂时）线程运行</td>
+<td></td>
+</tr>
+<tr>
+<td>resume()</td>
+<td>过时方法 恢复线程运行</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="start-与-run"><a href="#start-与-run" class="headerlink" title="start 与 run"></a>start 与 run</h2><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.<span class="keyword">extern</span>.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> </span>&#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(<span class="string">"t1"</span>) &#123;</span><br><span class="line">            @Override</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="built_in">run</span>() &#123;</span><br><span class="line">                <span class="built_in">log</span>.debug(<span class="string">"runing..."</span>);</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        t1.<span class="built_in">run</span>(); <span class="comment">// 如果直接使用的话</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">21<span class="selector-pseudo">:41</span><span class="selector-pseudo">:03.354</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">runing</span>...</span><br></pre></td></tr></table></figure>
+
+<p>可以发现调用的主体是 <code>main</code> 而不是 <code>t1</code>，这种调用，只是普通方法的执行。</p>
+<p>如果改成 <code>start</code> 的话，则会输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">21<span class="selector-pseudo">:44</span><span class="selector-pseudo">:03.663</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">runing</span>...</span><br></pre></td></tr></table></figure>
+
+<h2 id="线程状态"><a href="#线程状态" class="headerlink" title="线程状态"></a>线程状态</h2><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.<span class="keyword">extern</span>.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> </span>&#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(<span class="string">"t1"</span>) &#123;</span><br><span class="line">            @Override</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="built_in">run</span>() &#123;</span><br><span class="line">                <span class="built_in">log</span>.debug(<span class="string">"runing..."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        System.out.<span class="built_in">println</span>(t1.getState());</span><br><span class="line">        t1.start();</span><br><span class="line">        System.out.<span class="built_in">println</span>(t1.getState());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">NEW</span></span><br><span class="line"><span class="selector-tag">RUNNABLE</span></span><br><span class="line">21<span class="selector-pseudo">:45</span><span class="selector-pseudo">:20.461</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">runing</span>...</span><br></pre></td></tr></table></figure>
+
+<h2 id="sleep-和-yield"><a href="#sleep-和-yield" class="headerlink" title="sleep 和 yield"></a>sleep 和 yield</h2><p><code>sleep</code> 让当前线程从 <code>Running</code> 进入 <code>Timed Waiting</code> 状态「就绪」</p>
+<h3 id="查看-sleep-的状态"><a href="#查看-sleep-的状态" class="headerlink" title="查看 sleep 的状态"></a>查看 <code>sleep</code> 的状态</h3><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.<span class="keyword">extern</span>.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> </span>&#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(<span class="string">"t1"</span>) &#123;</span><br><span class="line">            @Override</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="built_in">run</span>() &#123;</span><br><span class="line">                <span class="built_in">log</span>.debug(<span class="string">"runing..."</span>);</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        t1.start();</span><br><span class="line">        <span class="built_in">log</span>.debug(<span class="string">"t1 state &#123;&#125;"</span>, t1.getState());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">500</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">log</span>.debug(<span class="string">"t1 state &#123;&#125;"</span>, t1.getState());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">21<span class="selector-pseudo">:49</span><span class="selector-pseudo">:52.759</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">runing</span>...</span><br><span class="line">21<span class="selector-pseudo">:49</span><span class="selector-pseudo">:52.759</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">t1</span> <span class="selector-tag">state</span> <span class="selector-tag">RUNNABLE</span></span><br><span class="line">21<span class="selector-pseudo">:49</span><span class="selector-pseudo">:53.265</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">t1</span> <span class="selector-tag">state</span> <span class="selector-tag">TIMED_WAITING</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="sleep-打断"><a href="#sleep-打断" class="headerlink" title="sleep 打断"></a>sleep 打断</h3><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.<span class="keyword">extern</span>.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> </span>&#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(<span class="string">"t1"</span>) &#123;</span><br><span class="line">            @Override</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">void</span> <span class="built_in">run</span>() &#123;</span><br><span class="line">                <span class="built_in">log</span>.debug(<span class="string">"runing..."</span>);</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    <span class="built_in">log</span>.debug(<span class="string">"wake up"</span>);</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        t1.start();</span><br><span class="line">        <span class="built_in">log</span>.debug(<span class="string">"t1 state &#123;&#125;"</span>, t1.getState());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">500</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">log</span>.debug(<span class="string">"interrupt..."</span>);</span><br><span class="line">        t1.interrupt();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">21</span>:<span class="number">54</span>:<span class="number">19.895</span> [main] DEBUG c.Test - t1 state RUNNABLE</span><br><span class="line"><span class="number">21</span>:<span class="number">54</span>:<span class="number">19.895</span> [t1] DEBUG c.Test - runing...</span><br><span class="line"><span class="number">21</span>:<span class="number">54</span>:<span class="number">20.403</span> [main] DEBUG c.Test - <span class="built_in">int</span>errupt...</span><br><span class="line"><span class="number">21</span>:<span class="number">54</span>:<span class="number">20.403</span> [t1] DEBUG c.Test - wake up</span><br><span class="line">java.lang.InterruptedException: sleep <span class="built_in">int</span>errupted</span><br><span class="line">	at java.base/java.lang.Thread.sleep(Native Method)</span><br><span class="line">	at com.redisc.Test$<span class="number">1.</span>run(Test.java:<span class="number">13</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="TimeUnit-更好的可读性"><a href="#TimeUnit-更好的可读性" class="headerlink" title="TimeUnit 更好的可读性"></a>TimeUnit 更好的可读性</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">Thread</span>.</span></span>sleep(<span class="number">1000</span>);</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">TimeUnit</span>.</span><span class="module"><span class="identifier">SECONDS</span>.</span></span>sleep(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>上面两个语句是一样的效果，只不过，下面的可读性更好</p>
+<h3 id="yield"><a href="#yield" class="headerlink" title="yield"></a>yield</h3><p>调用 <code>yield</code> 会让出当前线程从 <code>Runing</code> 进入 <code>Runnable</code> 就绪状态，然后调度执行其他线程</p>
+<h2 id="线程优先级"><a href="#线程优先级" class="headerlink" title="线程优先级"></a>线程优先级</h2><p>线程优先级会提示调度器优先调用该线程，但是，它仅仅是一个提示，调度器可以忽略它。</p>
+<p>如果 <code>CPU</code> 比较忙，那么，优先级高的线程会获得更多的时间片，但是，<code>CPU</code> 空闲时，优先级几乎没用。</p>
+<h2 id="join"><a href="#join" class="headerlink" title="join"></a>join</h2><p>先看一个程序</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.<span class="keyword">extern</span>.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> r = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> throws InterruptedException </span>&#123;</span><br><span class="line">        test();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> throws InterruptedException </span>&#123;</span><br><span class="line">        <span class="built_in">log</span>.debug(<span class="string">"开始"</span>);</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            <span class="built_in">log</span>.debug(<span class="string">"开始"</span>);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                TimeUnit.SECONDS.sleep(<span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">log</span>.debug(<span class="string">"结束"</span>);</span><br><span class="line">            r = <span class="number">10</span>;</span><br><span class="line">        &#125;);</span><br><span class="line">        t1.start();</span><br><span class="line">        <span class="built_in">log</span>.debug(<span class="string">"结束 &#123;&#125;"</span>, r);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">22<span class="selector-pseudo">:09</span><span class="selector-pseudo">:24.918</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 开始</span><br><span class="line">22<span class="selector-pseudo">:09</span><span class="selector-pseudo">:24.922</span> <span class="selector-attr">[Thread-0]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 开始</span><br><span class="line">22<span class="selector-pseudo">:09</span><span class="selector-pseudo">:24.922</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 结束 0</span><br><span class="line">22<span class="selector-pseudo">:09</span><span class="selector-pseudo">:25.927</span> <span class="selector-attr">[Thread-0]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 结束</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>t1</code> 睡眠的时候，主线程已经执行完了。</p>
+<p>添加 <code>join</code></p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.<span class="keyword">extern</span>.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> r = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">String</span>[] args)</span> throws InterruptedException </span>&#123;</span><br><span class="line">        test();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> throws InterruptedException </span>&#123;</span><br><span class="line">        <span class="built_in">log</span>.debug(<span class="string">"开始"</span>);</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            <span class="built_in">log</span>.debug(<span class="string">"开始"</span>);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                TimeUnit.SECONDS.sleep(<span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">log</span>.debug(<span class="string">"结束"</span>);</span><br><span class="line">            r = <span class="number">10</span>;</span><br><span class="line">        &#125;);</span><br><span class="line">        t1.start();</span><br><span class="line">        t1.join();</span><br><span class="line">        <span class="built_in">log</span>.debug(<span class="string">"结束 &#123;&#125;"</span>, r);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">22<span class="selector-pseudo">:10</span><span class="selector-pseudo">:33.217</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 开始</span><br><span class="line">22<span class="selector-pseudo">:10</span><span class="selector-pseudo">:33.219</span> <span class="selector-attr">[Thread-0]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 开始</span><br><span class="line">22<span class="selector-pseudo">:10</span><span class="selector-pseudo">:34.222</span> <span class="selector-attr">[Thread-0]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 结束</span><br><span class="line">22<span class="selector-pseudo">:10</span><span class="selector-pseudo">:34.222</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 结束 10</span><br></pre></td></tr></table></figure>
+
+<p><code>join</code> 就是等待某线程运行结束。</p>
+<h3 id="join-的执行开始时间"><a href="#join-的执行开始时间" class="headerlink" title="join 的执行开始时间"></a>join 的执行开始时间</h3><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    static int r = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    public static <span class="literal">void</span> main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        test();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private static <span class="literal">void</span> test() throws InterruptedException &#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread<span class="function"><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">try</span> &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                TimeUnit.SECONDS.sleep(<span class="number">1</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                e.printStackTrace();</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;)</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">Thread</span> <span class="title">t2</span> = <span class="title">new</span> <span class="title">Thread</span><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">try</span> &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                e.printStackTrace();</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;)</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">long</span> <span class="title">start</span> = <span class="title">System</span>.<span class="title">currentTimeMillis</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">        <span class="title">t2</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">join</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">        <span class="title">t2</span>.<span class="title">join</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">long</span> <span class="title">end</span> = <span class="title">System</span>.<span class="title">currentTimeMillis</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">        <span class="title">log</span>.<span class="title">debug</span><span class="params">(<span class="string">"&#123;&#125;"</span>, end - start)</span>;</span></span><br><span class="line"><span class="function">    &#125;</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">22</span>:<span class="number">18</span>:<span class="number">43.010</span> [main] DEBUG c.Test - <span class="number">2002</span></span><br></pre></td></tr></table></figure>
+
+<p>这是因为，当 <code>start()</code> 开始的时候，线程就已经开始运行了。虽然， <code>t1.join()</code> 等待 <code>t1</code> 执行完，但是，<code>t2</code> 此时也已经执行了 <code>1</code> 秒。</p>
+<p>当然， <code>join</code> 还可以设置时间，但是有一点需要注意，<code>join(time)</code>。如果 线程执行时间小于 <code>time</code>，那么线程也会结束，即，设置的 <code>time</code> 是线程运行的最大时长。</p>
+<h2 id="interrupt-方法"><a href="#interrupt-方法" class="headerlink" title="interrupt 方法"></a>interrupt 方法</h2><p>打断 <code>sleep、wait、join</code> 的线程</p>
+<h3 id="打算-sleep"><a href="#打算-sleep" class="headerlink" title="打算 sleep"></a>打算 sleep</h3><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    static int r = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    public static <span class="literal">void</span> main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        test();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private static <span class="literal">void</span> test() throws InterruptedException &#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread<span class="function"><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">try</span> &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                log.debug(<span class="string">"sleep"</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">                TimeUnit.SECONDS.sleep(<span class="number">5</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                e.printStackTrace();</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;)</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">        <span class="title">Thread</span>.<span class="title">sleep</span><span class="params">(<span class="number">2000</span>)</span>;</span></span><br><span class="line"><span class="function">        <span class="title">log</span>.<span class="title">debug</span><span class="params">(<span class="string">"interrupt"</span>)</span>;</span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">interrupt</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">        <span class="title">Thread</span>.<span class="title">sleep</span><span class="params">(<span class="number">200</span>)</span>;</span></span><br><span class="line"><span class="function">        <span class="title">log</span>.<span class="title">debug</span><span class="params">(<span class="string">"打断标记: &#123;&#125;"</span>, t1.isInterrupted())</span>;</span></span><br><span class="line"><span class="function">    &#125;</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">22</span>:<span class="number">29</span>:<span class="number">59.914</span> [Thread-<span class="number">0</span>] DEBUG c<span class="selector-class">.Test</span> - sleep</span><br><span class="line"><span class="number">22</span>:<span class="number">30</span>:<span class="number">01.913</span> [main] DEBUG c<span class="selector-class">.Test</span> - interrupt</span><br><span class="line">java<span class="selector-class">.lang</span><span class="selector-class">.InterruptedException</span>: sleep interrupted</span><br><span class="line">	at java.base/java<span class="selector-class">.lang</span><span class="selector-class">.Thread</span>.sleep(Native Method)</span><br><span class="line">	at java.base/java<span class="selector-class">.lang</span><span class="selector-class">.Thread</span>.sleep(Thread<span class="selector-class">.java</span>:<span class="number">337</span>)</span><br><span class="line">	at java.base/java<span class="selector-class">.util</span><span class="selector-class">.concurrent</span><span class="selector-class">.TimeUnit</span>.sleep(TimeUnit<span class="selector-class">.java</span>:<span class="number">446</span>)</span><br><span class="line">	at com<span class="selector-class">.redisc</span><span class="selector-class">.Test</span>.lambda<span class="variable">$test</span>$<span class="number">0</span>(Test<span class="selector-class">.java</span>:<span class="number">20</span>)</span><br><span class="line">	at java.base/java<span class="selector-class">.lang</span><span class="selector-class">.Thread</span>.run(Thread<span class="selector-class">.java</span>:<span class="number">832</span>)</span><br><span class="line"><span class="number">22</span>:<span class="number">30</span>:<span class="number">02.114</span> [main] DEBUG c<span class="selector-class">.Test</span> - 打断标记: false</span><br></pre></td></tr></table></figure>
+
+<p>这里注意一下 <code>Thread.sleep(200)</code>。从流程上来讲，打断 <code>sleep</code> 的线程后，该线程的打断标记应该是 <code>false</code>，但是，如果去掉睡眠 <code>200</code> ，则会显示 <code>true</code>。</p>
+<p>我的理解如下</p>
+<p>首先，打断 <code>sleep</code> 的线程后，该线程的打断标记应该是 <code>false</code> 这句话是对的，之所以出现 <code>true</code>，是因为还没有来得及设定打断标记，就被输出了。</p>
+<h3 id="打断正常运行的线程"><a href="#打断正常运行的线程" class="headerlink" title="打断正常运行的线程"></a>打断正常运行的线程</h3><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    static int r = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    public static <span class="literal">void</span> main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        test();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private static <span class="literal">void</span> test() throws InterruptedException &#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread<span class="function"><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">if</span> (Thread.currentThread().isInterrupted()) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                    log.debug(<span class="string">"退出循环"</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">                    <span class="keyword">break</span>;</span></span></span><br><span class="line"><span class="function"><span class="params">                &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;, <span class="string">"t1"</span>)</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">        <span class="title">Thread</span>.<span class="title">sleep</span><span class="params">(<span class="number">2000</span>)</span>;</span></span><br><span class="line"><span class="function">        <span class="title">log</span>.<span class="title">debug</span><span class="params">(<span class="string">"interrupt"</span>)</span>;</span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">interrupt</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">    &#125;</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">22<span class="selector-pseudo">:34</span><span class="selector-pseudo">:46.295</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">interrupt</span></span><br><span class="line">22<span class="selector-pseudo">:34</span><span class="selector-pseudo">:46.298</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 退出循环</span><br></pre></td></tr></table></figure>
+
+<p>为什么有</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">Thread</span>.</span></span>current<span class="constructor">Thread()</span>.is<span class="constructor">Interrupted()</span>) &#123;</span><br><span class="line">    log.debug(<span class="string">"退出循环"</span>);</span><br><span class="line">    break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>判断，是因为，即便是打断线程后，该循环依然会不断的运行。</p>
+<h3 id="两阶段终止"><a href="#两阶段终止" class="headerlink" title="两阶段终止"></a>两阶段终止</h3><ul>
+<li><a href="/2022/12/12/java80/">java | 两阶段终止模式</a></li>
+</ul>
+<h3 id="打断-park-线程"><a href="#打断-park-线程" class="headerlink" title="打断 park 线程"></a>打断 park 线程</h3><p>打断 <code>park</code> 线程不会清空打断状态。</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.LockSupport;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    public static <span class="literal">void</span> main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread<span class="function"><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            log.debug(<span class="string">"park"</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">            LockSupport.park();</span></span></span><br><span class="line"><span class="function"><span class="params">            log.debug(<span class="string">"unpark"</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;, <span class="string">"t1"</span>)</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">//        <span class="title">TimeUnit</span>.<span class="title">SECONDS</span>.<span class="title">sleep</span><span class="params">(<span class="number">1</span>)</span>;</span></span><br><span class="line"><span class="function">//        <span class="title">t1</span>.<span class="title">interrupt</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">    &#125;</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果执行的话，会一直停留在</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">23<span class="selector-pseudo">:20</span><span class="selector-pseudo">:05.252</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">park</span></span><br></pre></td></tr></table></figure>
+
+<p>如果加上打断状态</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.LockSupport;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    public static <span class="literal">void</span> main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread<span class="function"><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            log.debug(<span class="string">"park"</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">            LockSupport.park();</span></span></span><br><span class="line"><span class="function"><span class="params">            log.debug(<span class="string">"unpark"</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">            log.debug(<span class="string">"打断状态 &#123;&#125;"</span>, Thread.currentThread().isInterrupted());</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;, <span class="string">"t1"</span>)</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">        <span class="title">TimeUnit</span>.<span class="title">SECONDS</span>.<span class="title">sleep</span><span class="params">(<span class="number">1</span>)</span>;</span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">interrupt</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">    &#125;</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">23<span class="selector-pseudo">:20</span><span class="selector-pseudo">:59.948</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">park</span></span><br><span class="line">23<span class="selector-pseudo">:21</span><span class="selector-pseudo">:00.947</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> <span class="selector-tag">unpark</span></span><br><span class="line">23<span class="selector-pseudo">:21</span><span class="selector-pseudo">:00.947</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 打断状态 <span class="selector-tag">true</span></span><br></pre></td></tr></table></figure>
+
+<p>另外，<code>LockSupport.park();</code> 只能执行一次，如果想要执行多次，需要在前面使用 <code>Thread.interrupted();</code></p>
+<h2 id="守护线程"><a href="#守护线程" class="headerlink" title="守护线程"></a>守护线程</h2><p>默认情况下，java 进程需要等待所有线程都运行结束，才会结束。有一种特殊的线程叫做守护线程，只要其他非守护线程运行结束，即使守护线程的代码没有执行完，也会强制结束。</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">package com.redisc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line">@Slf4j(topic = <span class="string">"c.Test"</span>)</span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Test</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    public static <span class="literal">void</span> main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread<span class="function"><span class="params">(() -&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">            log.debug(<span class="string">"开始运行"</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">try</span> &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">                e.printStackTrace();</span></span></span><br><span class="line"><span class="function"><span class="params">            &#125;</span></span></span><br><span class="line"><span class="function"><span class="params">            log.debug(<span class="string">"运行结束"</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">        &#125;, <span class="string">"t1"</span>)</span>;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">setDaemon</span><span class="params">(<span class="literal">true</span>)</span>;</span></span><br><span class="line"><span class="function">        <span class="title">t1</span>.<span class="title">start</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">        <span class="title">TimeUnit</span>.<span class="title">SECONDS</span>.<span class="title">sleep</span><span class="params">(<span class="number">1</span>)</span>;</span></span><br><span class="line"><span class="function">        <span class="title">log</span>.<span class="title">debug</span><span class="params">(<span class="string">"运行结束"</span>)</span>;</span></span><br><span class="line"><span class="function">    &#125;</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">23<span class="selector-pseudo">:30</span><span class="selector-pseudo">:40.786</span> <span class="selector-attr">[t1]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 开始运行</span><br><span class="line">23<span class="selector-pseudo">:30</span><span class="selector-pseudo">:41.785</span> <span class="selector-attr">[main]</span> <span class="selector-tag">DEBUG</span> <span class="selector-tag">c</span><span class="selector-class">.Test</span> <span class="selector-tag">-</span> 运行结束</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/11/mysql15/" rel="prev" title="mysql | 数据库引擎">
+      <i class="fa fa-chevron-left"></i> mysql | 数据库引擎
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/12/12/fastapi0/" rel="next" title="fastapi | 简单的介绍">
+      fastapi | 简单的介绍 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#start-与-run"><span class="nav-number">1.</span> <span class="nav-text">start 与 run</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程状态"><span class="nav-number">2.</span> <span class="nav-text">线程状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sleep-和-yield"><span class="nav-number">3.</span> <span class="nav-text">sleep 和 yield</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看-sleep-的状态"><span class="nav-number">3.1.</span> <span class="nav-text">查看 sleep 的状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sleep-打断"><span class="nav-number">3.2.</span> <span class="nav-text">sleep 打断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TimeUnit-更好的可读性"><span class="nav-number">3.3.</span> <span class="nav-text">TimeUnit 更好的可读性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#yield"><span class="nav-number">3.4.</span> <span class="nav-text">yield</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程优先级"><span class="nav-number">4.</span> <span class="nav-text">线程优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#join"><span class="nav-number">5.</span> <span class="nav-text">join</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#join-的执行开始时间"><span class="nav-number">5.1.</span> <span class="nav-text">join 的执行开始时间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#interrupt-方法"><span class="nav-number">6.</span> <span class="nav-text">interrupt 方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#打算-sleep"><span class="nav-number">6.1.</span> <span class="nav-text">打算 sleep</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#打断正常运行的线程"><span class="nav-number">6.2.</span> <span class="nav-text">打断正常运行的线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两阶段终止"><span class="nav-number">6.3.</span> <span class="nav-text">两阶段终止</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#打断-park-线程"><span class="nav-number">6.4.</span> <span class="nav-text">打断 park 线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#守护线程"><span class="nav-number">7.</span> <span class="nav-text">守护线程</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

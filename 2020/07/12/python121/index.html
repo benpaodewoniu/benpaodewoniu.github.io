@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="你将学习如何使用不同的Python模块从web下载文件。此外，你将下载常规文件、web页面、Amazon S3和其他资源。 最后，你将学习如何克服可能遇到的各种挑战，例如下载重定向的文件、下载大型文件、完成一个多线程下载以及其他策略。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python | 下载文件的 11 种方式">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/07/12/python121/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="你将学习如何使用不同的Python模块从web下载文件。此外，你将下载常规文件、web页面、Amazon S3和其他资源。 最后，你将学习如何克服可能遇到的各种挑战，例如下载重定向的文件、下载大型文件、完成一个多线程下载以及其他策略。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-12T09:09:46.000Z">
+<meta property="article:modified_time" content="2020-07-13T11:15:23.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/07/12/python121/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python | 下载文件的 11 种方式 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/07/12/python121/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python | 下载文件的 11 种方式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-12 17:09:46" itemprop="dateCreated datePublished" datetime="2020-07-12T17:09:46+08:00">2020-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-13 19:15:23" itemprop="dateModified" datetime="2020-07-13T19:15:23+08:00">2020-07-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">爬虫</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%88%AC%E8%99%AB/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/12/python121/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/12/python121/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>你将学习如何使用不同的Python模块从web下载文件。此外，你将下载常规文件、web页面、Amazon S3和其他资源。</p>
+<p>最后，你将学习如何克服可能遇到的各种挑战，例如下载重定向的文件、下载大型文件、完成一个多线程下载以及其他策略。</p>
+<a id="more"></a>
+
+<h2 id="使用-Requests"><a href="#使用-Requests" class="headerlink" title="使用 Requests"></a>使用 Requests</h2><p>你可以使用requests模块从一个URL下载文件。</p>
+<p>考虑以下代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">url = <span class="string">'**/**.png'</span></span><br><span class="line">file = requests.get(url)</span><br><span class="line">open(<span class="string">'**.png'</span>,<span class="string">'wb'</span>).write(file.content)</span><br></pre></td></tr></table></figure>
+<p>你只需使用requests模块的get方法获取URL，并将结果存储到一个名为“myfile”的变量中。然后，将这个变量的内容写入文件。</p>
+<h2 id="使用wget"><a href="#使用wget" class="headerlink" title="使用wget"></a>使用wget</h2><p>你还可以使用Python的wget模块从一个URL下载文件。你可以使用pip按以下命令安装wget模块:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install wget</span><br></pre></td></tr></table></figure>
+
+<p>考虑以下代码，我们将使用它下载Python的logo图像。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> wget</span><br><span class="line">url = <span class="string">'***/***.png'</span></span><br><span class="line">wget.download(url,<span class="string">'**.png'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，URL和路径(图像将存储在其中)被传递给<code>wget</code>模块的<code>download</code>方法。</p>
+<h2 id="下载重定向的文件"><a href="#下载重定向的文件" class="headerlink" title="下载重定向的文件"></a>下载重定向的文件</h2><p>在本节中，你将学习如何使用<code>requests</code>从一个<code>URL</code>下载文件，该URL会被重定向到另一个带有一个<code>.pdf</code>文件的URL。该<code>URL</code>看起来如下:</p>
+<pre><code>https://***/downloads/pdf/lastest/</code></pre><p>要下载这个pdf文件，请使用以下代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">url = <span class="string">"https://***/downloads/pdf/lastest/"</span></span><br><span class="line">file = requests.get(url,allow_redirects=<span class="literal">True</span>)</span><br><span class="line">open(**/**.pdf,<span class="string">'wb'</span>).write(file.content)</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，我们第一步指定的是URL。然后，我们使用<code>request</code>模块的<code>get</code>方法来获取该<code>URL</code>。在get方法中，我们将<code>allow_redirects</code>设置为<code>True</code>，这将允许<code>URL</code>中的重定向，并且重定向后的内容将被分配给变量<code>file</code>。</p>
+<p>最后，我们打开一个文件来写入获取的内容。</p>
+<h2 id="分块下载大文件"><a href="#分块下载大文件" class="headerlink" title="分块下载大文件"></a>分块下载大文件</h2><p>下载大文件时，需要考虑内存问题，使用requests.get方法，默认会立即下载文件内容并保存到内存中，如果文件很大，会给内存造成压力，因此我们需要设置stream参数为True，这样，只有当我们遍历iter_content时才会进行数据下载</p>
+<p>考虑下面的代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">url = <span class="string">'https://www.python.org/ftp/python/3.8.1/python-3.8.1-macosx10.9.pkg'</span></span><br><span class="line">res = requests.get(url, stream=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">print(res.status_code, res.headers)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">"py.pkg"</span>, <span class="string">"wb"</span>) <span class="keyword">as</span> pypkg:</span><br><span class="line">    <span class="keyword">for</span> chunk <span class="keyword">in</span> res.iter_content(chunk_size=<span class="number">1024</span>):</span><br><span class="line">        <span class="keyword">if</span> chunk:</span><br><span class="line">            pypkg.write(chunk)</span><br></pre></td></tr></table></figure>
+
+<p>不漂亮吗?不要担心，稍后我们将显示一个下载过程的进度条。</p>
+<h2 id="使用进度条下载"><a href="#使用进度条下载" class="headerlink" title="使用进度条下载"></a>使用进度条下载</h2><p>使用clint模块来显示下载进度，你需要先安装</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> clint.textui <span class="keyword">import</span> progress</span><br><span class="line"></span><br><span class="line">url = <span class="string">'https://www.python.org/ftp/python/3.8.1/python-3.8.1-macosx10.9.pkg'</span></span><br><span class="line">res = requests.get(url, stream=<span class="literal">True</span>)</span><br><span class="line">total_length = int(res.headers.get(<span class="string">'content-length'</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">"py.pkg"</span>, <span class="string">"wb"</span>) <span class="keyword">as</span> pypkg:</span><br><span class="line">    <span class="keyword">for</span> chunk <span class="keyword">in</span> progress.bar(res.iter_content(chunk_size=<span class="number">1024</span>), expected_size=(total_length/<span class="number">1024</span>) + <span class="number">1</span>, width=<span class="number">100</span>):</span><br><span class="line">        <span class="keyword">if</span> chunk:</span><br><span class="line">            pypkg.write(chunk)</span><br></pre></td></tr></table></figure>
+
+<p>一次读取1024个字节，总文件大小是29051411，共需要读取28371次，随着读取的进行，进度条也会发生变化</p>
+<h2 id="下载多个文件-并行-批量下载"><a href="#下载多个文件-并行-批量下载" class="headerlink" title="下载多个文件(并行/批量下载)"></a>下载多个文件(并行/批量下载)</h2><p>要同时下载多个文件，请导入以下模块:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> multiprocessing.pool <span class="keyword">import</span> ThreadPool</span><br></pre></td></tr></table></figure>
+
+<p>我们导入了os和time模块来检查下载文件需要多少时间。ThreadPool模块允许你使用池运行多个线程或进程。</p>
+<p>让我们创建一个简单的函数，将响应分块发送到一个文件:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">url_response</span><span class="params">(url)</span>:</span></span><br><span class="line">	path,url = url</span><br><span class="line">	r = requests.get(url,stream = <span class="literal">True</span>)</span><br><span class="line">	<span class="keyword">with</span> open(path,<span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">		<span class="keyword">for</span> ch <span class="keyword">in</span> r:</span><br><span class="line">			f.write(ch)</span><br></pre></td></tr></table></figure>
+
+<p>这个URL是一个二维数组，它指定了你要下载的页面的路径和URL。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">urls = [(<span class="string">"Event1,'url1"</span>),</span><br><span class="line">(<span class="string">"Event2,'url2"</span>),</span><br><span class="line">(<span class="string">"Event3,'url3"</span>),</span><br><span class="line">(<span class="string">"Event4,'url4"</span>),</span><br><span class="line">(<span class="string">"Event5,'url5"</span>),</span><br><span class="line">(<span class="string">"Event6,'url6"</span>),</span><br><span class="line">(<span class="string">"Event7,'url7"</span>),</span><br><span class="line">...]</span><br></pre></td></tr></table></figure>
+
+<p>就像在前一节中所做的那样，我们将这个<code>URL</code>传递给<code>requests.get</code>。最后，我们打开文件(URL中指定的路径)并写入页面内容。</p>
+<p>现在，我们可以分别为每个URL调用这个函数，我们也可以同时为所有URL调用这个函数。让我们在for循环中分别为每个URL调用这个函数，注意计时器:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start = time()</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> urls:</span><br><span class="line">	url_response(x)</span><br><span class="line">print(time() - start)</span><br></pre></td></tr></table></figure>
+
+<p>使用下面的代码替代 <code>for 循环</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ThreadPool(<span class="number">9</span>).imap_unordered(url_response,urls)</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用urllib下载网页"><a href="#使用urllib下载网页" class="headerlink" title="使用urllib下载网页"></a>使用urllib下载网页</h2><p>在本节中，我们将使用urllib下载一个网页。</p>
+<p>urllib库是Python的标准库，因此你不需要安装它。</p>
+<p>以下代码行可以轻松地下载一个网页:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">urllib.request.urlretrieve(<span class="string">'url'</span>,<span class="string">'path'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在这里指定你想将文件保存为什么以及你想将它存储在哪里的URL</p>
+<pre><code>urllib.request.urlretrieve(&apos;https://www.baidu/com&apos;,&apos;~/baidu.html&apos;)</code></pre><p>在这段代码中，我们使用了<code>urlretrieve</code>方法并传递了文件的URL，以及保存文件的路径。文件扩展名将是.html。</p>
+<h2 id="通过代理下载"><a href="#通过代理下载" class="headerlink" title="通过代理下载"></a>通过代理下载</h2><p>如果你需要使用代理下载你的文件，你可以使用urllib模块的ProxyHandler。请看以下代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib.request</span><br><span class="line"></span><br><span class="line">proxy = urllib.request.ProxyHandler(&#123;<span class="string">'http'</span>:<span class="string">'127.0.0.2'</span>&#125;)</span><br><span class="line">openProxy = urllib.request.build_opener(proxy)</span><br><span class="line">urllib.request.urlretrieve(<span class="string">'https://...'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，我们创建了代理对象，并通过调用<code>urllib</code>的<code>build_opener</code>方法来打开该代理，并传入该代理对象。然后，我们创建请求来获取页面。</p>
+<p>此外，你还可以按照官方文档的介绍来使用requests模块:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">proxy = &#123;<span class="string">'http'</span>:<span class="string">'http://127.0.0.2:3001'</span>&#125;</span><br><span class="line">requests.get(<span class="string">'url'</span>,proxies = proxy)</span><br></pre></td></tr></table></figure>
+
+<p>你只需要导入requests模块并创建你的代理对象。然后，你就可以获取文件了。</p>
+<h2 id="使用urllib3"><a href="#使用urllib3" class="headerlink" title="使用urllib3"></a>使用urllib3</h2><p><code>urllib3</code>是<code>urllib</code>模块的改进版本。你可以使用pip下载并安装它:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install urllib3</span><br></pre></td></tr></table></figure>
+
+<p>我们将通过使用urllib3来获取一个网页并将它存储在一个文本文件中。</p>
+<p>导入以下模块:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib3,shutil</span><br></pre></td></tr></table></figure>
+
+<p>在处理文件时，我们使用了shutil模块。</p>
+<p>现在，我们像这样来初始化URL字符串变量：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url = <span class="string">'url'</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，我们使用了urllib3的PoolManager ，它会跟踪必要的连接池。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c = urllib3.PoolManager()</span><br></pre></td></tr></table></figure>
+
+<p>创建一个文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">file = <span class="string">'test.txt'</span></span><br></pre></td></tr></table></figure>
+
+<p>最后，我们发送一个<code>GET</code>请求来获取该URL并打开一个文件，接着将响应写入该文件:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> c.request(<span class="string">'GET'</span>,url,preload_content = <span class="literal">False</span>) <span class="keyword">as</span> res, open(file,<span class="string">'wb'</span>) <span class="keyword">as</span> out:</span><br><span class="line">	shutil.copyfileobj(res,out)</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用Boto3从S3下载文件"><a href="#使用Boto3从S3下载文件" class="headerlink" title="使用Boto3从S3下载文件"></a>使用Boto3从S3下载文件</h2><p>这个没懂，请参照</p>
+<ul>
+<li><a href="https://mp.weixin.qq.com/s/dhW5u4_ww8DRiPNwUgvMfw" rel="external nofollow noreferrer">Python下载文件的11种方式</a></li>
+</ul>
+<h2 id="使用asyncio"><a href="#使用asyncio" class="headerlink" title="使用asyncio"></a>使用asyncio</h2><p><code>asyncio</code>模块主要用于处理系统事件。它围绕一个事件循环进行工作，该事件循环会等待事件发生，然后对该事件作出反应。这个反应可以是调用另一个函数。这个过程称为事件处理。asyncio模块使用协同程序进行事件处理。</p>
+<p>要使用<code>asyncio</code>事件处理和协同功能，我们将导入<code>asyncio</code>模块:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br></pre></td></tr></table></figure>
+
+<p>现在，像这样定义asyncio协同方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">coroutine</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">await</span> fun()</span><br></pre></td></tr></table></figure>
+
+<p>关键字<code>async</code>表示这是一个原生<code>asyncio</code>协同程序。在协同程序的内部，我们有一个<code>await</code>关键字，它会返回一个特定的值。我们也可以使用<code>return</code>关键字。</p>
+<p>现在，让我们使用协同创建一段代码来从网站下载一个文件:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> urllib.requests</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">coroutine</span><span class="params">(url)</span>:</span></span><br><span class="line">	r = urllib.request.urlopen(url)</span><br><span class="line">	filename = <span class="string">'***.txt'</span></span><br><span class="line">	<span class="keyword">with</span> open(filename,<span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">		<span class="keyword">for</span> ch <span class="keyword">in</span> f:</span><br><span class="line">			f.write(ch)</span><br><span class="line">	msg = <span class="string">'success'</span></span><br><span class="line">	<span class="keyword">return</span> msg</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">main_fun</span><span class="params">(urls_to_download)</span>:</span></span><br><span class="line">	co = [coroutine(url) <span class="keyword">for</span> url <span class="keyword">in</span> urls_to_download]</span><br><span class="line"></span><br><span class="line">	downloaded,downloading = <span class="keyword">await</span> asyncio.wait(co)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> downloaded:</span><br><span class="line">		print(i.result())</span><br><span class="line"></span><br><span class="line">urls_to_download = [<span class="string">'url1'</span>,<span class="string">'url2'</span>,<span class="string">'url3'</span>]</span><br><span class="line"></span><br><span class="line">eventLoop = asyncio.get_event_loop()</span><br><span class="line">eventLoop.run_until_complete(main_fun(urls_to_download))</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，我们创建了一个异步协同函数，它会下载我们的文件并返回一条消息。</p>
+<p>然后，我们使用另一个异步协同程序调用<code>main_fun</code>，它会等待URL并将所有URL组成一个队列。asyncio的wait函数会等待协同程序完成。</p>
+<p>现在，为了启动协同程序，我们必须使用<code>asyncio</code>的<code>get_event_loop()</code>方法将协同程序放入事件循环中，最后，我们使用<code>asyncio</code>的<code>run_until_complete()</code>方法执行该事件循环。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/12/deeplearning8/" rel="prev" title="谷歌免费 GPU 平台">
+      <i class="fa fa-chevron-left"></i> 谷歌免费 GPU 平台
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/13/spider8/" rel="next" title="爬虫 | 反爬机制">
+      爬虫 | 反爬机制 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Requests"><span class="nav-number">1.</span> <span class="nav-text">使用 Requests</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用wget"><span class="nav-number">2.</span> <span class="nav-text">使用wget</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载重定向的文件"><span class="nav-number">3.</span> <span class="nav-text">下载重定向的文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分块下载大文件"><span class="nav-number">4.</span> <span class="nav-text">分块下载大文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用进度条下载"><span class="nav-number">5.</span> <span class="nav-text">使用进度条下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载多个文件-并行-批量下载"><span class="nav-number">6.</span> <span class="nav-text">下载多个文件(并行&#x2F;批量下载)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用urllib下载网页"><span class="nav-number">7.</span> <span class="nav-text">使用urllib下载网页</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过代理下载"><span class="nav-number">8.</span> <span class="nav-text">通过代理下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用urllib3"><span class="nav-number">9.</span> <span class="nav-text">使用urllib3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Boto3从S3下载文件"><span class="nav-number">10.</span> <span class="nav-text">使用Boto3从S3下载文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用asyncio"><span class="nav-number">11.</span> <span class="nav-text">使用asyncio</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

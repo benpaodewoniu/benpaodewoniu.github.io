@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="Click  是用 Python 写的一个第三方模块，用于快速创建命令行。我们知道，Python 内置了一个 Argparse 的标准库用于创建命令行，但使用起来有些繁琐，Click 相比于 Argparse，就好比 requests 相比于 urllib。 这篇文章主要包括：  初体验 参数篇 选项篇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python | click 模块">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/05/05/python89/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="Click  是用 Python 写的一个第三方模块，用于快速创建命令行。我们知道，Python 内置了一个 Argparse 的标准库用于创建命令行，但使用起来有些繁琐，Click 相比于 Argparse，就好比 requests 相比于 urllib。 这篇文章主要包括：  初体验 参数篇 选项篇">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-05T02:54:12.000Z">
+<meta property="article:modified_time" content="2020-05-10T08:27:04.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/05/05/python89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python | click 模块 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/05/05/python89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python | click 模块
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-05 10:54:12" itemprop="dateCreated datePublished" datetime="2020-05-05T10:54:12+08:00">2020-05-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-10 16:27:04" itemprop="dateModified" datetime="2020-05-10T16:27:04+08:00">2020-05-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/" itemprop="url" rel="index"><span itemprop="name">模块</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/click/" itemprop="url" rel="index"><span itemprop="name">click</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/05/05/python89/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/05/05/python89/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Click  是用 Python 写的一个第三方模块，用于快速创建命令行。我们知道，Python 内置了一个 Argparse 的标准库用于创建命令行，但使用起来有些繁琐，Click 相比于 Argparse，就好比 requests 相比于 urllib。</p>
+<p>这篇文章主要包括：</p>
+<ul>
+<li>初体验</li>
+<li>参数篇</li>
+<li>选项篇</li>
+</ul>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="初体验"><a href="#初体验" class="headerlink" title="初体验"></a>初体验</h1><br/>
+
+<ul>
+<li><a href="https://www.cnblogs.com/xueweihan/p/11795284.html" rel="external nofollow noreferrer">大家都说好用的 Python 命令行库：click</a></li>
+</ul>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>click 是一个以尽可能少的代码、以组合的方式创建优美的命令行程序的 Python 包。它有很高的可配置性，同时也能开箱即用。</p>
+<p>它旨在让编写命令行工具的过程既快速又有趣，还能防止由于无法实现预期的 CLI API 所产生挫败感。它有如下三个特点：</p>
+<ul>
+<li>任意嵌套命令</li>
+<li>自动生成帮助</li>
+<li>支持运行时延迟加载子命令</li>
+</ul>
+<h2 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h2><h3 id="业务逻辑"><a href="#业务逻辑" class="headerlink" title="业务逻辑"></a>业务逻辑</h3><p>首先定义业务逻辑，是不是感觉到有些难以置信呢？</p>
+<p>不论是 <code>argparse</code> 还是 <code>docopt</code>，业务逻辑都是被放在最后一步，但 <code>click</code> 却是放在第一步。细想想 <code>click</code> 的这种方式才更符合人的思维吧？不论用什么命令行框架，我们最终关心的就是实现业务逻辑，其它的能省则省。</p>
+<p>我们以官方示例为例，来介绍 <code>click</code> 的用法和哲学。假设命令行程序的输入是 <code>name</code> 和 <code>count</code>，功能是打印指定次数的名字。</p>
+<p>那么在 <code>hello.py</code> 中，很容易写出如下代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(count, name)</span>:</span></span><br><span class="line">    <span class="string">"""Simple program that greets NAME for a total of COUNT times."""</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(count):</span><br><span class="line">        click.echo(<span class="string">'Hello %s!'</span> % name)</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的逻辑很简单，就是循环 <code>count</code> 次，使用 <code>click.echo</code> 打印 <code>name</code>。其中，<code>click.echo</code> 和 <code>print</code> 的作用相似，但功能更加强大，能处理好 Unicode 和 二进制数据的情况。</p>
+<h3 id="定义参数"><a href="#定义参数" class="headerlink" title="定义参数"></a>定义参数</h3><p>很显然，我们需要针对 <code>count</code> 和 <code>name</code> 来定义它们所对应的参数信息。</p>
+<ul>
+<li><p><code>count</code> 对应为命令行选项 <code>--count</code>，类型为数字，我们希望在不提供参数时，其默认值是 1</p>
+</li>
+<li><p><code>name</code> 对应为命令行选项 <code>--name</code>，类型为字符串，我们希望在不提供参数时，能给人提示</p>
+</li>
+</ul>
+<p>使用 click，就可以写成下面这样：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> click <span class="keyword">import</span> click</span><br><span class="line"></span><br><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.option('--count', default=1, help='Number of greetings.')</span></span><br><span class="line"><span class="meta">@click.option('--name', prompt='Your name',</span></span><br><span class="line">              help=<span class="string">'The person to greet.'</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(count, name)</span>:</span></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>在上面的示例中：</p>
+<ul>
+<li><p>使用装饰器的方式，即定义了参数，又将之与处理逻辑绑定，这真是优雅。和 argparse、docopt 比起来，就少了一步绑定过程</p>
+</li>
+<li><p>使用 <code>click.command</code> 表示 hello 是对命令的处理</p>
+</li>
+<li><p>使用 <code>click.option</code> 来定义参数选项</p>
+<ul>
+<li>对于 <code>--count</code> 来说，使用 default 来指定默认值。而由于默认值是数字，进而暗示 –count 选项的类型为数字</li>
+<li>对于 <code>--name</code> 来说，使用 prompt 来指定未输入该选项时的提示语</li>
+<li>使用 <code>help</code> 来指定帮助信息</li>
+</ul>
+</li>
+</ul>
+<p>不论是装饰器的方式、还是各种默认行为，<code>click</code>都是像它的介绍所说的那样，让人尽可能少地编写代码，让整个过程变得快速而有趣。</p>
+<h2 id="代码梳理"><a href="#代码梳理" class="headerlink" title="代码梳理"></a>代码梳理</h2><p>使用 click 的方式非常简单，我们将上文的代码汇总下，以有一个更清晰的认识：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># hello.py</span></span><br><span class="line"><span class="keyword">import</span> click</span><br><span class="line"></span><br><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.option('--count', default=1, help='Number of greetings.')</span></span><br><span class="line"><span class="meta">@click.option('--name', prompt='Your name',</span></span><br><span class="line">              help=<span class="string">'The person to greet.'</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(count, name)</span>:</span></span><br><span class="line">    <span class="string">"""Simple program that greets NAME for a total of COUNT times."""</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(count):</span><br><span class="line">        click.echo(<span class="string">'Hello %s!'</span> % name)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    hello()</span><br></pre></td></tr></table></figure>
+
+<p>若我们指定次数和名字：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ python3 hello.py --<span class="built_in">count</span> <span class="number">2</span> --name <span class="type">Eric</span></span><br><span class="line"><span class="type">Hello</span> <span class="type">Eric!</span></span><br><span class="line"><span class="type">Hello</span> <span class="type">Eric!</span></span><br></pre></td></tr></table></figure>
+
+<p>若我们什么都不指定，则会提示输入名字，并默认输出一次：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> <span class="string">python3 hello.py</span></span><br><span class="line"><span class="attr">Your</span> <span class="string">name: Eric</span></span><br><span class="line"><span class="attr">Hello</span> <span class="string">Eric!</span></span><br></pre></td></tr></table></figure>
+
+<p>我们还可以通过 –help 参数查看自动生成的帮助信息：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ python test.py --help</span><br><span class="line">Usage: hello.py [OPTIONS]</span><br><span class="line"></span><br><span class="line"> <span class="built_in"> Simple </span>program that greets NAME <span class="keyword">for</span> a total of COUNT times.</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">  --count INTEGER  Number of greetings.</span><br><span class="line">  --name TEXT      The person <span class="keyword">to</span> greet.</span><br><span class="line">  --help           Show this message <span class="keyword">and</span> exit.</span><br></pre></td></tr></table></figure>
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p><code>click</code> 的思路非常简单，定义处理函数，通过它的装饰器来定义参数。使用装饰器的绝妙之处就在于把定义和绑定这两个步骤合为一个步骤，使得整个过程变得如丝般顺滑。</p>
+<p><code>click</code> 除了以 <code>Pythonic</code> 的方式让命令行程序的实现变得更加优雅和好用外，还提供了比 <code>argparse</code> 和 <code>docopt</code> 都要强大的功能。在接下来几节中，我们将会逐步揭开它的面纱。</p>
+<br/>
+
+<h1 id="参数篇"><a href="#参数篇" class="headerlink" title="参数篇"></a>参数篇</h1><br/>
+
+<ul>
+<li><a href="https://www.cnblogs.com/xueweihan/p/11840729.html" rel="external nofollow noreferrer">Python 命令行之旅：深入 click 之参数篇</a></li>
+</ul>
+<p>在概念上， click 把命令行分为 3 个组成：参数、选项和命令。</p>
+<ul>
+<li>参数 就是跟在命令后的除选项外的内容，比如 <code>git add a.txt</code> 中的 <code>a.txt</code> 就是表示文件路径的参数</li>
+<li>选项 就是以 <code>-</code> 或 <code>--</code> 开头的参数，比如 <code>-f</code>、<code>--file</code></li>
+<li>命令 就是命令行的初衷了，比如 <code>git</code> 就是命令，而 <code>git add</code> 中的 <code>add</code> 则是 <code>git</code> 的子命令</li>
+</ul>
+<h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><h3 id="基本参数"><a href="#基本参数" class="headerlink" title="基本参数"></a>基本参数</h3><p>基本参数 就是通过位置里指定参数值。</p>
+<p>比如，我们可以指定两个位置参数 <code>x</code> 和 <code>y</code> ，先添加的 <code>x</code> 位于第一个位置，后加入的 <code>y</code> 位于第二个位置。那么在命令行中输入 <code>1 2</code> 的时候，分别对应到的就是 <code>x</code> 和 <code>y</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> click</span><br><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.argument('x')</span></span><br><span class="line"><span class="meta">@click.argument('y')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(x, y)</span>:</span></span><br><span class="line">    print(x, y)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    hello()</span><br></pre></td></tr></table></figure>
+
+<p>执行</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python test.py <span class="number">1</span> <span class="number">2</span></span><br><span class="line"><span class="number">1</span> <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="参数类型"><a href="#参数类型" class="headerlink" title="参数类型"></a>参数类型</h3><p>参数类型 就是将参数值作为什么类型去解析，默认情况下是字符串类型。我们可以通过 <code>type</code> 入参来指定参数类型。</p>
+<p>click 支持的参数类型多种多样：</p>
+<ul>
+<li><code>str</code> / <code>click.STRING</code> 表示字符串类型，这也是默认类型</li>
+<li><code>int</code> / <code>click.INT</code> 表示整型</li>
+<li><code>float</code> / <code>click.FLOAT</code> 表示浮点型</li>
+<li><code>bool</code> / <code>click.BOOL</code> 表示布尔型。很棒之处在于，它会识别表示真/假的字符。对于 <code>1</code>、<code>yes</code>、<code>y</code> 和 <code>true</code> 会转化为 <code>True</code>；<code>0</code>、<code>no</code>、<code>n</code> 和 <code>false</code> 会转化为 <code>False</code></li>
+<li><code>click.UUID</code> 表示 <code>UUID</code>，会自动将参数转换为 <code>uuid.UUID</code> 对象</li>
+<li><code>click.FILE</code> 表示文件，会自动将参数转换为文件对象，并在命令行结束时自动关闭文件</li>
+<li><code>click.PATH</code> 表示路径</li>
+<li><code>click.Choice</code> 表示选择选项</li>
+<li><code>click.IntRange</code> 表示范围选项</li>
+</ul>
+<p>同 argparse 一样，click 也支持自定义类型，需要编写 click.ParamType 的子类，并重载 convert 方法。</p>
+<p>官网提供了一个例子，实现了一个整数类型，除了普通整数之外，还接受十六进制和八进制数字， 并将它们转换为常规整数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BasedIntParamType</span><span class="params">(click.ParamType)</span>:</span></span><br><span class="line">    name = <span class="string">"integer"</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">convert</span><span class="params">(self, value, param, ctx)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">if</span> value[:<span class="number">2</span>].lower() == <span class="string">"0x"</span>:</span><br><span class="line">                <span class="keyword">return</span> int(value[<span class="number">2</span>:], <span class="number">16</span>)</span><br><span class="line">            <span class="keyword">elif</span> value[:<span class="number">1</span>] == <span class="string">"0"</span>:</span><br><span class="line">                <span class="keyword">return</span> int(value, <span class="number">8</span>)</span><br><span class="line">            <span class="keyword">return</span> int(value, <span class="number">10</span>)</span><br><span class="line">        <span class="keyword">except</span> TypeError:</span><br><span class="line">            self.fail(</span><br><span class="line">                <span class="string">"expected string for int() conversion, got "</span></span><br><span class="line">                <span class="string">f"<span class="subst">&#123;value!r&#125;</span> of type <span class="subst">&#123;type(value).__name__&#125;</span>"</span>,</span><br><span class="line">                param,</span><br><span class="line">                ctx,</span><br><span class="line">            )</span><br><span class="line">        <span class="keyword">except</span> ValueError:</span><br><span class="line">            self.fail(<span class="string">f"<span class="subst">&#123;value!r&#125;</span> is not a valid integer"</span>, param, ctx)</span><br><span class="line"></span><br><span class="line">BASED_INT = BasedIntParamType()</span><br></pre></td></tr></table></figure>
+
+<h3 id="文件参数"><a href="#文件参数" class="headerlink" title="文件参数"></a>文件参数</h3><p>在基本参数的基础上，通过指定参数类型，我们就能构建出各类参数。</p>
+<p>文件参数 是非常常用的一类参数，通过 type=click.File 指定，它能正确处理所有 Python 版本的 unicode 和 字节，使得处理文件十分方便。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.argument('input', type=click.File('rb'))  # 指定文件为二进制读</span></span><br><span class="line"><span class="meta">@click.argument('output', type=click.File('wb'))  # 指定文件为二进制写</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">inout</span><span class="params">(input, output)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        chunk = input.read(<span class="number">1024</span>)  <span class="comment"># 此时 input 为文件对象，每次读入 1024 字节</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> chunk:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        output.write(chunk)  <span class="comment"># 此时 output 为文件对象，写入上步读入的内容</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="文件路径参数"><a href="#文件路径参数" class="headerlink" title="文件路径参数"></a>文件路径参数</h3><p>文件路径参数 用来处理文件路径，可以对路径做是否存在等检查，通过 <code>type=click.Path</code> 指定。不论文件名是 unicode 还是字节类型，获取到的参数类型都是 unicode 类型。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.argument('filename', type=click.Path(exists=True))  # 要求给定路径存在，否则报错</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(filename)</span>:</span></span><br><span class="line">    click.echo(click.format_filename(filename))</span><br></pre></td></tr></table></figure>
+
+
+<p>如果文件名是以 <code>-</code> 开头，会被误认为是命令行选项，这个时候需要在参数前加上 <code>--</code> 和空格，比如</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python hello<span class="selector-class">.py</span> -- -foo.txt</span><br><span class="line">-foo.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="选择项参数"><a href="#选择项参数" class="headerlink" title="选择项参数"></a>选择项参数</h3><p>选择项参数 用来限定参数内容，通过 <code>type=click.Choice</code> 指定。</p>
+<p>比如，指定文件读取方式限制为 <code>read-only</code> 和 <code>read-write</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.argument('mode', type=click.Choice(['read-only', 'read-write']))</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(mode)</span>:</span></span><br><span class="line">    click.echo(mode)</span><br></pre></td></tr></table></figure>
+
+<h3 id="可变参数"><a href="#可变参数" class="headerlink" title="可变参数"></a>可变参数</h3><p>可变参数 用来定义一个参数可以有多个值，且能通过 <code>nargs</code> 来定义值的个数，取得的参数的变量类型为元组。</p>
+<p>若 <code>nargs=N</code>，<code>N</code>为一个数字，则要求该参数提供 <code>N</code> 个值。若 <code>N</code> 为 <code>-1</code> 则接受提供无数量限制的参数，如:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.argument('foo', nargs=-1)</span></span><br><span class="line"><span class="meta">@click.argument('bar', nargs=1)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(foo, bar)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p>ps： 只能有一个参数可以有多个值</p>
+<p>举个例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> click</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.argument('foo', nargs=-1)</span></span><br><span class="line"><span class="meta">@click.argument('bar', nargs=-1)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(foo, bar)</span>:</span></span><br><span class="line">    print(foo)</span><br><span class="line">    print(bar)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    hello()</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ python test.py <span class="number">1</span> <span class="number">2</span> <span class="number">3</span> <span class="number">4</span> <span class="number">5</span> <span class="number">23</span> <span class="number">34</span> , <span class="number">23</span></span><br><span class="line">('<span class="number">1</span>', '<span class="number">2</span>', '<span class="number">3</span>', '<span class="number">4</span>', '<span class="number">5</span>', '<span class="number">23</span>', '<span class="number">34</span>', ',')</span><br><span class="line"><span class="number">23</span></span><br></pre></td></tr></table></figure>
+
+<p>如果要实现 <code>argparse</code> 中要求参数数量为 1 个或多个的功能，则指定 <code>nargs=-1</code> 且<code>required=True</code> 即可：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.argument('foo', nargs=-1, required=True)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(foo, bar)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="从环境变量读取参数"><a href="#从环境变量读取参数" class="headerlink" title="从环境变量读取参数"></a>从环境变量读取参数</h3><p>通过在 click.argument 中指定 envvar，则可读取指定名称的环境变量作为参数值，比如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.argument('filename', envvar='FILENAME')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(filename)</span>:</span></span><br><span class="line">    print(filename)</span><br></pre></td></tr></table></figure>
+
+<p>执行如下命令查看效果：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="attribute">FILENAME</span>=hello.txt python3 hello.py</span><br><span class="line">hello.txt</span><br></pre></td></tr></table></figure>
+
+<p>而在 <code>argparse</code> 中，则需要自己从环境变量中读取。</p>
+<br/>
+
+<h1 id="选项篇"><a href="#选项篇" class="headerlink" title="选项篇"></a>选项篇</h1><br/>
+
+<h2 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h2><p>通过 <code>click.option</code> 可以给命令增加选项，并通过配置函数的参数来配置不同功能的选项。</p>
+<h3 id="给选项命名"><a href="#给选项命名" class="headerlink" title="给选项命名"></a>给选项命名</h3><p><code>click.option</code> 中的命令规则可参考参数名称。它接受的前两个参数为长、短选项（顺序随意），其中：</p>
+<ul>
+<li>长选项以 “–” 开头，比如 “–string-to-echo”</li>
+<li>短选项以 “-” 开头，比如 “-s”</li>
+</ul>
+<p>第三个参数为选项参数的名称，如果不指定，将会使用长选项的下划线形式名称：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.option('-s', '--string-to-echo')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">echo</span><span class="params">(string_to_echo)</span>:</span></span><br><span class="line">    click.echo(string_to_echo)</span><br></pre></td></tr></table></figure>
+
+<p>显示指定为 string</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.option('-s', '--string-to-echo', 'string')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">echo</span><span class="params">(string)</span>:</span></span><br><span class="line">    click.echo(string)</span><br></pre></td></tr></table></figure>
+
+<h3 id="基本值选项"><a href="#基本值选项" class="headerlink" title="基本值选项"></a>基本值选项</h3><p>值选项是非常常用的选项，它接受一个值。如果在命令行中提供了值选项，则需要提供对应的值；反之则使用默认值。若没在 <code>click.option</code> 中指定默认值，则默认值为 <code>None</code>，且该选项的类型为 <code>STRING</code>；反之，则选项类型为默认值的类型。</p>
+<p>比如，提供默认值为 1，则选项类型为 <code>INT</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.option('--n', default=1)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dots</span><span class="params">(n)</span>:</span></span><br><span class="line">    click.echo(<span class="string">'.'</span> * n)</span><br></pre></td></tr></table></figure>
+
+<p>如果要求选项为必填，则可指定 <code>click.option</code> 的 <code>required=True</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.option('--n', required=True, type=int)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dots</span><span class="params">(n)</span>:</span></span><br><span class="line">    click.echo(<span class="string">'.'</span> * n)</span><br></pre></td></tr></table></figure>
+
+<p>如果选项名称和 Python 中的关键字冲突，则可以显式的指定选项名称。比如将 <code>--from</code> 的名称设置为 <code>from_</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.option('--from', '-f', 'from_')</span></span><br><span class="line"><span class="meta">@click.option('--to', '-t')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">reserved_param_name</span><span class="params">(from_, to)</span>:</span></span><br><span class="line">    click.echo(<span class="string">f'from <span class="subst">&#123;from_&#125;</span> to <span class="subst">&#123;to&#125;</span>'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>如果要在帮助中显式默认值，则可指定 <code>click.option</code> 的 <code>show_default=True</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@click.command()</span></span><br><span class="line"><span class="meta">@click.option('--n', default=1, show_default=True)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dots</span><span class="params">(n)</span>:</span></span><br><span class="line">    click.echo(<span class="string">'.'</span> * n)</span><br></pre></td></tr></table></figure>
+
+<p>在命令行中调用则有：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ dots --help</span><br><span class="line">Usage: dots [OPTIONS]</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">  --n INTEGER  [default: <span class="number">1</span>]</span><br><span class="line">  --help       Show this message and <span class="keyword">exit</span>.</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/05/movie31/" rel="prev" title="电影 | 《大空头》">
+      <i class="fa fa-chevron-left"></i> 电影 | 《大空头》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/05/python90/" rel="next" title="python | 日志基础">
+      python | 日志基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#初体验"><span class="nav-number">1.</span> <span class="nav-text">初体验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速开始"><span class="nav-number">1.2.</span> <span class="nav-text">快速开始</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#业务逻辑"><span class="nav-number">1.2.1.</span> <span class="nav-text">业务逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义参数"><span class="nav-number">1.2.2.</span> <span class="nav-text">定义参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码梳理"><span class="nav-number">1.3.</span> <span class="nav-text">代码梳理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">1.4.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参数篇"><span class="nav-number">2.</span> <span class="nav-text">参数篇</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参数"><span class="nav-number">2.1.</span> <span class="nav-text">参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本参数"><span class="nav-number">2.1.1.</span> <span class="nav-text">基本参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参数类型"><span class="nav-number">2.1.2.</span> <span class="nav-text">参数类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件参数"><span class="nav-number">2.1.3.</span> <span class="nav-text">文件参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件路径参数"><span class="nav-number">2.1.4.</span> <span class="nav-text">文件路径参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选择项参数"><span class="nav-number">2.1.5.</span> <span class="nav-text">选择项参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变参数"><span class="nav-number">2.1.6.</span> <span class="nav-text">可变参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从环境变量读取参数"><span class="nav-number">2.1.7.</span> <span class="nav-text">从环境变量读取参数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#选项篇"><span class="nav-number">3.</span> <span class="nav-text">选项篇</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#选项"><span class="nav-number">3.1.</span> <span class="nav-text">选项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#给选项命名"><span class="nav-number">3.1.1.</span> <span class="nav-text">给选项命名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基本值选项"><span class="nav-number">3.1.2.</span> <span class="nav-text">基本值选项</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

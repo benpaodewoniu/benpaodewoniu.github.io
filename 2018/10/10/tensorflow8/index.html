@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="正则化缓解过拟合。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorflow 正则化">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/10/10/tensorflow8/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="正则化缓解过拟合。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/8_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/8_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/8_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/8_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/8_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/8_5.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/8_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/6_0.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/6_1.JPG">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/6_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/6_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/6_4.png">
+<meta property="article:published_time" content="2018-10-10T06:30:55.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:45:21.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="machine learning">
+<meta property="article:tag" content="tensorflow">
+<meta property="article:tag" content="正则化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/tensorflow/8_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/10/10/tensorflow8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>tensorflow 正则化 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/10/10/tensorflow8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          tensorflow 正则化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-10 14:30:55" itemprop="dateCreated datePublished" datetime="2018-10-10T14:30:55+08:00">2018-10-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:45:21" itemprop="dateModified" datetime="2020-05-12T10:45:21+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/tensorflow/" itemprop="url" rel="index"><span itemprop="name">tensorflow</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/10/10/tensorflow8/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/10/10/tensorflow8/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>正则化缓解过拟合。</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.jianshu.com/p/6ffd815e2d11" rel="external nofollow noreferrer">TensorFlow从0到1 - 16 - L2正则化对抗“过拟合”</a></p>
+<p><a href="https://cloud.tencent.com/developer/article/1012635" rel="external nofollow noreferrer">深度学习系列教程（八）TensorFlow 中的正则化方法</a></p>
+<h2 id="什么是过拟合"><a href="#什么是过拟合" class="headerlink" title="什么是过拟合"></a>什么是过拟合</h2><p>对于一些离散的二维空间中的样本点，下面两条曲线谁存在过拟合？</p>
+<p><img src="/images/tensorflow/8_0.png" alt=""></p>
+<p>遵循奥卡姆剃刀的一派，主张“如无必要,勿增实体”。他们相信相对简单的模型泛化能力更好：上图中的蓝色直线，虽然只有很少的样本点直接落在它上面，但是不妨认为这些样本点或多或少包含一些噪声。基于这种认知，可以预测新样本也会在这条直线附近出现。</p>
+<p>或许很多时候，倾向简单会占上风，但是真实世界的复杂性深不可测。虽然在自然科学中，奥卡姆剃刀被作为启发性技巧来使用，帮助科学家发展理论模型工具，但是它并没有被当做逻辑上不可辩驳的定理或者科学结论。总有简单模型表达不了，只能通过复杂模型来描述的事物存在。很有可能红色的曲线才是对客观世界的真实反映。</p>
+<blockquote>
+<p>康德为了对抗奥卡姆剃刀产生的影响，创建了他自己的反剃刀：“存在的多样性不应被粗暴地忽视”。<br>阿尔伯特·爱因斯坦告诫：“科学理论应该尽可能简单，但不能过于简单。”</p>
+</blockquote>
+<p>所以仅从上图来判断，一个理性的回答是：不知道。即使是如此简单的二维空间情况下，在没有更多的新样本数据做出验证之前，不能仅通过模型形式的简单或复杂来判定谁存在过拟合。</p>
+<h2 id="过拟合的判断"><a href="#过拟合的判断" class="headerlink" title="过拟合的判断"></a>过拟合的判断</h2><p>二维、三维的模型，本身可以很容易的绘制出来，当新的样本出现后，通过观察即可大致判断模型是否存在过拟合。</p>
+<p>然而现实情况要复杂的多。对MNIST数字识别所采用的3层感知器——输入层784个神经元，隐藏层30个神经元，输出层10个神经元，包含23860个参数（23860 = 784 x 30 + 30 x 10 + 30 + 10），靠绘制模型来观察是不现实的。</p>
+<p>最有效的方式是通过识别精度判断模型是否存在过拟合：比较模型对验证集和训练集的识别精度，如果验证集识别精度大幅低于训练集，则可以判断模型存在过拟合。</p>
+<p>然而静态的比较已训练模型对两个集合的识别精度无法回答一个问题：过拟合是什么时候发生的？</p>
+<p>要获得这个信息，就需要在模型训练过程中动态的监测每次迭代（Epoch）后训练集和验证集的识别精度，一旦出现训练集识别率继续上升而验证集识别率不再提高，就说明过拟合发生了。</p>
+<p>这种方法还会带来一个额外的收获：确定作为超参数之一的迭代数（Epoch Number）的量级。更进一步，甚至可以不设置固定的迭代次数，以过拟合为信号，一旦发生就提前停止（early stopping）训练，避免后续无效的迭代。</p>
+<h2 id="过拟合检测"><a href="#过拟合检测" class="headerlink" title="过拟合检测"></a>过拟合检测</h2><pre><code>1个隐藏层，包含30个神经元；
+学习率：3.0；
+迭代数：30次；
+mini batch：10；</code></pre><p>训练过程中，分别对训练集和验证集的识别精度进行了跟踪，如下图所示，其中红线代表训练集识别率，蓝线代表测试集识别率。图中显示，大约在第15次迭代前后，测试集的识别精度稳定在95.5%不再提高，而训练集的识别精度仍然继续上升，直到30次迭代全部结束后达到了98.5%，两者相差3%。</p>
+<p>由此可见，模型存在明显的过拟合的特征。</p>
+<p><img src="/images/tensorflow/8_1.png" alt=""></p>
+<h2 id="过拟合的对策：L2正则化"><a href="#过拟合的对策：L2正则化" class="headerlink" title="过拟合的对策：L2正则化"></a>过拟合的对策：L2正则化</h2><p>对抗过拟合最有效的方法就是增加训练数据的完备性，但它昂贵且有限。另一种思路是减小网络的规模，但它可能会因为限制了模型的表达潜力而导致识别精度整体下降。</p>
+<p>本篇引入L2正则化（Regularization），可以在原有的训练数据，以及网络架构不缩减的情况下，有效避免过拟合。L2正则化即在损失函数C的表达式上追加L2正则化项：</p>
+<p><img src="/images/tensorflow/8_2.png" alt=""></p>
+<p>上式中的C0代表原损失函数，可以替换成均方误差、交叉熵等任何一种损失函数表达式。</p>
+<p>关于L2正则化项的几点说明：</p>
+<pre><code>求和∑是对网络中的所有权重进行的；
+λ（lambda）为自定义参数（超参数）；
+n是训练样本的数量（注意不是所有权重的数量！）；
+L2正则化并没有偏置参与；</code></pre><p>该如何理解正则化呢？</p>
+<p>对于使网络达到最小损失的权重w，很可能有非常多不同分布的解：有的均值偏大、有的偏小，有的分布均匀，有的稀疏。那么在这个w的解空间里，该如何挑选相对更好的呢？正则化通过添加约束的方式，帮我们找到一个方向。</p>
+<p>L2正则化表达式暗示着一种倾向：训练尽可能的小的权重，较大的权重需要保证能显著降低原有损失C0才能保留。</p>
+<p>至于正则化为何能有效的缓解过拟合，这方面数学解释其实并不充分，更多是基于经验的认知。</p>
+<h2 id="L2正则化的实现"><a href="#L2正则化的实现" class="headerlink" title="L2正则化的实现"></a>L2正则化的实现</h2><p>因为在原有损失函数中追加了L2正则化项，那么是不是得修改现有反向传播算法（BP1中有用到C的表达式）？答案是不需要。</p>
+<p>C对w求偏导数，可以拆分成原有C0对w求偏导，以及L2正则项对w求偏导。前者继续利用原有的反向传播计算方法，而后者可以直接计算得到：</p>
+<p><img src="/images/tensorflow/8_3.png" alt=""></p>
+<p>C对于偏置b求偏导保持不变：</p>
+<p><img src="/images/tensorflow/8_4.png" alt=""></p>
+<p>基于上述，就可以得到权重w和偏置b的更新方法：</p>
+<p><img src="/images/tensorflow/8_5.png" alt=""></p>
+<h2 id="TensorFlow实现L2正则化"><a href="#TensorFlow实现L2正则化" class="headerlink" title="TensorFlow实现L2正则化"></a>TensorFlow实现L2正则化</h2><p>TensorFlow的最优化方法tf.train.GradientDescentOptimizer包办了梯度下降、反向传播，所以基于TensorFlow实现L2正则化，并不能按照上节的算法直接干预权重的更新，而要使用TensorFlow方式：</p>
+<pre><code>tf.add_to_collection(tf.GraphKeys.WEIGHTS, W_2)
+tf.add_to_collection(tf.GraphKeys.WEIGHTS, W_3)
+regularizer = tf.contrib.layers.l2_regularizer(scale=5.0/50000)
+reg_term = tf.contrib.layers.apply_regularization(regularizer)
+
+loss = (tf.reduce_mean(
+    tf.nn.sigmoid_cross_entropy_with_logits(labels=y_, logits=z_3)) +
+    reg_term)</code></pre><p>对上述代码的一些说明：</p>
+<pre><code>将网络中所有层中的权重，依次通过tf.add_to_collectio加入到tf.GraphKeys.WEIGHTS中；
+调用tf.contrib.layers.l2_regularizer生成L2正则化方法，注意所传参数scale=λ/n(n为训练样本的数量);
+调用tf.contrib.layers.apply_regularization来生成损失函数的L2正则化项reg_term，所传第一个参数为上面生成的正则化方法，第二个参数为none时默认值为tf.GraphKeys.WEIGHTS；
+最后将L2正则化reg_term项追加到损失函数表达式；</code></pre><p>向原有损失函数追加L2正则化项，模型和训练设置略作调整：</p>
+<pre><code>1个隐藏层，包含100个神经元；
+学习率：0.5；
+迭代数：30次；
+mini batch：10；</code></pre><p>重新运行训练，跟踪训练集和验证集的识别精度，如下图所示。图中显示，在整个30次迭代中，训练集和验证集的识别率均持续上升（都超过95%），最终两者的差距控制在0.5%，过拟合程度显著的减轻了。</p>
+<p>需要注意的是，尽管正则化有效降低了验证集上过拟合程度，但是也降低了训练集的识别精度。所以在实现L2正则化时增加了隐藏层的神经元数量（从30到100）来抵消识别精度的下降。</p>
+<p><img src="/images/tensorflow/8_6.png" alt=""></p>
+<h2 id="以下为原-blog"><a href="#以下为原-blog" class="headerlink" title="以下为原 blog"></a>以下为原 blog</h2><p>正则化在损失函数中引入模型复杂度指标，利用给 W 加权值，弱化了训练数据的噪声。（一般不正则化 b）</p>
+<pre><code>loss = loss(y,y_) + REGULARIZER * loss(W)
+REGULARIZER : 用超参数 REGULARIZER 给出参数 W 在总 loss 中的比例，及正则化的权重
+W ：需要正则化的参数</code></pre><p>在 tensorflow 中 loss(W) 的两种形式的代码</p>
+<p>第一种</p>
+<p><img src="/images/tensorflow/6_0.JPG" alt=""></p>
+<pre><code>loss(W) = tf.contrib.layers.l1_regularizer(REGULARIZER)(w)</code></pre><p>第二种</p>
+<p><img src="/images/tensorflow/6_1.JPG" alt=""></p>
+<pre><code>loss(W) = tf.contrib.layers.l2_regularizer(REGULARIZER)(w)</code></pre><p>后来的代码段</p>
+<pre><code>tf.add_to_collection(&apos;losses&apos;,tf.contrib.layers.l2_regularizer(regularizer)(w))
+    将内容加到集合对应位置做加法
+    即将 tf.contrib.layers.l2_regularizer(regularizer)(w) 加到 losses
+loss = cem + tf.add_n(tf.get_collection(&apos;losses&apos;))
+    其中 cem 代表交叉熵</code></pre><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">BATCH_SIZE = <span class="number">30</span></span><br><span class="line">seed = <span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 基于 seed 产生随机数</span></span><br><span class="line">rdm = np.random.RandomState(seed)</span><br><span class="line"><span class="comment"># 随机数返回 300 行 2 列 的矩阵，表示 300 组坐标点 (X0,X1) 作为输入数据集</span></span><br><span class="line">X = rdm.randn(<span class="number">300</span>,<span class="number">2</span>)</span><br><span class="line"><span class="comment"># 从 X 这个 300 行 2 列的矩阵中取出一行，判断如果两个坐标的平方和小于 2，给 Y 赋值 1，其余赋值 0</span></span><br><span class="line"><span class="comment"># 作为输入数据集的标签</span></span><br><span class="line">Y_ = [int(X0 * X0 + X1 * X1 &lt; <span class="number">2</span>) <span class="keyword">for</span> (X0,X1) <span class="keyword">in</span> X]</span><br><span class="line"><span class="comment"># 遍历 Y 中的每个元素， 1 赋值 'red' 其余赋值 'blue',这样可视化时区分明显</span></span><br><span class="line">Y_c = [[<span class="string">'red'</span> <span class="keyword">if</span> y <span class="keyword">else</span> <span class="string">'blue'</span>] <span class="keyword">for</span> y <span class="keyword">in</span> Y_]</span><br><span class="line"><span class="comment"># 对数据集X 和 标签 Y 进行 shape 整理，第一个元素为 -1 表示，随第二个参数计算得到，第二个元素表示多少列，把X 整理为 n 行 2 列，把 Y 整理为 n 行 1 列</span></span><br><span class="line">X =  np.vstack(X).reshape(<span class="number">-1</span>,<span class="number">2</span>)</span><br><span class="line">Y_ = np.vstack(Y_).reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">plt.scatter(X[:,<span class="number">0</span>],X[:,<span class="number">1</span>],c=np.squeeze(Y_c))</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义神经网络的输入，参数和输出，定义前向传播过程</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_weight</span><span class="params">(shape,regularizer)</span>:</span></span><br><span class="line">	w = tf.Variable(tf.random_normal(shape),dtype=tf.float32)</span><br><span class="line">	tf.add_to_collection(<span class="string">'losses'</span>,tf.contrib.layers.l2_regularizer(regularizer)(w))</span><br><span class="line">	<span class="keyword">return</span> w</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_bias</span><span class="params">(shape)</span>:</span></span><br><span class="line">	b = tf.Variable(tf.constant(<span class="number">0.01</span>,shape = shape))</span><br><span class="line">	<span class="keyword">return</span> b</span><br><span class="line"></span><br><span class="line">x = tf.placeholder(tf.float32,shape=(<span class="literal">None</span>,<span class="number">2</span>))</span><br><span class="line">y_ = tf.placeholder(tf.float32,shape=(<span class="literal">None</span>,<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line">w1 = get_weight([<span class="number">2</span>,<span class="number">11</span>],<span class="number">0.01</span>)</span><br><span class="line">b1 = get_bias([<span class="number">11</span>])</span><br><span class="line">y1 = tf.nn.relu(tf.matmul(x,w1) + b1)</span><br><span class="line"></span><br><span class="line">w2 = get_weight([<span class="number">11</span>,<span class="number">1</span>],<span class="number">0.01</span>)</span><br><span class="line">b2 = get_bias([<span class="number">1</span>])</span><br><span class="line">y = tf.matmul(y1,w2) + b2 <span class="comment"># 输出层不激活</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义损失函数</span></span><br><span class="line"></span><br><span class="line">loss_mse = tf.reduce_mean(tf.square(y - y_))</span><br><span class="line">loss_total = loss_mse + tf.add_n(tf.get_collection(<span class="string">'losses'</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义反向传播方法，不含正则化</span></span><br><span class="line"></span><br><span class="line">train_step = tf.train.AdamOptimizer(<span class="number">0.0001</span>).minimize(loss_mse)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">	init_op = tf.global_variables_initializer()</span><br><span class="line">	sess.run(init_op)</span><br><span class="line">	STEPS = <span class="number">40000</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(STEPS):</span><br><span class="line">		start = (i * BATCH_SIZE) % <span class="number">300</span></span><br><span class="line">		end = start + BATCH_SIZE</span><br><span class="line">		sess.run(train_step,feed_dict=&#123;x:X[start:end],y_:Y_[start:end]&#125;)</span><br><span class="line">		<span class="keyword">if</span> i % <span class="number">2000</span> == <span class="number">0</span>:</span><br><span class="line">			loss_mse_v = sess.run(loss_mse,feed_dict=&#123;x:X,y_:Y_&#125;)</span><br><span class="line">	<span class="comment"># xx 在 -3 到 3 之间以步长为 0.01，yy在 -3 到 3 之间以步长 0.01 生成而为网络坐标点</span></span><br><span class="line">	xx,yy = np.mgrid[<span class="number">-3</span>:<span class="number">3</span>:<span class="number">.01</span>,<span class="number">-3</span>:<span class="number">3</span>:<span class="number">.01</span>]</span><br><span class="line">	<span class="comment"># 将 xx yy 拉直，并合并成一个 2 列的矩阵，得到一个网状坐标点集合</span></span><br><span class="line">	grid = np.c_[xx.ravel(),yy.ravel()]</span><br><span class="line">	<span class="comment"># 将网格坐标点喂入神经网络， probs 为输出</span></span><br><span class="line">	probs = sess.run(y,feed_dict=&#123;x:grid&#125;)</span><br><span class="line">	<span class="comment"># probs 的 shape 调整成 xx 的样子</span></span><br><span class="line">	probs = probs.reshape(xx.shape)</span><br><span class="line">	print(sess.run(w1))</span><br><span class="line">	print(sess.run(b1))</span><br><span class="line">	print(sess.run(w2))</span><br><span class="line">	print(sess.run(b2))</span><br><span class="line"></span><br><span class="line">plt.scatter(X[:,<span class="number">0</span>],X[:,<span class="number">1</span>],c = np.squeeze(Y_c))</span><br><span class="line">plt.contour(xx,yy,probs,levels=[<span class="number">.5</span>])</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义反向传播方法：包含正则化</span></span><br><span class="line">train_step = tf.train.AdamOptimizer(<span class="number">0.0001</span>).minimize(loss_total)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.Session() <span class="keyword">as</span> sess:</span><br><span class="line">	init_op = tf.global_variables_initializer()</span><br><span class="line">	sess.run(init_op)</span><br><span class="line">	STEPS = <span class="number">40000</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(STEPS):</span><br><span class="line">		start = (i * BATCH_SIZE) % <span class="number">300</span></span><br><span class="line">		end = start + BATCH_SIZE</span><br><span class="line">		sess.run(train_step,feed_dict=&#123;x:X[start:end],y_:Y_[start:end]&#125;)</span><br><span class="line">		<span class="keyword">if</span> i &amp; <span class="number">2000</span> == <span class="number">0</span>:</span><br><span class="line">			loss_v = sess.run(loss_total,feed_dict=&#123;x:X,y_:Y_&#125;)</span><br><span class="line">	<span class="comment"># xx 在 -3 到 3 之间以步长为 0.01，yy在 -3 到 3 之间以步长 0.01 生成而为网络坐标点</span></span><br><span class="line">	xx, yy = np.mgrid[<span class="number">-3</span>:<span class="number">3</span>:<span class="number">.01</span>, <span class="number">-3</span>:<span class="number">3</span>:<span class="number">.01</span>]</span><br><span class="line">	<span class="comment"># 将 xx yy 拉直，并合并成一个 2 列的矩阵，得到一个网状坐标点集合</span></span><br><span class="line">	grid = np.c_[xx.ravel(), yy.ravel()]</span><br><span class="line">	<span class="comment"># 将网格坐标点喂入神经网络， probs 为输出</span></span><br><span class="line">	probs = sess.run(y, feed_dict=&#123;x: grid&#125;)</span><br><span class="line">	<span class="comment"># probs 的 shape 调整成 xx 的样子</span></span><br><span class="line">	probs = probs.reshape(xx.shape)</span><br><span class="line">	print(sess.run(w1))</span><br><span class="line">	print(sess.run(b1))</span><br><span class="line">	print(sess.run(w2))</span><br><span class="line">	print(sess.run(b2))</span><br><span class="line"></span><br><span class="line">plt.scatter(X[:,<span class="number">0</span>],X[:,<span class="number">1</span>],c = np.squeeze(Y_c))</span><br><span class="line">plt.contour(xx,yy,probs,levels=[<span class="number">.5</span>])</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据展示"><a href="#数据展示" class="headerlink" title="数据展示"></a>数据展示</h2><p>原始展示</p>
+<p><img src="/images/tensorflow/6_2.png" alt=""></p>
+<p>无正则化</p>
+<p><img src="/images/tensorflow/6_3.png" alt=""></p>
+<p>有正则化</p>
+<p><img src="/images/tensorflow/6_4.png" alt=""></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+              <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+              <a href="/tags/%E6%AD%A3%E5%88%99%E5%8C%96/" rel="tag"># 正则化</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/08/tensorflow7/" rel="prev" title="tensorflow 滑动平均">
+      <i class="fa fa-chevron-left"></i> tensorflow 滑动平均
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/13/es0/" rel="next" title="遗传算法 GA 基本原理">
+      遗传算法 GA 基本原理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是过拟合"><span class="nav-number">2.</span> <span class="nav-text">什么是过拟合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过拟合的判断"><span class="nav-number">3.</span> <span class="nav-text">过拟合的判断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过拟合检测"><span class="nav-number">4.</span> <span class="nav-text">过拟合检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过拟合的对策：L2正则化"><span class="nav-number">5.</span> <span class="nav-text">过拟合的对策：L2正则化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#L2正则化的实现"><span class="nav-number">6.</span> <span class="nav-text">L2正则化的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TensorFlow实现L2正则化"><span class="nav-number">7.</span> <span class="nav-text">TensorFlow实现L2正则化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以下为原-blog"><span class="nav-number">8.</span> <span class="nav-text">以下为原 blog</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码"><span class="nav-number">9.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据展示"><span class="nav-number">10.</span> <span class="nav-text">数据展示</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

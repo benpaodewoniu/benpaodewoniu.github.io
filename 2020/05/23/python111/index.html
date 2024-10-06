@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这个是 python 的参数传递的机理所在，值得一读。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python | 赋值、引用、拷贝、作用域 深入理解">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/05/23/python111/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这个是 python 的参数传递的机理所在，值得一读。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/111_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/111_1.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/111_2.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/111_3.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/111_4.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/111_5.jpg">
+<meta property="article:published_time" content="2020-05-23T14:49:42.000Z">
+<meta property="article:modified_time" content="2020-05-24T13:47:00.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/python/111_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/05/23/python111/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python | 赋值、引用、拷贝、作用域 深入理解 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/05/23/python111/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python | 赋值、引用、拷贝、作用域 深入理解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-23 22:49:42" itemprop="dateCreated datePublished" datetime="2020-05-23T22:49:42+08:00">2020-05-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-24 21:47:00" itemprop="dateModified" datetime="2020-05-24T21:47:00+08:00">2020-05-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/05/23/python111/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/05/23/python111/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这个是 python 的参数传递的机理所在，值得一读。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://www.cnblogs.com/yuyan/archive/2012/04/21/2461673.html" rel="external nofollow noreferrer">关于Python中的引用</a></li>
+<li><a href="https://draapho.github.io/2016/11/21/1618-python-variable/" rel="external nofollow noreferrer">python基础： 深入理解 python 中的赋值、引用、拷贝、作用域</a></li>
+<li><a href="http://winterttr.me/2015/10/24/python-passing-arguments-as-value-or-reference/" rel="external nofollow noreferrer">Python的函数参数传递：传值？引用？</a></li>
+</ul>
+<br/>
+
+<h1 id="赋值、拷贝"><a href="#赋值、拷贝" class="headerlink" title="赋值、拷贝"></a>赋值、拷贝</h1><br/>
+
+<p>在python中，类型属于对象，变量是没有类型的，这正是python的语言特性，也是吸引着很多pythoner的一点。所有的变量「整数、string、函数等」都可以理解是内存中一个对象的“引用”，或者，也可以看似c中void*的感觉。所以，希望大家在看到一个python变量的时候，把变量和真正的内存对象分开。</p>
+<blockquote>
+<p>类型是属于对象的，而不是变量。</p>
+</blockquote>
+<p>背书python中的引用对象问题：</p>
+<ol>
+<li><p>python不允许程序员选择采用传值还是传引用。Python参数传递采用的肯定是“传对象引用”的方式。实际上，这种方式相当于传值和传引用的一种综合。如果函数收到的是一个可变对象（比如字典或者列表）的引用，就能修改对象的原始值——相当于通过“传引用”来传递对象。如果函数收到的是一个不可变对象（比如数字、字符或者元组）的引用，就不能直接修改原始对象——相当于通过“传值’来传递对象。</p>
+</li>
+<li><p>当人们复制列表或字典时，就复制了对象列表的引用同，如果改变引用的值，则修改了原始的参数。</p>
+</li>
+<li><p>为了简化内存管理，Python通过引用计数机制实现自动垃圾回收功能，Python中的每个对象都有一个引用计数，用来计数该对象在不同场所分别被引用了多少次。每当引用一次Python对象，相应的引用计数就增1，每当消毁一次Python对象，则相应的引用就减1，只有当引用计数为零时，才真正从内存中删除Python对象。</p>
+</li>
+</ol>
+<h2 id="python的赋值"><a href="#python的赋值" class="headerlink" title="python的赋值"></a>python的赋值</h2><p>在 python 中赋值语句总是建立对象的引用值，而不是复制对象。因此，python 变量更像是指针，而不是数据存储区域。</p>
+<p><img src="/images/python/111_0.jpg" alt=""></p>
+<p>这点和大多数 OO 语言类似吧，比如 C++、java 等 ~</p>
+<h2 id="一个赋值问题"><a href="#一个赋值问题" class="headerlink" title="一个赋值问题"></a>一个赋值问题</h2><p>在Python中，令<code>values=[0,1,2];values[1]=values</code>,为何结果是<code>[0,[...],2]</code>? </p>
+<pre><code>&gt;&gt;&gt; values = [0, 1, 2]
+&gt;&gt;&gt; values[1] = values
+&gt;&gt;&gt; values
+[0, [...], 2]       # 实际结果, 为何要赋值无限次?
+[0, [0, 1, 2], 2]   # 预想结果</code></pre><p>可以说 Python 没有赋值，只有引用。你这样相当于创建了一个引用自身的结构，所以导致了无限循环。为了理解这个问题，有个基本概念需要搞清楚。</p>
+<p>Python 没有「变量」，我们平时所说的变量其实只是「标签」，是引用。</p>
+<p>执行 <code>values = [0, 1, 2]</code> 的时候，Python 做的事情是首先创建一个列表对象 <code>[0, 1, 2]</code>，然后给它贴上名为 values 的标签。</p>
+<p>如果随后又执行 <code>values = [3, 4, 5]</code> 的话，Python 做的事情是创建另一个列表对象 <code>[3, 4, 5]</code>，然后把刚才那张名为 values 的标签从前面的 <code>[0, 1, 2]</code> 对象上撕下来，重新贴到 <code>[3, 4, 5]</code> 这个对象上。</p>
+<p>至始至终，并没有一个叫做 values 的列表对象容器存在，Python 也没有把任何对象的值复制进 values 去。过程如图所示：</p>
+<p><img src="/images/python/111_1.jpg" alt=""></p>
+<p>执行 <code>values[1] = values</code> 的时候，Python 做的事情则是把 values 这个标签所引用的列表对象的第二个元素指向 values 所引用的列表对象本身。执行完毕后，values 标签还是指向原来那个对象，只不过那个对象的结构发生了变化，从之前的列表 <code>[0, 1, 2]</code> 变成了 <code>[0, ?, 2]</code>，而这个 ? 则是指向那个对象本身的一个引用。如图所示：</p>
+<p><img src="/images/python/111_2.jpg" alt=""></p>
+<h2 id="浅复制及其风险"><a href="#浅复制及其风险" class="headerlink" title="浅复制及其风险"></a>浅复制及其风险</h2><p>要达到你所需要的效果，即得到 <code>[0, [0, 1, 2], 2]</code> 这个对象，你不能直接将 <code>values[1]</code> 指向 values 引用的对象本身，而是需要吧 <code>[0, 1, 2]</code> 这个对象「复制」一遍，得到一个新对象，再将 <code>values[1]</code> 指向这个复制后的对象。Python 里面复制对象的操作因对象类型而异，复制列表 values 的操作是</p>
+<pre><code>values[:] #生成对象的拷贝或者是复制序列，不再是引用和共享变量，但此法只能顶层复制</code></pre><p>所以你需要执行 <code>values[1] = values[:]</code></p>
+<p>Python 做的事情是，先 dereference 得到 values 所指向的对象 <code>[0, 1, 2]</code>，然后执行 <code>[0, 1, 2][:]</code> 复制操作得到一个新的对象，内容也是 <code>[0, 1, 2]</code>，然后将 values 所指向的列表对象的第二个元素指向这个复制二来的列表对象，最终 values 指向的对象是 <code>[0, [0, 1, 2], 2]</code>。过程如图所示：</p>
+<p><img src="/images/python/111_3.jpg" alt=""></p>
+<p>往更深处说，<code>values[:]</code> 复制操作是所谓的「浅复制」(shallow copy)，当列表对象有嵌套的时候也会产生出乎意料的错误，比如为何要赋值无限次</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a = [<span class="number">0</span>, [<span class="number">1</span>, <span class="number">2</span>], <span class="number">3</span>]</span><br><span class="line">b = a[:]</span><br><span class="line">a[<span class="number">0</span>] = <span class="number">8</span></span><br><span class="line">a[<span class="number">1</span>][<span class="number">1</span>] = <span class="number">9</span></span><br></pre></td></tr></table></figure>
+
+<p>问：此时 a 和 b 分别是多少？</p>
+<p>正确答案是 a 为 <code>[8, [1, 9], 3]</code>，b 为 <code>[0, [1, 9], 3]</code>。发现没？b 的第二个元素也被改变了。想想是为什么？不明白的话看下图</p>
+<p><img src="/images/python/111_4.jpg" alt=""></p>
+<h2 id="深复制"><a href="#深复制" class="headerlink" title="深复制"></a>深复制</h2><p>正确的复制嵌套元素的方法是进行「深复制」(deep copy)，方法是</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line">a = [<span class="number">0</span>, [<span class="number">1</span>, <span class="number">2</span>], <span class="number">3</span>]</span><br><span class="line">b = copy.deepcopy(a)</span><br><span class="line">a[<span class="number">0</span>] = <span class="number">8</span></span><br><span class="line">a[<span class="number">1</span>][<span class="number">1</span>] = <span class="number">9</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/111_5.jpg" alt=""></p>
+<h2 id="引用-VS-拷贝"><a href="#引用-VS-拷贝" class="headerlink" title="引用 VS 拷贝"></a>引用 VS 拷贝</h2><ul>
+<li>没有限制条件的分片表达式（L[:]）能够复制序列，但此法只能浅层复制。</li>
+<li>字典 copy 方法，D.copy() 能够复制字典，但此法只能浅层复制</li>
+<li>有些内置函数，例如 list，能够生成拷贝 list(L)</li>
+<li>copy 标准库模块能够生成完整拷贝：deepcopy 本质上是递归 copy</li>
+<li>对于不可变对象和可变对象来说，浅复制都是复制的引用，只是因为复制不变对象和复制不变对象的引用是等效的（因为对象不可变，当改变时会新建对象重新赋值）。所以看起来浅复制只复制不可变对象（整数，实数，字符串等），对于可变对象，浅复制其实是创建了一个对于该对象的引用，也就是说只是给同一个对象贴上了另一个标签而已。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">L = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">D = &#123;<span class="string">'a'</span>: <span class="number">1</span>, <span class="string">'b'</span>: <span class="number">2</span>&#125;</span><br><span class="line">D1 = &#123;<span class="string">'a'</span>: <span class="number">1</span>, <span class="string">'b'</span>: &#123;<span class="string">'a'</span>: <span class="number">2</span>&#125;&#125;</span><br><span class="line">A = L[:]</span><br><span class="line">B = D.copy()</span><br><span class="line">B1 = D1.copy()</span><br><span class="line">print(L, D)</span><br><span class="line">print(A, B)</span><br><span class="line">A[<span class="number">1</span>] = <span class="string">'NI'</span></span><br><span class="line">B[<span class="string">'c'</span>] = <span class="string">'spam'</span></span><br><span class="line">B1[<span class="string">'b'</span>][<span class="string">'a'</span>] = <span class="number">3</span></span><br><span class="line">print(L, D)</span><br><span class="line">print(A, B)</span><br><span class="line">print(D1, B1)</span><br></pre></td></tr></table></figure>
+
+<pre><code>[1, 2, 3] {&apos;a&apos;: 1, &apos;b&apos;: 2}
+[1, 2, 3] {&apos;a&apos;: 1, &apos;b&apos;: 2}
+[1, 2, 3] {&apos;a&apos;: 1, &apos;b&apos;: 2}
+[1, &apos;NI&apos;, 3] {&apos;a&apos;: 1, &apos;b&apos;: 2, &apos;c&apos;: &apos;spam&apos;}
+{&apos;a&apos;: 1, &apos;b&apos;: {&apos;a&apos;: 3}} {&apos;a&apos;: 1, &apos;b&apos;: {&apos;a&apos;: 3}}</code></pre><h2 id="增强赋值以及共享引用"><a href="#增强赋值以及共享引用" class="headerlink" title="增强赋值以及共享引用"></a>增强赋值以及共享引用</h2><p><code>x = x + y</code>，x 出现两次，必须执行两次，性能不好，合并必须新建对象 x，然后复制两个列表合并</p>
+<p>属于复制/拷贝</p>
+<p><code>x += y</code>，x 只出现一次，也只会计算一次，性能好，不生成新对象，只在内存块末尾增加元素。</p>
+<p>当 x、y 为list时， += 会自动调用 extend 方法进行合并运算，in-place change。</p>
+<p>属于共享引用</p>
+<br/>
+
+<h1 id="深入理解-python-变量作用域及其陷阱"><a href="#深入理解-python-变量作用域及其陷阱" class="headerlink" title="深入理解 python 变量作用域及其陷阱"></a>深入理解 python 变量作用域及其陷阱</h1><br/>
+
+<p>在python中，类型属于对象，变量是没有类型的，这正是python的语言特性，也是吸引着很多pythoner的一点。所有的变量都可以理解是内存中一个对象的“引用”，或者，也可以看似c中void*的感觉。所以，希望大家在看到一个python变量的时候，把变量和真正的内存对象分开。</p>
+<p>类型是属于对象的，而不是变量。</p>
+<p>这样，很多问题就容易思考了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nfoo = <span class="number">1</span>   <span class="comment">#一个指向int数据类型的nfoo（再次提醒，nfoo没有类型）</span></span><br><span class="line">lstFoo = [<span class="number">1</span>]   <span class="comment">#一个指向list类型的lstFoo，这个list中包含一个整数1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="可变对象-amp-不可变对象"><a href="#可变对象-amp-不可变对象" class="headerlink" title="可变对象 &amp; 不可变对象"></a>可变对象 &amp; 不可变对象</h2><ul>
+<li>在Python中，对象分为两种：可变对象和不可变对象，</li>
+<li>不可变对象包括int，float，long，str，tuple等，可变对象包括list，set，dict等。</li>
+<li>需要注意的是：这里说的不可变指的是值的不可变。对于不可变类型的变量，如果要更改变量，则会创建一个新值，把变量绑定到新值上，而旧值如果没有被引用就等待垃圾回收。另外，不可变的类型可以计算hash值，作为字典的key。</li>
+<li>可变类型数据对对象操作的时候，不需要再在其他地方申请内存，只需要在此对象后面连续申请(+/-)即可，也就是它的内存地址会保持不变，但区域会变长或者变短。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = <span class="string">'xianglong.me'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(a)</span><br><span class="line"><span class="number">140443303134352</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = <span class="string">'1saying.com'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(a)</span><br><span class="line"><span class="number">140443303131776</span></span><br><span class="line"><span class="comment"># 重新赋值之后，变量a的内存地址已经变了</span></span><br><span class="line"><span class="comment"># 'xianglong.me'是str类型，不可变，所以赋值操作知识重新创建了str '1saying.com'对象，然后将变量a指向了它</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(a_list)</span><br><span class="line"><span class="number">140443302951680</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a_list.append(<span class="number">4</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>id(a_list)</span><br><span class="line"><span class="number">140443302951680</span></span><br><span class="line"><span class="comment"># list重新赋值之后，变量a_list的内存地址并未改变</span></span><br><span class="line"><span class="comment"># [1, 2, 3]是可变的，append操作只是改变了其value，变量a_list指向没有变</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="函数值传递"><a href="#函数值传递" class="headerlink" title="函数值传递"></a>函数值传递</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ChangeInt</span><span class="params">( a )</span>:</span></span><br><span class="line">    a = <span class="number">10</span></span><br><span class="line">nfoo = <span class="number">2</span> </span><br><span class="line">ChangeInt(nfoo)</span><br><span class="line">print(nfoo) <span class="comment">#结果是2</span></span><br></pre></td></tr></table></figure>
+
+<p>这时发生了什么，有一个int对象2，和指向它的变量nfoo，当传递给ChangeInt的时候，按照传值的方式，复制了变量nfoo的值，这样，a就是nfoo指向同一个Int对象了，函数中a=10的时候，发生什么？（还记得我上面讲到的那些概念么），int是不能更改的对象，于是，做了一个新的int对象，另a指向它（但是此时，被变量nfoo指向的对象，没有发生变化），于是在外面的感觉就是函数没有改变nfoo的值，看起来像C++中的传值方式。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ChangeList</span><span class="params">( a )</span>:</span></span><br><span class="line">    a[<span class="number">0</span>] = <span class="number">10</span></span><br><span class="line">lstFoo = [<span class="number">2</span>]</span><br><span class="line">ChangeList(lstFoo )</span><br><span class="line">print(lstFoo) <span class="comment">#结果是[10]</span></span><br></pre></td></tr></table></figure>
+
+<p>当传递给ChangeList的时候，变量仍旧按照“传值”的方式，复制了变量lstFoo 的值，于是a和lstFoo 指向同一个对象，但是，list是可以改变的对象，对a[0]的操作，就是对lstFoo指向的对象的内容的操作，于是，这时的a[0] = 10，就是更改了lstFoo 指向的对象的第一个元素，所以，再次输出lstFoo 时，显示[10]，内容被改变了，看起来，像C++中的按引用传递。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func_list</span><span class="params">(a_list)</span>:</span></span><br><span class="line">    a_list[<span class="number">0</span>] = <span class="number">4</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func_list2</span><span class="params">(a)</span>:</span></span><br><span class="line">    a = a + [<span class="number">4</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func_list3</span><span class="params">(a)</span>:</span></span><br><span class="line">    a += [<span class="number">4</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">t_list = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">t_list2 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">t_list3 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">func_list(t_list)</span><br><span class="line">func_list2(t_list2)</span><br><span class="line">func_list3(t_list3)</span><br><span class="line">print(t_list)</span><br><span class="line"><span class="comment"># [4, 2, 3]</span></span><br><span class="line">print(t_list2)</span><br><span class="line"><span class="comment"># [1, 2, 3]</span></span><br><span class="line">print(t_list3)</span><br><span class="line"><span class="comment"># [1, 2, 3, 4]</span></span><br></pre></td></tr></table></figure>
+
+<p>这主要是由于<code>=</code>操作符会新建一个新的变量保存赋值结果，然后再把引用名指向<code>=</code>左边，即修改了原来的p引用，使p成为指向新赋值变量的引用。而<code>+=</code>不会，直接修改了原来p引用的内容，事实上<code>+=</code>和<code>=</code>在python内部使用了不同的实现函数。</p>
+<p>同样</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">list_a = []</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">a</span><span class="params">()</span>:</span></span><br><span class="line">    list_a = [<span class="number">1</span>]      <span class="comment">## 语句1</span></span><br><span class="line">a()</span><br><span class="line">print(list_a)    <span class="comment"># []</span></span><br><span class="line"></span><br><span class="line">list_b = []</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">b</span><span class="params">()</span>:</span></span><br><span class="line">    list_b.append(<span class="number">1</span>)    <span class="comment">## 语句2</span></span><br><span class="line">b()</span><br><span class="line">print(list_b)    <span class="comment"># [1]</span></span><br></pre></td></tr></table></figure>
+
+<p>因为 <code>=</code> 创建了局部变量，而 <code>.append()</code> 或者 <code>.extend()</code> 重用了全局变量。</p>
+<h2 id="为什么修改全局的dict变量不用global关键字"><a href="#为什么修改全局的dict变量不用global关键字" class="headerlink" title="为什么修改全局的dict变量不用global关键字"></a>为什么修改全局的dict变量不用global关键字</h2><p>为什么修改字典d的值不用global关键字先声明呢？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="string">'foo'</span></span><br><span class="line">d = &#123;<span class="string">'a'</span>:<span class="number">1</span>&#125;</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">()</span>:</span></span><br><span class="line">    s = <span class="string">'bar'</span></span><br><span class="line">    d[<span class="string">'b'</span>] = <span class="number">2</span></span><br><span class="line">f()</span><br><span class="line">print(s)  <span class="comment"># foo</span></span><br><span class="line">print(d) <span class="comment"># &#123;'a': 1, 'b': 2&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>这是因为，在s = ‘bar’这句中，它是“有歧义的“，因为它既可以是表示引用全局变量s，也可以是创建一个新的局部变量，所以在python中，默认它的行为是创建局部变量，除非显式声明global，global定义的本地变量会变成其对应全局变量的一个别名，即是同一个变量。</p>
+<p>在<code>d[&#39;b&#39;]</code>=2这句中，它是“明确的”，因为如果把d当作是局部变量的话，它会报KeyError，所以它只能是引用全局的d,故不需要多此一举显式声明global。</p>
+<p>上面这两句赋值语句其实是不同的行为，一个是rebinding（不可变对象）, 一个是mutation（可变对象）.</p>
+<p>但是如果是下面这样：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">d = &#123;<span class="string">'a'</span>:<span class="number">1</span>&#125;</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">()</span>:</span></span><br><span class="line">    d = &#123;&#125;</span><br><span class="line">    d[<span class="string">'b'</span>] = <span class="number">2</span></span><br><span class="line">f()</span><br><span class="line">print(d)  <span class="comment"># &#123;'a': 1&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>在<code>d = {}</code>这句，它是”有歧义的“了，所以它是创建了局部变量d，而不是引用全局变量d，所以<code>d[&#39;b&#39;]=2</code>也是操作的局部变量。</p>
+<p>推而远之，这一切现象的本质就是”它是否是明确的“。</p>
+<p>仔细想想，就会发现不止dict不需要global，所有”明确的“东西都不需要global。因为int类型str类型之类的不可变对象，每一次操作就重建新的对象，他们只有一种修改方法，即x = y， 恰好这种修改方法同时也是创建变量的方法，所以产生了歧义，不知道是要修改还是创建。而dict/list/对象等可变对象，操作不会重建对象，可以通过dict[‘x’]=y或list.append()之类的来修改，跟创建变量不冲突，不产生歧义，所以都不用显式global。</p>
+<h2 id="陷阱：使用可变的默认参数"><a href="#陷阱：使用可变的默认参数" class="headerlink" title="陷阱：使用可变的默认参数"></a>陷阱：使用可变的默认参数</h2><p>我多次见到过如下的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(a, b, c=[])</span>:</span></span><br><span class="line"><span class="comment"># append to c</span></span><br><span class="line"><span class="comment"># do some more stuff</span></span><br></pre></td></tr></table></figure>
+
+<p>永远不要使用可变的默认参数，可以使用如下的代码代替：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(a, b, c=None)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> c <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        c = []</span><br><span class="line">    <span class="comment"># append to c</span></span><br><span class="line">    <span class="comment"># do some more stuff</span></span><br></pre></td></tr></table></figure>
+
+<p>与其解释这个问题是什么，不如展示下使用可变默认参数的影响：‍‍</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">In[<span class="number">2</span>]: <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(a, b, c=[])</span>:</span></span><br><span class="line"><span class="meta">... </span>       c.append(a)</span><br><span class="line"><span class="meta">... </span>       c.append(b)</span><br><span class="line"><span class="meta">... </span>       print(c)</span><br><span class="line">...</span><br><span class="line">In[<span class="number">3</span>]: foo(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">[<span class="number">1</span>, <span class="number">1</span>]</span><br><span class="line">In[<span class="number">4</span>]: foo(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]</span><br><span class="line">In[<span class="number">5</span>]: foo(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+
+<p>同一个变量c在函数调用的每一次都被反复引用。这可能有一些意想不到的后果。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/23/python109/" rel="prev" title="python109">
+      <i class="fa fa-chevron-left"></i> python109
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/23/python112/" rel="next" title="python | 内部类和内部方法">
+      python | 内部类和内部方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#赋值、拷贝"><span class="nav-number">2.</span> <span class="nav-text">赋值、拷贝</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#python的赋值"><span class="nav-number">2.1.</span> <span class="nav-text">python的赋值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个赋值问题"><span class="nav-number">2.2.</span> <span class="nav-text">一个赋值问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浅复制及其风险"><span class="nav-number">2.3.</span> <span class="nav-text">浅复制及其风险</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#深复制"><span class="nav-number">2.4.</span> <span class="nav-text">深复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引用-VS-拷贝"><span class="nav-number">2.5.</span> <span class="nav-text">引用 VS 拷贝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增强赋值以及共享引用"><span class="nav-number">2.6.</span> <span class="nav-text">增强赋值以及共享引用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#深入理解-python-变量作用域及其陷阱"><span class="nav-number">3.</span> <span class="nav-text">深入理解 python 变量作用域及其陷阱</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#可变对象-amp-不可变对象"><span class="nav-number">3.1.</span> <span class="nav-text">可变对象 &amp; 不可变对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#函数值传递"><span class="nav-number">3.2.</span> <span class="nav-text">函数值传递</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么修改全局的dict变量不用global关键字"><span class="nav-number">3.3.</span> <span class="nav-text">为什么修改全局的dict变量不用global关键字</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#陷阱：使用可变的默认参数"><span class="nav-number">3.4.</span> <span class="nav-text">陷阱：使用可变的默认参数</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

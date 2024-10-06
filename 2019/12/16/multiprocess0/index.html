@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这个蛮重要的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python | 线程间的通信与同步">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/12/16/multiprocess0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这个蛮重要的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-12-16T08:25:21.000Z">
+<meta property="article:modified_time" content="2022-10-06T13:01:44.340Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="multiprocess">
+<meta property="article:tag" content="多进程">
+<meta property="article:tag" content="多线程">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/12/16/multiprocess0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python | 线程间的通信与同步 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/12/16/multiprocess0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python | 线程间的通信与同步
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-16 16:25:21" itemprop="dateCreated datePublished" datetime="2019-12-16T16:25:21+08:00">2019-12-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-06 21:01:44" itemprop="dateModified" datetime="2022-10-06T21:01:44+08:00">2022-10-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多进程 & 多线程</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多线程</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/%E5%A4%9A%E8%BF%9B%E7%A8%8B-%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E9%80%9A%E4%BF%A1/" itemprop="url" rel="index"><span itemprop="name">通信</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/12/16/multiprocess0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/12/16/multiprocess0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这个蛮重要的。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="直接使用共享内存"><a href="#直接使用共享内存" class="headerlink" title="直接使用共享内存"></a>直接使用共享内存</h1><br/>
+
+<p>python 的多线程效果很差，一般使用多进程，但是，多线程有一个好处就是，他们共享一个进程的内存信息。比如，在主程序中定义一个变量，那么线程中大家都会得到他。</p>
+<p>所以，多线程同步，我们利用的也是这个特征。</p>
+<p>你可以直接运行下面的代码，然后观察特征：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">arr = []</span><br><span class="line">EEG_LENGTH = <span class="number">100</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tt</span><span class="params">(f)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        time.sleep(<span class="number">0.001</span>)</span><br><span class="line">        x = np.random.random()</span><br><span class="line">        f(x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ttt</span><span class="params">(x)</span>:</span></span><br><span class="line">    arr.append(x)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">proc2</span><span class="params">()</span>:</span></span><br><span class="line">    plt.ion()</span><br><span class="line">    figure = plt.figure(figsize=(<span class="number">10</span>, <span class="number">5</span>))</span><br><span class="line">    data = []</span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    x = np.linspace(<span class="number">0</span>, <span class="number">2</span>, EEG_LENGTH)</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        print(len(arr))</span><br><span class="line">        <span class="keyword">if</span> len(arr) &gt; <span class="number">0</span>:</span><br><span class="line">            data.append(arr.pop())</span><br><span class="line">        <span class="keyword">if</span> len(data) == EEG_LENGTH:</span><br><span class="line">            plt.cla()</span><br><span class="line">            plt.plot(x, data)</span><br><span class="line">            data = data[<span class="number">1</span>:]</span><br><span class="line">            plt.xticks([])</span><br><span class="line">            plt.yticks([])</span><br><span class="line">            plt.pause(<span class="number">0.00000001</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    p = Thread(target=proc2)</span><br><span class="line">    p.start()</span><br><span class="line">    tt(ttt)</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="condition实现线程通信「等待和唤醒」"><a href="#condition实现线程通信「等待和唤醒」" class="headerlink" title="condition实现线程通信「等待和唤醒」"></a>condition实现线程通信「等待和唤醒」</h1><br/>
+
+<p>假设系统中有两个线程，这两个线程分别代表存款者和取钱者，现在假设系统有一种特殊的要求，即要求存款者和取钱者不断地重复存款、取钱的动作，而且要求每当存款者将钱存入指定账户后，取钱者就立即取出该笔钱。不允许存款者连续两次存钱，也不允许取钱者连续两次取钱。</p>
+<p>为了实现这种功能，可以借助于 <code>Condition</code> 对象来保持协调。使用 Condition 可以让那些己经得到 Lock 对象却无法继续执行的线程释放 Lock 对象，Condition 对象也可以唤醒其他处于等待状态的线程。</p>
+<p>threading.Condition() 创建一把资源锁（默认是Rlock）</p>
+<p>将 Condition 对象与 Lock 对象组合使用，可以为每个对象提供多个等待集（wait-set）。因此，Condition 对象总是需要有对应的 Lock 对象。从 Condition 的构造器 <code>__init__(self, lock=None)</code> 可以看出，程序在创建 Condition 时可通过 lock 参数传入要绑定的 Lock 对象；如果不指定 lock 参数，在创建 Condition 时它会自动创建一个与之绑定的 Lock 对象。</p>
+<p>Condition 类提供了如下几个方法：</p>
+<ul>
+<li><code>acquire([timeout])/release()</code>：调用 Condition 关联的 Lock 的 acquire() 或 release() 方法。</li>
+<li><code>wait([timeout])</code>：导致当前线程进入 Condition 的等待池等待通知并释放锁，直到其他线程调用该 Condition 的 notify() 或 notify_all() 方法来唤醒该线程。在调用该 wait() 方法时可传入一个 timeout 参数，指定该线程最多等待多少秒，wait() 必须在线程得到 Lock 后才能使用。</li>
+<li><code>notify()</code>：唤醒在该 Condition 等待池中的单个线程并通知它，收到通知的线程将自动调用 acquire() 方法尝试加锁。如果所有线程都在该 Condition 等待池中等待，则会选择唤醒其中一个线程，选择是任意性的，Notify(n=1)，最多唤醒 n 个线程。</li>
+<li><code>notify_all()</code>：唤醒在该 Condition 等待池中等待的所有线程并通知它们。</li>
+</ul>
+<p>本例程序中，可以通过一个旗标来标识账户中是否已有存款，当旗标为 False 时，表明账户中没有存款，存款者线程可以向下执行，当存款者把钱存入账户中后，将旗标设为 True，并调用 Condition 的 notify() 或 notify_all() 方法来唤醒其他线程。</p>
+<p>当存款者线程进入线程体后，如果旗标为 True，就调用 Condition 的 wait() 方法让该线程等待。当旗标为 True 时，表明账户中已经存入了钱，取钱者线程可以向下执行，当取钱者把钱从账户中取出后，将旗标设为 False，并调用 Condition 的 notify() 或 notify_all() 方法来唤醒其他线程；当取钱者线程进入线程体后，如果旗标为 False，就调用 wait() 方法让该线程等待。</p>
+<p>本程序为 Account 类提供了 draw() 和 deposit() 两个方法，分别对应于该账户的取钱和存款操作。因为这两个方法可能需要并发修改 Account 类的 self.balance 成员变量的值，所以它们都使用 Lock 来控制线程安全。除此之外，这两个方法还使用了 Condition 的 wait() 和 notify_all() 来控制线程通信。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Account</span>:</span></span><br><span class="line">    <span class="comment"># 定义构造器</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, account_no, balance)</span>:</span></span><br><span class="line">        <span class="comment"># 封装账户编号、账户余额的两个成员变量</span></span><br><span class="line">        self.account_no = account_no</span><br><span class="line">        self._balance = balance</span><br><span class="line">        self.cond = threading.Condition()</span><br><span class="line">        <span class="comment"># 定义代表是否已经存钱的旗标</span></span><br><span class="line">        self._flag = <span class="literal">False</span></span><br><span class="line">    <span class="comment"># 因为账户余额不允许随便修改，所以只为self._balance提供getter方法</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getBalance</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self._balance</span><br><span class="line">    <span class="comment"># 提供一个线程安全的draw()方法来完成取钱操作</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">draw</span><span class="params">(self, draw_amount)</span>:</span></span><br><span class="line">        <span class="comment"># 加锁,相当于调用Condition绑定的Lock的acquire()</span></span><br><span class="line">        self.cond.acquire()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="comment"># 如果self._flag为假，表明账户中还没有人存钱进去，取钱方法阻塞</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> self._flag:</span><br><span class="line">                self.cond.wait()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 执行取钱操作</span></span><br><span class="line">                print(threading.current_thread().name</span><br><span class="line">                    + <span class="string">" 取钱:"</span> +  str(draw_amount))</span><br><span class="line">                self._balance -= draw_amount</span><br><span class="line">                print(<span class="string">"账户余额为："</span> + str(self._balance))</span><br><span class="line">                <span class="comment"># 将标识账户是否已有存款的旗标设为False</span></span><br><span class="line">                self._flag = <span class="literal">False</span></span><br><span class="line">                <span class="comment"># 唤醒其他线程</span></span><br><span class="line">                self.cond.notify_all()</span><br><span class="line">        <span class="comment"># 使用finally块来释放锁</span></span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.cond.release()</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deposit</span><span class="params">(self, deposit_amount)</span>:</span></span><br><span class="line">        <span class="comment"># 加锁,相当于调用Condition绑定的Lock的acquire()</span></span><br><span class="line">        self.cond.acquire()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="comment"># 如果self._flag为真，表明账户中已有人存钱进去，存钱方法阻塞</span></span><br><span class="line">            <span class="keyword">if</span> self._flag:            <span class="comment"># ①</span></span><br><span class="line">                self.cond.wait()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 执行存款操作</span></span><br><span class="line">                print(threading.current_thread().name\</span><br><span class="line">                    + <span class="string">" 存款:"</span> +  str(deposit_amount))</span><br><span class="line">                self._balance += deposit_amount</span><br><span class="line">                print(<span class="string">"账户余额为："</span> + str(self._balance))</span><br><span class="line">                <span class="comment"># 将表示账户是否已有存款的旗标设为True</span></span><br><span class="line">                self._flag = <span class="literal">True</span></span><br><span class="line">                <span class="comment"># 唤醒其他线程</span></span><br><span class="line">                self.cond.notify_all()</span><br><span class="line">        <span class="comment"># 使用finally块来释放锁</span></span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.cond.release()</span><br></pre></td></tr></table></figure>
+
+<p>关于为什么</p>
+<p>self.cond.notify_all() 放在 self.cond.release() 前面，原因是，如果提前释放锁，由于 check interval 存在，可能会切换进程，导致，等待的进程永远无法被唤醒。</p>
+<p>上面程序使用 Condition 的 wait() 和 notify_all() 方法进行控制，对存款者线程而言，当程序进入 deposit() 方法后，如果 self._flag 为 True，则表明账户中已有存款，程序调用 Condition 的 wait() 方法被阻塞；否则，程序向下执行存款操作，当存款操作执行完成后，系统将 self._flag 设为 True，然后调用 notify_all() 来唤醒其他被阻塞的线程。如果系统中有存款者线程，存款者线程也会被唤醒，但该存款者线程执行到 ① 号代码处时再次进入阻塞状态，只有执行 draw() 方法的取钱者线程才可以向下执行。同理，取钱者线程的运行流程也是如此。</p>
+<p>程序中的存款者线程循环 100 次重复存款，而取钱者线程则循环 100 次重复取钱，存款者线程和取钱者线程分别调用 Account 对象的 deposit()、draw() 方法来实现。主程序可以启动任意多个“存款”线程和“取钱”线程，可以看到所有的“取钱”线程必须等“存款”线程存钱后才可以向下执行，而“存款”线程也必须等“取钱”线程取钱后才可以向下执行。主程序代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> Account</span><br><span class="line"><span class="comment">#  定义一个函数，模拟重复max次执行取钱操作</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">draw_many</span><span class="params">(account, draw_amount, max)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(max):</span><br><span class="line">        account.draw(draw_amount)</span><br><span class="line"><span class="comment">#  定义一个函数，模拟重复max次执行存款操作</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">deposit_many</span><span class="params">(account, deposit_amount, max)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(max):</span><br><span class="line">        account.deposit(deposit_amount)</span><br><span class="line"><span class="comment"># 创建一个账户</span></span><br><span class="line">acct = Account.Account(<span class="string">"1234567"</span> , <span class="number">0</span>)</span><br><span class="line"><span class="comment"># 创建、并启动一个“取钱”线程</span></span><br><span class="line">threading.Thread(name=<span class="string">"取钱者"</span>, target=draw_many,</span><br><span class="line">    args=(acct, <span class="number">800</span>, <span class="number">100</span>)).start()</span><br><span class="line"><span class="comment"># 创建、并启动一个“存款”线程</span></span><br><span class="line">threading.Thread(name=<span class="string">"存款者甲"</span>, target=deposit_many,</span><br><span class="line">    args=(acct , <span class="number">800</span>, <span class="number">100</span>)).start();</span><br><span class="line">threading.Thread(name=<span class="string">"存款者乙"</span>, target=deposit_many,</span><br><span class="line">    args=(acct , <span class="number">800</span>, <span class="number">100</span>)).start()</span><br><span class="line">threading.Thread(name=<span class="string">"存款者丙"</span>, target=deposit_many,</span><br><span class="line">    args=(acct , <span class="number">800</span>, <span class="number">100</span>)).start()</span><br></pre></td></tr></table></figure>
+
+<p>运行该程序，可以看到存款者线程、取钱者线程交替执行的情形，每当存款者向账户中存入 800 元之后，取钱者线程就立即从账户中取出这笔钱。存款完成后账户余额总是 800 元，取钱结束后账户余额总是 0 元。</p>
+<pre><code>...
+存款者丙 存款:800
+账户余额为：800
+取钱者 取钱:800
+账户余额为：0
+存款者丙 存款:800
+账户余额为：800
+取钱者 取钱:800
+账户余额为：0
+存款者甲 存款:800
+账户余额为：800
+...</code></pre><p>程序被堵塞</p>
+<p>程序最后被阻塞无法继续向下执行。这是因为 3 个存款者线程共有 300 次尝试存钱操作，但 1 个取钱者线程只有 100 次尝试取钱操作，所以程序最后被阻塞。</p>
+<p>阻塞并不是死锁，对于这种情况，取钱者线程已经执行结束，而存款者线程只是在等待其他线程来取钱而已，并不是等待其他线程释放同步监视器。不要把死锁和程序阻塞等同起来。</p>
+<br/>
+
+<h1 id="Python-Queue队列实现线程通信"><a href="#Python-Queue队列实现线程通信" class="headerlink" title="Python Queue队列实现线程通信"></a>Python Queue队列实现线程通信</h1><br/>
+
+<p>queue 模块下提供了几个阻塞队列，这些队列主要用于实现线程通信。在 queue 模块下主要提供了三个类，分别代表三种队列，它们的主要区别就在于进队列、出队列的不同。</p>
+<p>关于这三个队列类的简单介绍如下：</p>
+<ul>
+<li><p>queue.Queue(maxsize=0)：代表 FIFO（先进先出）的常规队列，maxsize 可以限制队列的大小。如果队列的大小达到队列的上限，就会加锁，再次加入元素时就会被阻塞，直到队列中的元素被消费。如果将 maxsize 设置为 0 或负数，则该队列的大小就是无限制的。</p>
+</li>
+<li><p>queue.LifoQueue(maxsize=0)：代表 LIFO（后进先出）的队列，与 Queue 的区别就是出队列的顺序不同。</p>
+</li>
+<li><p>PriorityQueue(maxsize=0)：代表优先级队列，优先级最小的元素先出队列。</p>
+</li>
+</ul>
+<p>这三个队列类的属性和方法基本相同， 它们都提供了如下属性和方法：</p>
+<ul>
+<li>Queue.qsize()：返回队列的实际大小，也就是该队列中包含几个元素。<ul>
+<li>这个方法在 <code>macbook</code> 中不能执行</li>
+</ul>
+</li>
+<li>Queue.empty()：判断队列是否为空。</li>
+<li>Queue.full()：判断队列是否已满。</li>
+<li>Queue.put(item, block=True, timeout=None)：向队列中放入元素。如果队列己满，且 block 参数为 True（阻塞），当前线程被阻塞，timeout 指定阻塞时间，如果将 timeout 设置为 None，则代表一直阻塞，直到该队列的元素被消费；如果队列己满，且 block 参数为 False（不阻塞），则直接引发 queue.FULL 异常。</li>
+<li>Queue.put_nowait(item)：向队列中放入元素，不阻塞。相当于在上一个方法中将 block 参数设置为 False。</li>
+<li>Queue.get(item, block=True, timeout=None)：从队列中取出元素（消费元素）。如果队列已满，且 block 参数为 True（阻塞），当前线程被阻塞，timeout 指定阻塞时间，如果将 timeout 设置为 None，则代表一直阻塞，直到有元素被放入队列中； 如果队列己空，且 block 参数为 False（不阻塞），则直接引发 queue.EMPTY 异常。</li>
+<li>Queue.get_nowait(item)：从队列中取出元素，不阻塞。相当于在上一个方法中将 block 参数设置为 False。</li>
+</ul>
+<p>下面以普通的 Queue 为例介绍阻塞队列的功能和用法。首先用一个最简单的程序来测试 Queue 的 put() 和 get() 方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> queue</span><br><span class="line"><span class="comment"># 定义一个长度为2的阻塞队列</span></span><br><span class="line">bq = queue.Queue(<span class="number">2</span>)</span><br><span class="line">bq.put(<span class="string">"Python"</span>)</span><br><span class="line">bq.put(<span class="string">"Python"</span>)</span><br><span class="line">print(<span class="string">"1111111111"</span>)</span><br><span class="line">bq.put(<span class="string">"Python"</span>)  <span class="comment"># ① 阻塞线程</span></span><br><span class="line">print(<span class="string">"2222222222"</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在掌握了 Queue 阻塞队列的特性之后，在下面程序中就可以利用 Queue 来实现线程通信了。</p>
+<p>与此类似的是，在 Queue 已空的情况下，程序使用 get() 方法尝试取出元素将会阻塞线程。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> queue</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">product</span><span class="params">(bq)</span>:</span></span><br><span class="line">    str_tuple = (<span class="string">"Python"</span>, <span class="string">"Kotlin"</span>, <span class="string">"Swift"</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">99999</span>):</span><br><span class="line">        print(threading.current_thread().name + <span class="string">"生产者准备生产元组元素！"</span>)</span><br><span class="line">        time.sleep(<span class="number">0.2</span>);</span><br><span class="line">        <span class="comment"># 尝试放入元素，如果队列已满，则线程被阻塞</span></span><br><span class="line">        bq.put(str_tuple[i % <span class="number">3</span>])</span><br><span class="line">        print(threading.current_thread().name \</span><br><span class="line">            + <span class="string">"生产者生产元组元素完成！"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">consume</span><span class="params">(bq)</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        print(threading.current_thread().name + <span class="string">"消费者准备消费元组元素！"</span>)</span><br><span class="line">        time.sleep(<span class="number">0.2</span>)</span><br><span class="line">        <span class="comment"># 尝试取出元素，如果队列已空，则线程被阻塞</span></span><br><span class="line">        t = bq.get()</span><br><span class="line">        print(threading.current_thread().name \</span><br><span class="line">            + <span class="string">"消费者消费[ %s ]元素完成！"</span> % t)</span><br><span class="line"><span class="comment"># 创建一个容量为1的Queue</span></span><br><span class="line">bq = queue.Queue(maxsize=<span class="number">1</span>)</span><br><span class="line"><span class="comment"># 启动3个生产者线程</span></span><br><span class="line">threading.Thread(target=product, args=(bq, )).start()</span><br><span class="line">threading.Thread(target=product, args=(bq, )).start()</span><br><span class="line">threading.Thread(target=product, args=(bq, )).start()</span><br><span class="line"><span class="comment"># 启动一个消费者线程</span></span><br><span class="line">threading.Thread(target=consume, args=(bq, )).start()</span><br></pre></td></tr></table></figure>
+
+<p>上面程序启动了三个生产者线程向 Queue 队列中放入元素，启动了一个消费者线程从 Queue 队列中取出元素。本程序中 Queue 队列的大小为 1，因此三个生产者线程无法连续放入元素，必须等待消费者线程取出一个元素后，其中的一个生产者线程才能放入一个元素。</p>
+<p>从运行结果中可以看出，三个生产者线程都想向 Queue 中放入元素，但只要其中一个生产者线程向该队列中放入元素之后，其他生产者线程就必须等待，等待消费者线程取出 Queue 队列中的元素。</p>
+<br/>
+
+<h1 id="Python-Event实现线程通信"><a href="#Python-Event实现线程通信" class="headerlink" title="Python Event实现线程通信"></a>Python Event实现线程通信</h1><br/>
+
+<p> Event 是一种非常简单的线程通信机制，一个线程发出一个 Event，另一个线程可通过该 Event 被触发。</p>
+<p>Event 本身管理一个内部旗标，程序可以通过 Event 的 set() 方法将该旗标设置为 True，也可以调用 clear() 方法将该旗标设置为 False。程序可以调用 wait() 方法来阻塞当前线程，直到 Event 的内部旗标被设置为 True。</p>
+<p>Event 提供了如下方法：</p>
+<ul>
+<li>is_set()：该方法返回 Event 的内部旗标是否为True。</li>
+<li>set()：该方法将会把 Event 的内部旗标设置为 True，并唤醒所有处于等待状态的线程。</li>
+<li>clear()：该方法将 Event 的内部旗标设置为 False，通常接下来会调用 wait() 方法来阻塞当前线程。</li>
+<li>wait(timeout=None)：该方法会阻塞当前线程。</li>
+</ul>
+<p>下面程序示范了 Event 最简单的用法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line">event = threading.Event()</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cal</span><span class="params">(name)</span>:</span></span><br><span class="line">    <span class="comment"># 等待事件，进入等待阻塞状态</span></span><br><span class="line">    print(<span class="string">'%s 启动'</span> % threading.currentThread().getName())</span><br><span class="line">    print(<span class="string">'%s 准备开始计算状态'</span> % name)</span><br><span class="line">    event.wait()    <span class="comment"># ①</span></span><br><span class="line">    <span class="comment"># 收到事件后进入运行状态</span></span><br><span class="line">    print(<span class="string">'%s 收到通知了.'</span> % threading.currentThread().getName())</span><br><span class="line">    print(<span class="string">'%s 正式开始计算！'</span>% name)</span><br><span class="line"><span class="comment"># 创建并启动两条，它们都会①号代码处等待</span></span><br><span class="line">threading.Thread(target=cal, args=(<span class="string">'甲'</span>, )).start()</span><br><span class="line">threading.Thread(target=cal, args=(<span class="string">"乙"</span>, )).start()</span><br><span class="line">time.sleep(<span class="number">2</span>)    <span class="comment">#②</span></span><br><span class="line">print(<span class="string">'------------------'</span>)</span><br><span class="line"><span class="comment"># 发出事件</span></span><br><span class="line">print(<span class="string">'主线程发出事件'</span>)</span><br><span class="line">event.set()</span><br></pre></td></tr></table></figure>
+
+<p>运行上面程序，将看到如下输出结果：</p>
+<pre><code>Thread-1 启动
+甲 准备开始计算状态
+Thread-2 启动
+乙 准备开始计算状态
+------------------
+主线程发出事件
+Thread-1 收到通知了.
+Thread-2 收到通知了.
+甲 正式开始计算！
+乙 正式开始计算！</code></pre><p>上面程序还没有使用 Event 的内部旗标，如果结合 Event 的内部旗标，同样可实现前面的 Account 的生产者-消费者效果：存钱线程（生产者）存钱之后，必须等取钱线程（消费者）取钱之后才能继续向下执行。</p>
+<blockquote>
+<p>Event 实际上优点类似于 Condition 和旗标的结合体，但 Event 本身并不带 Lock 对象，因此如果要实现线程同步，还需要额外的 Lock 对象。</p>
+</blockquote>
+<p>下面是使用 Event 改写后的 Account：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Account</span>:</span></span><br><span class="line">    <span class="comment"># 定义构造器</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, account_no, balance)</span>:</span></span><br><span class="line">        <span class="comment"># 封装账户编号、账户余额的两个成员变量</span></span><br><span class="line">        self.account_no = account_no</span><br><span class="line">        self._balance = balance</span><br><span class="line">        self.lock = threading.Lock()</span><br><span class="line">        self.event = threading.Event()</span><br><span class="line">    <span class="comment"># 因为账户余额不允许随便修改，所以只为self._balance提供getter方法</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getBalance</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self._balance</span><br><span class="line">    <span class="comment"># 提供一个线程安全的draw()方法来完成取钱操作</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">draw</span><span class="params">(self, draw_amount)</span>:</span></span><br><span class="line">        <span class="comment"># 加锁</span></span><br><span class="line">        self.lock.acquire()</span><br><span class="line">        <span class="comment"># 如果Event内部旗标为True，表明账户中已有人存钱进去</span></span><br><span class="line">        <span class="keyword">if</span> self.event.is_set():</span><br><span class="line">            <span class="comment"># 执行取钱操作</span></span><br><span class="line">            print(threading.current_thread().name</span><br><span class="line">                + <span class="string">" 取钱:"</span> +  str(draw_amount))</span><br><span class="line">            self._balance -= draw_amount</span><br><span class="line">            print(<span class="string">"账户余额为："</span> + str(self._balance))</span><br><span class="line">            <span class="comment"># 将Event内部旗标设为False</span></span><br><span class="line">            self.event.clear()</span><br><span class="line">            <span class="comment"># 释放加锁</span></span><br><span class="line">            self.lock.release()</span><br><span class="line">            <span class="comment"># 阻塞当前线程阻塞</span></span><br><span class="line">            self.event.wait()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 释放加锁</span></span><br><span class="line">            self.lock.release()</span><br><span class="line">            <span class="comment"># 阻塞当前线程阻塞</span></span><br><span class="line">            self.event.wait()</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">deposit</span><span class="params">(self, deposit_amount)</span>:</span></span><br><span class="line">        <span class="comment"># 加锁</span></span><br><span class="line">        self.lock.acquire()</span><br><span class="line">        <span class="comment"># 如果Event内部旗标为False，表明账户中还没有人存钱进去</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.event.is_set():</span><br><span class="line">            <span class="comment"># 执行存款操作</span></span><br><span class="line">            print(threading.current_thread().name\</span><br><span class="line">                + <span class="string">" 存款:"</span> +  str(deposit_amount))</span><br><span class="line">            self._balance += deposit_amount</span><br><span class="line">            print(<span class="string">"账户余额为："</span> + str(self._balance))</span><br><span class="line">            <span class="comment"># 将Event内部旗标设为True</span></span><br><span class="line">            self.event.set()</span><br><span class="line">            <span class="comment"># 释放加锁</span></span><br><span class="line">            self.lock.release()</span><br><span class="line">            <span class="comment"># 阻塞当前线程阻塞</span></span><br><span class="line">            self.event.wait()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 释放加锁</span></span><br><span class="line">            self.lock.release()</span><br><span class="line">            <span class="comment"># 阻塞当前线程阻塞</span></span><br><span class="line">            self.event.wait()</span><br></pre></td></tr></table></figure>
+
+
+<br/>
+
+<h1 id="信号量-Semaphore"><a href="#信号量-Semaphore" class="headerlink" title="信号量(Semaphore)"></a>信号量(Semaphore)</h1><br/>
+
+<p>信号量用来控制线程并发数的，Semaphore管理一个内置的计数 器，每当调用acquire()时-1，调用release()时+1。计数器不能小于0，当计数器为 0时，acquire()将阻塞线程至同步锁定状态，直到其他线程调用release()。其实就是控制最多几个线程可以操作同享资源。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">semaphore = threading.Semaphore(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">if</span> semaphore.acquire():</span><br><span class="line">        <span class="keyword">print</span> (threading.currentThread().getName() + <span class="string">'获取共享资源'</span>)</span><br><span class="line">        time.sleep(<span class="number">2</span>)</span><br><span class="line">        semaphore.release()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>)</span><br><span class="line">  t1 = threading.Thread(target=func)</span><br><span class="line">  t1.start()</span><br></pre></td></tr></table></figure>
+
+<p>上面一个简单的例子就是创建10个线程，让每次只让5个线程去执行func函数。</p>
+<p>结果：5个线程一批一批的执行打印,中间停格2s</p>
+<pre><code>Thread-1获取共享资源
+Thread-2获取共享资源
+Thread-3获取共享资源
+Thread-4获取共享资源
+Thread-5获取共享资源
+Thread-6获取共享资源
+Thread-8获取共享资源
+Thread-7获取共享资源
+Thread-9获取共享资源
+Thread-10获取共享资源</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/multiprocess/" rel="tag"># multiprocess</a>
+              <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag"># 多进程</a>
+              <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag"># 多线程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/16/python69/" rel="prev" title="python | matplotlib | 画连续动态图，一边图片，一边信号">
+      <i class="fa fa-chevron-left"></i> python | matplotlib | 画连续动态图，一边图片，一边信号
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/16/python101/" rel="next" title="python | 线程池">
+      python | 线程池 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#直接使用共享内存"><span class="nav-number">1.</span> <span class="nav-text">直接使用共享内存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#condition实现线程通信「等待和唤醒」"><span class="nav-number">2.</span> <span class="nav-text">condition实现线程通信「等待和唤醒」</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Python-Queue队列实现线程通信"><span class="nav-number">3.</span> <span class="nav-text">Python Queue队列实现线程通信</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Python-Event实现线程通信"><span class="nav-number">4.</span> <span class="nav-text">Python Event实现线程通信</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#信号量-Semaphore"><span class="nav-number">5.</span> <span class="nav-text">信号量(Semaphore)</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="Here is the tutorial of python’s matplotlib.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python - matplotlib">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/05/23/python2/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="Here is the tutorial of python’s matplotlib.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_4_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_4_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_4_2.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_4_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/python/2_4_4.png">
+<meta property="article:published_time" content="2018-05-23T06:10:44.000Z">
+<meta property="article:modified_time" content="2021-01-30T14:40:29.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="tutorial">
+<meta property="article:tag" content="matplotlib">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/python/2_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/05/23/python2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python - matplotlib | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/05/23/python2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python - matplotlib
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-05-23 14:10:44" itemprop="dateCreated datePublished" datetime="2018-05-23T14:10:44+08:00">2018-05-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-30 22:40:29" itemprop="dateModified" datetime="2021-01-30T22:40:29+08:00">2021-01-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/" itemprop="url" rel="index"><span itemprop="name">模块</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">高级</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E6%A8%A1%E5%9D%97/%E9%AB%98%E7%BA%A7/matplotlib/" itemprop="url" rel="index"><span itemprop="name">matplotlib</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/05/23/python2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/05/23/python2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Here is the tutorial of python’s matplotlib.</p>
+<a id="more"></a>
+
+<h1 id="基本使用方法"><a href="#基本使用方法" class="headerlink" title="基本使用方法"></a>基本使用方法</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>matplotlib是python中强大的画图模块，按官网上的图例，基本能做出各种各样美观的图表，但python缺省并不带这个模块，需要自己安装呵</p>
+<pre><code>pip install -i http://pypi.douban.com/simple matplotlib</code></pre><p>同时也会相应自主安装 numpy</p>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p>我们用不到 matplotlib 的所有功能，基本上只是使用一小部分，所以只需要：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">x = np.linspace(<span class="number">-1</span>,<span class="number">1</span>,<span class="number">50</span>)</span><br><span class="line">y = <span class="number">2</span> * x + <span class="number">1</span></span><br><span class="line">plt.plot(x,y)	</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/2_0.png" alt=""></p>
+<h2 id="figure-的使用"><a href="#figure-的使用" class="headerlink" title="figure 的使用"></a>figure 的使用</h2><p>figure(num=None, figsize=None, dpi=None, facecolor=None, edgecolor=None, frameon=True)</p>
+<pre><code>num:图像编号或名称，数字为编号 ，字符串为名称
+figsize:指定figure的宽和高，单位为英寸；
+dpi参数指定绘图对象的分辨率，即每英寸多少个像素，缺省值为80
+facecolor:背景颜色
+edgecolor:边框颜色
+frameon:是否显示边框</code></pre><p>想要画出多个图像</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">x = np.linspace(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">50</span>)</span><br><span class="line">y1 = <span class="number">2</span> * x + <span class="number">1</span></span><br><span class="line">y2 = x ** <span class="number">2</span></span><br><span class="line">plt.figure()</span><br><span class="line">plt.plot(x, y1)</span><br><span class="line">plt.figure(num = <span class="number">3</span>,figsize=(<span class="number">8</span>,<span class="number">5</span>))</span><br><span class="line">	<span class="comment"># num 是命名这个图片 figsize 是设置大小</span></span><br><span class="line">plt.plot(x, y2)</span><br><span class="line">plt.plot(x,y1,color = <span class="string">'red'</span>,linewidth = <span class="number">1.0</span>,linestyle = <span class="string">'--'</span>)</span><br><span class="line">	<span class="comment"># 在一幅图中做两条线</span></span><br><span class="line">	<span class="comment"># linestyle 是线段类型，比如这个就是虚线</span></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>一共表现为两张图</p>
+<p><img src="/images/python/2_0.png" alt=""></p>
+<p><img src="/images/python/2_1.png" alt=""></p>
+<h2 id="设置坐标"><a href="#设置坐标" class="headerlink" title="设置坐标"></a>设置坐标</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">x = np.linspace(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">50</span>)</span><br><span class="line">y1 = <span class="number">2</span> * x + <span class="number">1</span></span><br><span class="line">y2 = x ** <span class="number">2</span></span><br><span class="line">plt.figure()</span><br><span class="line">plt.plot(x, y2)</span><br><span class="line">plt.plot(x,y1,color = <span class="string">'red'</span>,linewidth = <span class="number">1.0</span>,linestyle = <span class="string">'--'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置 x y 轴</span></span><br><span class="line">plt.xlim((<span class="number">-1</span>,<span class="number">2</span>))</span><br><span class="line">plt.ylim((<span class="number">-2</span>,<span class="number">3</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置坐标轴名字</span></span><br><span class="line">plt.xlabel(<span class="string">'i am x'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'i am y'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 换间隔 比如原来从 -1 到 1 是 -1 0 1 可以改为 -1 -0.5  。。。 1，y 同理</span></span><br><span class="line">new_ticks = np.linspace(<span class="number">-1</span>,<span class="number">2</span>,<span class="number">5</span>)</span><br><span class="line">plt.xticks(new_ticks)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 给特定的点设置标签</span></span><br><span class="line">plt.yticks(</span><br><span class="line">	[<span class="number">-2.</span><span class="number">-1.8</span>,<span class="number">-1</span>,<span class="number">1.22</span>,<span class="number">3</span>],</span><br><span class="line">	<span class="comment"># 在标签前面加 r 然后字符前后加 $ 可以转换字体 另外中间空格需要加 \（因为这是正则的形式，空格需要转义）</span></span><br><span class="line">	<span class="comment"># 如果要加特殊符号 比如 阿尔法 可以是 \alpha 其他特殊符号可以搜一下</span></span><br><span class="line">	[<span class="string">r'$really \ bad$'</span>, <span class="string">'bad'</span>, <span class="string">r'$normal\ \alpha$'</span>, <span class="string">'good'</span>, <span class="string">'really good'</span>]</span><br><span class="line">)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/2_2.png" alt=""></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改坐标轴位置</span></span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">x = np.linspace(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">50</span>)</span><br><span class="line">y1 = <span class="number">2</span> * x + <span class="number">1</span></span><br><span class="line">y2 = x ** <span class="number">2</span></span><br><span class="line">plt.figure()</span><br><span class="line">plt.plot(x, y2)</span><br><span class="line">plt.plot(x,y1,color = <span class="string">'red'</span>,linewidth = <span class="number">1.0</span>,linestyle = <span class="string">'--'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置 x y 轴</span></span><br><span class="line">plt.xlim((<span class="number">-1</span>,<span class="number">2</span>))</span><br><span class="line">plt.ylim((<span class="number">-2</span>,<span class="number">3</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置坐标轴名字</span></span><br><span class="line">plt.xlabel(<span class="string">'i am x'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'i am y'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 换间隔 比如原来从 -1 到 1 是 -1 0 1 可以改为 -1 -0.5  。。。 1，y 同理</span></span><br><span class="line">new_ticks = np.linspace(<span class="number">-1</span>,<span class="number">2</span>,<span class="number">5</span>)</span><br><span class="line">plt.xticks(new_ticks)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 给特定的点设置标签</span></span><br><span class="line">plt.yticks(</span><br><span class="line">	[<span class="number">-2.</span><span class="number">-1.8</span>,<span class="number">-1</span>,<span class="number">1.22</span>,<span class="number">3</span>],</span><br><span class="line">	<span class="comment"># 在标签前面加 r 然后字符前后加 $ 可以转换字体 另外中间空格需要加 \（因为这是正则的形式，空格需要转义）</span></span><br><span class="line">	<span class="comment"># 如果要加特殊符号 比如 阿尔法 可以是 \alpha 其他特殊符号可以搜一下</span></span><br><span class="line">	[<span class="string">r'$really \ bad$'</span>, <span class="string">'bad'</span>, <span class="string">r'$normal\ \alpha$'</span>, <span class="string">'good'</span>, <span class="string">'really good'</span>]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gca 得到现在的坐标抽</span></span><br><span class="line">ax = plt.gca()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 边框，有四条，分别是上下左右</span></span><br><span class="line">ax.spines[<span class="string">'right'</span>].set_color(<span class="string">'none'</span>)</span><br><span class="line">ax.spines[<span class="string">'top'</span>].set_color(<span class="string">'none'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置坐标点位置，比如原来的原点是 (0,0)，现在的原点是（0，-1）</span></span><br><span class="line">ax.xaxis.set_ticks_position(<span class="string">'bottom'</span>)</span><br><span class="line">ax.yaxis.set_ticks_position(<span class="string">'left'</span>)</span><br><span class="line">ax.spines[<span class="string">'bottom'</span>].set_position((<span class="string">'data'</span>,<span class="number">-1</span>))</span><br><span class="line">ax.spines[<span class="string">'left'</span>].set_position((<span class="string">'data'</span>,<span class="number">0</span>))</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/2_3.png" alt=""></p>
+<h2 id="legend-图例"><a href="#legend-图例" class="headerlink" title="legend 图例"></a>legend 图例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">x = np.linspace(<span class="number">-1</span>, <span class="number">1</span>, <span class="number">50</span>)</span><br><span class="line">y1 = <span class="number">2</span> * x + <span class="number">1</span></span><br><span class="line">y2 = x ** <span class="number">2</span></span><br><span class="line">plt.figure()</span><br><span class="line">plt.xlim((<span class="number">-1</span>, <span class="number">2</span>))</span><br><span class="line">plt.ylim((<span class="number">-2</span>, <span class="number">3</span>))</span><br><span class="line">plt.xlabel(<span class="string">'i am x'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'i am y'</span>)</span><br><span class="line">new_ticks = np.linspace(<span class="number">-1</span>, <span class="number">2</span>, <span class="number">5</span>)</span><br><span class="line">plt.xticks(new_ticks)</span><br><span class="line">plt.yticks(</span><br><span class="line">    [<span class="number">-2.</span> - <span class="number">1.8</span>, <span class="number">-1</span>, <span class="number">1.22</span>, <span class="number">3</span>],</span><br><span class="line">    [<span class="string">r'$really \ bad$'</span>, <span class="string">'bad'</span>, <span class="string">r'$normal\ \alpha$'</span>, <span class="string">'good'</span>, <span class="string">'really good'</span>]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">#对线段进行解释说明</span></span><br><span class="line">plt.plot(x, y2,label = <span class="string">'up'</span>)</span><br><span class="line">plt.plot(x, y1, color=<span class="string">'red'</span>, linewidth=<span class="number">1.0</span>, linestyle=<span class="string">'--'</span>,label = <span class="string">'down'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 参数有很多，其中有个是 loc 位置 当 loc = ‘best’时，会自动找寻最佳位置</span></span><br><span class="line"><span class="comment"># label的选择是就近原则，如下不会打出 up,down 只会打出 li cong</span></span><br><span class="line">plt.legend(loc = <span class="string">'best'</span>,labels = [<span class="string">'li'</span>,<span class="string">'cong'</span>])</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/2_4.png" alt=""></p>
+<h2 id="动图"><a href="#动图" class="headerlink" title="动图"></a>动图</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line">number = np.linspace(<span class="number">0</span>,<span class="number">5</span>,<span class="number">100</span>)</span><br><span class="line">y = np.sin(number)</span><br><span class="line">plt.plot(number,y)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">200</span>):</span><br><span class="line">    l = plt.scatter(i, <span class="number">5</span>, s=<span class="number">200</span>, lw=<span class="number">0</span>, c=<span class="string">'red'</span>, alpha=<span class="number">0.5</span>)</span><br><span class="line">    plt.pause(<span class="number">0.1</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">'l'</span> <span class="keyword">in</span> globals():</span><br><span class="line">        l.remove()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>#接口</p>
+<h2 id="pyplot"><a href="#pyplot" class="headerlink" title="pyplot"></a>pyplot</h2><p>pyplot是一个收集一些函数的模块，这些函数允许以函数式方式使用matplotlib。</p>
+<h1 id="小技巧"><a href="#小技巧" class="headerlink" title="小技巧"></a>小技巧</h1><h2 id="去掉坐标系"><a href="#去掉坐标系" class="headerlink" title="去掉坐标系"></a>去掉坐标系</h2><p>这两段代码效果一样。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">plt.figure()</span><br><span class="line">plt.xticks([])</span><br><span class="line">plt.yticks([])</span><br><span class="line">data = np.arange(<span class="number">12</span>)</span><br><span class="line">plt.plot(data,data*<span class="number">2</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p>注意，类似的这些操作若想起作用，需要将其置于 plt.show() 之前，plt.imshow() 之后</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">plt.figure()</span><br><span class="line">frame = plt.gca()</span><br><span class="line"><span class="comment"># y 轴不可见</span></span><br><span class="line">frame.axes.get_yaxis().set_visible(<span class="literal">False</span>)</span><br><span class="line"><span class="comment"># x 轴不可见</span></span><br><span class="line">frame.axes.get_xaxis().set_visible(<span class="literal">False</span>)</span><br><span class="line">data = np.arange(<span class="number">12</span>)</span><br><span class="line">plt.plot(data,data*<span class="number">2</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/2_4_0.png" alt=""></p>
+<h2 id="去掉边界"><a href="#去掉边界" class="headerlink" title="去掉边界"></a>去掉边界</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">plt.figure()</span><br><span class="line">frame = plt.gca()</span><br><span class="line"><span class="comment"># y 轴不可见</span></span><br><span class="line">frame.axes.get_yaxis().set_visible(<span class="literal">False</span>)</span><br><span class="line"><span class="comment"># x 轴不可见</span></span><br><span class="line">frame.axes.get_xaxis().set_visible(<span class="literal">False</span>)</span><br><span class="line">plt.axis(<span class="string">'off'</span>)</span><br><span class="line">data = np.arange(<span class="number">12</span>)</span><br><span class="line">plt.plot(data,data*<span class="number">2</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/2_4_1.png" alt=""></p>
+<p>注意，类似的这些操作若想起作用，需要将其置于 plt.show() 之前，plt.imshow() 之后</p>
+<h2 id="无限动图"><a href="#无限动图" class="headerlink" title="无限动图"></a>无限动图</h2><p>效果图如下：</p>
+<p><img src="/images/python/2_4_2.gif" alt=""></p>
+<p>Matplotlib中默认是使用阻塞模式。看一下这里用到的matplotlib中的几个函数：</p>
+<pre><code>plt.ion()：打开交互模式
+plt.ioff()：关闭交互模式
+plt.clf()：清除当前的Figure对象
+plt.cla()：清除当前的Axes对象
+plt.pause()：暂停功能</code></pre><p>了解了以上几个函数之后，就可以很方便的画出动态图了。原理很简单，就是一个“画图–&gt;清理–&gt;画图”的循环，注意这中间的pause暂停。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">	plt.figure(figsize=(<span class="number">8</span>, <span class="number">6</span>), dpi=<span class="number">80</span>)</span><br><span class="line">	plt.ion()</span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">		plt.cla()</span><br><span class="line">		x = np.linspace(-np.pi + <span class="number">0.1</span> * i, np.pi + <span class="number">0.1</span> * i, <span class="number">256</span>, endpoint=<span class="literal">True</span>)</span><br><span class="line">		y = np.cos(x)</span><br><span class="line">		plt.plot(x,y)</span><br><span class="line">		plt.pause(<span class="number">0.01</span>)</span><br><span class="line">		plt.ioff()</span><br><span class="line">		plt.show()</span><br><span class="line">test()</span><br></pre></td></tr></table></figure>
+
+<p>让人感到奇怪的是，即便是将 ion() 和 ioff() 注释掉后，还是原来的效果。。。</p>
+<p>真让人头大</p>
+<h2 id="解决中文乱码"><a href="#解决中文乱码" class="headerlink" title="解决中文乱码"></a>解决中文乱码</h2><h3 id="win下的解决方案"><a href="#win下的解决方案" class="headerlink" title="win下的解决方案"></a>win下的解决方案</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">plt.figure()</span><br><span class="line">plt.text(<span class="number">0.5</span>,<span class="number">0.3</span>,<span class="string">"李丛123"</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/2_4_3.png" alt=""></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">plt.rcParams[<span class="string">'font.sans-serif'</span>]=[<span class="string">'SimHei'</span>] <span class="comment">#用来正常显示中文标签</span></span><br><span class="line">plt.rcParams[<span class="string">'axes.unicode_minus'</span>]=<span class="literal">False</span> <span class="comment">#用来正常显示负号</span></span><br><span class="line"><span class="comment">#有中文出现的情况，需要u'内容'</span></span><br><span class="line">plt.figure()</span><br><span class="line">plt.text(<span class="number">0.5</span>,<span class="number">0.3</span>,<span class="string">u"李丛123"</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/python/2_4_4.png" alt=""></p>
+<h3 id="macbook下的解决方案"><a href="#macbook下的解决方案" class="headerlink" title="macbook下的解决方案"></a>macbook下的解决方案</h3><p>由于Mac系统自带有中文字库，Arial Unicode MS即为其中一种。不需要安装字库，不需要修改配置文件。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">plt.rcParams[<span class="string">"font.family"</span>] = <span class="string">'Arial Unicode MS'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="通用解决方案，建议用这个"><a href="#通用解决方案，建议用这个" class="headerlink" title="通用解决方案，建议用这个"></a>通用解决方案，建议用这个</h3><p>使用外界字体集</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> matplotlib.font_manager <span class="keyword">import</span> FontProperties</span><br><span class="line"></span><br><span class="line">chinese_font = FontProperties(fname=<span class="string">'./SanJiShaHeiJianTi-2.ttf'</span>)</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">plt.title(<span class="string">'原始波形'</span>, fontproperties=chinese_font)</span><br><span class="line">...</span><br><span class="line">plt.title(<span class="string">'原始部分波形（前50组样本）'</span>, fontproperties=chinese_font)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/tutorial/" rel="tag"># tutorial</a>
+              <a href="/tags/matplotlib/" rel="tag"># matplotlib</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/05/23/python1/" rel="prev" title="python - pandas">
+      <i class="fa fa-chevron-left"></i> python - pandas
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/05/23/article1/" rel="next" title="《幸福是什么》">
+      《幸福是什么》 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本使用方法"><span class="nav-number">1.</span> <span class="nav-text">基本使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本用法"><span class="nav-number">1.2.</span> <span class="nav-text">基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#figure-的使用"><span class="nav-number">1.3.</span> <span class="nav-text">figure 的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置坐标"><span class="nav-number">1.4.</span> <span class="nav-text">设置坐标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#legend-图例"><span class="nav-number">1.5.</span> <span class="nav-text">legend 图例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动图"><span class="nav-number">1.6.</span> <span class="nav-text">动图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pyplot"><span class="nav-number">1.7.</span> <span class="nav-text">pyplot</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小技巧"><span class="nav-number">2.</span> <span class="nav-text">小技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#去掉坐标系"><span class="nav-number">2.1.</span> <span class="nav-text">去掉坐标系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#去掉边界"><span class="nav-number">2.2.</span> <span class="nav-text">去掉边界</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无限动图"><span class="nav-number">2.3.</span> <span class="nav-text">无限动图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决中文乱码"><span class="nav-number">2.4.</span> <span class="nav-text">解决中文乱码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#win下的解决方案"><span class="nav-number">2.4.1.</span> <span class="nav-text">win下的解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#macbook下的解决方案"><span class="nav-number">2.4.2.</span> <span class="nav-text">macbook下的解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通用解决方案，建议用这个"><span class="nav-number">2.4.3.</span> <span class="nav-text">通用解决方案，建议用这个</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

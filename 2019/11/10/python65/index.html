@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这个是追踪错误的很牛逼的方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python-traceback">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/11/10/python65/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这个是追踪错误的很牛逼的方法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-11-10T13:39:13.000Z">
+<meta property="article:modified_time" content="2020-03-21T10:05:11.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="traceback">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/11/10/python65/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python-traceback | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/11/10/python65/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python-traceback
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-10 21:39:13" itemprop="dateCreated datePublished" datetime="2019-11-10T21:39:13+08:00">2019-11-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-21 18:05:11" itemprop="dateModified" datetime="2020-03-21T18:05:11+08:00">2020-03-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">进阶</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/11/10/python65/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/11/10/python65/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这个是追踪错误的很牛逼的方法。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h1><br/>
+
+<p>在项目中，我遇见了一个问题，我们会把状态用 log 输入到文件中，但是，有的输出并不知道哪里错了，也就是不知道哪个文件错了。</p>
+<p>而且，有的时候，服务器遇到了错误，在本地可能遇不到，所以，我们有了追踪服务器的错误路径的需求。</p>
+<p>别人教我用 traceback</p>
+<p>以下是摘抄</p>
+<p>刚接触Python的时候，简单的异常处理已经可以帮助我们解决大多数问题，但是随着逐渐地深入，我们会发现有很多情况下简单的异常处理已经无法解决问题了，如下代码，单纯的打印异常所能提供的信息会非常有限。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">raise</span> Exception(<span class="string">"--func1 exception--"</span>)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">try</span>:</span><br><span class="line">    func1()</span><br><span class="line">  <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    <span class="keyword">print</span> e</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
+<p>执行后输出如下</p>
+<pre><code>--func1 exception--</code></pre><p>通过示例，我们发现普通的打印异常只有很少量的信息（通常是异常的value值），这种情况下我们很难定位在哪块代码出的问题，以及如何出现这种异常。那么到底要如何打印更加详细的信息呢？下面我们就来一一介绍。</p>
+<br/>
+
+<h1 id="sys-exc-info和traceback-object"><a href="#sys-exc-info和traceback-object" class="headerlink" title="sys.exc_info和traceback object"></a>sys.exc_info和traceback object</h1><br/>
+
+<p>Python程序的traceback信息均来源于一个叫做traceback object的对象，而这个traceback object通常是通过函数sys.exc_info()来获取的，先来看一个例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">raise</span> NameError(<span class="string">"--func1 exception--"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">try</span>:</span><br><span class="line">    func1()</span><br><span class="line">  <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    exc_type, exc_value, exc_traceback_obj = sys.exc_info()</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"exc_type: %s"</span> % exc_type</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"exc_value: %s"</span> % exc_value</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"exc_traceback_obj: %s"</span> % exc_traceback_obj</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
+
+<p>执行后输出如下：</p>
+<pre><code>exc_type: &lt;type &apos;exceptions.NameError&apos;&gt;
+exc_value: --func1 exception--
+exc_traceback_obj: &lt;traceback object at 0x7faddf5d93b0&gt;</code></pre><p>通过以上示例我们可以看出，sys.exc_info()获取了当前处理的exception的相关信息，并返回一个元组，元组的第一个数据是异常的类型(示例是NameError类型)，第二个返回值是异常的value值，第三个就是我们要的traceback object.</p>
+<p>有了traceback object我们就可以通过traceback module来打印和格式化traceback的相关信息，下面我们就来看下traceback module的相关函数。</p>
+<br/>
+
+<h1 id="traceback-module"><a href="#traceback-module" class="headerlink" title="traceback module"></a>traceback module</h1><br/>
+
+<p>Python的traceback module提供一整套接口用于提取，格式化和打印Python程序的stack traces信息，下面我们通过例子来详细了解下这些接口：</p>
+<h2 id="print-tb"><a href="#print-tb" class="headerlink" title="print_tb"></a>print_tb</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> traceback</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">raise</span> NameError(<span class="string">"--func1 exception--"</span>)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">try</span>:</span><br><span class="line">    func1()</span><br><span class="line">  <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    exc_type, exc_value, exc_traceback_obj = sys.exc_info()</span><br><span class="line">    traceback.print_tb(exc_traceback_obj)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<pre><code>File &quot;&lt;ipython-input-23-52bdf2c9489c&gt;&quot;, line 11, in main
+    func1()
+File &quot;&lt;ipython-input-23-52bdf2c9489c&gt;&quot;, line 6, in func1
+    raise NameError(&quot;--func1 exception--&quot;)</code></pre><p>这里我们可以发现打印的异常信息更加详细了，下面我们了解下print_tb的详细信息：</p>
+<p>traceback.print_tb(tb[, limit[, file]])</p>
+<pre><code>tb: 这个就是traceback object, 是我们通过sys.exc_info获取到的
+limit: 这个是限制stack trace层级的，如果不设或者为None，就会打印所有层级的stack trace
+file: 这个是设置打印的输出流的，可以为文件，也可以是stdout之类的file-like object。如果不设或为None，则输出到sys.stderr。</code></pre><h2 id="print-exception"><a href="#print-exception" class="headerlink" title="print_exception"></a>print_exception</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> traceback</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">raise</span> NameError(<span class="string">"--func1 exception--"</span>)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func2</span><span class="params">()</span>:</span></span><br><span class="line">  func1()</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">try</span>:</span><br><span class="line">    func2()</span><br><span class="line">  <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    exc_type, exc_value, exc_traceback_obj = sys.exc_info()</span><br><span class="line">    traceback.print_exception(exc_type, exc_value, exc_traceback_obj, limit=<span class="number">2</span>, file=sys.stdout)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<pre><code>Traceback (most recent call last):
+  File &quot;&lt;ipython-input-24-a68061acf52f&gt;&quot;, line 13, in main
+    func2()
+  File &quot;&lt;ipython-input-24-a68061acf52f&gt;&quot;, line 9, in func2
+    func1()
+NameError: --func1 exception--</code></pre><p>看下定义：<br>traceback.print_exception(etype, value, tb[, limit[, file]])</p>
+<p>跟print_tb相比多了两个参数etype和value，分别是exception type和exception value，加上tb(traceback object)，正好是sys.exc_info()返回的三个值</p>
+<p>另外，与print_tb相比，打印信息多了开头的”Traceback (most…)”信息以及最后一行的异常类型和value信息</p>
+<p>还有一个不同是当异常为SyntaxError时，会有”^”来指示语法错误的位置</p>
+<br/>
+
+<h1 id="print-exc"><a href="#print-exc" class="headerlink" title="print_exc"></a>print_exc</h1><br/>
+
+<p>print_exc是简化版的print_exception, 由于exception type, value和traceback object都可以通过sys.exc_info()获取，因此print_exc()就自动执行exc_info()来帮助获取这三个参数了，也因此这个函数是我们的程序中最常用的，因为它足够简单</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> traceback</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">raise</span> NameError(<span class="string">"--func1 exception--"</span>)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func2</span><span class="params">()</span>:</span></span><br><span class="line">  func1()</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">try</span>:</span><br><span class="line">    func2()</span><br><span class="line">  <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    traceback.print_exc(limit=<span class="number">1</span>, file=sys.stdout)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
+
+<p>输出（由于limit=1，因此只有一个层级被打印出来）：</p>
+<pre><code>Traceback (most recent call last):
+  File &quot;&lt;ipython-input-25-a1f5c73b97c4&gt;&quot;, line 13, in main
+    func2()
+NameError: --func1 exception--</code></pre><p>定义如下：traceback.print_exc([limit[, file]])</p>
+<p>只有两个参数，够简单</p>
+<br/>
+
+<h1 id="format-exc"><a href="#format-exc" class="headerlink" title="format_exc"></a>format_exc</h1><br/>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> traceback</span><br><span class="line">logger = logging.getLogger(<span class="string">"traceback_test"</span>)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">raise</span> NameError(<span class="string">"--func1 exception--"</span>)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func2</span><span class="params">()</span>:</span></span><br><span class="line">  func1()</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">try</span>:</span><br><span class="line">    func2()</span><br><span class="line">  <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    logger.error(traceback.format_exc(limit=<span class="number">1</span>, file=sys.stdout))</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
+
+<p>从这个例子可以看出有时候我们想得到的是一个字符串，比如我们想通过logger将异常记录在log里，这个时候就需要format_exc了，这个也是最常用的一个函数，它跟print_exc用法相同，只是不直接打印而是返回了字符串。</p>
+<p>traceback module中还有一些其它的函数，但因为并不常用，就不在展开来讲，感兴趣的同学可以看下参考链接中的文档。</p>
+<br/>
+
+<h1 id="获取线程中的异常信息"><a href="#获取线程中的异常信息" class="headerlink" title="获取线程中的异常信息"></a>获取线程中的异常信息</h1><br/>
+
+<p>通常情况下我们无法将多线程中的异常带回主线程，所以也就无法打印线程中的异常，而通过上边学到这些知识，我们可以对线程做如下修改，从而实现捕获线程异常的目的。</p>
+<p>以下示例来自weidong的博客文章，稍有修改（见参考链接）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> traceback</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_func</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">raise</span> BaseException(<span class="string">"thread exception"</span>)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExceptionThread</span><span class="params">(threading.Thread)</span>:</span></span><br><span class="line"> </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, group=None, target=None, name=None, args=<span class="params">()</span>, kwargs=None, verbose=None)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Redirect exceptions of thread to an exception handler.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    threading.Thread.__init__(self, group, target, name, args, kwargs, verbose)</span><br><span class="line">    <span class="keyword">if</span> kwargs <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">      kwargs = &#123;&#125;</span><br><span class="line">    self._target = target</span><br><span class="line">    self._args = args</span><br><span class="line">    self._kwargs = kwargs</span><br><span class="line">    self._exc = <span class="literal">None</span></span><br><span class="line"> </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">      <span class="keyword">if</span> self._target:</span><br><span class="line">        self._target()</span><br><span class="line">    <span class="keyword">except</span> BaseException <span class="keyword">as</span> e:</span><br><span class="line">      <span class="keyword">import</span> sys</span><br><span class="line">      self._exc = sys.exc_info()</span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">      <span class="comment">#Avoid a refcycle if the thread is running a function with</span></span><br><span class="line">      <span class="comment">#an argument that has a member that points to the thread.</span></span><br><span class="line">      <span class="keyword">del</span> self._target, self._args, self._kwargs</span><br><span class="line"> </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">join</span><span class="params">(self)</span>:</span></span><br><span class="line">    threading.Thread.join(self)</span><br><span class="line">    <span class="keyword">if</span> self._exc:</span><br><span class="line">      msg = <span class="string">"Thread '%s' threw an exception: %s"</span> % (self.getName(), self._exc[<span class="number">1</span>])</span><br><span class="line">      new_exc = Exception(msg)</span><br><span class="line">      <span class="keyword">raise</span> new_exc.__class__, new_exc, self._exc[<span class="number">2</span>]</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">t = ExceptionThread(target=my_func, name=<span class="string">'my_thread'</span>)</span><br><span class="line">t.start()</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">  t.join()</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">  traceback.print_exc()</span><br></pre></td></tr></table></figure>
+
+<p>输出如下：</p>
+<pre><code>Traceback (most recent call last):
+  File &quot;/data/code/testcode/thread_exc.py&quot;, line 43, in &lt;module&gt;
+    t.join()
+  File &quot;/data/code/testcode/thread_exc.py&quot;, line 23, in run
+    self._target()
+  File &quot;/data/code/testcode/thread_exc.py&quot;, line 5, in my_func
+    raise BaseException(&quot;thread exception&quot;)
+Exception: Thread &apos;my_thread&apos; threw an exception: thread exception</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/traceback/" rel="tag"># traceback</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/10/pycharm0/" rel="prev" title="pycharm的一些技巧">
+      <i class="fa fa-chevron-left"></i> pycharm的一些技巧
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/10/websocket0/" rel="next" title="websocket入门">
+      websocket入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引子"><span class="nav-number">1.</span> <span class="nav-text">引子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sys-exc-info和traceback-object"><span class="nav-number">2.</span> <span class="nav-text">sys.exc_info和traceback object</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#traceback-module"><span class="nav-number">3.</span> <span class="nav-text">traceback module</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#print-tb"><span class="nav-number">3.1.</span> <span class="nav-text">print_tb</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#print-exception"><span class="nav-number">3.2.</span> <span class="nav-text">print_exception</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#print-exc"><span class="nav-number">4.</span> <span class="nav-text">print_exc</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#format-exc"><span class="nav-number">5.</span> <span class="nav-text">format_exc</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#获取线程中的异常信息"><span class="nav-number">6.</span> <span class="nav-text">获取线程中的异常信息</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

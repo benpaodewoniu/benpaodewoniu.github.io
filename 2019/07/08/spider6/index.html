@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这个是让你学会使用mitmproxy。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mitmproxy的用法">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/07/08/spider6/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这个是让你学会使用mitmproxy。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/spider/6_0.png">
+<meta property="article:published_time" content="2019-07-08T13:15:57.000Z">
+<meta property="article:modified_time" content="2020-05-08T06:05:54.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="爬虫">
+<meta property="article:tag" content="spider">
+<meta property="article:tag" content="手机爬虫">
+<meta property="article:tag" content="mitmproxy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/spider/6_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/07/08/spider6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>mitmproxy的用法 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/07/08/spider6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mitmproxy的用法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-07-08 21:15:57" itemprop="dateCreated datePublished" datetime="2019-07-08T21:15:57+08:00">2019-07-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-08 14:05:54" itemprop="dateModified" datetime="2020-05-08T14:05:54+08:00">2020-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">爬虫</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%88%AC%E8%99%AB/%E6%89%8B%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">手机</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/07/08/spider6/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/07/08/spider6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这个是让你学会使用mitmproxy。</p>
+<a id="more"></a>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://edu.csdn.net/notebook/python/week11/2.html" rel="external nofollow noreferrer">mitmproxy的使用</a></p>
+<p><a href="https://blog.csdn.net/u014796999/article/details/83934512" rel="external nofollow noreferrer">mitmdump抓取数据的使用步骤实例——第一阶段</a></p>
+<p><a href="https://www.cnblogs.com/lsdb/p/10106655.html" rel="external nofollow noreferrer">Python3+mitmproxy安装使用教程</a></p>
+<p><a href="https://www.jianshu.com/p/a495cc016682" rel="external nofollow noreferrer">深入了解mitmproxy</a></p>
+<h1 id="python编写脚本"><a href="#python编写脚本" class="headerlink" title="python编写脚本"></a>python编写脚本</h1><p>这里我使用的是 anaconda 的集成虚拟环境，更加值得注意的是，mitmproxy的使用python 版本至少是 3.6。</p>
+<p>进入 python 3.6 的虚拟环境。</p>
+<p>输入</p>
+<pre><code>pip install mitmproxy</code></pre><p>这个一定要用3.6以上的环境安装。</p>
+<h2 id="写脚本"><a href="#写脚本" class="headerlink" title="写脚本"></a>写脚本</h2><p>写出来的脚本，运行下面的命令</p>
+<pre><code>mitmdump.exe -s example_script.py</code></pre><p>在虚拟环境下，运行。</p>
+<p><img src="/images/spider/6_0.png" alt=""></p>
+<p>我们在相关的python文件中写对应的代码，然后处理。和正常的python代码一样，只不过需要有两个注意点。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> mitmproxy <span class="keyword">import</span> ctx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 所有发出的请求数据包都会被这个方法所处理</span></span><br><span class="line"><span class="comment"># 所谓的处理，我们这里只是打印一下一些项；当然可以修改这些项的值直接给这些项赋值即可</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">request</span><span class="params">(flow)</span>:</span></span><br><span class="line">    <span class="comment"># 获取请求对象</span></span><br><span class="line">    request = flow.request</span><br><span class="line">    <span class="comment"># 实例化输出类</span></span><br><span class="line">    info = ctx.log.info</span><br><span class="line">    <span class="comment"># 打印请求的url</span></span><br><span class="line">    info(request.url)</span><br><span class="line">    <span class="comment"># 打印请求方法</span></span><br><span class="line">    info(request.method)</span><br><span class="line">    <span class="comment"># 打印host头</span></span><br><span class="line">    info(request.host)</span><br><span class="line">    <span class="comment"># 打印请求端口</span></span><br><span class="line">    info(str(request.port))</span><br><span class="line">    <span class="comment"># 打印所有请求头部</span></span><br><span class="line">    info(str(request.headers))</span><br><span class="line">    <span class="comment"># 打印cookie头</span></span><br><span class="line">    info(str(request.cookies))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 所有服务器响应的数据包都会被这个方法处理</span></span><br><span class="line"><span class="comment"># 所谓的处理，我们这里只是打印一下一些项</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">response</span><span class="params">(flow)</span>:</span></span><br><span class="line">    <span class="comment"># 获取响应对象</span></span><br><span class="line">    response = flow.response</span><br><span class="line">    <span class="comment"># 实例化输出类</span></span><br><span class="line">    info = ctx.log.info</span><br><span class="line">    <span class="comment"># 打印响应码</span></span><br><span class="line">    info(str(response.status_code))</span><br><span class="line">    <span class="comment"># 打印所有头部</span></span><br><span class="line">    info(str(response.headers))</span><br><span class="line">    <span class="comment"># 打印cookie头部</span></span><br><span class="line">    info(str(response.cookies))</span><br><span class="line">    <span class="comment"># 打印响应报文内容</span></span><br><span class="line">    info(str(response.text))</span><br></pre></td></tr></table></figure>
+
+<p>主要events一览表</p>
+<p>需要修改各种事件内容时，重写以下对应方法，这里主要用的是request、response方法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> typing</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> mitmproxy.addonmanager</span><br><span class="line"><span class="keyword">import</span> mitmproxy.connections</span><br><span class="line"><span class="keyword">import</span> mitmproxy.http</span><br><span class="line"><span class="keyword">import</span> mitmproxy.log</span><br><span class="line"><span class="keyword">import</span> mitmproxy.tcp</span><br><span class="line"><span class="keyword">import</span> mitmproxy.websocket</span><br><span class="line"><span class="keyword">import</span> mitmproxy.proxy.protocol</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Events</span>:</span></span><br><span class="line">    <span class="comment"># HTTP lifecycle</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">http_connect</span><span class="params">(self, flow: mitmproxy.http.HTTPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            An HTTP CONNECT request was received. Setting a non 2xx response on</span></span><br><span class="line"><span class="string">            the flow will return the response to the client abort the</span></span><br><span class="line"><span class="string">            connection. CONNECT requests and responses do not generate the usual</span></span><br><span class="line"><span class="string">            HTTP handler events. CONNECT requests are only valid in regular and</span></span><br><span class="line"><span class="string">            upstream proxy modes.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">requestheaders</span><span class="params">(self, flow: mitmproxy.http.HTTPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            HTTP request headers were successfully read. At this point, the body</span></span><br><span class="line"><span class="string">            is empty.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">request</span><span class="params">(self, flow: mitmproxy.http.HTTPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            The full HTTP request has been read.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">responseheaders</span><span class="params">(self, flow: mitmproxy.http.HTTPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            HTTP response headers were successfully read. At this point, the body</span></span><br><span class="line"><span class="string">            is empty.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">response</span><span class="params">(self, flow: mitmproxy.http.HTTPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            The full HTTP response has been read.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">error</span><span class="params">(self, flow: mitmproxy.http.HTTPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            An HTTP error has occurred, e.g. invalid server responses, or</span></span><br><span class="line"><span class="string">            interrupted connections. This is distinct from a valid server HTTP</span></span><br><span class="line"><span class="string">            error response, which is simply a response with an HTTP error code.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># TCP lifecycle</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tcp_start</span><span class="params">(self, flow: mitmproxy.tcp.TCPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A TCP connection has started.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tcp_message</span><span class="params">(self, flow: mitmproxy.tcp.TCPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A TCP connection has received a message. The most recent message</span></span><br><span class="line"><span class="string">            will be flow.messages[-1]. The message is user-modifiable.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tcp_error</span><span class="params">(self, flow: mitmproxy.tcp.TCPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A TCP error has occurred.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tcp_end</span><span class="params">(self, flow: mitmproxy.tcp.TCPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A TCP connection has ended.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Websocket lifecycle</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">websocket_handshake</span><span class="params">(self, flow: mitmproxy.http.HTTPFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Called when a client wants to establish a WebSocket connection. The</span></span><br><span class="line"><span class="string">            WebSocket-specific headers can be manipulated to alter the</span></span><br><span class="line"><span class="string">            handshake. The flow object is guaranteed to have a non-None request</span></span><br><span class="line"><span class="string">            attribute.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">websocket_start</span><span class="params">(self, flow: mitmproxy.websocket.WebSocketFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A websocket connection has commenced.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">websocket_message</span><span class="params">(self, flow: mitmproxy.websocket.WebSocketFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Called when a WebSocket message is received from the client or</span></span><br><span class="line"><span class="string">            server. The most recent message will be flow.messages[-1]. The</span></span><br><span class="line"><span class="string">            message is user-modifiable. Currently there are two types of</span></span><br><span class="line"><span class="string">            messages, corresponding to the BINARY and TEXT frame types.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">websocket_error</span><span class="params">(self, flow: mitmproxy.websocket.WebSocketFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A websocket connection has had an error.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">websocket_end</span><span class="params">(self, flow: mitmproxy.websocket.WebSocketFlow)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A websocket connection has ended.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Network lifecycle</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">clientconnect</span><span class="params">(self, layer: mitmproxy.proxy.protocol.Layer)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A client has connected to mitmproxy. Note that a connection can</span></span><br><span class="line"><span class="string">            correspond to multiple HTTP requests.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">clientdisconnect</span><span class="params">(self, layer: mitmproxy.proxy.protocol.Layer)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            A client has disconnected from mitmproxy.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">serverconnect</span><span class="params">(self, conn: mitmproxy.connections.ServerConnection)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Mitmproxy has connected to a server. Note that a connection can</span></span><br><span class="line"><span class="string">            correspond to multiple requests.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">serverdisconnect</span><span class="params">(self, conn: mitmproxy.connections.ServerConnection)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Mitmproxy has disconnected from a server.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">next_layer</span><span class="params">(self, layer: mitmproxy.proxy.protocol.Layer)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Network layers are being switched. You may change which layer will</span></span><br><span class="line"><span class="string">            be used by returning a new layer object from this event.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># General lifecycle</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">configure</span><span class="params">(self, updated: typing.Set[str])</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Called when configuration changes. The updated argument is a</span></span><br><span class="line"><span class="string">            set-like object containing the keys of all changed options. This</span></span><br><span class="line"><span class="string">            event is called during startup with all options in the updated set.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">done</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Called when the addon shuts down, either by being removed from</span></span><br><span class="line"><span class="string">            the mitmproxy instance, or when mitmproxy itself shuts down. On</span></span><br><span class="line"><span class="string">            shutdown, this event is called after the event loop is</span></span><br><span class="line"><span class="string">            terminated, guaranteeing that it will be the final event an addon</span></span><br><span class="line"><span class="string">            sees. Note that log handlers are shut down at this point, so</span></span><br><span class="line"><span class="string">            calls to log functions will produce no output.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">load</span><span class="params">(self, entry: mitmproxy.addonmanager.Loader)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Called when an addon is first loaded. This event receives a Loader</span></span><br><span class="line"><span class="string">            object, which contains methods for adding options and commands. This</span></span><br><span class="line"><span class="string">            method is where the addon configures itself.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log</span><span class="params">(self, entry: mitmproxy.log.LogEntry)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Called whenever a new log entry is created through the mitmproxy</span></span><br><span class="line"><span class="string">            context. Be careful not to log from this event, which will cause an</span></span><br><span class="line"><span class="string">            infinite loop!</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">running</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Called when the proxy is completely up and running. At this point,</span></span><br><span class="line"><span class="string">            you can expect the proxy to be bound to a port, and all addons to be</span></span><br><span class="line"><span class="string">            loaded.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update</span><span class="params">(self, flows: typing.Sequence[mitmproxy.flow.Flow])</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">            Update is called when one or more flow objects have been modified,</span></span><br><span class="line"><span class="string">            usually from a different addon.</span></span><br><span class="line"><span class="string">        """</span></span><br></pre></td></tr></table></figure>
+
+<p>针对http，常用的API</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#http.HTTPFlow 实例 flow</span></span><br><span class="line">flow.request.headers <span class="comment">#获取所有头信息，包含Host、User-Agent、Content-type等字段</span></span><br><span class="line">flow.request.url <span class="comment">#完整的请求地址，包含域名及请求参数，但是不包含放在body里面的请求参数</span></span><br><span class="line">flow.request.pretty_url <span class="comment">#同flow.request.url目前没看出什么差别</span></span><br><span class="line">flow.request.host <span class="comment">#域名</span></span><br><span class="line">flow.request.method <span class="comment">#请求方式。POST、GET等</span></span><br><span class="line">flow.request.scheme <span class="comment">#什么请求 ，如https</span></span><br><span class="line">flow.request.path <span class="comment"># 请求的路径，url除域名之外的内容</span></span><br><span class="line">flow.request.get_text() <span class="comment">#请求中body内容，有一些http会把请求参数放在body里面，那么可通过此方法获取，返回字典类型</span></span><br><span class="line">flow.request.query <span class="comment">#返回MultiDictView类型的数据，url直接带的键值参数</span></span><br><span class="line">flow.request.get_content()<span class="comment">#bytes,结果如flow.request.get_text() </span></span><br><span class="line">flow.request.raw_content <span class="comment">#bytes,结果如flow.request.get_content()</span></span><br><span class="line">flow.request.urlencoded_form <span class="comment">#MultiDictView，content-type：application/x-www-form-urlencoded时的请求参数，不包含url直接带的键值参数</span></span><br><span class="line">flow.request.multipart_form <span class="comment">#MultiDictView，content-type：multipart/form-data</span></span><br><span class="line">时的请求参数，不包含url直接带的键值参数</span><br><span class="line"><span class="comment">#以上均为获取request信息的一些常用方法，对于response，同理</span></span><br><span class="line">flow.response.status_code <span class="comment">#状态码</span></span><br><span class="line">flow.response.text<span class="comment">#返回内容，已解码</span></span><br><span class="line">flow.response.content <span class="comment">#返回内容，二进制</span></span><br><span class="line">flow.response.setText()<span class="comment">#修改返回内容，不需要转码</span></span><br><span class="line"><span class="comment">#以上为不完全列举</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改response内容，这里是服务器已经有返回了结果，再更改，也可以做不经过服务器处理，直接返回，看需求</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">response</span><span class="params">(flow:http.HTTPFlow)</span>-&gt; <span class="keyword">None</span>:</span></span><br><span class="line">    <span class="comment">#特定接口需要返回1001结果</span></span><br><span class="line">    interface_list=[<span class="string">"page/**"</span>] <span class="comment">#由于涉及公司隐私问题，隐藏实际的接口</span></span><br><span class="line">    </span><br><span class="line">    url_path=flow.request.path</span><br><span class="line">    <span class="keyword">if</span>  url_path.split(<span class="string">"?"</span>)[<span class="number">0</span>] <span class="keyword">in</span>  interface_list:</span><br><span class="line">        ctx.log.info(<span class="string">"#"</span>*<span class="number">50</span>)</span><br><span class="line">        ctx.log.info(<span class="string">"待修改路径的内容："</span>+url_path)</span><br><span class="line">        ctx.log.info(<span class="string">"修改成：1001错误返回"</span>)</span><br><span class="line">        ctx.log.info(<span class="string">"修改前：\n"</span>)</span><br><span class="line">        ctx.log.info(flow.response.text)</span><br><span class="line">        flow.response.set_text(json.dumps(&#123;<span class="string">"result"</span>:<span class="string">"1001"</span>,<span class="string">"message"</span>:<span class="string">"服务异常"</span>&#125;))<span class="comment">#修改，使用set_text不用转码</span></span><br><span class="line">        ctx.log.info(<span class="string">"修改后：\n"</span>)</span><br><span class="line">        ctx.log.info(flow.response.text)</span><br><span class="line">        ctx.log.info(<span class="string">"#"</span>*<span class="number">50</span>)</span><br><span class="line">    <span class="keyword">elif</span>  flow.request.host <span class="keyword">in</span>  host_list:<span class="comment">#host_list 域名列表，作为全局变量，公司有多个域名，也隐藏</span></span><br><span class="line">        ctx.log.info(<span class="string">"response= "</span>+flow.response.text)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%88%AC%E8%99%AB/" rel="tag"># 爬虫</a>
+              <a href="/tags/spider/" rel="tag"># spider</a>
+              <a href="/tags/%E6%89%8B%E6%9C%BA%E7%88%AC%E8%99%AB/" rel="tag"># 手机爬虫</a>
+              <a href="/tags/mitmproxy/" rel="tag"># mitmproxy</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/08/webdesign2/" rel="prev" title="修改knowhow中的坑">
+      <i class="fa fa-chevron-left"></i> 修改knowhow中的坑
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/07/django0/" rel="next" title="博客制作——django入门">
+      博客制作——django入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#python编写脚本"><span class="nav-number">2.</span> <span class="nav-text">python编写脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#写脚本"><span class="nav-number">2.1.</span> <span class="nav-text">写脚本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一个例子"><span class="nav-number">3.</span> <span class="nav-text">一个例子</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

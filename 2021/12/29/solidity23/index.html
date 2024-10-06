@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="回退函数 receive fallback">
+<meta property="og:type" content="article">
+<meta property="og:title" content="solidity | 回退函数、receive和fallback">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2021/12/29/solidity23/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="回退函数 receive fallback">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/solidity/23_0.png">
+<meta property="article:published_time" content="2021-12-29T12:54:05.000Z">
+<meta property="article:modified_time" content="2023-02-24T06:13:28.199Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="eth">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/solidity/23_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2021/12/29/solidity23/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>solidity | 回退函数、receive和fallback | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2021/12/29/solidity23/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          solidity | 回退函数、receive和fallback
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-29 20:54:05" itemprop="dateCreated datePublished" datetime="2021-12-29T20:54:05+08:00">2021-12-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-02-24 14:13:28" itemprop="dateModified" datetime="2023-02-24T14:13:28+08:00">2023-02-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/" itemprop="url" rel="index"><span itemprop="name">区块链</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/" itemprop="url" rel="index"><span itemprop="name">平台 && 公链 && 项目 && 方向</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/" itemprop="url" rel="index"><span itemprop="name">eth</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/" itemprop="url" rel="index"><span itemprop="name">solidity</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E5%B9%B3%E5%8F%B0-%E5%85%AC%E9%93%BE-%E9%A1%B9%E7%9B%AE-%E6%96%B9%E5%90%91/eth/solidity/%E5%9F%BA%E7%A1%80/%E5%87%BD%E6%95%B0/" itemprop="url" rel="index"><span itemprop="name">函数</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/12/29/solidity23/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/12/29/solidity23/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>回退函数</li>
+<li><code>receive</code></li>
+<li><code>fallback</code></li>
+</ul>
+<a id="more"></a>
+
+<h2 id="回退函数-「在-0-6-版本之后失效，变成-receive和fallback」"><a href="#回退函数-「在-0-6-版本之后失效，变成-receive和fallback」" class="headerlink" title="回退函数 「在 0.6 版本之后失效，变成 receive和fallback」"></a>回退函数 「在 0.6 版本之后失效，变成 receive和fallback」</h2><ul>
+<li>无名称</li>
+<li>无参数</li>
+<li>无返回值</li>
+<li>一个合约只能有一个回退函数</li>
+<li>当给合约转以太币的时候，需要 <code>payable</code> 回退函数</li>
+<li>如果调用合约没有匹配上任何函数，就会调用回退函数</li>
+</ul>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.4.</span><span class="number">18</span>;</span><br><span class="line"></span><br><span class="line">contract Test&#123;</span><br><span class="line"></span><br><span class="line">    uint <span class="keyword">public</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span><span class="params">()</span></span> <span class="keyword">public</span> payable&#123;</span><br><span class="line">        x = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract <span class="keyword">Call</span>&#123;</span><br><span class="line"></span><br><span class="line">    constructor() <span class="keyword">public</span> payable&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span><span class="params">()</span></span> <span class="keyword">public</span> payable&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span></span> tansferTest(address addr) <span class="keyword">public</span> &#123;</span><br><span class="line">        addr.<span class="built_in">transfer</span>(<span class="number">1</span> ether);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的函数在执行 <code>call.transferTest</code> 的时候会失败。</p>
+<p>因为，回退函数在接收以太币的时候，仅有 <code>2300 gas</code> 来执行，下面的操作超过 <code>2300</code></p>
+<ul>
+<li>写存储</li>
+<li>创建合约</li>
+<li>执行一个外部函数调用</li>
+<li>发送 <code>ether</code></li>
+</ul>
+<p>receive()和fallback()，他们主要在两种情况下被使用：</p>
+<ul>
+<li>接收ETH</li>
+<li>处理合约中不存在的函数调用（代理合约 <code>proxy contract</code>）</li>
+</ul>
+<p>注意：在 <code>solidity 0.6.x</code> 版本之前，语法上只有 <code>fallback()</code> 函数，用来接收用户发送的 <code>ETH</code> 时调用以及在被调用函数签名没有匹配到时，来调用。</p>
+<p><code>0.6</code> 版本之后，<code>solidity</code> 才将 <code>fallback()</code> 函数拆分成 <code>receive()</code> 和 <code>fallback()</code> 两个函数。</p>
+<p>我们这一讲主要讲接收 <code>ETH</code> 的情况。</p>
+<h2 id="接收ETH函数-receive"><a href="#接收ETH函数-receive" class="headerlink" title="接收ETH函数 receive"></a>接收ETH函数 receive</h2><p><code>receive()</code> 只用于处理接收 <code>ETH</code>。</p>
+<p>一个合约最多有一个 <code>receive()</code> 函数，声明方式与一般函数不一样，不需要 <code>function</code> 关键字：<code>receive() external payable { ... }</code>。</p>
+<p><code>receive()</code> 函数不能有任何的参数，不能返回任何值，必须包含 <code>external</code> 和 <code>payable</code>。</p>
+<p>当合约接收 <code>ETH</code> 的时候，<code>receive()</code> 会被触发。</p>
+<p><code>receive()</code> 最好不要执行太多的逻辑因为如果别人用 <code>send</code> 和 <code>transfer</code> 方法发送 <code>ETH</code> 的话，<code>gas</code> 会限制在 <code>2300</code> ，<code>receive()</code> 太复杂可能会触发<code>Out of Gas</code> 报错；如果用 <code>call</code> 就可以自定义 <code>gas</code> 执行更复杂的逻辑。</p>
+<p>我们可以在 <code>receive()</code> 里发送一个 <code>event</code>，例如：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义事件</span></span><br><span class="line">event <span class="constructor">Received(<span class="params">address</span> Sender, <span class="params">uint</span> Value)</span>;</span><br><span class="line"><span class="comment">// 接收ETH时释放Received事件</span></span><br><span class="line">receive<span class="literal">()</span> external payable &#123;</span><br><span class="line">    emit <span class="constructor">Received(<span class="params">msg</span>.<span class="params">sender</span>, <span class="params">msg</span>.<span class="params">value</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有些恶意合约，会在 <code>receive()</code> 函数（老版本的话，就是 <code>fallback()</code> 函数）嵌入恶意消耗 <code>gas</code> 的内容或者使得执行故意失败的代码，导致一些包含退款和转账逻辑的合约不能正常工作，因此写包含退款等逻辑的合约时候，一定要注意这种情况。</p>
+<h2 id="回退函数-fallback"><a href="#回退函数-fallback" class="headerlink" title="回退函数 fallback"></a>回退函数 fallback</h2><p><code>fallback()</code> 函数会在调用合约不存在的函数时被触发。可用于接收 <code>ETH</code> ，也可以用于代理合约 <code>proxy contract</code>。</p>
+<p><code>fallback()</code> 声明时不需要 <code>function</code> 关键字，必须由 <code>external</code> 修饰，一般也会用 <code>payable</code> 修饰，用于接收 <code>ETH</code>: <code>fallback() external payable { ... }</code>。</p>
+<p>我们定义一个 <code>fallback()</code> 函数，被触发时候会释放 <code>fallbackCalled</code> 事件，并输出 <code>msg.sender</code>，<code>msg.value</code>和<code>msg.data</code>:</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// fallback</span></span><br><span class="line">fallback<span class="literal">()</span> external payable&#123;</span><br><span class="line">    emit fallback<span class="constructor">Called(<span class="params">msg</span>.<span class="params">sender</span>, <span class="params">msg</span>.<span class="params">value</span>, <span class="params">msg</span>.<span class="params">data</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="receive和fallback的区别"><a href="#receive和fallback的区别" class="headerlink" title="receive和fallback的区别"></a>receive和fallback的区别</h2><p><code>receive</code> 和 <code>fallback</code> 都能够用于接收<code>ETH</code>，他们触发的规则如下：</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">触发fallback<span class="comment">()</span> 还是 receive<span class="comment">()</span>?</span><br><span class="line">           接收ETH</span><br><span class="line">              |</span><br><span class="line">         msg.data是空？</span><br><span class="line">            /  \</span><br><span class="line">          是    否</span><br><span class="line">          /      \</span><br><span class="line">receive<span class="comment">()</span>存在?   fallback<span class="comment">()</span></span><br><span class="line">        / \</span><br><span class="line">       是  否</span><br><span class="line">      /     \</span><br><span class="line">receive<span class="comment">()</span>   fallback<span class="comment">()</span></span><br></pre></td></tr></table></figure>
+
+<p>简单来说，合约接收 <code>ETH</code> 时，<code>msg.data</code>为空且存在 <code>receive()</code> 时，会触发<code>receive()</code>；<code>msg.data</code>不为空或不存在<code>receive()</code>时，会触发<code>fallback()</code>，此时<code>fallback()</code>必须为<code>payable</code>。</p>
+<p><code>receive()</code>和<code>payable fallback()</code>均不存在的时候，向合约直接发送<code>ETH</code>将会报错（你仍可以通过带有<code>payable</code>的函数向合约发送ETH）。</p>
+<p>ps: <code>2023-2-24</code> ，如果 <code>msg.data</code> 为空，且 <code>receive</code> 不存在，此时，只有 <code>fallback</code> 会报错，而不是图中所示。所以，<code>receive</code> 和 <code>fallback</code> 都需要实现。</p>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><h3 id="成功-「receive」"><a href="#成功-「receive」" class="headerlink" title="成功 「receive」"></a>成功 「receive」</h3><p>代码</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span>.<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    constructor<span class="literal">()</span> payable&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> transfer<span class="constructor">Eth(<span class="params">address</span> <span class="params">payable</span> T)</span> public&#123;</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">T</span>.</span></span>transfer(<span class="number">100</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> get<span class="constructor">Blanace()</span> public view returns(uint256)&#123;</span><br><span class="line">        return address(this).balance; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract callfunction &#123;</span><br><span class="line">    event reveive<span class="constructor">Called(<span class="params">address</span>)</span>;</span><br><span class="line">    event fallback<span class="constructor">Called(<span class="params">address</span>,<span class="params">uint256</span>,<span class="params">bytes</span>)</span>;</span><br><span class="line"></span><br><span class="line">    receive<span class="literal">()</span> external payable&#123;</span><br><span class="line">        emit reveive<span class="constructor">Called(<span class="params">msg</span>.<span class="params">sender</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fallback<span class="literal">()</span> external payable&#123;</span><br><span class="line">        emit fallback<span class="constructor">Called(<span class="params">msg</span>.<span class="params">sender</span>, <span class="params">msg</span>.<span class="params">value</span>, <span class="params">msg</span>.<span class="params">data</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> get<span class="constructor">Blanace()</span> public view returns(uint256)&#123;</span><br><span class="line">        return address(this).balance; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于 <code>remix</code> 自带的链上操作，没有转账功能，所以，创建了一个合约进行转账。</p>
+<ul>
+<li>先部署 <code>test</code> 「传入 <code>1ETH</code>」</li>
+<li>再部署 <code>callfunction</code></li>
+<li>执行 <code>callfunction</code> 的 <code>getBlanace</code><ul>
+<li><code>0</code></li>
+</ul>
+</li>
+<li>执行 <code>test</code> 的 <code>transferEth</code>(<code>callfunction</code> 的地址)</li>
+<li>执行 <code>callfunction</code> 的 <code>getBlanace</code><ul>
+<li><code>100</code></li>
+<li><code>log</code> 输出</li>
+<li>说明执行的是 <code>receive()</code></li>
+</ul>
+</li>
+</ul>
+<p><code>log</code> 输出</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"from"</span>: <span class="string">"0xb27A31f1b0AF2946B7F582768f03239b1eC07c2c"</span>,</span><br><span class="line">        <span class="attr">"topic"</span>: <span class="string">"0x794ae4db4fa93171e957bf40514fe3fd673f9c8a166e172f0ffb677b53b55648"</span>,</span><br><span class="line">        <span class="attr">"event"</span>: <span class="string">"reveiveCalled"</span>,</span><br><span class="line">        <span class="attr">"args"</span>: &#123;</span><br><span class="line">            <span class="attr">"0"</span>: <span class="string">"0xcD6a42782d230D7c13A74ddec5dD140e55499Df9"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>如果想要回退 <code>ETH</code> 可以使用。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span>.<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    constructor<span class="literal">()</span> payable&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> transfer<span class="constructor">Eth(<span class="params">address</span> <span class="params">payable</span> T)</span> public&#123;</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">T</span>.</span></span>transfer(<span class="number">100</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> get<span class="constructor">Blanace()</span> public view returns(uint256)&#123;</span><br><span class="line">        return address(this).balance; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract callfunction &#123;</span><br><span class="line"></span><br><span class="line">    event reveive<span class="constructor">Called(<span class="params">address</span>)</span>;</span><br><span class="line">    event fallback<span class="constructor">Called(<span class="params">address</span>,<span class="params">uint256</span>,<span class="params">bytes</span>)</span>;</span><br><span class="line"></span><br><span class="line">    receive<span class="literal">()</span> external payable&#123;</span><br><span class="line">        emit reveive<span class="constructor">Called(<span class="params">msg</span>.<span class="params">sender</span>)</span>;</span><br><span class="line">        revert<span class="literal">()</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fallback<span class="literal">()</span> external payable&#123;</span><br><span class="line">        emit fallback<span class="constructor">Called(<span class="params">msg</span>.<span class="params">sender</span>, <span class="params">msg</span>.<span class="params">value</span>, <span class="params">msg</span>.<span class="params">data</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> get<span class="constructor">Blanace()</span> public view returns(uint256)&#123;</span><br><span class="line">        return address(this).balance; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就不会向 <code>callfunction</code> 转移 <code>ETH</code> 了。</p>
+<h3 id="失败-「receive」"><a href="#失败-「receive」" class="headerlink" title="失败 「receive」"></a>失败 「receive」</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span>.<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    constructor<span class="literal">()</span> payable&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> transfer<span class="constructor">Eth(<span class="params">address</span> <span class="params">payable</span> T)</span> public&#123;</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">T</span>.</span></span>transfer(<span class="number">100</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> get<span class="constructor">Blanace()</span> public view returns(uint256)&#123;</span><br><span class="line">        return address(this).balance; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract callfunction &#123;</span><br><span class="line"></span><br><span class="line">    uint256 x;</span><br><span class="line"></span><br><span class="line">    event reveive<span class="constructor">Called(<span class="params">address</span>)</span>;</span><br><span class="line">    event fallback<span class="constructor">Called(<span class="params">address</span>,<span class="params">uint256</span>,<span class="params">bytes</span>)</span>;</span><br><span class="line"></span><br><span class="line">    receive<span class="literal">()</span> external payable&#123;</span><br><span class="line">        x = <span class="number">200</span>;</span><br><span class="line">        emit reveive<span class="constructor">Called(<span class="params">msg</span>.<span class="params">sender</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fallback<span class="literal">()</span> external payable&#123;</span><br><span class="line">        emit fallback<span class="constructor">Called(<span class="params">msg</span>.<span class="params">sender</span>, <span class="params">msg</span>.<span class="params">value</span>, <span class="params">msg</span>.<span class="params">data</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> get<span class="constructor">Blanace()</span> public view returns(uint256)&#123;</span><br><span class="line">        return address(this).balance; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于赋予 <code>x</code> ，<code>gas</code> 超过了 <code>2300</code>，所以，<code>receive</code> 会失败。</p>
+<p>失败后</p>
+<ul>
+<li><code>test</code> 合约<ul>
+<li><code>ETH</code> 数量没有变化</li>
+</ul>
+</li>
+<li><code>callfunction</code> 合约<ul>
+<li><code>balance = 0</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="成功-「fallback」"><a href="#成功-「fallback」" class="headerlink" title="成功 「fallback」"></a>成功 「fallback」</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity ^<span class="number">0.8</span>.<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    constructor<span class="literal">()</span> payable&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> transfer<span class="constructor">Eth(<span class="params">address</span> <span class="params">payable</span> T)</span> public&#123;</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">T</span>.</span></span>transfer(<span class="number">100</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> get<span class="constructor">Blanace()</span> public view returns(uint256)&#123;</span><br><span class="line">        return address(this).balance; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract callfunction &#123;</span><br><span class="line"></span><br><span class="line">    event fallback<span class="constructor">Called(<span class="params">address</span>,<span class="params">uint256</span>,<span class="params">bytes</span>)</span>;</span><br><span class="line"></span><br><span class="line">    fallback<span class="literal">()</span> external payable&#123;</span><br><span class="line">        emit fallback<span class="constructor">Called(<span class="params">msg</span>.<span class="params">sender</span>, <span class="params">msg</span>.<span class="params">value</span>, <span class="params">msg</span>.<span class="params">data</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> get<span class="constructor">Blanace()</span> public view returns(uint256)&#123;</span><br><span class="line">        return address(this).balance; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行操作如下</p>
+<p><img src="/images/solidity/23_0.png" alt=""></p>
+<p>ps: <code>msg.data</code> 不是 <code>inputs</code></p>
+<p><code>log</code> 输出</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"from"</span>: <span class="string">"0x9396B453Fad71816cA9f152Ae785276a1D578492"</span>,</span><br><span class="line">        <span class="attr">"topic"</span>: <span class="string">"0x7bf8121d238f1338d4842c396807cbe93f5a2396e2b3cad1639735997867b1f5"</span>,</span><br><span class="line">        <span class="attr">"event"</span>: <span class="string">"fallbackCalled"</span>,</span><br><span class="line">        <span class="attr">"args"</span>: &#123;</span><br><span class="line">            <span class="attr">"0"</span>: <span class="string">"0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"</span>,</span><br><span class="line">            <span class="attr">"1"</span>: <span class="string">"19"</span>,</span><br><span class="line">            <span class="attr">"2"</span>: <span class="string">"0xabcd"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/eth/" rel="tag"># eth</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/29/solidity22/" rel="prev" title="solidity ｜ 库">
+      <i class="fa fa-chevron-left"></i> solidity ｜ 库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/12/29/solidity24/" rel="next" title="solidity | 事件 event 与 logs">
+      solidity | 事件 event 与 logs <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#回退函数-「在-0-6-版本之后失效，变成-receive和fallback」"><span class="nav-number">1.</span> <span class="nav-text">回退函数 「在 0.6 版本之后失效，变成 receive和fallback」</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接收ETH函数-receive"><span class="nav-number">2.</span> <span class="nav-text">接收ETH函数 receive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#回退函数-fallback"><span class="nav-number">3.</span> <span class="nav-text">回退函数 fallback</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#receive和fallback的区别"><span class="nav-number">4.</span> <span class="nav-text">receive和fallback的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例"><span class="nav-number">5.</span> <span class="nav-text">案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#成功-「receive」"><span class="nav-number">5.1.</span> <span class="nav-text">成功 「receive」</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#失败-「receive」"><span class="nav-number">5.2.</span> <span class="nav-text">失败 「receive」</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#成功-「fallback」"><span class="nav-number">5.3.</span> <span class="nav-text">成功 「fallback」</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

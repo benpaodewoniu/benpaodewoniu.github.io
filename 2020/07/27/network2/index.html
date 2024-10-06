@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="参考资料  彻底明白ip地址，区分localhost、127.0.0.1和0.0.0.0">
+<meta property="og:type" content="article">
+<meta property="og:title" content="localhost、127.0.0.1和0.0.0.0">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/07/27/network2/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="参考资料  彻底明白ip地址，区分localhost、127.0.0.1和0.0.0.0">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-27T08:22:55.000Z">
+<meta property="article:modified_time" content="2021-01-06T13:29:36.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="network">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/07/27/network2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>localhost、127.0.0.1和0.0.0.0 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/07/27/network2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          localhost、127.0.0.1和0.0.0.0
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-27 16:22:55" itemprop="dateCreated datePublished" datetime="2020-07-27T16:22:55+08:00">2020-07-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-06 21:29:36" itemprop="dateModified" datetime="2021-01-06T21:29:36+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/27/network2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/27/network2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考资料</p>
+<ul>
+<li><a href="https://www.jianshu.com/p/ad7cd1d5be45" rel="external nofollow noreferrer">彻底明白ip地址，区分localhost、127.0.0.1和0.0.0.0</a></li>
+</ul>
+<a id="more"></a>
+
+<h2 id="简要的了解下公网与内网中的IP地址"><a href="#简要的了解下公网与内网中的IP地址" class="headerlink" title="简要的了解下公网与内网中的IP地址"></a>简要的了解下公网与内网中的IP地址</h2><p>一般我们会将网络划分公网（连Internet的）与内网。</p>
+<h3 id="公有IP地址"><a href="#公有IP地址" class="headerlink" title="公有IP地址"></a>公有IP地址</h3><p>一般称公网中的IP地址为公有地址。公有地址由Inter NIC（因特网信息中心）负责，这些IP地址分配给注册并向Inter NIC提出申请的组织机构。公有地址是全球唯一的，公网中不可能存在两个相同的IP地址。</p>
+<p>范围：除了私有地址以外的地址，都属于公有地址</p>
+<h3 id="私有IP地址"><a href="#私有IP地址" class="headerlink" title="私有IP地址"></a>私有IP地址</h3><p>一般称内网（即局域网）中的IP地址为私有地址。私有地址是非注册地址，用于组织机构内部使用。私有地址的范围如下：</p>
+<ul>
+<li>A类IP地址中：10.0.0.0–10.255.255.255</li>
+<li>B类IP地址中：172.16.0.0–172.31.255.255</li>
+<li>C类IP地址中：192.168.0.0–192.168.255.255</li>
+</ul>
+<p>私有地址与公有地址不同，并不是由Internet分配的，是不允许出现在Internet中的，我们在公网中是看不到私有IP地址的，并且公有地址也不会使用上述的三类地址。所以，私有地址是不能直接与Internet连接的。</p>
+<p>而如果想用私有地址与Internet连接来访问公网，那该怎么做？这就需要将私有IP地址转换成公网IP地址，与外部连接。所以，我们平时使用的路由器中会装有一个叫做 NAT（网络地址转换） 的软件，我们的路由器中会至少会有一个有效的公网IP，NAT会将我们的私有地址转成路由器中的公网IP与外部Internet连接。而同样的，因为使用的是路由器中的公共的公网IP来连接Internet，所以这个内网中的PC在Internet中显示的都是路由器的公共IP，这样做不仅提供了一定程度的安全，也可以有效的减缓可用的IP地址空间的枯竭问题。（像我们学校或者公司的内网一般都是这么做的）</p>
+<p>另外还有一点，在同一个局域网内，IP地址是唯一的；但是在不同的局域网内，IP地址是可以重复出现的。</p>
+<blockquote>
+<p>举个小例子: 在局域网A中，有个主机的IP地址是192.168.10.128，那么绝不可能在局域网A中还有其他主机的IP地址为192.168.10.128。但是在局域网B中却可以有主机的IP地址也是192.168.10.128。<br>如果局域网A中的192.168.10.128主机与局域网B中的192.168.10.128主机通信，不会冲突吗？不会，因为上述说过，它们最终都是使用路由器中的公网IP来连接外网的，而公网IP是全球唯一的。</p>
+</blockquote>
+<h2 id="localhost、127-0-0-1和0-0-0-0和-和本机IP的区别"><a href="#localhost、127-0-0-1和0-0-0-0和-和本机IP的区别" class="headerlink" title="localhost、127.0.0.1和0.0.0.0和 ::: 和本机IP的区别"></a>localhost、127.0.0.1和0.0.0.0和 ::: 和本机IP的区别</h2><h3 id="localhost"><a href="#localhost" class="headerlink" title="localhost"></a>localhost</h3><p>localhost其实是域名，一般windows系统默认将<code>localhost</code>指向<code>127.0.0.1</code>，但是<code>localhost</code>并不等于<code>127.0.0.1</code>，localhost指向的IP地址是可以配置的</p>
+<h3 id="127-0-0-1"><a href="#127-0-0-1" class="headerlink" title="127.0.0.1"></a>127.0.0.1</h3><p>首先我们要先知道一个概念，凡是以127开头的IP地址，都是回环地址（Loop back address），其所在的回环接口一般被理解为虚拟网卡，并不是真正的路由器接口。</p>
+<p>所谓的回环地址，通俗的讲，就是我们在主机上发送给127开头的IP地址的数据包会被发送的主机自己接收，根本传不出去，外部设备也无法通过回环地址访问到本机。</p>
+<p>小说明：正常的数据包会从IP层进入链路层，然后发送到网络上；而给回环地址发送数据包，数据包会直接被发送主机的IP层获取，后面就没有链路层他们啥事了。</p>
+<p>而<code>127.0.0.1</code>作为<code>{127}</code>集合中的一员，当然也是个回环地址。只不过<code>127.0.0.1</code>经常被默认配置为<code>localhost</code>的<code>IP</code>地址。<br>一般会通过<code>ping 127.0.0.1</code>来测试某台机器上的网络设备是否工作正常。</p>
+<h3 id="0-0-0-0"><a href="#0-0-0-0" class="headerlink" title="0.0.0.0"></a>0.0.0.0</h3><p>首先，<code>0.0.0.0</code>是不能被<code>ping</code>通的。在服务器中，<code>0.0.0.0</code>并不是一个真实的的IP地址，它表示本机中所有的IPV4地址。监听<code>0.0.0.0</code>的端口，就是监听本机中所有IP的端口。</p>
+<h3 id=""><a href="#" class="headerlink" title=":::"></a>:::</h3><p>IPV6 的所有监听，某种程度上相当于 <code>0.0.0.0</code>。其中 <code>::</code> 相当于所有 <code>0.0.0.0</code> 最后一个 <code>:</code> 含义暂时还没搞懂，猜测是 <code>port</code></p>
+<h3 id="本机IP"><a href="#本机IP" class="headerlink" title="本机IP"></a>本机IP</h3><p>本机IP通常仅指在同一个局域网内，能同时被外部设备访问和本机访问的那些IP地址（可能不止一个）。像<code>127.0.0.1</code>这种一般是不被当作本机IP的。本机IP是与具体的网络接口绑定的，比如以太网卡、无线网卡或者PPP/PPPoE拨号网络的虚拟网卡，想要正常工作都要绑定一个地址，否则其他设备就不知道如何访问它。</p>
+<p>小例子剧场（帮助理解本机IP、127.0.0.1和0.0.0.0）</p>
+<p>现在有两台<code>pc</code>在同一个局域网内，分别为<code>pc1</code>与<code>pc2</code>，<code>pc1</code>上有一个网卡，IP地址为<code>192.168.10.128</code></p>
+<ul>
+<li><code>pc1</code>中<code>sever</code>监听<code>127.0.0.1</code>，则<code>pc1</code>中的<code>client</code>可以连上<code>127.0.0.1</code>，<code>192.168.10.128</code>连不上；而<code>pc2</code>中<code>client</code>都连不上。</li>
+<li><code>pc1</code>中<code>sever</code>监听<code>192.168.10.128</code>，则<code>pc1</code>中的<code>client</code>可以连上<code>192.168.10.128</code>，<code>127.0.0.1</code>连不上；而<code>pc2</code>中<code>client</code>能连上<code>192.168.10.128</code>。</li>
+<li><code>pc1</code>中<code>sever</code>监听<code>0.0.0.0</code>，则<code>pc1</code>中的<code>client</code>可以连上<code>127.0.0.1</code>和<code>192.168.10.128</code>，<code>pc2</code>中的<code>client</code>能连上<code>192.168.10.128</code>。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/network/" rel="tag"># network</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/27/linux15/" rel="prev" title="linux | 查看系统状态">
+      <i class="fa fa-chevron-left"></i> linux | 查看系统状态
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/27/leetcode2/" rel="next" title="offer 59 - I. 滑动窗口的最大值">
+      offer 59 - I. 滑动窗口的最大值 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简要的了解下公网与内网中的IP地址"><span class="nav-number">1.</span> <span class="nav-text">简要的了解下公网与内网中的IP地址</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#公有IP地址"><span class="nav-number">1.1.</span> <span class="nav-text">公有IP地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#私有IP地址"><span class="nav-number">1.2.</span> <span class="nav-text">私有IP地址</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#localhost、127-0-0-1和0-0-0-0和-和本机IP的区别"><span class="nav-number">2.</span> <span class="nav-text">localhost、127.0.0.1和0.0.0.0和 ::: 和本机IP的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#localhost"><span class="nav-number">2.1.</span> <span class="nav-text">localhost</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#127-0-0-1"><span class="nav-number">2.2.</span> <span class="nav-text">127.0.0.1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0-0-0-0"><span class="nav-number">2.3.</span> <span class="nav-text">0.0.0.0</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#null"><span class="nav-number">2.4.</span> <span class="nav-text">:::</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本机IP"><span class="nav-number">2.5.</span> <span class="nav-text">本机IP</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

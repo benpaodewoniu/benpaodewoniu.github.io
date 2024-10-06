@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这是我见过的很优秀的代码。一个将面向对象和 GA 思想改编淋淋尽致的代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GA 的案例 用圆圈拼 chrome 图标">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/12/04/es7/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这是我见过的很优秀的代码。一个将面向对象和 GA 思想改编淋淋尽致的代码。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/12_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/12_1.png">
+<meta property="article:published_time" content="2018-12-04T10:43:17.000Z">
+<meta property="article:modified_time" content="2020-04-26T14:50:12.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="GA">
+<meta property="article:tag" content="进化算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/machinelearningalgorithm/12_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/12/04/es7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>GA 的案例 用圆圈拼 chrome 图标 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/12/04/es7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GA 的案例 用圆圈拼 chrome 图标
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-04 18:43:17" itemprop="dateCreated datePublished" datetime="2018-12-04T18:43:17+08:00">2018-12-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-26 22:50:12" itemprop="dateModified" datetime="2020-04-26T22:50:12+08:00">2020-04-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/" itemprop="url" rel="index"><span itemprop="name">项目经历</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%9B%E5%8C%96%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">进化算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%BE%AE%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">微型</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/12/04/es7/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/12/04/es7/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这是我见过的很优秀的代码。一个将面向对象和 GA 思想改编淋淋尽致的代码。</p>
+<a id="more"></a>
+
+<p>这是 github 中的一个项目，OK,为了知识产权发挥效力，我将原链接贴出来。</p>
+<p><a href="https://github.com/KIDJourney/ga_circlepuzzle" rel="external nofollow noreferrer">原链接</a></p>
+<h2 id="效果展示"><a href="#效果展示" class="headerlink" title="效果展示"></a>效果展示</h2><p><img src="/images/machinelearningalgorithm/12_0.png" alt=""></p>
+<h2 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image, ImageDraw</span><br><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> randint <span class="keyword">as</span> _r</span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过变异的指数来限制变化的范围</span></span><br><span class="line"><span class="comment"># 这个函数会对原来数值进行轻微的改变，不会进行大幅度改变，当然改变的取值范围根据变异的指数来确定</span></span><br><span class="line"><span class="comment"># 比如从 100 变到 105</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">random_change_in_range</span><span class="params">(old_value, random_rate, max_value, min_value)</span>:</span></span><br><span class="line">    change_range = int(old_value * random_rate)</span><br><span class="line">    new_value = old_value + _r(-change_range, change_range)</span><br><span class="line">    new_value = max(min_value, min(max_value, new_value))</span><br><span class="line">    <span class="keyword">return</span> new_value</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Color</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 初始化一个颜色值，格式是 PNG</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mutate_speed=<span class="number">0.1</span>)</span>:</span></span><br><span class="line">        self.r = _r(<span class="number">0</span>, <span class="number">255</span>)</span><br><span class="line">        self.g = _r(<span class="number">0</span>, <span class="number">255</span>)</span><br><span class="line">        self.b = _r(<span class="number">0</span>, <span class="number">255</span>)</span><br><span class="line">        self.a = _r(<span class="number">0</span>, <span class="number">255</span>)</span><br><span class="line">        self.mutate_speed = mutate_speed</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 对颜色进行突变</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mutate</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> attr <span class="keyword">in</span> [<span class="string">'r'</span>, <span class="string">'g'</span>, <span class="string">'b'</span>, <span class="string">'a'</span>]:</span><br><span class="line">            new_value = random_change_in_range(getattr(self, attr), self.mutate_speed, <span class="number">255</span>, <span class="number">0</span>)</span><br><span class="line">            setattr(self, attr, new_value)</span><br><span class="line">        self.a = _r(<span class="number">255</span> // <span class="number">3</span>, <span class="number">255</span> * <span class="number">2</span> // <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">as_tuple</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.r, self.g, self.b, self.a</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> (<span class="string">" &#123;&#125;"</span> * <span class="number">4</span>).format(self.r, self.g, self.b, self.a)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.__str__()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Circle</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, image_size, mutate_speed=<span class="number">0.1</span>, mutate_rate=<span class="number">50</span>)</span>:</span></span><br><span class="line">        self.max_range = image_size</span><br><span class="line">        <span class="comment"># 圆心</span></span><br><span class="line">        self.centre = (_r(<span class="number">0</span>, image_size[<span class="number">0</span>]), _r(<span class="number">0</span>, image_size[<span class="number">1</span>]))</span><br><span class="line">        <span class="comment"># 半径</span></span><br><span class="line">        self.radius = min(abs(self.max_range[<span class="number">0</span>] - self.centre[<span class="number">0</span>]), abs(self.max_range[<span class="number">1</span>] - self.centre[<span class="number">1</span>]))</span><br><span class="line">        self.mutate_speed = mutate_speed</span><br><span class="line">        self.mutate_rate = mutate_rate</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 这个圆的颜色</span></span><br><span class="line">        self.color = Color(self.mutate_speed)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_mutate</span><span class="params">(self)</span>:</span></span><br><span class="line"></span><br><span class="line">        self.centre = (</span><br><span class="line">            random_change_in_range(self.centre[<span class="number">0</span>], self.mutate_speed, self.max_range[<span class="number">0</span>], <span class="number">0</span>),</span><br><span class="line">            random_change_in_range(self.centre[<span class="number">1</span>], self.mutate_speed, self.max_range[<span class="number">1</span>], <span class="number">0</span>)</span><br><span class="line">        )</span><br><span class="line">        self.radius = random_change_in_range(self.radius, self.mutate_speed, max(self.max_range[<span class="number">0</span>] - self.centre[<span class="number">0</span>],</span><br><span class="line">                                                                                 self.max_range[<span class="number">1</span>] - self.centre[<span class="number">1</span>]), <span class="number">0</span>)</span><br><span class="line">        self.color.mutate()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mutate</span><span class="params">(self)</span>:</span></span><br><span class="line">        mutated = self.is_mutable()</span><br><span class="line">        <span class="keyword">if</span> mutated:</span><br><span class="line">            self._mutate()</span><br><span class="line">        <span class="keyword">return</span> mutated</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">is_mutable</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> _r(<span class="number">0</span>, <span class="number">100</span>) &lt; self.mutate_rate</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 画圆</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">as_image</span><span class="params">(self)</span>:</span></span><br><span class="line">        temp_image = Image.new(<span class="string">"RGBA"</span>, self.max_range)</span><br><span class="line">        draw = ImageDraw.Draw(temp_image)</span><br><span class="line">        draw.ellipse(self.as_tuple(), fill=self.color.as_tuple())</span><br><span class="line">        <span class="keyword">return</span> temp_image</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">as_tuple</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.centre[<span class="number">0</span>], self.centre[<span class="number">1</span>], self.centre[<span class="number">0</span>] + self.radius, self.centre[<span class="number">1</span>] + self.radius</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125;   radius:&#123;&#125;"</span>.format(self.centre, self.radius)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.__str__()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># *---------&gt;x</span></span><br><span class="line"><span class="comment"># |</span></span><br><span class="line"><span class="comment"># |</span></span><br><span class="line"><span class="comment"># |</span></span><br><span class="line"><span class="comment"># |</span></span><br><span class="line"><span class="comment"># |</span></span><br><span class="line"><span class="comment"># v</span></span><br><span class="line"><span class="comment"># y</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PixelImage</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, image_size, circle_nums=<span class="number">100</span>, mutate_speed=<span class="number">0.1</span>, mutate_rate=<span class="number">50</span>)</span>:</span></span><br><span class="line">        self.image_size = image_size</span><br><span class="line">        self.pixels = []</span><br><span class="line">        self.image = <span class="literal">None</span></span><br><span class="line">        self.mutate_speed = mutate_speed</span><br><span class="line">        self.mutate_rate = mutate_rate</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 初始化目标数量的圆圈</span></span><br><span class="line">        self.circles = [Circle(image_size, mutate_speed, mutate_rate) <span class="keyword">for</span> _ <span class="keyword">in</span> range(circle_nums)]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">born_a_child</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="comment"># make a copy</span></span><br><span class="line">        child = copy.deepcopy(self)</span><br><span class="line">        <span class="comment"># if no one mutate</span></span><br><span class="line">        <span class="keyword">return</span> child</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mutate</span><span class="params">(self)</span>:</span></span><br><span class="line">        counter = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> circle <span class="keyword">in</span> self.circles:</span><br><span class="line">            counter += <span class="number">1</span> <span class="keyword">if</span> circle.mutate() <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> counter == <span class="number">0</span>:</span><br><span class="line">            self.circles[<span class="number">0</span>]._mutate()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_pixels</span><span class="params">(self)</span>:</span></span><br><span class="line">        temp_image = Image.new(<span class="string">'RGBA'</span>, self.image_size)</span><br><span class="line">        <span class="keyword">for</span> circle <span class="keyword">in</span> self.circles:</span><br><span class="line">            temp_image = Image.alpha_composite(temp_image, circle.as_image())</span><br><span class="line"></span><br><span class="line">        self.image = temp_image</span><br><span class="line"></span><br><span class="line">        pixels = [self.image.getpixel((x, y)) <span class="keyword">for</span> y <span class="keyword">in</span> range(self.image.size[<span class="number">1</span>]) <span class="keyword">for</span> x <span class="keyword">in</span> range(temp_image.size[<span class="number">0</span>])]</span><br><span class="line">        <span class="keyword">return</span> pixels</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">save_as_img</span><span class="params">(self, path, name)</span>:</span></span><br><span class="line">        name += <span class="string">'.png'</span></span><br><span class="line">        path = os.path.realpath(path)</span><br><span class="line">        self.image.save(os.path.join(path, name))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Transform</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, target, output_path, max_loop=<span class="number">10240</span>, save_pre_loop=<span class="number">1000</span>, circle_nums=<span class="number">100</span>, mutate_speed=<span class="number">0.1</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 mutate_rate=<span class="number">10</span>)</span>:</span></span><br><span class="line">        self.target = Image.open(target).resize((<span class="number">128</span>, <span class="number">128</span>)).convert(<span class="string">'RGBA'</span>)</span><br><span class="line">        self.output_path = output_path</span><br><span class="line">        self.max_loop = max_loop</span><br><span class="line">        self.save_pre_loop = save_pre_loop</span><br><span class="line"></span><br><span class="line">        self.circle_nums = circle_nums</span><br><span class="line">        self.mutate_speed = mutate_speed</span><br><span class="line">        self.mutate_rate = mutate_rate</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 得到目标图象的像素信息</span></span><br><span class="line">        self.target_pixels = [self.target.getpixel((x, y)) <span class="keyword">for</span> y <span class="keyword">in</span> range(self.target.size[<span class="number">1</span>]) <span class="keyword">for</span> x <span class="keyword">in</span></span><br><span class="line">                              range(self.target.size[<span class="number">0</span>])]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compare_pixel</span><span class="params">(self, pixels)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> len(pixels) != len(self.target_pixels):</span><br><span class="line">            <span class="keyword">raise</span> Exception(<span class="string">"Pixels nums not equal"</span>)</span><br><span class="line">        ret = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> index <span class="keyword">in</span> range(len(self.target_pixels)):</span><br><span class="line">            dr = self.target_pixels[index][<span class="number">0</span>] - pixels[index][<span class="number">0</span>]</span><br><span class="line">            dg = self.target_pixels[index][<span class="number">1</span>] - pixels[index][<span class="number">1</span>]</span><br><span class="line">            db = self.target_pixels[index][<span class="number">2</span>] - pixels[index][<span class="number">2</span>]</span><br><span class="line">            ret += dr * dr + dg * dg + db * db</span><br><span class="line">        <span class="keyword">return</span> ret</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="comment"># 初始化</span></span><br><span class="line">        parent = PixelImage(self.target.size, self.circle_nums, self.mutate_speed, self.mutate_rate)</span><br><span class="line">        counter = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="keyword">if</span> counter &gt; self.max_loop:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">            <span class="comment"># 生出一个孩子</span></span><br><span class="line">            child = parent.born_a_child()</span><br><span class="line"></span><br><span class="line">            child.mutate()</span><br><span class="line"></span><br><span class="line">            self.parent = parent</span><br><span class="line">            self.child = child</span><br><span class="line"></span><br><span class="line">            parent_diff = self.compare_pixel(parent.get_pixels())</span><br><span class="line">            child_diff = self.compare_pixel(child.get_pixels())</span><br><span class="line"></span><br><span class="line">            print(<span class="string">"Loop:&#123;&#125; \t\t Score Parent:&#123;&#125; \t\t Child: &#123;&#125;"</span>.format(counter, parent_diff, child_diff))</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> counter % self.save_pre_loop == <span class="number">0</span>:</span><br><span class="line">                parent.save_as_img(self.output_path, str(counter))</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> child_diff &lt; parent_diff:</span><br><span class="line">                parent = child</span><br><span class="line"></span><br><span class="line">            counter += <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    MAX_LOOP = <span class="number">102400</span></span><br><span class="line">    SAVE_PRE_LOOP = <span class="number">1000</span></span><br><span class="line">    MUTATE_RATE = <span class="number">10</span></span><br><span class="line">    MUTATE_SPEED = <span class="number">0.1</span></span><br><span class="line">    CIRCLE_NUMS = <span class="number">100</span></span><br><span class="line"></span><br><span class="line">    parser = argparse.ArgumentParser()</span><br><span class="line">    parser.add_argument(<span class="string">'target'</span>, help=<span class="string">'the image to transform'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'output'</span>, help=<span class="string">'the folder to store result'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--max_loop'</span>, help=<span class="string">'the max loop nums of transform'</span>, type=int)</span><br><span class="line">    parser.add_argument(<span class="string">'--save_pre_loop'</span>, help=<span class="string">'save the temp result pre loop'</span>, type=int)</span><br><span class="line">    parser.add_argument(<span class="string">'--mutate_rate'</span>, help=<span class="string">'the rate of mutate MUTATE_RATE, percent'</span>, type=int)</span><br><span class="line">    parser.add_argument(<span class="string">'--mutate_speed'</span>, help=<span class="string">'the mutate speed of every mutate'</span>, type=float)</span><br><span class="line">    parser.add_argument(<span class="string">'--circle_nums'</span>, help=<span class="string">'numbers of circles to fit the image'</span>, type=int)</span><br><span class="line">    args = parser.parse_args()</span><br><span class="line"></span><br><span class="line">    TARGET = args.target</span><br><span class="line">    OUTPUT = args.output</span><br><span class="line">    MAX_LOOP = args.max_loop <span class="keyword">or</span> MAX_LOOP</span><br><span class="line">    SAVE_PRE_LOOP = args.save_pre_loop <span class="keyword">or</span> SAVE_PRE_LOOP</span><br><span class="line">    MUTATE_RATE = args.mutate_rate <span class="keyword">or</span> MUTATE_RATE</span><br><span class="line">    MUTATE_SPEED = args.mutate_speed <span class="keyword">or</span> MUTATE_SPEED</span><br><span class="line">    CIRCLE_NUMS = args.circle_nums <span class="keyword">or</span> CIRCLE_NUMS</span><br><span class="line"></span><br><span class="line">    transformater = Transform(TARGET, OUTPUT, max_loop=MAX_LOOP, save_pre_loop=SAVE_PRE_LOOP, mutate_rate=MUTATE_RATE,</span><br><span class="line">                              circle_nums=CIRCLE_NUMS, mutate_speed=MUTATE_SPEED)</span><br><span class="line">    print(<span class="string">"""Max Loop: &#123;&#125; \t Save Pre Loop: &#123;&#125; \t Mutate Rate: &#123;&#125; \t Circle Nums: &#123;&#125; \t Mutate Speed: &#123;&#125;"""</span>.format(</span><br><span class="line">        MAX_LOOP, SAVE_PRE_LOOP, MUTATE_RATE, CIRCLE_NUMS, MUTATE_SPEED))</span><br><span class="line">    transformater.main()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<h2 id="思维导图"><a href="#思维导图" class="headerlink" title="思维导图"></a>思维导图</h2><p><img src="/images/machinelearningalgorithm/12_1.png" alt=""></p>
+<h2 id="算法原理"><a href="#算法原理" class="headerlink" title="算法原理"></a>算法原理</h2><p>还是先感谢一下这个代码的作者，让我看到如此优美的代码，尽管他自己说这是他东拼西凑的，但是，还是让我感到艺术。</p>
+<p>OK，让我们正式进入主题。另外，我得吐槽一下思维导图，明明我在思维导图中已经介绍的很详细了，但是却不能导出注释。。。</p>
+<p>先占坑，明天更新</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/GA/" rel="tag"># GA</a>
+              <a href="/tags/%E8%BF%9B%E5%8C%96%E7%AE%97%E6%B3%95/" rel="tag"># 进化算法</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/04/movie15/" rel="prev" title="《破坏王2：大闹互联网》">
+      <i class="fa fa-chevron-left"></i> 《破坏王2：大闹互联网》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/05/brain-wave0/" rel="next" title="脑电信号入门">
+      脑电信号入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#效果展示"><span class="nav-number">1.</span> <span class="nav-text">效果展示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体代码"><span class="nav-number">2.</span> <span class="nav-text">具体代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#思维导图"><span class="nav-number">3.</span> <span class="nav-text">思维导图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#算法原理"><span class="nav-number">4.</span> <span class="nav-text">算法原理</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="分支，GIT 的核心。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GIT | 分支">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/03/22/git6/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="分支，GIT 的核心。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/git/6_0.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/git/6_1.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/git/6_2.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/git/6_3.gif">
+<meta property="article:published_time" content="2020-03-22T07:38:26.000Z">
+<meta property="article:modified_time" content="2020-04-20T01:54:50.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/git/6_0.gif">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/03/22/git6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>GIT | 分支 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/03/22/git6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GIT | 分支
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-22 15:38:26" itemprop="dateCreated datePublished" datetime="2020-03-22T15:38:26+08:00">2020-03-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-20 09:54:50" itemprop="dateModified" datetime="2020-04-20T09:54:50+08:00">2020-04-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index"><span itemprop="name">git</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/22/git6/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/22/git6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>分支，GIT 的核心。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="创建分支"><a href="#创建分支" class="headerlink" title="创建分支"></a>创建分支</h1><br/>
+
+<pre><code>git branch 分支名</code></pre><br/>
+
+<h1 id="删除分支"><a href="#删除分支" class="headerlink" title="删除分支"></a>删除分支</h1><br/>
+
+<pre><code>git branch -d 分支名</code></pre><p>强制删除</p>
+<pre><code>git branch -D 分支名</code></pre><p>比如，我们新创建了一个分支，但是，最后这个分支没用了，所以，要删除，但是，这个分支并没有合并到 master ，所以，git 会产生疑问，这个时候你要使用强制删除。</p>
+<br/>
+
+<h1 id="查看分支"><a href="#查看分支" class="headerlink" title="查看分支"></a>查看分支</h1><br/>
+
+<pre><code>git branch</code></pre><br/>
+
+<h1 id="切换分支"><a href="#切换分支" class="headerlink" title="切换分支"></a>切换分支</h1><br/>
+
+<pre><code>git checkout 分支
+我更推荐你用下面的命令
+git switch 分支</code></pre><br/>
+
+<h1 id="分支备注"><a href="#分支备注" class="headerlink" title="分支备注"></a>分支备注</h1><br/>
+
+<p>有的时候我们创建了大量的分支，最后发现有的分支是什么作用，有没有被合并都不知道了，所以，我们迫切的需要一个可以备注分支作用的命令。</p>
+<pre><code>git config branch.{branch_name}.description &quot;内容&quot;</code></pre><p>比如</p>
+<pre><code>git config branch.dev.description &quot;升级部分数据&quot;</code></pre><h2 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h2><pre><code>git config branch.dev.description</code></pre><h2 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h2><pre><code>git config branch.dev.description &quot;修改的内容&quot;</code></pre><br/>
+
+<h1 id="合并分支"><a href="#合并分支" class="headerlink" title="合并分支"></a>合并分支</h1><br/>
+
+<h2 id="分支合并"><a href="#分支合并" class="headerlink" title="分支合并"></a>分支合并</h2><p>我们切换到自己创建的分支，比如 bitmex 。然后，我们想把 master 的代码合并到 我们创建的分支上。</p>
+<p>所以，我要先切换到 master，然后 pull ，保证 master 的代码是最新的。</p>
+<p>然后，在切换到 bitmex 中，执行 </p>
+<pre><code>git merge master[合并本地 master 分支]
+git merge origin master [合并远程 master 分支]</code></pre><p>这个 merge 操作，是你在哪个分支，就会自动吧 merge 后面的分支和当前分支的代码进行合并。</p>
+<h2 id="合并分支实例"><a href="#合并分支实例" class="headerlink" title="合并分支实例"></a>合并分支实例</h2><p>团队在写项目代码的时候，经常会建设多个分支。但是，最终，我们都是要回归 master 分支的。</p>
+<p>在这里，我们有一个情况，就是，当团队成员将 master 分支代码修改之后，而你正在 update_li 这个分支上修改，所以，你虽然一开始是基于 master 创建的分支，但是，你现在的代码已经和 master 有了很大的不同。</p>
+<p>这里，假设一种情况。如果，在你的分支上，你已经测试过无误之后，首先你将代码更新到 update_li 这个分支上，这个时候，你需要将你的代码合并到 master 上。以下是具体的步骤。</p>
+<p>首先，要合并 master ，我们的原则是 master 的代码是可以稳定运行的代码，所以，冲突方面应该在自己的分支上解决。</p>
+<p>我们先切换到 master 分支上，然后 git pull origin master ，我们将 master 的代码变成最新的代码。</p>
+<h3 id="在自己分支上解决完冲突"><a href="#在自己分支上解决完冲突" class="headerlink" title="在自己分支上解决完冲突"></a>在自己分支上解决完冲突</h3><p>然后，我们切换到 update_li 这个分支上，我们使用</p>
+<pre><code>git merge origin master</code></pre><p>这个 origin 是指远程仓库，这句话的意思是 merge 远程仓库的 master，由于之前我们已经将本地的 master pull 到最新的代码，所以，直接用</p>
+<pre><code>git merge master（merge 本地代码）</code></pre><p>这条命令也可以，当然最好还是加上 origin</p>
+<p>我们在 update_li 上解决完冲突后，使用 git status 看一下</p>
+<p>这个时候，你会发现，有很多 文件需要我们 commit ，这是很正常的事，因为，你从 master 分支上，merge 了很多文件。这些文件都是你之前没有的，而且，你 merge 的话，就默认，这些文件属于你的，你只需要把这些文件提交到远程分支上就好了。</p>
+<p>ok，现在我们就默认你已经将代码提交到 update_li 上了，在这里我需要重申一遍，update_li 上面保存的代码应该是 最新的 master + 你自己写的代码。</p>
+<h3 id="将解决完冲突的合并到-master"><a href="#将解决完冲突的合并到-master" class="headerlink" title="将解决完冲突的合并到 master"></a>将解决完冲突的合并到 master</h3><p>现在让我们切换到 master 上。</p>
+<p>我们执行</p>
+<pre><code>git merge origin update_li</code></pre><p>这样，在 master 上，我们的代码就是已经处理完冲突之后的代码了。</p>
+<p>这个时候，你再讲代码 git push origin master 就好了。</p>
+<h2 id="Git合并指定文件到另一个分支"><a href="#Git合并指定文件到另一个分支" class="headerlink" title="Git合并指定文件到另一个分支"></a>Git合并指定文件到另一个分支</h2><p>如果只想将feature分支的某个文件f.txt合并到master分支上</p>
+<pre><code>git checkout feature 
+git checkout --patch master f.txt</code></pre><p>第一个命令： 切换到feature分支；</p>
+<p>第二个命令：合并master分支上f文件到feature分支上，将master分支上 f 文件追加补丁到feature分支上 f文件。你可以接受或者拒绝补丁内容。</p>
+<p>如果只是简单的将feature分支的文件f.txt copy到master分支上；</p>
+<pre><code>git checkout master
+git checkout feature f.txt</code></pre><h2 id="合并指定分支上的-commit"><a href="#合并指定分支上的-commit" class="headerlink" title="合并指定分支上的 commit"></a>合并指定分支上的 commit</h2><p>这个命令是</p>
+<pre><code>git cherry-pick commit_id</code></pre><p>因为 commit_id 是唯一的，所以不需要指定分支。</p>
+<h3 id="合并指定-commit-实例"><a href="#合并指定-commit-实例" class="headerlink" title="合并指定 commit 实例"></a>合并指定 commit 实例</h3><p>假设有两个分支</p>
+<ul>
+<li>master</li>
+<li>dev</li>
+</ul>
+<p>dev 我们新创建了一个 t.txt 的文件，我们对 t.txt 文件做了如下的修改</p>
+<table>
+<thead>
+<tr>
+<th>commit_id</th>
+<th>t.txt的内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>6786</td>
+<td>1</td>
+</tr>
+<tr>
+<td>7844</td>
+<td>12</td>
+</tr>
+<tr>
+<td>1231</td>
+<td>123</td>
+</tr>
+</tbody></table>
+<p>然后，我们切换到 master 分支，如果执行</p>
+<pre><code>git cherry-pick 7844</code></pre><p>那么，master 分支上会出现 t.txt ，并且里面的内容是 12</p>
+<p>如果，我们后悔了这次合并的 commit</p>
+<p>我们只需要执行</p>
+<pre><code>git cherry-pick --abort</code></pre><p>就好了。</p>
+<h3 id="git合并某一系列的-commit-（没成功试过，暂时记录一下）"><a href="#git合并某一系列的-commit-（没成功试过，暂时记录一下）" class="headerlink" title="git合并某一系列的 commit （没成功试过，暂时记录一下）"></a>git合并某一系列的 commit （没成功试过，暂时记录一下）</h3><p>在一些特性情况下，合并单个commit并不够，你需要合并一系列相连的commits。这种情况下就不要选择cherry-pick了，rebase 更适合。还以上例为例，假设你需要合并feature分支的commit76cada ~62ecb3 到master分支。</p>
+<p>首先需要基于feature创建一个新的分支，并指明新分支的最后一个commit：</p>
+<pre><code>git checkout featuregit 
+git checkout -b newbranch 62ecb3</code></pre><p>然后，rebase 这个新分支的 commit 到 master（–onto master）。76cada^ 指明你想从哪个特定的commit开始。</p>
+<pre><code>git rebase --onto master 76cada^ 
+    这个命令在 newbranch 执行</code></pre><p>得到的结果就是feature分支的commit 76cada ~ 62ecb3 都被合并到了master分支。【我试了，但是没成功。。。】</p>
+<h3 id="git-merge-反悔，去掉一些-commit"><a href="#git-merge-反悔，去掉一些-commit" class="headerlink" title="git merge 反悔，去掉一些 commit"></a>git merge 反悔，去掉一些 commit</h3><p><a href="https://www.zhihu.com/question/325639912/answer/695706958" rel="external nofollow noreferrer">参考资料</a></p>
+<h4 id="情况-1"><a href="#情况-1" class="headerlink" title="情况 1"></a>情况 1</h4><p>假如你有连续4个commit：</p>
+<p>commit-id-1，commit-id-2，commit-id-3，commit-id-4</p>
+<p>当你后悔搞了commit-id-3和commit-id-4之后，你可以反悔并且悄悄: </p>
+<pre><code>git reset commit-id-2。</code></pre><p>意思就是说：“我后悔了，悄悄把我后面的脚印擦掉吧，只留到commit-id-2”。这样操作以后执行git log就不会看到你后面commit-id-3和commit-id-4的痕迹(表面上看不到，Git会给你留途径让你看到痕迹，这里不继续延伸了)。当然了建议git reset后面加一个–hard参数让你改写历史的时候工作区也跟上一起刷新，最后推荐的命令是</p>
+<pre><code>git reset --hard commit-id-2。</code></pre><h4 id="情况-2"><a href="#情况-2" class="headerlink" title="情况 2"></a>情况 2</h4><p>假如你有连续4个commit：</p>
+<pre><code>commit-id-1，commit-id-2，commit-id-3，commit-id-4</code></pre><p>当你后悔搞了commit-id-3之后，你可以反悔并公开：</p>
+<pre><code>git revert commit-id-3</code></pre><p>这样操作以后你的commit树就变成了commit-id-1，commit-id-2，commit-id-3，commit-id-4，commit-id-5这个样子。</p>
+<p>其含义是，你撤销了 commit-id-3 的操作，所以，你自动提交了 commit-id-5，也就是，假设 commit-id-3 在文件中插了一段代码，那么 commit-id-5 就是去掉这段代码。</p>
+<h4 id="reset-和-revert-的区别"><a href="#reset-和-revert-的区别" class="headerlink" title="reset 和 revert 的区别"></a>reset 和 revert 的区别</h4><p>还有一个最重要的区别就是：reset是“reset到xxx”；revert是“revert掉xxx”。</p>
+<p>也就是说，reset处理的是一个区间，是从HEAD到你指定的commit-id之间的所有commit-id全部抹除，所以很省力；</p>
+<p>revert一次命令只能处理一个commit-id，所以对于大区间来说会比较费劲。revert最主要的一件事情要理解：假如你站在大楼的10层，想把第8层和第9层干掉的话，那么先revert第9层，再revert第8层，原因自己分析吧。</p>
+<br/>
+
+<h1 id="反悔合并"><a href="#反悔合并" class="headerlink" title="反悔合并"></a>反悔合并</h1><br/>
+
+<pre><code>git merge --abort</code></pre><br/>
+
+<h1 id="合并的类型"><a href="#合并的类型" class="headerlink" title="合并的类型"></a>合并的类型</h1><br/>
+
+<h2 id="Fast-forward-—ff"><a href="#Fast-forward-—ff" class="headerlink" title="Fast-forward (—ff)"></a>Fast-forward (—ff)</h2><p>在当前分支相比于我们要合并的分支没有额外的提交（commit）时，可以执行 fast-forward 合并。Git 很懒，首先会尝试执行最简单的选项：fast-forward！这类合并不会创建新的提交，而是会将我们正在合并的分支上的提交直接合并到当前分支。</p>
+<p><img src="/images/git/6_0.gif" alt=""></p>
+<p>完美！现在，我们在 dev 分支上所做的所有改变都合并到了 master 分支上。那么 no-fast-forward 又是什么意思呢？</p>
+<h2 id="No-fast-foward-—no-ff"><a href="#No-fast-foward-—no-ff" class="headerlink" title="No-fast-foward (—no-ff)"></a>No-fast-foward (—no-ff)</h2><p>如果你的当前分支相比于你想要合并的分支没有任何提交，那当然很好，但很遗憾现实情况很少如此！如果我们在当前分支上提交我们想要合并的分支不具备的改变，那么 git 将会执行 no-fast-forward 合并。</p>
+<p>使用 no-fast-forward 合并时，Git 会在当前活动分支上创建新的 merging commit。这个提交的父提交（parent commit）即指向这个活动分支，也指向我们想要合并的分支！</p>
+<p><img src="/images/git/6_1.gif" alt=""></p>
+<p>没什么大不了的，完美的合并！现在，我们在 dev 分支上所做的所有改变都合并到了 master 分支上。</p>
+<br/>
+
+<h1 id="合并冲突"><a href="#合并冲突" class="headerlink" title="合并冲突"></a>合并冲突</h1><br/>
+
+<p>尽管 Git 能够很好地决定如何合并分支以及如何向文件添加修改，但它并不总是能完全自己做决定。当我们想要合并的两个分支的同一文件中的同一行代码上有不同的修改，或者一个分支删除了一个文件而另一个分支修改了这个文件时，Git 就不知道如何取舍了。</p>
+<p>在这样的情况下，Git 会询问你想要保留哪种选择？假设在这两个分支中，我们都编辑了 README.md 的第一行。</p>
+<p><img src="/images/git/6_2.gif" alt=""></p>
+<p>如果我们想把 dev 合并到 master，就会出现一个合并冲突：你想要标题是 Hello! 还是 Hey!？</p>
+<p>当尝试合并这些分支时，Git 会向你展示冲突出现的位置。我们可以手动移除我们不想保留的修改，保存这些修改，再次添加这个已修改的文件，然后提交这些修改。</p>
+<p><img src="/images/git/6_3.gif" alt=""></p>
+<p>完成！尽管合并冲突往往很让人厌烦，但这是合理的：Git 不应该瞎猜我们想要保留哪些修改。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"># git</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/22/git5/" rel="prev" title="GIT | 回退">
+      <i class="fa fa-chevron-left"></i> GIT | 回退
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/22/git7/" rel="next" title="GIT | 其他包括基础、技巧等">
+      GIT | 其他包括基础、技巧等 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#创建分支"><span class="nav-number">1.</span> <span class="nav-text">创建分支</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#删除分支"><span class="nav-number">2.</span> <span class="nav-text">删除分支</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看分支"><span class="nav-number">3.</span> <span class="nav-text">查看分支</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#切换分支"><span class="nav-number">4.</span> <span class="nav-text">切换分支</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分支备注"><span class="nav-number">5.</span> <span class="nav-text">分支备注</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#查看"><span class="nav-number">5.1.</span> <span class="nav-text">查看</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改"><span class="nav-number">5.2.</span> <span class="nav-text">修改</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#合并分支"><span class="nav-number">6.</span> <span class="nav-text">合并分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#分支合并"><span class="nav-number">6.1.</span> <span class="nav-text">分支合并</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并分支实例"><span class="nav-number">6.2.</span> <span class="nav-text">合并分支实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在自己分支上解决完冲突"><span class="nav-number">6.2.1.</span> <span class="nav-text">在自己分支上解决完冲突</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将解决完冲突的合并到-master"><span class="nav-number">6.2.2.</span> <span class="nav-text">将解决完冲突的合并到 master</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git合并指定文件到另一个分支"><span class="nav-number">6.3.</span> <span class="nav-text">Git合并指定文件到另一个分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并指定分支上的-commit"><span class="nav-number">6.4.</span> <span class="nav-text">合并指定分支上的 commit</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#合并指定-commit-实例"><span class="nav-number">6.4.1.</span> <span class="nav-text">合并指定 commit 实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git合并某一系列的-commit-（没成功试过，暂时记录一下）"><span class="nav-number">6.4.2.</span> <span class="nav-text">git合并某一系列的 commit （没成功试过，暂时记录一下）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-merge-反悔，去掉一些-commit"><span class="nav-number">6.4.3.</span> <span class="nav-text">git merge 反悔，去掉一些 commit</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#情况-1"><span class="nav-number">6.4.3.1.</span> <span class="nav-text">情况 1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#情况-2"><span class="nav-number">6.4.3.2.</span> <span class="nav-text">情况 2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#reset-和-revert-的区别"><span class="nav-number">6.4.3.3.</span> <span class="nav-text">reset 和 revert 的区别</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反悔合并"><span class="nav-number">7.</span> <span class="nav-text">反悔合并</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#合并的类型"><span class="nav-number">8.</span> <span class="nav-text">合并的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Fast-forward-—ff"><span class="nav-number">8.1.</span> <span class="nav-text">Fast-forward (—ff)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#No-fast-foward-—no-ff"><span class="nav-number">8.2.</span> <span class="nav-text">No-fast-foward (—no-ff)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#合并冲突"><span class="nav-number">9.</span> <span class="nav-text">合并冲突</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

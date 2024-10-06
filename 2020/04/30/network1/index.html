@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="基础网络知识，关于 ping 之后到底做了什么。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络 | 当你 ping 的时候，你知道背后发生了什么吗？「转载」">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/30/network1/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="基础网络知识，关于 ping 之后到底做了什么。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/network/1_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/network/1_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/network/1_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/network/1_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/network/1_4.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/network/1_5.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/network/1_6.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/network/1_7.png">
+<meta property="article:published_time" content="2020-04-30T07:40:46.000Z">
+<meta property="article:modified_time" content="2020-07-27T08:02:47.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="network">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/network/1_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/30/network1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>网络 | 当你 ping 的时候，你知道背后发生了什么吗？「转载」 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/30/network1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网络 | 当你 ping 的时候，你知道背后发生了什么吗？「转载」
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-30 15:40:46" itemprop="dateCreated datePublished" datetime="2020-04-30T15:40:46+08:00">2020-04-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-27 16:02:47" itemprop="dateModified" datetime="2020-07-27T16:02:47+08:00">2020-07-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/30/network1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/30/network1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>基础网络知识，关于 <code>ping</code> 之后到底做了什么。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://mp.weixin.qq.com/s/bueDInZLcHb3DZwCOZF9ZQ" rel="external nofollow noreferrer">当你 ping 的时候，你知道背后发生了什么吗？</a></li>
+</ul>
+<br/>
+
+<h1 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h1><br/>
+
+<p>对于 <code>ping</code> 命令，想必只要是程序员都知道吧？当我们检查网络情况的时候，最先使用的命令肯定是 <code>ping</code> 命令吧？一般我们用 <code>ping</code> 查看网络情况，主要是检查两个指标：</p>
+<ul>
+<li>第一个是看看是不是超时</li>
+<li>第二个看看是不是延迟太高</li>
+</ul>
+<p>如果超时那么肯定是网络有问题（禁 ping情况除外）；如果延迟太高，网络情况肯定也是很糟糕的。</p>
+<p>那么对于 <code>ping</code> 命令的原理， <code>ping</code> 是如何检查网络的？大家之前有了解吗？接下来我们来跟着 <code>ping</code> 命令走一圈，看看 <code>ping</code> 是如何工作的。</p>
+<br/>
+
+<h1 id="环境准备和抓包"><a href="#环境准备和抓包" class="headerlink" title="环境准备和抓包"></a>环境准备和抓包</h1><br/>
+
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>抓包工具：Wireshark 准备两台电脑，进行互 ping操作：</p>
+<ul>
+<li>A电脑（IP地址： <code>192.168.2.135</code> / MAC地址： <code>98:22:EF:E8:A8:87</code>）</li>
+<li>B电脑（IP地址： <code>192.168.2.179</code> / MAC地址： <code>90:A4:DE:C2:DF:FE</code>）</li>
+</ul>
+<h2 id="抓包操作"><a href="#抓包操作" class="headerlink" title="抓包操作"></a>抓包操作</h2><p>打开 Wireshark，选取指定的网卡进行抓包，进行 ping操作，在 A电脑上 ping B电脑的 IP。</p>
+<p><img src="/images/network/1_0.png" alt=""></p>
+<p>抓包情况如下：</p>
+<p><img src="/images/network/1_1.png" alt=""></p>
+<p>这里先简单的介绍下Wireshark的控制面板，这个面板包含7个字段，分别是：</p>
+<ul>
+<li>NO: 编号</li>
+<li>Time: 包的时间戳</li>
+<li>Source: 源地址</li>
+<li>Destination: 目标地址</li>
+<li>Protocol: 协议</li>
+<li>Length: 包长度</li>
+<li>Info: 数据包附加信息</li>
+</ul>
+<br/>
+
+<h1 id="深入解析"><a href="#深入解析" class="headerlink" title="深入解析"></a>深入解析</h1><br/>
+
+<p>上图中抓包编号 <code>54-132</code> 显示的就是整个 <code>ping</code> 命令的过程，我们知道 <code>ping</code> 命令不是依托于 TCP或者 UDP这种传输层协议的，而是依托于 <code>ICMP</code> 协议实现的， 那么什么是 <code>ICMP</code> 协议呢？这里简单介绍下：</p>
+<h2 id="ICMP协议的产生背景"><a href="#ICMP协议的产生背景" class="headerlink" title="ICMP协议的产生背景"></a>ICMP协议的产生背景</h2><p>[RFC792]中说明了 ICMP产生的原因：由于互联网之间通讯会涉及很多网关和主机，为了能够报告数据错误，所以产生了 ICMP协议。也就是说 ICMP 协议就是为了更高效的转发 IP数据报和提高交付成功的机会。</p>
+<h2 id="ICMP协议的数据格式"><a href="#ICMP协议的数据格式" class="headerlink" title="ICMP协议的数据格式"></a>ICMP协议的数据格式</h2><p><img src="/images/network/1_2.png" alt=""></p>
+<p>根据上图我们知道了 <code>ICMP协议</code>头包含 4个字节，头部主要用来说明类型和校验 <code>ICMP报文</code>。下图是对应的类型和代码释义列表，我们后面分析抓包的时候会用到。</p>
+<table>
+<thead>
+<tr>
+<th>状态(Type)</th>
+<th>编码(Code)</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>回声应答(ping)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0</td>
+<td>目的网络不可达</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>目的主机不可达</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>目的协议不可达</td>
+</tr>
+<tr>
+<td>3</td>
+<td>3</td>
+<td>目的端口不可达</td>
+</tr>
+<tr>
+<td>3</td>
+<td>6</td>
+<td>目的网络未知</td>
+</tr>
+<tr>
+<td>3</td>
+<td>7</td>
+<td>目的主机未知</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0</td>
+<td>源抑制（拥塞控制-未用）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0</td>
+<td>回声请求（ping）</td>
+</tr>
+<tr>
+<td>9</td>
+<td>0</td>
+<td>路由通告</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0</td>
+<td>路由发现</td>
+</tr>
+<tr>
+<td>11</td>
+<td>0</td>
+<td>TTL超期</td>
+</tr>
+<tr>
+<td>12</td>
+<td>0</td>
+<td>IP首部错误</td>
+</tr>
+</tbody></table>
+<p>简单介绍完了 <code>ICMP</code>，那么抓包过程中出现的 <code>ARP协议</code>是什么呢？我们同样来简单解释下：</p>
+<h2 id="ARP协议"><a href="#ARP协议" class="headerlink" title="ARP协议"></a>ARP协议</h2><p>我们知道，在一个局域网中，计算机通信实际上是依赖于 MAC地址进行通信的，那么 <code>ARP（ AddressResolutionProtocol）</code>的作用就是根据 IP地址查找出对应的 MAC地址。</p>
+<h2 id="Ping过程解析"><a href="#Ping过程解析" class="headerlink" title="Ping过程解析"></a>Ping过程解析</h2><p>了解了上面的基础概念后，我们来分析下抓包的数据，其流程如下：</p>
+<ol>
+<li><p>A 电脑（ 192.168.2.135）发起 ping请求， ping192.168.2.179</p>
+</li>
+<li><p>A 电脑广播发起 ARP请求，查询 192.168.2.179的 MAC地址。</p>
+</li>
+<li><p>B 电脑应答 ARP请求，向 A电脑发起单向应答，告诉 A电脑自己的 MAC地址为 90:A4:DE:C2:DF:FE</p>
+</li>
+<li><p>知道了 MAC地址后，开始进行真正的 ping请求，由于 B电脑可以根据A电脑发送的请求知道 源 MAC地址，所以就可以根据源 MAC地址进行响应了。</p>
+</li>
+</ol>
+<p>上面的请求过程我画成流程图比较直观一点：</p>
+<p><img src="/images/network/1_3.png" alt=""></p>
+<p>观察仔细的朋友可能已经发现，<code>Ping</code> 4次请求和响应结束后，还有一次 B电脑对 A电脑的 <code>ARP请求</code>，这是为什么呢？这里我猜测应该是有 2个原因：</p>
+<ul>
+<li><p>由于 <code>ARP</code>有缓存机制，为了防止 <code>ARP</code>过期，结束后重新更新下 ARP缓存，保证下次请求能去往正确的路径，如果 <code>ARP</code>过期就会导致出现一次错误，从而影响测试准确性。</p>
+</li>
+<li><p>由于 <code>ping</code>命令的响应时间是根据请求包和响应包的时间戳计算出来的，所以一次 <code>ARP</code>过程也是会消耗时间。这里提前缓存最新的 ARP结果就是节省了下次 ping的 ARP时间。</p>
+</li>
+</ul>
+<p>为了验证我们的猜测，我再进行一次 <code>ping</code>操作，抓包看看是不是和我们猜测的一样。此时，计算机里面已经有了<code>ARP</code>的缓存，我们执行 <code>ARP-a</code> 看看缓存的arp列表：</p>
+<p><img src="/images/network/1_4.png" alt=""></p>
+<p>我们看看第二次 ping的抓包</p>
+<p><img src="/images/network/1_5.png" alt=""></p>
+<p>我们看到上图中在真正 <code>ping</code>之前并没有进行一次 <code>ARP</code>请求，这也就是说，直接拿了缓存中的 <code>ARP</code>来执行了，另外当 B计算机进行响应之前还是进行了一次 <code>ARP请求</code>，它还是要确认下之前的 <code>ARP缓存</code>是否为正确的。然后结束<code>ping操作</code>之后，同样再发一次 ARP请求，更新下自己的 <code>ARP缓存</code>。这里和我们的猜想基本一致。</p>
+<p>弄懂了 <code>ping</code> 的流程之后我们来解析下之前解释的 <code>ICMP数据</code> 结果是否和抓包的一致。我们来点击一个 ping request看看 ICMP协议详情</p>
+<p><img src="/images/network/1_6.png" alt=""></p>
+<p>图中红框内就行 ICMP协议的详情了，这里的 <code>Type=8,code=0</code>, 校验是正确，且这是一个请求报文。我们再点击<code>Responseframe:57</code>，这里说明响应报文在<code>序号 57</code>。详情如下：</p>
+<p><img src="/images/network/1_7.png" alt=""></p>
+<p>上图的响应报文， <code>Type=0,code=0</code>，这里知道就是响应报文了，然后最后就是根据请求和响应的时间戳计算出来的响应延迟。 <code>3379.764ms-3376.890ms=2.874ms</code>。</p>
+<br/>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><br/>
+
+<p>我们分析了一次完整的 <code>ping</code> 请求过程， ping命令是依托于 <code>ICMP</code> 协议的， <code>ICMP</code>协议的存在就是为了更高效的转发 <code>IP</code> 数据报和提高交付成功的机会。 <code>ping</code> 命令除了依托于 <code>ICMP</code>，在局域网下还要借助于 <code>ARP协议</code>， <code>ARP协议</code>能根据 <code>IP地址</code> 反查出计算机的 <code>MAC地址</code>。另外 <code>ARP</code> 是有缓存的，为了保证 <code>ARP的准确性</code>，计算机会更新 <code>ARP缓存</code>。</p>
+<p><code>Ping</code> 命令是用来检测网络是否畅通的，而 <code>Telnet</code> 命令则用来远程登陆。 但 <code>Ping</code> 不通并不一定代表网络不通。<code>ping</code> 是基于 <code>ICMP</code> 协议的命令，就是你发出去一个数据包，对方收到后返给你一个！就好比声纳。这个协议是可以禁止的！禁止后，如果你 <code>ping</code> 对方，对方收到后就不回馈给你，这样你就显示无法 <code>ping</code> 通，但实际你们还是连着的！<code>telnet</code> 是登陆服务器的！服务没禁止就能登陆。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/network/" rel="tag"># network</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/30/zookeeper4/" rel="prev" title="zookeeper | 什么是ZooKeeper？「转载」">
+      <i class="fa fa-chevron-left"></i> zookeeper | 什么是ZooKeeper？「转载」
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/30/cryptography1/" rel="next" title="密码学 | 哈希算法「转载」">
+      密码学 | 哈希算法「转载」 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概览"><span class="nav-number">2.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#环境准备和抓包"><span class="nav-number">3.</span> <span class="nav-text">环境准备和抓包</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境准备"><span class="nav-number">3.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓包操作"><span class="nav-number">3.2.</span> <span class="nav-text">抓包操作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#深入解析"><span class="nav-number">4.</span> <span class="nav-text">深入解析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ICMP协议的产生背景"><span class="nav-number">4.1.</span> <span class="nav-text">ICMP协议的产生背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ICMP协议的数据格式"><span class="nav-number">4.2.</span> <span class="nav-text">ICMP协议的数据格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARP协议"><span class="nav-number">4.3.</span> <span class="nav-text">ARP协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ping过程解析"><span class="nav-number">4.4.</span> <span class="nav-text">Ping过程解析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

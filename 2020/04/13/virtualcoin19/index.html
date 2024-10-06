@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="移动平均线(MA)，或者叫做 SMA「SMA 和 MA 都是同一个指标，不同的名字」。 移动平均线，Moving Average，简称MA，是由著名的美国投资专家Joseph E.Granville（葛兰碧，又译为格兰威尔）于 20 世纪中期提出来的。 移动平均线是最为人所知的判断当前行情趋势的一个指标。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="币圈 | MA">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/13/virtualcoin19/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="移动平均线(MA)，或者叫做 SMA「SMA 和 MA 都是同一个指标，不同的名字」。 移动平均线，Moving Average，简称MA，是由著名的美国投资专家Joseph E.Granville（葛兰碧，又译为格兰威尔）于 20 世纪中期提出来的。 移动平均线是最为人所知的判断当前行情趋势的一个指标。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-13T08:51:12.000Z">
+<meta property="article:modified_time" content="2022-10-16T14:23:25.863Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="量化">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/13/virtualcoin19/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>币圈 | MA | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/13/virtualcoin19/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          币圈 | MA
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-13 16:51:12" itemprop="dateCreated datePublished" datetime="2020-04-13T16:51:12+08:00">2020-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-16 22:23:25" itemprop="dateModified" datetime="2022-10-16T22:23:25+08:00">2022-10-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%87%8F%E5%8C%96%E6%8A%95%E8%B5%84/" itemprop="url" rel="index"><span itemprop="name">量化投资</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%87%8F%E5%8C%96%E6%8A%95%E8%B5%84/%E6%8A%80%E6%9C%AF%E6%8C%87%E6%A0%87/" itemprop="url" rel="index"><span itemprop="name">技术指标</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/13/virtualcoin19/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/13/virtualcoin19/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>移动平均线(<code>MA</code>)，或者叫做 <code>SMA</code>「<code>SMA</code> 和 <code>MA</code> 都是同一个指标，不同的名字」。</p>
+<p>移动平均线，<code>Moving Average</code>，简称<code>MA</code>，是由著名的美国投资专家<code>Joseph E.Granville</code>（葛兰碧，又译为格兰威尔）于 <code>20</code> 世纪中期提出来的。</p>
+<p>移动平均线是最为人所知的判断当前行情趋势的一个指标。</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a href="https://www.bilibili.com/video/BV1xf4y1t7YB?p=3&vd_source=0df8c8881239aaf9ede73ef2f1cd8012" rel="external nofollow noreferrer">【技术分析新手入门系列】技术指标 MA MACD RSI KDJ BOLL 布林线 趋势线 应用讲解</a></li>
+<li><a href="https://www.youtube.com/watch?v=XovM3vi0SdE" rel="external nofollow noreferrer">技术指标在币圈比特币交易中如何使用，以移动平均线MA为例说说我个人的一点点看法</a></li>
+</ul>
+<h2 id="MA计算方法"><a href="#MA计算方法" class="headerlink" title="MA计算方法"></a>MA计算方法</h2><p><code>MA</code> 的计算方法很简单，即：大家小学时学过的简单移动平均——平均数。</p>
+<p>假设，有 <code>5</code> 个 <code>1</code> 小时 频率K线的收盘价列表：</p>
+<ul>
+<li>c1,c2,c3,c4,c5</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>时间点</th>
+<th>3日MA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>c3</td>
+<td>$\frac{c1+c2+c3}{3}$</td>
+</tr>
+<tr>
+<td>c4</td>
+<td>$\frac{c2+c3+c4}{3}$</td>
+</tr>
+<tr>
+<td>c5</td>
+<td>$\frac{c3+c4+c5}{3}$</td>
+</tr>
+</tbody></table>
+<h2 id="TA-Lib-代码"><a href="#TA-Lib-代码" class="headerlink" title="TA-Lib 代码"></a>TA-Lib 代码</h2><figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy as np</span><br><span class="line"><span class="keyword">import</span> talib as ta</span><br><span class="line"></span><br><span class="line">price = np.<span class="built_in">array</span>([<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>])</span><br><span class="line">ma = ta.MA(price, <span class="number">3</span>)</span><br><span class="line">print(ma)</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[nan nan  <span class="number">2.</span>  <span class="number">3.</span>  <span class="number">4.</span>]</span><br></pre></td></tr></table></figure>
+
+<h2 id="MA指标原理"><a href="#MA指标原理" class="headerlink" title="MA指标原理"></a>MA指标原理</h2><p>移动平均线表明在一定期间内数据的平均值，将每天的MA值连成线，就能画出一条移动平均线。</p>
+<p>MA的取值直接取决于两个因素</p>
+<ul>
+<li>被平均的价格</li>
+<li>设置的K线数量：</li>
+</ul>
+<h3 id="价格"><a href="#价格" class="headerlink" title="价格"></a>价格</h3><p>一般大家使用 <code>MA</code> 时，使用的价格是收盘价。</p>
+<p>这里思考一个问题，为什么使用价格是收盘价？这是因为，收盘价往往代表多空双方博弈的结果。但是，加密货币是 <code>7 * 24</code> 小时，也就是没有收盘时间，所以，每个交易所都有自己定义的收盘条件。</p>
+<p>有的交易者会使用(开盘价+收盘价)/2的中间价格来作为MA计算时的输入（可以防止收盘价被人恶意操纵，进行骗线，制造陷阱）。</p>
+<h3 id="K线数量"><a href="#K线数量" class="headerlink" title="K线数量"></a>K线数量</h3><p>如果您是长线的交易风格，可以选择较长的时间窗口，比如：<code>70</code> 等；如果您是短线交易风格，可以选择<code>5</code>、<code>20</code>等参数。</p>
+<p>当然选择的时间参数越短，<code>MA</code>均线对行情的反应越灵敏；选择的时间参数越长，<code>MA</code>均线对行情的反应越滞后。</p>
+<p>每笔价格都是多空双方博弈后达成一致的当前价格的留影，单个价格并不能告诉你群体当前是看多还是看空。就像单张照片并不能告诉你一个人是乐观还是悲观，但是如果把这个人的连续10张照片都拿来，拼成一幅完成的图，就可以从中看出这个人的气质特征，如果持续每1个小时更新这幅图，就可以监测这个人的心情变化。</p>
+<p>移动平均就是市场的一幅图，移动平均发出的最重要的信息是其倾斜方向。当它向上倾斜时，表明群体正变得乐观，即看多；当它向下倾斜时，表明群体正变得悲观，即看空。</p>
+<p>当群体比之前乐观时，价格就会向上突破移动平均线；当群体变得悲观时，价格就会向下跌破移动平均线。</p>
+<h2 id="MA的使用"><a href="#MA的使用" class="headerlink" title="MA的使用"></a>MA的使用</h2><p>成功的交易者并不预测未来，而只是监测市场。<code>MA</code> 帮助我们顺势操作。</p>
+<p><code>MA</code> 传达的唯一重要信息是其倾斜方向，它表明了市场惯性的方向。具体的操作规则「看看就行，跟着操作，会死」 如下：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>做多</td>
+<td>MA 上升且收盘价在 MA 之上时买入做多</td>
+</tr>
+<tr>
+<td>平多</td>
+<td>当价格收在 MA 之下时卖出平多</td>
+</tr>
+<tr>
+<td>做空</td>
+<td>当 MA 下降且价格收在 MA 之下时做空</td>
+</tr>
+<tr>
+<td>平空</td>
+<td>当价格收在 MA 之上时平掉空头仓位</td>
+</tr>
+</tbody></table>
+<p><code>MA</code> 可以做支撑位和压力位。上升的<code>MA</code> 将对价格起到支撑作用，下降的 <code>MA</code> 起到压力作用。所以要在上升的 <code>MA</code> 附近买入，在下降的 <code>MA</code> 附近做空。</p>
+<p>另外，单一的 <code>MA</code> 指标只能说明趋势情况，而不能直接使用。</p>
+<h3 id="MA-指标的特性"><a href="#MA-指标的特性" class="headerlink" title="MA 指标的特性"></a>MA 指标的特性</h3><ul>
+<li>滞后性</li>
+</ul>
+<p>MA 指标代表的是一种趋势，但是，这个趋势有一定的滞后性，并且，周期越长，滞后性越明显。</p>
+<p>当价格上涨的时候，MA 只有加了上涨值，所以才呈现上涨趋势。MA 的过去数据的权重很大，当前数据的权重反而很小，当周期不断扩大的时候，当前数据的权重不断变小。</p>
+<p>基于此，MA 只能用于判断趋势，而不能直接当成买卖指标。</p>
+<p>MA 的使用通常有两种场景</p>
+<ul>
+<li>多指标共用</li>
+<li>趋势指标</li>
+</ul>
+<p>这里扩展一下这两个场景。</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><h3 id="多指标共用"><a href="#多指标共用" class="headerlink" title="多指标共用"></a>多指标共用</h3><p>比如 MA 5 和其他指标使用，多条 MA 线使用，比如 MA 5 和 MA 20 等。</p>
+<p>通过交叉来判断金叉，死叉，然后进行买卖操作。但是，实战起来肯定有其他数据作为支撑。</p>
+<h2 id="MA的优点："><a href="#MA的优点：" class="headerlink" title="MA的优点："></a>MA的优点：</h2><ul>
+<li>MA是一个趋势指标，在强势趋势中很有效。适合趋势行情。</li>
+<li>MA的计算很简单。简单是美。</li>
+</ul>
+<h2 id="MA的缺点："><a href="#MA的缺点：" class="headerlink" title="MA的缺点："></a>MA的缺点：</h2><ul>
+<li><p>MA是一个趋势指标，当市场处于震荡行情时，使用MA经常会被打脸，此时可以用震荡指标。</p>
+</li>
+<li><p>MA均值计算自带的缺陷：每个价格都将引起MA的两次变化。进入计算、移除计算各一次。</p>
+<ul>
+<li><p>首先当一个数据加进来时，MA要变化一次，这很好，我们也希望MA能反应行情的变化。</p>
+</li>
+<li><p>但不好的是当淘汰出去一个高价格时，MA值就会变小；相反，淘汰出一个低价格时，MA值就会变大。而这种变化并不是由当前的市场变化引起的。</p>
+</li>
+<li><p>想象一下，当BTC_USDT徘徊在8000 ~ 9000之间，它的MA(10)为8500，但其中一天价格达到了10500。当这一高价格10天之后被淘汰出去时，MA值就会回落，就像出现一轮下跌趋势一样。这种回落毫无意义，因为它反映的不是市场当前的实际情况。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="MA的改进："><a href="#MA的改进：" class="headerlink" title="MA的改进："></a>MA的改进：</h2><p>针对上述MA的第2个缺陷点——“每个价格都将引起MA的两次变化”：</p>
+<ul>
+<li>我们可以使用指数移动平均(EMA)来平滑掉价格移除时带来的MA高变动。</li>
+<li>我们也可以使用加权移动平均(WMA)来为每个价格设置权重。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%87%8F%E5%8C%96/" rel="tag"># 量化</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/13/virtualcoin18/" rel="prev" title="币圈 | DMA">
+      <i class="fa fa-chevron-left"></i> 币圈 | DMA
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/13/virtualcoin20/" rel="next" title="币圈 | 多重时间维度">
+      币圈 | 多重时间维度 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MA计算方法"><span class="nav-number">2.</span> <span class="nav-text">MA计算方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TA-Lib-代码"><span class="nav-number">3.</span> <span class="nav-text">TA-Lib 代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MA指标原理"><span class="nav-number">4.</span> <span class="nav-text">MA指标原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#价格"><span class="nav-number">4.1.</span> <span class="nav-text">价格</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#K线数量"><span class="nav-number">4.2.</span> <span class="nav-text">K线数量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MA的使用"><span class="nav-number">5.</span> <span class="nav-text">MA的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MA-指标的特性"><span class="nav-number">5.1.</span> <span class="nav-text">MA 指标的特性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用场景"><span class="nav-number">6.</span> <span class="nav-text">使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多指标共用"><span class="nav-number">6.1.</span> <span class="nav-text">多指标共用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MA的优点："><span class="nav-number">7.</span> <span class="nav-text">MA的优点：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MA的缺点："><span class="nav-number">8.</span> <span class="nav-text">MA的缺点：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MA的改进："><span class="nav-number">9.</span> <span class="nav-text">MA的改进：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="python 执行 shell 命令，并与之交互。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python | subprocess.Popen 使用详解">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2022/04/05/python155/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="python 执行 shell 命令，并与之交互。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-04-05T06:10:03.000Z">
+<meta property="article:modified_time" content="2022-04-05T06:25:30.808Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2022/04/05/python155/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>python | subprocess.Popen 使用详解 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2022/04/05/python155/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python | subprocess.Popen 使用详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-04-05 14:10:03 / 修改时间：14:25:30" itemprop="dateCreated datePublished" datetime="2022-04-05T14:10:03+08:00">2022-04-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/04/05/python155/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/04/05/python155/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>python 执行 shell 命令，并与之交互。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<ul>
+<li><a href="https://ld246.com/article/1577762914087" rel="external nofollow noreferrer">python 中 subprocess.Popen 使用详解</a></li>
+</ul>
+<br/>
+
+<p>Popen 的常用参数</p>
+<br/>
+
+<h2 id="args"><a href="#args" class="headerlink" title="args"></a>args</h2><blockquote>
+<p>args should be a sequence of program arguments or else a single string or path-like object. By default, the program to execute is the first item in args if args is a sequence. If args is a string, the interpretation is platform-dependent and described below. See the shell and executable arguments for additional differences from the default behavior. Unless otherwise stated, it is recommended to pass args as a sequence.</p>
+</blockquote>
+<p>可见，<code>args</code> 参数接受三种形式的值。在没有特殊说明的情况下，推荐使用第一种。</p>
+<ul>
+<li>程序参数的序列（以 <code>list</code> 的形式）</li>
+<li>字符串</li>
+<li>（可执行文件的）路径</li>
+</ul>
+<p>也就是说，以下三种形式的执行效果是相同的。</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">f</span> = subprocess.Popen(<span class="string">"python test.py"</span>)</span><br><span class="line"><span class="attr">f</span> = subprocess.Popen([<span class="string">"python"</span>, <span class="string">"test.py"</span>])</span><br><span class="line"><span class="attr">f</span> = subprocess.Popen(<span class="string">"test.bat"</span>)</span><br></pre></td></tr></table></figure>
+
+<p>第三种输出和前两种有一点不同。</p>
+<h2 id="shell"><a href="#shell" class="headerlink" title="shell"></a>shell</h2><p>参数 <code>shell</code> （默认为 <code>False</code>）指定是否使用 <code>shell</code> 执行程序。如果 <code>shell</code> 为 <code>True</code>，更推荐将 <code>args</code> 作为字符串传递而非序列。</p>
+<p>在 <code>POSIX</code>，当 <code>shell=True</code>， <code>shell</code> 默认为 <code>/bin/sh</code>。如果 <code>args</code> 是一个字符串，此字符串指定将通过 <code>shell</code> 执行的命令。这意味着字符串的格式必须和在命令提示符中所输入的完全相同。这包括，例如，引号和反斜杠转义包含空格的文件名。如果 <code>args</code> 是一个序列，第一项指定了命令，另外的项目将作为传递给 <code>shell</code>（而非命令） 的参数对待。</p>
+<p>在 <code>Windows</code>，使用 <code>shell=True</code>，环境变量 <code>COMSPEC</code> 指定了默认 <code>shell</code>。在 <code>Windows</code> 你唯一需要指定 <code>shell=True</code> 的情况是你想要执行内置在 <code>shell</code> 中的命令（例如 <code>dir</code> 或者 <code>copy</code>）。在运行一个批处理文件或者基于控制台的可执行文件时，不需要 <code>shell=True</code>。</p>
+<p>加上 <code>shell</code> 参数，会额外增加一个 <code>Windows</code> 命令处理程序的进程，通过该进程来调用 <code>Git</code> 进程。也就是说，</p>
+<p>不带 <code>shell</code>：<code>PyCharm -&gt; python -&gt; Git</code></p>
+<p>带 <code>shell</code>：<code>PyCharm -&gt; python -&gt; cmd -&gt; Git</code></p>
+<p>那么，我们什么时候需要 <code>shell=True</code> 呢？</p>
+<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import subprocess</span><br><span class="line">&gt;&gt;&gt; f = subprocess.Popen("echo hello")</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File "&lt;input&gt;", line 1, in &lt;module&gt;</span><br><span class="line">  File "C:<span class="symbol">\U</span>sers<span class="symbol">\t</span>auji<span class="symbol">\A</span>ppData<span class="symbol">\L</span>ocal<span class="symbol">\C</span>ontinuum<span class="symbol">\m</span>iniconda3<span class="symbol">\l</span>ib<span class="symbol">\s</span>ubprocess.py", line 775, in __init__</span><br><span class="line">    restore_signals, start_new_session)</span><br><span class="line">  File "C:<span class="symbol">\U</span>sers<span class="symbol">\t</span>auji<span class="symbol">\A</span>ppData<span class="symbol">\L</span>ocal<span class="symbol">\C</span>ontinuum<span class="symbol">\m</span>iniconda3<span class="symbol">\l</span>ib<span class="symbol">\s</span>ubprocess.py", line 1178, in _execute_child</span><br><span class="line">    startupinfo)FileNotFoundError: [WinError 2] 系统找不到指定的文件。</span><br><span class="line">&gt;&gt;&gt; f = subprocess.Popen("echo hello", shell=True)</span><br></pre></td></tr></table></figure>
+
+<p>可以发现，有很多命令是只在 <code>cmd</code> 中才能使用的。当然，更多的情况可以参考 <code>stackoverflow</code> 上的讨论。</p>
+<p>也就是说，当你需要使用 <code>shell</code> 中特有的命令时，需要加上 <code>shell=True</code>。</p>
+<h2 id="stdin-stdout-stderr"><a href="#stdin-stdout-stderr" class="headerlink" title="stdin, stdout, stderr"></a>stdin, stdout, stderr</h2><p><code>stdin</code>, <code>stdout</code> 和 <code>stderr</code> 分别指定被运行的程序的标准输入、输出和标准错误的文件句柄。合法的值有 <code>PIPE</code> ， <code>DEVNULL</code> ， 一个存在的文件描述符（一个正整数），一个存在的 文件对象 以及 <code>None</code>。 <code>PIPE</code> 表示应创建一个新的对子进程的管道。 <code>DEVNULL</code> 表示使用特殊的 <code>os.devnull</code> 文件。使用默认的 <code>None</code>，则不进行成定向；子进程的文件流将继承自父进程。另外， <code>stderr</code> 可设为 <code>STDOUT</code>，表示应用程序的标准错误数据应和标准输出一同捕获。</p>
+<p>当不使用这些参数的时候，<code>python</code> 默认会将子进程的 <code>stdout</code>，<code>stderr</code> 输出到当前的 <code>python</code> 窗口。而使用这些参数时，<code>python</code> 会将输出的内容重定向到指定的位置，这里最常用的应该是 <code>PIPE</code>。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;</span>&gt; import subprocess</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; f = subprocess.Popen(<span class="string">"echo hello"</span>,shell=True)</span><br><span class="line">hello</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; f.stdout.read()Traceback (most recent call last)<span class="symbol">:</span></span><br><span class="line">  File <span class="string">"&lt;input&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;<span class="class"><span class="keyword">module</span>&gt;</span></span><br><span class="line"><span class="symbol">AttributeError:</span> <span class="string">'NoneType'</span> object has no attribute <span class="string">'read'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; f = subprocess.Popen(<span class="string">"echo hello"</span>,shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; f.stdout.read()</span><br><span class="line">b<span class="string">'hello\r\n'</span></span><br></pre></td></tr></table></figure>
+
+<p>可以发现，当指定了 <code>stdout</code>, <code>stderr</code> 之后，程序输出的内容并不会直接呈现在 <code>python</code> 窗口中了，而是会被保存在 <code>stdout</code> 的属性中。</p>
+<p>如果程序出错则是保存在 <code>stderr</code> 中。下面的例子里，我把 <code>echo</code> 错误地写成了 <code>ech</code> ，可以发现输出被保存到了 <code>stderr</code> 中。</p>
+<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f=subprocess.Popen("ech hello",shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)</span><br><span class="line">&gt;&gt;&gt; f.stdout.read()</span><br><span class="line">b''</span><br><span class="line">&gt;&gt;&gt; f.stderr.read()</span><br><span class="line">b"'ech' <span class="symbol">\x</span>b2<span class="symbol">\x</span>bb<span class="symbol">\x</span>ca<span class="symbol">\x</span>c7<span class="symbol">\x</span>c4<span class="symbol">\x</span>da<span class="symbol">\x</span>b2<span class="symbol">\x</span>bf<span class="symbol">\x</span>bb<span class="symbol">\x</span>f2<span class="symbol">\x</span>cd<span class="symbol">\x</span>e2<span class="symbol">\x</span>b2<span class="symbol">\x</span>bf<span class="symbol">\x</span>c3<span class="symbol">\x</span>fc<span class="symbol">\x</span>c1<span class="symbol">\x</span>ee<span class="symbol">\x</span>a3<span class="symbol">\x</span>ac<span class="symbol">\x</span>d2<span class="symbol">\x</span>b2<span class="symbol">\x</span>b2<span class="symbol">\x</span>bb<span class="symbol">\x</span>ca<span class="symbol">\x</span>c7<span class="symbol">\x</span>bf<span class="symbol">\x</span>c9<span class="symbol">\x</span>d4<span class="symbol">\x</span>cb<span class="symbol">\x</span>d0<span class="symbol">\x</span>d0<span class="symbol">\x</span>b5<span class="symbol">\x</span>c4<span class="symbol">\x</span>b3<span class="symbol">\x</span>cc<span class="symbol">\x</span>d0<span class="symbol">\x</span>f2<span class="symbol">\r</span><span class="symbol">\n</span><span class="symbol">\x</span>bb<span class="symbol">\x</span>f2<span class="symbol">\x</span>c5<span class="symbol">\x</span>fa<span class="symbol">\x</span>b4<span class="symbol">\x</span>a6<span class="symbol">\x</span>c0<span class="symbol">\x</span>ed<span class="symbol">\x</span>ce<span class="symbol">\x</span>c4<span class="symbol">\x</span>bc<span class="symbol">\x</span>fe<span class="symbol">\x</span>a1<span class="symbol">\x</span>a3<span class="symbol">\r</span><span class="symbol">\n</span>"</span><br></pre></td></tr></table></figure>
+
+<h2 id="encoding-or-text"><a href="#encoding-or-text" class="headerlink" title="encoding or text"></a>encoding or text</h2><p>可以发现，上面的输出怎么都是以 <code>byte</code> 的形式，这样可读性太差了吧。是的，我们可以通过 <code>encoding</code> 参数将其 <code>decode</code> 为文字，或者使用 <code>text=True</code>。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import subprocess</span><br><span class="line">&gt;&gt;&gt; f=subprocess.<span class="constructor">Popen(<span class="string">"echo hello"</span>,<span class="params">shell</span>=True, <span class="params">stdout</span>=<span class="params">subprocess</span>.PIPE, <span class="params">stderr</span>=<span class="params">subprocess</span>.PIPE)</span></span><br><span class="line">&gt;&gt;&gt; f.stdout.read<span class="literal">()</span></span><br><span class="line">b'hello\r\n'</span><br><span class="line">&gt;&gt;&gt; f=subprocess.<span class="constructor">Popen(<span class="string">"echo hello"</span>,<span class="params">shell</span>=True, <span class="params">encoding</span>=<span class="string">"utf8"</span>,<span class="params">stdout</span>=<span class="params">subprocess</span>.PIPE, <span class="params">stderr</span>=<span class="params">subprocess</span>.PIPE)</span></span><br><span class="line">&gt;&gt;&gt; f.stdout.read<span class="literal">()</span></span><br><span class="line">'hello\n'</span><br><span class="line">&gt;&gt;&gt; f=subprocess.<span class="constructor">Popen(<span class="string">"echo hello"</span>,<span class="params">shell</span>=True, <span class="params">text</span>=True, <span class="params">stdout</span>=<span class="params">subprocess</span>.PIPE, <span class="params">stderr</span>=<span class="params">subprocess</span>.PIPE)</span></span><br><span class="line">&gt;&gt;&gt; f.stdout.read<span class="literal">()</span></span><br><span class="line">'hello\n'</span><br></pre></td></tr></table></figure>
+
+<p>值得一提的是，使用 <code>text=True</code> 可以让我们避免选择编码格式的麻烦。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import subprocess</span><br><span class="line">&gt;&gt;&gt; f=subprocess.<span class="constructor">Popen(<span class="string">"echo 你好"</span>,<span class="params">shell</span>=True, <span class="params">encoding</span>=<span class="string">"utf8"</span>,<span class="params">stdout</span>=<span class="params">subprocess</span>.PIPE, <span class="params">stderr</span>=<span class="params">subprocess</span>.PIPE)</span></span><br><span class="line">&gt;&gt;&gt; f.stdout.read<span class="literal">()</span>Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;input&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;<span class="keyword">module</span>&gt;</span><br><span class="line">  File <span class="string">"C:\Users\tauji\AppData\Local\Continuum\miniconda3\lib\codecs.py"</span>, line <span class="number">322</span>, <span class="keyword">in</span> decode</span><br><span class="line">    (result, consumed) = self.<span class="constructor">_buffer_decode(<span class="params">data</span>, <span class="params">self</span>.<span class="params">errors</span>, <span class="params">final</span>)</span></span><br><span class="line">UnicodeDecodeError: 'utf-<span class="number">8</span>' codec can't decode byte <span class="number">0xc4</span> <span class="keyword">in</span> position <span class="number">0</span>: invalid continuation byte</span><br><span class="line">&gt;&gt;&gt; f=subprocess.<span class="constructor">Popen(<span class="string">"echo 你好"</span>,<span class="params">shell</span>=True, <span class="params">text</span>=True, <span class="params">stdout</span>=<span class="params">subprocess</span>.PIPE, <span class="params">stderr</span>=<span class="params">subprocess</span>.PIPE)</span></span><br><span class="line">&gt;&gt;&gt; f.stdout.read<span class="literal">()</span></span><br><span class="line">'你好 \n'</span><br></pre></td></tr></table></figure>
+
+<h2 id="cwd"><a href="#cwd" class="headerlink" title="cwd"></a>cwd</h2><blockquote>
+<p>If cwd is not None, the function changes the working directory to cwd before executing the child. cwd can be a string, bytes or path-like object. In particular, the function looks for executable (or for the first item in args) relative to cwd if the executable path is a relative path.</p>
+</blockquote>
+<p>在我写 <code>PCI</code> 项目时，使用到 <code>cwd</code> 参数的一个典型场景就是使用 <code>git log -n1</code> 来获取仓库最新的一次 <code>commit</code> 的 <code>id</code>。由于不同的仓库保存在不同的路径，所以使用 <code>cwd</code> 参数远远优于 <code>os.chdir()</code>。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import subprocess</span><br><span class="line">&gt;&gt;&gt; f = subprocess.Popen(<span class="string">"git log -n1"</span>,<span class="attribute">shell</span>=<span class="literal">True</span>, <span class="attribute">text</span>=<span class="literal">True</span>, <span class="attribute">cwd</span>=<span class="string">"/Users/taujiong/Projects/PCI"</span>,stdout=subprocess.PIPE)</span><br><span class="line">&gt;&gt;&gt; <span class="builtin-name">print</span>(f.stdout.read())</span><br><span class="line">commit 80b8d372dff5a4c71cbc29ca9e395c6cd5f6e7c2</span><br><span class="line">Author: taujiong &lt;taujiong@outlook.com&gt;</span><br><span class="line">Date:   Fri Nov 1 13:08:44 2019 +0800</span><br></pre></td></tr></table></figure>
+
+<pre><code>在服务器端使用 socketserver 代替 socket</code></pre><p>值得注意的一点是，<code>cwd</code> 需要传入一个绝对路径。例如，在 <code>Linux</code> 或者 <code>Mac</code> 中，使用 <code>cwd=~/Projects/PCI</code> 是会报错的。</p>
+<pre><code>FileNotFoundError: [Errno 2] No such file or directory: &apos;~/Projects/PCI&apos;: &apos;~/Projects/PCI&apos;</code></pre><h2 id="env"><a href="#env" class="headerlink" title="env"></a>env</h2><p>如果 <code>env</code> 不是 <code>None</code>, 它必须是一个字典， 为新的进程设置环境变量; 它用于替换继承的当前进程的环境的默认行为。 它将直接被传递给 <code>Popen</code>.</p>
+<p><code>env</code> 参数可以为子进程设置特殊的环境变量，这在我的项目中暂时没有用到，但是不得不承认这也是一个常用的参数。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; <span class="keyword">import</span> subprocess</span><br><span class="line">&gt;&gt;&gt; f = subprocess.Popen(<span class="string">"echo hello, <span class="variable">$name</span>, <span class="variable">$new_env</span>"</span>, shell=True, env=&#123;<span class="string">"new_env"</span>: <span class="string">"this is a new env variable defined by user"</span>, <span class="string">"name"</span>: <span class="string">"taujiong"</span>&#125;)</span><br><span class="line">hello, taujiong, <span class="keyword">this</span> <span class="keyword">is</span> a new env variable defined <span class="keyword">by</span> user</span><br></pre></td></tr></table></figure>
+
+<p>正如文档里面说的，<code>env</code> 参数的值必须是一个字典类型。设置了 <code>env</code> 参数之后，不仅可以在命令中使用，也可以在 <code>bat</code> 或者 <code>sh</code> 脚本中使用。</p>
+<p>注意，示例代码中环境变量的写法是 <code>unix</code> 系统的写法，在 <code>Windows</code> 环境下你应该使用 <code>%name%</code> 来代替 <code>$name</code> 。</p>
+<h2 id="communicate-方法"><a href="#communicate-方法" class="headerlink" title="communicate 方法"></a>communicate 方法</h2><p>之前一直没有提的一点是，<code>subprocess.Popen</code> 的使用非常类似于文件的 <code>open</code>。这种调用方式是通过管道的方式来实现，函数返回一个 <code>file-like</code> 的对象，所以我们可以像操作文件那样操作 <code>subprocess.Popen</code>。比如说对 <code>subprocess.Popen</code> 使用 <code>with</code> 上下文管理，对 <code>f.stdout</code> 使用 <code>read</code>, <code>readline</code>, <code>readlines</code> 等操作。</p>
+<p>有的时候，我们需要在子进程里面实现一些输入，子进程才能进行下一步动作，此时我们需要 <code>communicate()</code> 方法。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; <span class="keyword">import</span> subprocess</span><br><span class="line">&gt;&gt;&gt; f = subprocess.Popen("python test.py", shell=<span class="keyword">True</span>, stdin=subprocess.PIPE)</span><br><span class="line">what <span class="keyword">is</span> your <span class="type">name</span>?</span><br><span class="line">&gt;&gt;&gt; f.communicate("taujiong".encode("utf8"))</span><br><span class="line">hello, taujiong</span><br><span class="line">(<span class="keyword">None</span>, <span class="keyword">None</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="code-in-test-py"><a href="#code-in-test-py" class="headerlink" title="code in test.py"></a>code in test.py</h3><figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">name</span> = <span class="function"><span class="title">input</span>(<span class="string">"what is your name?"</span>)</span></span><br><span class="line"><span class="function"><span class="title">print</span>(<span class="variable">f</span><span class="string">"hello, &#123;name&#125;"</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>test.py</code> 里，我们使用了 <code>name = input(&quot;what is your name?&quot;)</code> 来接收用户的输入，同时在 <code>Popen</code> 中设置了 <code>stdin</code> 参数为一个管道。此时，我们就可以使用 <code>communicate</code>方法来将输入传输到子进程之中了。</p>
+<p>注意到，<code>communicate</code> 方法返回两个值，文档里面说到这两个值分别为 <code>stdout</code> 以及 <code>stderr</code>。当你在 <code>Popen</code> 参数中设置了二者为 <code>PIPE</code> 时，就可以返回相应的结果了，否则将会像上例中那样显示两个 <code>None</code>。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; f = subprocess.Popen(<span class="string">"python test.py"</span>, <span class="attribute">shell</span>=<span class="literal">True</span>, <span class="attribute">stdin</span>=subprocess.PIPE, <span class="attribute">stdout</span>=subprocess.PIPE, <span class="attribute">stderr</span>=subprocess.PIPE)</span><br><span class="line">&gt;&gt;&gt; out, err = f.communicate(<span class="string">"taujiong"</span>.encode(<span class="string">"utf8"</span>))</span><br><span class="line">&gt;&gt;&gt; out.decode(<span class="string">"utf8"</span>)</span><br><span class="line"><span class="string">"what is your name?\nhello, taujiong\n"</span>&gt;&gt;&gt; err.decode(<span class="string">"utf8"</span>)<span class="string">''</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="returncode-属性"><a href="#returncode-属性" class="headerlink" title="returncode 属性"></a>returncode 属性</h2><p>对于一个进程来说，在其结束时往往会返回一个 <code>exit code</code>，通常情况下，<code>code</code> 为 <code>0</code> 表示一切正常，否则就是出现错误。</p>
+<p>在 <code>Popen</code> 中，同样也有 <code>returncode</code> 来返回子程序的 <code>exit code</code>。不过这个值必须要在 <code>communicate</code> 方法之后才能获取到。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;</span>&gt; import subprocess</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; f = subprocess.Popen(<span class="string">"echo Hello"</span>, shell=True)</span><br><span class="line">Hello</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; f.returncode  <span class="comment"># 此处没有任何返回值</span></span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; f.communicate()(None, None)</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; f.returncode</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>上面的所有内容都是我在写 PCI 项目时所需要用到的常用参数，我觉得对于大部分普通项目来说已经够用了。在之前查阅相关资料时，还看到了包括子程序死锁等高级问题，我还没有遇到，所以暂且按下不表。</p>
+<p>最后以一段代码来总结一下这些内容在我程序中的体现吧。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import subprocess</span><br><span class="line"></span><br><span class="line">f = subprocess.Popen(<span class="string">"git log -n1"</span>,</span><br><span class="line">                     <span class="attribute">text</span>=<span class="literal">True</span>,</span><br><span class="line">                     <span class="attribute">shell</span>=<span class="literal">True</span>,</span><br><span class="line">                     <span class="attribute">cwd</span>=<span class="string">"Users/taujiong/Projects/PCI"</span>,</span><br><span class="line">                     <span class="attribute">stdout</span>=subprocess.PIPE,</span><br><span class="line">                     <span class="attribute">stderr</span>=subprocess.PIPE)</span><br><span class="line">out, err = f.communicate()</span><br><span class="line"><span class="keyword">if</span> f.returncode:</span><br><span class="line">    return err</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    msgs = out.split(<span class="string">"\n"</span>)</span><br><span class="line">    commit = msgs[0].split(<span class="string">" "</span>)[-1]</span><br><span class="line">    return commit</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/05/statisticgit0/" rel="prev" title="statisticgit | 统计 git 的代码数量">
+      <i class="fa fa-chevron-left"></i> statisticgit | 统计 git 的代码数量
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/05/virtualcoin24/" rel="next" title="virtualcoin | 利用交易所撮合机制的策略">
+      virtualcoin | 利用交易所撮合机制的策略 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#args"><span class="nav-number">1.1.</span> <span class="nav-text">args</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shell"><span class="nav-number">1.2.</span> <span class="nav-text">shell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stdin-stdout-stderr"><span class="nav-number">1.3.</span> <span class="nav-text">stdin, stdout, stderr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#encoding-or-text"><span class="nav-number">1.4.</span> <span class="nav-text">encoding or text</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cwd"><span class="nav-number">1.5.</span> <span class="nav-text">cwd</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#env"><span class="nav-number">1.6.</span> <span class="nav-text">env</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#communicate-方法"><span class="nav-number">1.7.</span> <span class="nav-text">communicate 方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#code-in-test-py"><span class="nav-number">1.7.1.</span> <span class="nav-text">code in test.py</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#returncode-属性"><span class="nav-number">1.8.</span> <span class="nav-text">returncode 属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.9.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

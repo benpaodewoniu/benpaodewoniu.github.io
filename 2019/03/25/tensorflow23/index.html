@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="内容如题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="模型的保存和提取">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2019/03/25/tensorflow23/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="内容如题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/tensorflow/23_0.png">
+<meta property="article:published_time" content="2019-03-25T15:22:54.000Z">
+<meta property="article:modified_time" content="2020-05-12T02:46:21.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="tensorflow">
+<meta property="article:tag" content="模型保存">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/tensorflow/23_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2019/03/25/tensorflow23/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>模型的保存和提取 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2019/03/25/tensorflow23/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          模型的保存和提取
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-25 23:22:54" itemprop="dateCreated datePublished" datetime="2019-03-25T23:22:54+08:00">2019-03-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-12 10:46:21" itemprop="dateModified" datetime="2020-05-12T10:46:21+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">框架</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%A1%86%E6%9E%B6/tensorflow/" itemprop="url" rel="index"><span itemprop="name">tensorflow</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/03/25/tensorflow23/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/03/25/tensorflow23/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>内容如题。</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://blog.csdn.net/marsjhao/article/details/72829635" rel="external nofollow noreferrer">TensorFlow模型保存和提取方法</a></p>
+<p><a href="https://www.cnblogs.com/hejunlin1992/p/7767912.html" rel="external nofollow noreferrer">Tensorflow模型的保存与恢复</a></p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>在这篇tensorflow教程中，我会解释：</p>
+<p>Tensorflow的模型（model）长什么样子？</p>
+<p>如何保存tensorflow的模型？</p>
+<p>如何恢复一个tensorflow模型来用于预测或者迁移学习？</p>
+<p>如何使用预训练好的模型（imported pretrained models）来用于fine-tuning和 modification</p>
+<h2 id="Tensorflow模型是什么？"><a href="#Tensorflow模型是什么？" class="headerlink" title="Tensorflow模型是什么？"></a>Tensorflow模型是什么？</h2><p>当你已经训练好一个神经网络之后，你想要保存它，用于以后的使用，部署到产品里面去。所以，Tensorflow模型是什么？Tensorflow模型主要包含网络的设计或者图（graph），和我们已经训练好的网络参数的值。因此Tensorflow模型有两个主要的文件：</p>
+<h3 id="Meta-graph"><a href="#Meta-graph" class="headerlink" title="Meta graph:"></a>Meta graph:</h3><p>这是一个保存完整Tensorflow graph的protocol buffer，比如说，所有的 variables, operations, collections等等。这个文件的后缀是 .meta 。</p>
+<h3 id="Checkpoint-file"><a href="#Checkpoint-file" class="headerlink" title="Checkpoint file:"></a>Checkpoint file:</h3><p>这是一个包含所有权重（weights），偏置（biases），梯度（gradients）和所有其他保存的变量（variables）的二进制文件。它包含两个文件：</p>
+<pre><code>mymodel.data-00000-of-00001
+mymodel.index</code></pre><p>其中，.data文件包含了我们的训练变量。</p>
+<p>另外，除了这两个文件，Tensorflow有一个叫做checkpoint的文件，记录着已经最新的保存的模型文件。</p>
+<p>注：Tensorflow 0.11版本以前，Checkpoint file只有一个后缀名为.ckpt的文件。</p>
+<p>因此，总结来说，Tensorflow（版本0.10以后）模型长这个样子：</p>
+<p><img src="/images/tensorflow/23_0.png" alt=""></p>
+<p>Tensorflow版本0.11以前，只包含以下三个文件：</p>
+<pre><code>inception_v1.meta
+inception_v1.ckpt
+checkpoint</code></pre><h2 id="保存一个Tensorflow模型"><a href="#保存一个Tensorflow模型" class="headerlink" title="保存一个Tensorflow模型"></a>保存一个Tensorflow模型</h2><p>当网络训练结束时，我们要保存所有变量和网络结构体到文件中。在Tensorflow中，我们可以创建一个tf.train.Saver() 类的实例，如下：</p>
+<pre><code>saver = tf.train.Saver()</code></pre><p>由于Tensorflow变量仅仅只在session中存在，因此需要调用save方法来将模型保存在一个session中。</p>
+<pre><code>saver.save(sess, &apos;my-test-model&apos;)</code></pre><p>在这里，sess是一个session对象，其中my-test-model是你给模型起的名字。下面是一个完整的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">w1 = tf.Variable(tf.random_normal(shape=[<span class="number">2</span>]), name=<span class="string">'w1'</span>)</span><br><span class="line">w2 = tf.Variable(tf.random_normal(shape=[<span class="number">5</span>]), name=<span class="string">'w2'</span>)</span><br><span class="line">saver = tf.train.Saver()</span><br><span class="line">sess = tf.Session()</span><br><span class="line">sess.run(tf.global_variables_initializer())</span><br><span class="line">saver.save(sess, <span class="string">'my_test_model'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># This will save following files in Tensorflow v &gt;= 0.11</span></span><br><span class="line"><span class="comment"># my_test_model.data-00000-of-00001</span></span><br><span class="line"><span class="comment"># my_test_model.index</span></span><br><span class="line"><span class="comment"># my_test_model.meta</span></span><br><span class="line"><span class="comment"># checkpoint</span></span><br></pre></td></tr></table></figure>
+
+<p>如果我们想在训练1000次迭代之后保存模型，可以使用如下方法保存</p>
+<pre><code>saver.save(sess, &apos;my_test_model&apos;,global_step=1000)</code></pre><p>这个将会在模型名字的后面追加上‘-1000’，下面的文件将会被创建：</p>
+<pre><code>my_test_model-1000.index
+my_test_model-1000.meta
+my_test_model-1000.data-00000-of-00001
+checkpoint</code></pre><p>由于网络的图（graph）在训练的时候是不会改变的，因此，我们没有必要每次都重复保存.meta文件，可以使用如下方法：</p>
+<pre><code>saver.save(sess, &apos;my-model&apos;,global_step=step,write_meta_graph=False)</code></pre><p>如果你只想要保存最新的4个模型，并且想要在训练的时候每2个小时保存一个模型，那么你可以使用max_to_keep 和 keep_checkpoint_every_n_hours，如下所示：</p>
+<pre><code>#saves a model every 2 hours and maximum 4 latest models are saved.
+saver = tf.train.Saver(max_to_keep=4, keep_checkpoint_every_n_hours=2)</code></pre><p>注意到，我们在tf.train.Saver()中并没有指定任何东西，因此它将保存所有变量。如果我们不想保存所有的变量，只想保存其中一些变量，我们可以在创建tf.train.Saver实例的时候，给它传递一个我们想要保存的变量的list或者字典。示例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line">w1 = tf.Variable(tf.random_normal(shape=[<span class="number">2</span>]), name=<span class="string">'w1'</span>)</span><br><span class="line">w2 = tf.Variable(tf.random_normal(shape=[<span class="number">5</span>]), name=<span class="string">'w2'</span>)</span><br><span class="line">saver = tf.train.Saver([w1,w2])</span><br><span class="line">sess = tf.Session()</span><br><span class="line">sess.run(tf.global_variables_initializer())</span><br><span class="line">saver.save(sess, <span class="string">'my_test_model'</span>,global_step=<span class="number">1000</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="导入一个已经训练好的模型"><a href="#导入一个已经训练好的模型" class="headerlink" title="导入一个已经训练好的模型"></a>导入一个已经训练好的模型</h2><p>如果你想要使用别人已经训练好的模型来fine-tuning，那么你需要做两个步骤：</p>
+<h3 id="创建网络Create-the-network"><a href="#创建网络Create-the-network" class="headerlink" title="创建网络Create the network:"></a>创建网络Create the network:</h3><p>你可以通过写python代码，来手动地创建每一个、每一层，使得跟原始网络一样。</p>
+<p>但是，如果你仔细想的话，我们已经将模型保存在了 .meta 文件中，因此我们可以使用tf.train.import()函数来重新创建网络，使用方法如下：</p>
+<pre><code>saver = tf.train.import_meta_graph(&apos;my_test_model-1000.meta&apos;)</code></pre><p>注意，这仅仅是将已经定义的网络导入到当前的graph中，但是我们还是需要加载网络的参数值。</p>
+<h3 id="加载参数Load-the-parameters"><a href="#加载参数Load-the-parameters" class="headerlink" title="加载参数Load the parameters"></a>加载参数Load the parameters</h3><p>我们可以通过调用restore函数来恢复网络的参数，如下：</p>
+<pre><code>with tf.Session() as sess:
+  new_saver = tf.train.import_meta_graph(&apos;my_test_model-1000.meta&apos;)
+  new_saver.restore(sess, tf.train.latest_checkpoint(&apos;./&apos;))</code></pre><p>在这之后，像w1和w2的tensor的值已经被恢复，并且可以获取到：</p>
+<pre><code>with tf.Session() as sess:    
+    saver = tf.train.import_meta_graph(&apos;my-model-1000.meta&apos;)
+    saver.restore(sess,tf.train.latest_checkpoint(&apos;./&apos;))
+    print(sess.run(&apos;w1:0&apos;))
+##Model has been restored. Above statement will print the saved value of w1.</code></pre><p>上面介绍了如何保存和恢复一个Tensorflow模型。下面介绍一个加载任何预训练模型的实用方法。</p>
+<h2 id="Working-with-restored-models"><a href="#Working-with-restored-models" class="headerlink" title="Working with restored models"></a>Working with restored models</h2><p>下面介绍如何恢复任何一个预训练好的模型，并使用它来预测，fine-tuning或者进一步训练。当你使用Tensorflow时，你会定义一个图（graph），其中，你会给这个图喂（feed）训练数据和一些超参数（比如说learning rate，global step等）。下面我们使用placeholder建立一个小的网络，然后保存该网络。注意到，当网络被保存时，placeholder的值并不会被保存。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line"><span class="comment">#Prepare to feed input, i.e. feed_dict and placeholders</span></span><br><span class="line">w1 = tf.placeholder(<span class="string">"float"</span>, name=<span class="string">"w1"</span>)</span><br><span class="line">w2 = tf.placeholder(<span class="string">"float"</span>, name=<span class="string">"w2"</span>)</span><br><span class="line">b1= tf.Variable(<span class="number">2.0</span>,name=<span class="string">"bias"</span>)</span><br><span class="line">feed_dict =&#123;w1:<span class="number">4</span>,w2:<span class="number">8</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#Define a test operation that we will restore</span></span><br><span class="line">w3 = tf.add(w1,w2)</span><br><span class="line">w4 = tf.multiply(w3,b1,name=<span class="string">"op_to_restore"</span>)</span><br><span class="line">sess = tf.Session()</span><br><span class="line">sess.run(tf.global_variables_initializer())</span><br><span class="line"></span><br><span class="line"><span class="comment">#Create a saver object which will save all the variables</span></span><br><span class="line">saver = tf.train.Saver()</span><br><span class="line"></span><br><span class="line"><span class="comment">#Run the operation by feeding input</span></span><br><span class="line"><span class="keyword">print</span> sess.run(w4,feed_dict)</span><br><span class="line"><span class="comment">#Prints 24 which is sum of (w1+w2)*b1 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Now, save the graph</span></span><br><span class="line">saver.save(sess, <span class="string">'my_test_model'</span>,global_step=<span class="number">1000</span>)</span><br></pre></td></tr></table></figure>
+
+<p>现在，我们想要恢复这个网络，我们不仅需要恢复图（graph）和权重，而且也需要准备一个新的feed_dict，将新的训练数据喂给网络。我们可以通过使用graph.get_tensor_by_name()方法来获得已经保存的操作（operations）和placeholder variables。</p>
+<pre><code>#How to access saved variable/Tensor/placeholders 
+w1 = graph.get_tensor_by_name(&quot;w1:0&quot;)
+## How to access saved operation
+op_to_restore = graph.get_tensor_by_name(&quot;op_to_restore:0&quot;)</code></pre><p>如果我们仅仅想要用不同的数据运行这个网络，可以简单的使用feed_dict来将新的数据传递给网络。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line">sess=tf.Session()    </span><br><span class="line"><span class="comment">#First let's load meta graph and restore weights</span></span><br><span class="line">saver = tf.train.import_meta_graph(<span class="string">'my_test_model-1000.meta'</span>)</span><br><span class="line">saver.restore(sess,tf.train.latest_checkpoint(<span class="string">'./'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Now, let's access and create placeholders variables and</span></span><br><span class="line"><span class="comment"># create feed-dict to feed new data</span></span><br><span class="line"></span><br><span class="line">graph = tf.get_default_graph()</span><br><span class="line">w1 = graph.get_tensor_by_name(<span class="string">"w1:0"</span>)</span><br><span class="line">w2 = graph.get_tensor_by_name(<span class="string">"w2:0"</span>)</span><br><span class="line">feed_dict =&#123;w1:<span class="number">13.0</span>,w2:<span class="number">17.0</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#Now, access the op that you want to run. </span></span><br><span class="line">op_to_restore = graph.get_tensor_by_name(<span class="string">"op_to_restore:0"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> sess.run(op_to_restore,feed_dict)</span><br><span class="line"><span class="comment">#This will print 60 which is calculated </span></span><br><span class="line"><span class="comment">#using new values of w1 and w2 and saved value of b1.</span></span><br></pre></td></tr></table></figure>
+
+<p>如果你想要给graph增加更多的操作（operations）然后训练它，可以像如下那么做：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"></span><br><span class="line">sess=tf.Session()    </span><br><span class="line"><span class="comment">#First let's load meta graph and restore weights</span></span><br><span class="line">saver = tf.train.import_meta_graph(<span class="string">'my_test_model-1000.meta'</span>)</span><br><span class="line">saver.restore(sess,tf.train.latest_checkpoint(<span class="string">'./'</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Now, let's access and create placeholders variables and</span></span><br><span class="line"><span class="comment"># create feed-dict to feed new data</span></span><br><span class="line"></span><br><span class="line">graph = tf.get_default_graph()</span><br><span class="line">w1 = graph.get_tensor_by_name(<span class="string">"w1:0"</span>)</span><br><span class="line">w2 = graph.get_tensor_by_name(<span class="string">"w2:0"</span>)</span><br><span class="line">feed_dict =&#123;w1:<span class="number">13.0</span>,w2:<span class="number">17.0</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#Now, access the op that you want to run. </span></span><br><span class="line">op_to_restore = graph.get_tensor_by_name(<span class="string">"op_to_restore:0"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#Add more to the current graph</span></span><br><span class="line">add_on_op = tf.multiply(op_to_restore,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> sess.run(add_on_op,feed_dict)</span><br><span class="line"><span class="comment">#This will print 120.</span></span><br></pre></td></tr></table></figure>
+
+<p>但是，你可以只恢复旧的graph的一部分，然后插入一些操作用于fine-tuning？当然可以。仅仅需要通过 by graph.get_tensor_by_name() 方法来获取合适的operation，然后在这上面建立graph。下面是一个实际的例子，我们使用meta graph 加载了一个预训练好的vgg模型，并且在最后一层将输出个数改成2，然后用新的数据fine-tuning。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">......</span><br><span class="line">......</span><br><span class="line">saver = tf.train.import_meta_graph(<span class="string">'vgg.meta'</span>)</span><br><span class="line"><span class="comment"># Access the graph</span></span><br><span class="line">graph = tf.get_default_graph()</span><br><span class="line"><span class="comment">## Prepare the feed_dict for feeding data for fine-tuning </span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Access the appropriate output for fine-tuning</span></span><br><span class="line">fc7= graph.get_tensor_by_name(<span class="string">'fc7:0'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#use this if you only want to change gradients of the last layer</span></span><br><span class="line">fc7 = tf.stop_gradient(fc7) <span class="comment"># It's an identity function</span></span><br><span class="line">fc7_shape= fc7.get_shape().as_list()</span><br><span class="line"></span><br><span class="line">new_outputs=<span class="number">2</span></span><br><span class="line">weights = tf.Variable(tf.truncated_normal([fc7_shape[<span class="number">3</span>], num_outputs], stddev=<span class="number">0.05</span>))</span><br><span class="line">biases = tf.Variable(tf.constant(<span class="number">0.05</span>, shape=[num_outputs]))</span><br><span class="line">output = tf.matmul(fc7, weights) + biases</span><br><span class="line">pred = tf.nn.softmax(output)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Now, you run this with fine-tuning data in sess.run()</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/tensorflow/" rel="tag"># tensorflow</a>
+              <a href="/tags/%E6%A8%A1%E5%9E%8B%E4%BF%9D%E5%AD%98/" rel="tag"># 模型保存</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/25/tensorflow22/" rel="prev" title="tensorflow 的变量以及初始化">
+      <i class="fa fa-chevron-left"></i> tensorflow 的变量以及初始化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/26/python57/" rel="next" title="python 的动态图">
+      python 的动态图 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目录"><span class="nav-number">2.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tensorflow模型是什么？"><span class="nav-number">3.</span> <span class="nav-text">Tensorflow模型是什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Meta-graph"><span class="nav-number">3.1.</span> <span class="nav-text">Meta graph:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Checkpoint-file"><span class="nav-number">3.2.</span> <span class="nav-text">Checkpoint file:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#保存一个Tensorflow模型"><span class="nav-number">4.</span> <span class="nav-text">保存一个Tensorflow模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#导入一个已经训练好的模型"><span class="nav-number">5.</span> <span class="nav-text">导入一个已经训练好的模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建网络Create-the-network"><span class="nav-number">5.1.</span> <span class="nav-text">创建网络Create the network:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载参数Load-the-parameters"><span class="nav-number">5.2.</span> <span class="nav-text">加载参数Load the parameters</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Working-with-restored-models"><span class="nav-number">6.</span> <span class="nav-text">Working with restored models</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

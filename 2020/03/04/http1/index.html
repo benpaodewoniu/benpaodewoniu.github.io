@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这一章节我们将实现 TCP 协议的套接字服务的编程，为后续应用层 HTTP 协议 做准备。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="http | 自己实现一个 http 服务器 NO:2">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/03/04/http1/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这一章节我们将实现 TCP 协议的套接字服务的编程，为后续应用层 HTTP 协议 做准备。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/http/1_0.png">
+<meta property="article:published_time" content="2020-03-04T15:38:06.000Z">
+<meta property="article:modified_time" content="2020-04-30T07:37:08.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="http">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/http/1_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/03/04/http1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>http | 自己实现一个 http 服务器 NO:2 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/03/04/http1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          http | 自己实现一个 http 服务器 NO:2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-04 23:38:06" itemprop="dateCreated datePublished" datetime="2020-03-04T23:38:06+08:00">2020-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-30 15:37:08" itemprop="dateModified" datetime="2020-04-30T15:37:08+08:00">2020-04-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/" itemprop="url" rel="index"><span itemprop="name">项目经历</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%B0%8F%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">小型</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/http/" itemprop="url" rel="index"><span itemprop="name">http</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/http/%E8%87%AA%E5%B7%B1%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E6%9C%8D%E5%8A%A1%E5%99%A8/" itemprop="url" rel="index"><span itemprop="name">自己实现一个服务器</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E7%BB%8F%E5%8E%86/%E5%B0%8F%E5%9E%8B/http%E6%9C%8D%E5%8A%A1%E5%99%A8/" itemprop="url" rel="index"><span itemprop="name">http服务器</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/04/http1/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/04/http1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这一章节我们将实现 TCP 协议的套接字服务的编程，为后续应用层 HTTP 协议 做准备。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="技术路线"><a href="#技术路线" class="headerlink" title="技术路线"></a>技术路线</h1><br/>
+
+<p>画图是真的烂，我也是第一次用这个插件，见谅，2333～～～</p>
+<pre class="mermaid">graph TB
+    subgraph 自定义
+    SimpleHTTPServer---SimpleHTTPRequestHandler
+    SimpleHTTPServer---Client
+    end
+    subgraph HTTP
+    BaseHTTPSercer---BaseHTTPRequsetHandler
+    BaseHTTPSercer ==> SimpleHTTPServer
+    BaseHTTPRequsetHandler ==> SimpleHTTPRequestHandler
+    end
+    subgraph TCP
+    TCPServer---StreamRequsetHandler
+    TCPServer ==> BaseHTTPSercer
+    StreamRequsetHandler ==> BaseHTTPRequsetHandler
+    end</pre>
+
+<p>在这里说明一下</p>
+<ul>
+<li>TCP 端<ul>
+<li>TCPServer ：接收客户端的 TCP 连接</li>
+<li>StreamRequsetHandler ：封装字节流网络请求处理功能</li>
+</ul>
+</li>
+<li>HTTP端<ul>
+<li>BaseHTTPSercer ：基础 HTTP 服务器</li>
+<li>BaseHTTPRequsetHandler ：封装 HTTP 请求处理的基础功能</li>
+</ul>
+</li>
+<li>自定义<ul>
+<li>SimpleHTTPRequestHandler ：实现自定义的 HTTP 请求（GET、POST）处理逻辑</li>
+</ul>
+</li>
+</ul>
+<br/>
+
+<h1 id="图片说明图"><a href="#图片说明图" class="headerlink" title="图片说明图"></a>图片说明图</h1><br/>
+
+<p><img src="/images/http/1_0.png" alt=""></p>
+<br/>
+
+<h1 id="本节目录"><a href="#本节目录" class="headerlink" title="本节目录"></a>本节目录</h1><br/>
+
+
+<ul>
+<li>http<ul>
+<li>handler<ul>
+<li>__init__.py</li>
+<li>base_handler.py</li>
+</ul>
+</li>
+<li>server<ul>
+<li>socket_server.py</li>
+</ul>
+</li>
+<li>test<ul>
+<li>test.py</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<br/>
+
+<h1 id="本章完成的内容"><a href="#本章完成的内容" class="headerlink" title="本章完成的内容"></a>本章完成的内容</h1><br/>
+
+<h2 id="技术路线图"><a href="#技术路线图" class="headerlink" title="技术路线图"></a>技术路线图</h2><pre class="mermaid">graph TB
+    subgraph TCP
+    TCPServer---StreamRequsetHandler
+    end</pre>
+
+<ul>
+<li>TCP 端<ul>
+<li>TCPServer ：接收客户端的 TCP 连接</li>
+<li>StreamRequsetHandler ：封装字节流网络请求处理功能</li>
+</ul>
+</li>
+</ul>
+<h2 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h2><pre class="mermaid">graph LR
+    目录:socket-->socket_server.py
+    目录:handler-->base_handler.py</pre>
+
+<ul>
+<li>socket 是处理 TCPServer</li>
+<li>handler 是处理 StreamRequsetHandler</li>
+</ul>
+<h2 id="涉及的技术"><a href="#涉及的技术" class="headerlink" title="涉及的技术"></a>涉及的技术</h2><pre class="mermaid">graph LR
+    TCPServer-->StreamRequsetHandler
+    StreamRequsetHandler-->多线程TCPServer</pre>
+
+<ul>
+<li>TCPServer<ul>
+<li>需要 TCP 服务器的工作原理</li>
+</ul>
+</li>
+<li>StreamRequsetHandler<ul>
+<li>需要 TCP 连接处理的原理</li>
+</ul>
+</li>
+<li>多线程TCPServer<ul>
+<li>需要服务端多线程处理请求模型</li>
+</ul>
+</li>
+</ul>
+<br/>
+
+<h1 id="TCPServer"><a href="#TCPServer" class="headerlink" title="TCPServer"></a>TCPServer</h1><br/>
+
+<p>后面那些都是方法</p>
+<pre class="mermaid">graph LR
+    TCPServer
+    TCPServer-->启动
+    启动-->serve_forever
+    TCPServer-->处理请求
+    处理请求-->get_request
+    处理请求-->process_request
+    处理请求-->close_request
+    TCPServer-->正常关闭
+    正常关闭-->shutdown
+    TCPServer-->a(处理对象:服务端地址-处理器-套接字)</pre>
+
+<h2 id="socket-server-py"><a href="#socket-server-py" class="headerlink" title="socket_server.py"></a>socket_server.py</h2><pre class="mermaid">graph LR
+    目录:socket-->socket_server.py</pre>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- encoding=utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TCPServer</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, server_address, handler_class)</span>:</span></span><br><span class="line">        self.server_address = server_address</span><br><span class="line">        self.HandlerClass = handler_class</span><br><span class="line">        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">        self.is_shutdown = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 服务器的启动函数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">serve_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.socket.bind(self.server_address)</span><br><span class="line">        self.socket.listen(<span class="number">10</span>)</span><br><span class="line">        <span class="comment"># while True:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.is_shutdown:</span><br><span class="line">            <span class="comment"># 1. 接收请求</span></span><br><span class="line">            request, client_address = self.get_request()</span><br><span class="line">            <span class="comment"># 2. 处理请求</span></span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                self.process_request(request, client_address)</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                print(e)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 接收请求</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_request</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.socket.accept()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 处理请求</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request, client_address)</span>:</span></span><br><span class="line">        handler = self.HandlerClass(self, request, client_address)</span><br><span class="line">        handler.handle()</span><br><span class="line">        <span class="comment"># 3. 关闭连接</span></span><br><span class="line">        self.close_request(request)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 关闭请求</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        request.shutdown(socket.SHUT_WR)</span><br><span class="line">        request.close()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 关闭服务器</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">shutdown</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.is_shutdown = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="StreamRequsetHandler"><a href="#StreamRequsetHandler" class="headerlink" title="StreamRequsetHandler"></a>StreamRequsetHandler</h1><br/>
+
+<ul>
+<li>BaseRequestHandler<ul>
+<li>定义连接处理的基本操作 &amp; 相关属性</li>
+</ul>
+</li>
+<li>StreamRequsetHandler<ul>
+<li>主要作用是 封装 TCP 处理逻辑</li>
+</ul>
+</li>
+</ul>
+<pre class="mermaid">graph LR
+    BaseRequestHandler
+    BaseRequestHandler==>StreamRequsetHandler
+    StreamRequsetHandler
+    StreamRequsetHandler-->编码/解码
+    编码/解码-->encode/decode
+    StreamRequsetHandler-->读/写消息
+    读/写消息-->read/readline
+    读/写消息-->write_content
+    读/写消息-->send</pre>
+
+<h2 id="base-handler-py"><a href="#base-handler-py" class="headerlink" title="base_handler.py"></a>base_handler.py</h2><pre class="mermaid">graph LR
+    目录:handler-->base_handler.py</pre>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- encoding=utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseRequestHandler</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, server, request, client_address)</span>:</span></span><br><span class="line">        self.server = server</span><br><span class="line">        self.request = request</span><br><span class="line">        self.client_address = client_address</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StreamRequestHandler</span><span class="params">(BaseRequestHandler)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, server, request, client_address)</span>:</span></span><br><span class="line">        BaseRequestHandler.__init__(self, server, request, client_address)</span><br><span class="line"></span><br><span class="line">        self.rfile = self.request.makefile(<span class="string">'rb'</span>)</span><br><span class="line">        self.wfile = self.request.makefile(<span class="string">'wb'</span>)</span><br><span class="line">        self.wbuf = []</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 编码：字符串-&gt;字节码</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">encode</span><span class="params">(self, msg)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> isinstance(msg, bytes):</span><br><span class="line">            msg = bytes(msg, encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">        <span class="keyword">return</span> msg</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 解码：字节码-&gt;字符串</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decode</span><span class="params">(self, msg)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> isinstance(msg, bytes):</span><br><span class="line">            msg = msg.decode()</span><br><span class="line">        <span class="keyword">return</span> msg</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 读消息</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">read</span><span class="params">(self, length)</span>:</span></span><br><span class="line">        msg = self.rfile.read(length)</span><br><span class="line">        <span class="keyword">return</span> self.decode(msg)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 读取一行消息</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">readline</span><span class="params">(self, length=<span class="number">65536</span>)</span>:</span></span><br><span class="line">        msg = self.rfile.readline(length).strip()</span><br><span class="line">        <span class="keyword">return</span> self.decode(msg)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 写消息</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">write_content</span><span class="params">(self, msg)</span>:</span></span><br><span class="line">        msg = self.encode(msg)</span><br><span class="line">        self.wbuf.append(msg)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 发送消息</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">send</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> self.wbuf:</span><br><span class="line">            self.wfile.write(line)</span><br><span class="line">        self.wfile.flush()</span><br><span class="line">        self.wbuf = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.wfile.close()</span><br><span class="line">        self.rfile.close()</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="编写测试用例"><a href="#编写测试用例" class="headerlink" title="编写测试用例"></a>编写测试用例</h1><br/>
+
+<h2 id="test-py"><a href="#test-py" class="headerlink" title="test.py"></a>test.py</h2><pre class="mermaid">graph LR
+    目录:test-->test.py</pre>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- encoding=utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> server.socket_server <span class="keyword">import</span> TCPServer</span><br><span class="line"><span class="keyword">from</span> handler.base_handler <span class="keyword">import</span> StreamRequestHandler</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> server.base_http_server <span class="keyword">import</span> BaseHTTPServer</span><br><span class="line"><span class="keyword">from</span> handler.base_http_handler <span class="keyword">import</span> BaseHTTPRequestHandler</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestBaseRequestHandler</span><span class="params">(StreamRequestHandler)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 具体处理的逻辑(Echo)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle</span><span class="params">(self)</span>:</span></span><br><span class="line">        msg = self.readline()</span><br><span class="line">        print(<span class="string">'Server recv msg: '</span> + msg)</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line">        self.write_content(msg)</span><br><span class="line">        self.send()</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试SocketServer(TCPServer)</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SocketServerTest</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run_server</span><span class="params">(self)</span>:</span></span><br><span class="line">        tcp_server = TCPServer((<span class="string">'127.0.0.1'</span>, <span class="number">8888</span>), TestBaseRequestHandler)</span><br><span class="line">        tcp_server.serve_forever()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 客户端的具体连接逻辑</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">client_connect</span><span class="params">(self)</span>:</span></span><br><span class="line">        client = socket.socket()</span><br><span class="line">        client.connect((<span class="string">'127.0.0.1'</span>, <span class="number">8888</span>))</span><br><span class="line">        client.send(<span class="string">b'Hello TCPServer\r\n'</span>)</span><br><span class="line">        msg = client.recv(<span class="number">1024</span>)</span><br><span class="line">        print(<span class="string">'Client recv msg: '</span> + msg.decode())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 生成客户端</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">gen_clients</span><span class="params">(self, num)</span>:</span></span><br><span class="line">        clients = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(num):</span><br><span class="line">            client_thread = threading.Thread(target=self.client_connect)</span><br><span class="line">            clients.append(client_thread)</span><br><span class="line">        <span class="keyword">return</span> clients</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">        server_thread = threading.Thread(target=self.run_server)</span><br><span class="line">        server_thread.start()</span><br><span class="line"></span><br><span class="line">        time.sleep(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">        clients = self.gen_clients(<span class="number">10</span>)</span><br><span class="line">        <span class="keyword">for</span> client <span class="keyword">in</span> clients:</span><br><span class="line">            client.start()</span><br><span class="line"></span><br><span class="line">        server_thread.join()</span><br><span class="line">        <span class="keyword">for</span> client <span class="keyword">in</span> clients:</span><br><span class="line">            client.join()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    SocketServerTest().run()</span><br></pre></td></tr></table></figure>
+
+<p>上面就完成了简单的例子，但是，目前完成的服务器还非常初级，甚至，是单线程工作，下一步，我们将代码改编成多线程。</p>
+<p>其实只需要修改</p>
+<ul>
+<li>socket_server.py</li>
+</ul>
+<p>将里面的处理函数，变成多线程处理，其全部代码如下所示</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- encoding=utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TCPServer</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, server_address, handler_class)</span>:</span></span><br><span class="line">        self.server_address = server_address</span><br><span class="line">        self.HandlerClass = handler_class</span><br><span class="line">        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">        self.is_shutdown = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 服务器的启动函数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">serve_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.socket.bind(self.server_address)</span><br><span class="line">        self.socket.listen(<span class="number">10</span>)</span><br><span class="line">        <span class="comment"># while True:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.is_shutdown:</span><br><span class="line">            <span class="comment"># 1. 接收请求</span></span><br><span class="line">            request, client_address = self.get_request()</span><br><span class="line">            <span class="comment"># 2. 处理请求</span></span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                <span class="comment"># self.process_request(request, client_address)</span></span><br><span class="line">                self.process_request_multithread(request, client_address)</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                print(e)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 接收请求</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_request</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.socket.accept()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 处理请求</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request, client_address)</span>:</span></span><br><span class="line">        handler = self.HandlerClass(self, request, client_address)</span><br><span class="line">        handler.handle()</span><br><span class="line">        <span class="comment"># 3. 关闭连接</span></span><br><span class="line">        self.close_request(request)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 多线程处理请求</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request_multithread</span><span class="params">(self, request, client_address)</span>:</span></span><br><span class="line">        t = threading.Thread(target=self.process_request,</span><br><span class="line">                             args=(request, client_address))</span><br><span class="line">        t.start()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 关闭请求</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        request.shutdown(socket.SHUT_WR)</span><br><span class="line">        request.close()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 关闭服务器</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">shutdown</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.is_shutdown = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/http/" rel="tag"># http</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/04/http0/" rel="prev" title="http | 自己实现一个 http 服务器 NO:1">
+      <i class="fa fa-chevron-left"></i> http | 自己实现一个 http 服务器 NO:1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/06/hexo15/" rel="next" title="hexo | 使用 markdown 语法进行画图">
+      hexo | 使用 markdown 语法进行画图 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#技术路线"><span class="nav-number">1.</span> <span class="nav-text">技术路线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#图片说明图"><span class="nav-number">2.</span> <span class="nav-text">图片说明图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本节目录"><span class="nav-number">3.</span> <span class="nav-text">本节目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本章完成的内容"><span class="nav-number">4.</span> <span class="nav-text">本章完成的内容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#技术路线图"><span class="nav-number">4.1.</span> <span class="nav-text">技术路线图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目录结构"><span class="nav-number">4.2.</span> <span class="nav-text">目录结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#涉及的技术"><span class="nav-number">4.3.</span> <span class="nav-text">涉及的技术</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TCPServer"><span class="nav-number">5.</span> <span class="nav-text">TCPServer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#socket-server-py"><span class="nav-number">5.1.</span> <span class="nav-text">socket_server.py</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#StreamRequsetHandler"><span class="nav-number">6.</span> <span class="nav-text">StreamRequsetHandler</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#base-handler-py"><span class="nav-number">6.1.</span> <span class="nav-text">base_handler.py</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编写测试用例"><span class="nav-number">7.</span> <span class="nav-text">编写测试用例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#test-py"><span class="nav-number">7.1.</span> <span class="nav-text">test.py</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="参考资料  什么是KDJ？ 技术指标KDJ 股市分析指标，经典KDJ指标9，3，3，其中参数9为设定天数为9天，其后的3，3代表什么意思？ github | ta-lib 作者给出 python 的纯计算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="virtualcoin | KDJ 指标">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2022/10/10/virtualcoin26/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="参考资料  什么是KDJ？ 技术指标KDJ 股市分析指标，经典KDJ指标9，3，3，其中参数9为设定天数为9天，其后的3，3代表什么意思？ github | ta-lib 作者给出 python 的纯计算">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/virtualcoin/26_0.png">
+<meta property="article:published_time" content="2022-10-10T05:17:26.000Z">
+<meta property="article:modified_time" content="2022-10-18T05:01:13.230Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="量化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/virtualcoin/26_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2022/10/10/virtualcoin26/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>virtualcoin | KDJ 指标 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2022/10/10/virtualcoin26/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          virtualcoin | KDJ 指标
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-10-10 13:17:26" itemprop="dateCreated datePublished" datetime="2022-10-10T13:17:26+08:00">2022-10-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-18 13:01:13" itemprop="dateModified" datetime="2022-10-18T13:01:13+08:00">2022-10-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%87%8F%E5%8C%96%E6%8A%95%E8%B5%84/" itemprop="url" rel="index"><span itemprop="name">量化投资</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%87%8F%E5%8C%96%E6%8A%95%E8%B5%84/%E6%8A%80%E6%9C%AF%E6%8C%87%E6%A0%87/" itemprop="url" rel="index"><span itemprop="name">技术指标</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2022/10/10/virtualcoin26/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2022/10/10/virtualcoin26/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考资料</p>
+<ul>
+<li><a href="https://www.futunn.com/learn/detail-what-is-kdj-64858-0" rel="external nofollow noreferrer">什么是KDJ？</a></li>
+<li><a href="http://www.35coder.com/tech-kdj/" rel="external nofollow noreferrer">技术指标KDJ</a></li>
+<li><a href="http://zhidao.baidu.com/question/568375918/answer/1432778558" rel="external nofollow noreferrer">股市分析指标，经典KDJ指标9，3，3，其中参数9为设定天数为9天，其后的3，3代表什么意思？</a></li>
+<li><a href="https://github.com/mrjbq7/ta-lib/issues/203" rel="external nofollow noreferrer">github | ta-lib 作者给出 python 的纯计算</a></li>
+</ul>
+<a id="more"></a>
+
+<p>大部分资料都是讲一下 <code>KDJ</code> 的含义，很少有资料能把 <code>KDJ</code> 怎么计算说清楚，经过我的资料查询，现在我已经将 <code>KDJ</code> 的计算都弄懂了。</p>
+<h2 id="KDJ-公式"><a href="#KDJ-公式" class="headerlink" title="KDJ 公式"></a>KDJ 公式</h2><p>$$ RSV_n = \frac{C - L_n}{H_n - L_n} * 100 $$</p>
+<p>其中，<code>n</code> 代表一个时间周期，比如 <code>9</code> 分钟，<code>10</code> 天，<code>20</code> 小时等，这个数值是自己设置。假设这里的 <code>n</code> 代表的是 <code>9</code> 分钟</p>
+<ul>
+<li>$ C $<ul>
+<li>第 9 分钟的收盘价</li>
+</ul>
+</li>
+<li>$ L_n $<ul>
+<li>9 分钟内的最低价</li>
+</ul>
+</li>
+<li>$ H_n $<ul>
+<li>9 分钟内的最高价</li>
+</ul>
+</li>
+</ul>
+<p><code>RSV</code> 总在 <code>1 - 100</code> 之间波动。</p>
+<p>$$ K = \frac{2}{3} * K_l + \frac{1}{3} * RSV  $$</p>
+<p>这是 <code>K</code> 值的计算方法，其中 $ K_l $ 代表的是上一个周期的 <code>K</code> 值，这里有几个注意点</p>
+<ul>
+<li>为什么是 2/3 和 1/3<ul>
+<li>这个后面讲解</li>
+</ul>
+</li>
+<li>$ K_l $<ul>
+<li>上一个周期的 K 值，如果上一个周期没有 K 的话，可以用 50 代替</li>
+</ul>
+</li>
+</ul>
+<p>$$ D = \frac{2}{3} * D_l + \frac{1}{3} * K  $$</p>
+<p>这是 <code>D</code> 值的计算方法</p>
+<ul>
+<li>$ D_l $<ul>
+<li>上一个周期的 D 值，如果上一个周期没有 D 的话，可以用 50 代替</li>
+</ul>
+</li>
+<li>K<ul>
+<li>上面计算的 K</li>
+</ul>
+</li>
+</ul>
+<p>$$ J = 3 * K - 2 * D $$</p>
+<h3 id="具体细节讲解"><a href="#具体细节讲解" class="headerlink" title="具体细节讲解"></a>具体细节讲解</h3><p>通常 <code>KDJ</code> 的参数都是 <code>9，3，3</code></p>
+<ul>
+<li>9<ul>
+<li>代表 9 天的周期</li>
+</ul>
+</li>
+<li>3<ul>
+<li>M1</li>
+</ul>
+</li>
+<li>3<ul>
+<li>M2</li>
+</ul>
+</li>
+</ul>
+<p>上面说的雨里雾里，直接说一下，怎么计算吧。</p>
+<p>如果，你用 <code>tb-lib</code> 进行 <code>KDJ</code> 的编写的话，大概能写出下面的代码</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">dw[<span class="string">'slowk'</span>], dw[<span class="string">'slowd'</span>] = talib.STOCH(</span><br><span class="line">			df[<span class="string">'high'</span>].values, </span><br><span class="line">			df[<span class="string">'low'</span>].values, </span><br><span class="line">			df[<span class="string">'close'</span>].values,</span><br><span class="line">                        <span class="attribute">fastk_period</span>=9,</span><br><span class="line">                        <span class="attribute">slowk_period</span>=3,</span><br><span class="line">                        <span class="attribute">slowk_matype</span>=0,</span><br><span class="line">                        <span class="attribute">slowd_period</span>=3,</span><br><span class="line">                        <span class="attribute">slowd_matype</span>=0)</span><br></pre></td></tr></table></figure>
+
+<p>那么，内部实际上是怎么的情况呢。</p>
+<p><code>slowk_priod</code> 和 <code>slowd_priod</code> 又是怎么运用呢？结合，参考资料，给出下面的新的公式。</p>
+<p>$$ RSV_n = \frac{C - L_n}{H_n - L_n} * 100 $$</p>
+<p>$$ K = SMA(RSV,M1,1) $$</p>
+<p>$$ D = SMA(K,M2,1) $$</p>
+<p>而，SMA 参考</p>
+<ul>
+<li><a href="https://baike.baidu.com/item/SMA%E5%9D%87%E7%BA%BF/7238642#:~:text=SMA(X%2CN%2CM,%E5%80%BC%EF%BC%8CN%E5%BF%85%E9%A1%BB%E5%A4%A7%E4%BA%8EM%E3%80%82" rel="external nofollow noreferrer">SMA均线</a></li>
+</ul>
+<p><code>SMA</code> 的计算如下</p>
+<p>$$ Y=SMA(X,N,M) $$</p>
+<p>则</p>
+<p>$$ Y = \frac{M * Y + (N - M) * Y’} {N} $$</p>
+<p>其中</p>
+<ul>
+<li>Y’ 代表上一周期的 Y 值</li>
+<li>N 必须大于 M</li>
+</ul>
+<p>至此，上面的各种参数所代表的公式计算已经说清楚了，下面我们再来看看真实数据的表现。</p>
+<h2 id="真实数据展示"><a href="#真实数据展示" class="headerlink" title="真实数据展示"></a>真实数据展示</h2><div style="width: 50%;padding-left: 25%">
+
+<p><img src="/images/virtualcoin/26_0.png" alt=""></p>
+</div>
+
+<p>这里选用的参数是 <code>9，3，3</code></p>
+<p>在图中的地针中，参数如下</p>
+<ul>
+<li>K = 43.75</li>
+<li>D = 50.38</li>
+</ul>
+<p><code>9</code> 日的数据如下</p>
+<ul>
+<li>地针的收盘价是<ul>
+<li>19.94</li>
+</ul>
+</li>
+<li>9 日内最高价是<ul>
+<li>23.03</li>
+</ul>
+</li>
+<li>9 日内最低价是<ul>
+<li>19.25</li>
+</ul>
+</li>
+</ul>
+<p>上一个周期的</p>
+<ul>
+<li>K<ul>
+<li>56.51</li>
+</ul>
+</li>
+<li>D<ul>
+<li>53.69</li>
+</ul>
+</li>
+</ul>
+<p>所以，计算如下</p>
+<p>$$ RSV = \frac{19.94 - 19.25}{23.03 - 19.25} * 100 = 18.253968 $$</p>
+<p>$$ K = \frac{2}{3} * 56.51 + \frac{1}{3} * 18.253968 = 43.7579 $$</p>
+<p><code>D</code> 就不计算了。</p>
+<p>另外，我查了一下币安和火币，关于 <code>KDJ</code> 的算法，发现上述算法和他们展示的不一致，这个没深究，等后面填坑吧。</p>
+<p>这里有一个特殊情况，就是，假设你只有第一日和第二日的数据，如何算 <code>9，3，3</code> 的 <code>KDJ</code> 值呢？</p>
+<p>这里看一组数据。</p>
+<p>这是 <code>2018-12-12日</code> 招商银行 <code>600036</code> 的 <code>KDJ</code> 值数据</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">date	    close	high	low	    rsv	        max	    min	    k	        d	        j</span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-16</span>	<span class="number">30.88</span>	<span class="number">31.26</span>	<span class="number">30.55</span>	<span class="number">46.478873</span>	<span class="number">31.26</span>	<span class="number">30.55</span>	<span class="number">50.000000</span>	<span class="number">50.000000</span>	<span class="number">50.000000</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-17</span>	<span class="number">30.69</span>	<span class="number">32.07</span>	<span class="number">30.51</span>	<span class="number">11.538462</span>	<span class="number">32.07</span>	<span class="number">30.51</span>	<span class="number">37.179487</span>	<span class="number">45.726496</span>	<span class="number">20.085470</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-18</span>	<span class="number">31.30</span>	<span class="number">31.72</span>	<span class="number">31.09</span>	<span class="number">50.641026</span>	<span class="number">32.07</span>	<span class="number">30.51</span>	<span class="number">41.666667</span>	<span class="number">44.373219</span>	<span class="number">36.253561</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-19</span>	<span class="number">31.44</span>	<span class="number">32.30</span>	<span class="number">31.19</span>	<span class="number">51.955307</span>	<span class="number">32.30</span>	<span class="number">30.51</span>	<span class="number">45.096214</span>	<span class="number">44.614217</span>	<span class="number">46.060206</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-22</span>	<span class="number">32.04</span>	<span class="number">32.58</span>	<span class="number">31.14</span>	<span class="number">73.913043</span>	<span class="number">32.58</span>	<span class="number">30.51</span>	<span class="number">54.701824</span>	<span class="number">47.976753</span>	<span class="number">68.151965</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-23</span>	<span class="number">32.98</span>	<span class="number">33.09</span>	<span class="number">32.15</span>	<span class="number">95.736434</span>	<span class="number">33.09</span>	<span class="number">30.51</span>	<span class="number">68.380027</span>	<span class="number">54.777844</span>	<span class="number">95.584393</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-24</span>	<span class="number">32.78</span>	<span class="number">34.24</span>	<span class="number">32.40</span>	<span class="number">60.857909</span>	<span class="number">34.24</span>	<span class="number">30.51</span>	<span class="number">65.872654</span>	<span class="number">58.476114</span>	<span class="number">80.665734</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-25</span>	<span class="number">32.36</span>	<span class="number">32.95</span>	<span class="number">31.86</span>	<span class="number">49.597855</span>	<span class="number">34.24</span>	<span class="number">30.51</span>	<span class="number">60.447721</span>	<span class="number">59.133317</span>	<span class="number">63.076531</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-26</span>	<span class="number">32.41</span>	<span class="number">33.22</span>	<span class="number">32.14</span>	<span class="number">50.938338</span>	<span class="number">34.24</span>	<span class="number">30.51</span>	<span class="number">57.277927</span>	<span class="number">58.514853</span>	<span class="number">54.804074</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-29</span>	<span class="number">31.94</span>	<span class="number">33.01</span>	<span class="number">31.78</span>	<span class="number">38.337802</span>	<span class="number">34.24</span>	<span class="number">30.51</span>	<span class="number">50.964552</span>	<span class="number">55.998086</span>	<span class="number">40.897483</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-30</span>	<span class="number">31.54</span>	<span class="number">32.11</span>	<span class="number">31.39</span>	<span class="number">14.285714</span>	<span class="number">34.24</span>	<span class="number">31.09</span>	<span class="number">38.738273</span>	<span class="number">50.244815</span>	<span class="number">15.725188</span></span><br><span class="line"><span class="number">2018</span><span class="number">-01</span><span class="number">-31</span>	<span class="number">32.87</span>	<span class="number">32.92</span>	<span class="number">31.20</span>	<span class="number">55.806452</span>	<span class="number">34.24</span>	<span class="number">31.14</span>	<span class="number">44.427666</span>	<span class="number">48.305765</span>	<span class="number">36.671466</span></span><br><span class="line"><span class="number">2018</span><span class="number">-02</span><span class="number">-01</span>	<span class="number">33.36</span>	<span class="number">33.82</span>	<span class="number">32.78</span>	<span class="number">71.612903</span>	<span class="number">34.24</span>	<span class="number">31.14</span>	<span class="number">53.489411</span>	<span class="number">50.033647</span>	<span class="number">60.400940</span></span><br></pre></td></tr></table></figure>
+
+<p>我们计算 <code>2018-01-17</code> 的 <code>KDJ</code> 值，相关参数如下「只能取 <code>16，17</code> 两天」</p>
+<ul>
+<li>close<ul>
+<li>30.69</li>
+</ul>
+</li>
+<li>high<ul>
+<li>32.07</li>
+</ul>
+</li>
+<li>low<ul>
+<li>30.51</li>
+</ul>
+</li>
+</ul>
+<p>最后算出的值就是表格中所展示的。</p>
+<h2 id="KDJ-的具体含义"><a href="#KDJ-的具体含义" class="headerlink" title="KDJ 的具体含义"></a>KDJ 的具体含义</h2><p>这个暂时不写了，留待以后吧。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%87%8F%E5%8C%96/" rel="tag"># 量化</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/09/life17/" rel="prev" title="life ｜ 我的感情经营">
+      <i class="fa fa-chevron-left"></i> life ｜ 我的感情经营
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/10/11/linux20/" rel="next" title="linux | 文件描述符">
+      linux | 文件描述符 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#KDJ-公式"><span class="nav-number">1.</span> <span class="nav-text">KDJ 公式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#具体细节讲解"><span class="nav-number">1.1.</span> <span class="nav-text">具体细节讲解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#真实数据展示"><span class="nav-number">2.</span> <span class="nav-text">真实数据展示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KDJ-的具体含义"><span class="nav-number">3.</span> <span class="nav-text">KDJ 的具体含义</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

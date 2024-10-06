@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="如题所示，另外代码是用 python 实现，附上自己的理解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="排序算法总结">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/06/30/algorithm2/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="如题所示，另外代码是用 python 实现，附上自己的理解。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_0.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_1.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_2.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_3.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_4.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_5.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_9.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_6.gif">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_7.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/algorithm/2_8.png">
+<meta property="article:published_time" content="2018-06-30T13:50:52.000Z">
+<meta property="article:modified_time" content="2021-08-08T15:19:39.874Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/algorithm/2_0.gif">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/06/30/algorithm2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>排序算法总结 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/06/30/algorithm2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          排序算法总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-06-30 21:50:52" itemprop="dateCreated datePublished" datetime="2018-06-30T21:50:52+08:00">2018-06-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-08 23:19:39" itemprop="dateModified" datetime="2021-08-08T23:19:39+08:00">2021-08-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">架构算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9E%B6%E6%9E%84%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95/%E7%BB%8F%E5%85%B8/" itemprop="url" rel="index"><span itemprop="name">经典</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/06/30/algorithm2/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/06/30/algorithm2/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>如题所示，另外代码是用 python 实现，附上自己的理解。</p>
+<a id="more"></a>
+
+<h2 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>这个算法的名字由来是因为越大的元素会经由交换慢慢“浮”到数列的顶端，故名“冒泡排序”。</p>
+<p><img src="/images/algorithm/2_0.gif" alt=""></p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bubbleSort</span><span class="params">(arr)</span>:</span>		<span class="comment">#冒泡排序</span></span><br><span class="line">	l = len(arr)</span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(l):</span><br><span class="line">		<span class="keyword">for</span> j <span class="keyword">in</span> range(l - i):</span><br><span class="line">			<span class="keyword">if</span> j + <span class="number">1</span> &lt; l - i <span class="keyword">and</span> arr[j] &gt; arr[j + <span class="number">1</span>]:</span><br><span class="line">				tmp = arr[j]</span><br><span class="line">				arr[j] = arr[j + <span class="number">1</span>]</span><br><span class="line">				arr[j + <span class="number">1</span>] = tmp</span><br><span class="line">	<span class="keyword">return</span> arr</span><br></pre></td></tr></table></figure>
+
+<h2 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h2><h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。以此类推，直到所有元素均排序完毕。</p>
+<p><img src="/images/algorithm/2_1.gif" alt=""></p>
+<p>选择排序有插入版和交换版。</p>
+<p>其中插入版是稳定的，交换版是不稳定的，下面的代码是插入版的。</p>
+<h3 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">selectionSort</span><span class="params">(arr)</span>:</span> <span class="comment"># 选择排序</span></span><br><span class="line">	l = len(arr)</span><br><span class="line">	index = <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(l):</span><br><span class="line">		value = arr[i]</span><br><span class="line">		<span class="keyword">for</span> j <span class="keyword">in</span> range(i+<span class="number">1</span>,l):</span><br><span class="line">			<span class="keyword">if</span> value &lt; arr[j]:</span><br><span class="line">				value = arr[j]</span><br><span class="line">				index = j</span><br><span class="line">		arr[index] = arr[i]</span><br><span class="line">		arr[i] = value</span><br><span class="line">	<span class="keyword">return</span> arr</span><br></pre></td></tr></table></figure>
+
+<h2 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h2><h3 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h3><p>它的工作原理是通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。</p>
+<p><img src="/images/algorithm/2_2.gif" alt=""></p>
+<h3 id="自己写的代码"><a href="#自己写的代码" class="headerlink" title="自己写的代码"></a>自己写的代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">change</span><span class="params">(arr,i,j)</span>:</span></span><br><span class="line">	tmp = arr[j]</span><br><span class="line">	<span class="keyword">for</span> k <span class="keyword">in</span> range(i,j)[::<span class="number">-1</span>]:</span><br><span class="line">		print(k)</span><br><span class="line">		arr[j] = arr[k]</span><br><span class="line">	arr[i] = tmp</span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">insertSort</span><span class="params">(arr)</span>:</span>	<span class="comment"># 插入排序</span></span><br><span class="line">	min_index =<span class="number">0</span></span><br><span class="line">	l = len(arr)</span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> 	range(l):</span><br><span class="line">		<span class="keyword">for</span> j <span class="keyword">in</span> range(i):</span><br><span class="line">			<span class="keyword">if</span> arr[j] &lt;= arr[i] <span class="keyword">and</span> arr[i] &lt; arr[j + <span class="number">1</span>] <span class="keyword">and</span> j + <span class="number">1</span> &lt; l:</span><br><span class="line">				print(j)</span><br><span class="line">				change(arr,i,j)</span><br><span class="line">	<span class="keyword">return</span> arr</span><br></pre></td></tr></table></figure>
+
+<h3 id="网上流传的代码"><a href="#网上流传的代码" class="headerlink" title="网上流传的代码"></a>网上流传的代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">insert_Sort</span><span class="params">(arr)</span>:</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">1</span>,len(arr)):</span><br><span class="line">		<span class="keyword">for</span> i <span class="keyword">in</span> range(x<span class="number">-1</span>,<span class="number">-1</span>,<span class="number">-1</span>):</span><br><span class="line">			<span class="keyword">if</span>(arr[i] &gt; arr[i + <span class="number">1</span>]):</span><br><span class="line">				arr[i],arr[i+<span class="number">1</span>] = arr[i+<span class="number">1</span>],arr[i]</span><br></pre></td></tr></table></figure>
+
+<h3 id="后面相当于变相的冒泡排序"><a href="#后面相当于变相的冒泡排序" class="headerlink" title="后面相当于变相的冒泡排序"></a>后面相当于变相的冒泡排序</h3><h2 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h2><h3 id="原理-3"><a href="#原理-3" class="headerlink" title="原理"></a>原理</h3><p>将两个已经排序的序列合并成一个序列的操作。运用分而治之的思想。</p>
+<p><img src="/images/algorithm/2_3.gif" alt=""></p>
+<p><img src="/images/algorithm/2_4.gif" alt=""></p>
+<h3 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mergeSort</span><span class="params">(arr,first,mid,last,tmp)</span>:</span>	<span class="comment"># 归并排序</span></span><br><span class="line">	i,j,k = first,mid+<span class="number">1</span>,<span class="number">0</span></span><br><span class="line">	<span class="keyword">while</span>(i &lt;= mid) <span class="keyword">and</span> (j &lt;= last):</span><br><span class="line">		<span class="keyword">if</span>(arr[i] &lt;= arr[j]):</span><br><span class="line">			tmp[k] = arr[i]</span><br><span class="line">			i += <span class="number">1</span></span><br><span class="line">			k += <span class="number">1</span></span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">			tmp[k] = arr[j]</span><br><span class="line">			j += <span class="number">1</span></span><br><span class="line">			k += <span class="number">1</span></span><br><span class="line">	<span class="keyword">while</span>(i &lt;= mid):</span><br><span class="line">		tmp[k] = arr[i]</span><br><span class="line">		i += <span class="number">1</span></span><br><span class="line">		k += <span class="number">1</span></span><br><span class="line">	<span class="keyword">while</span>(j &lt;= last):</span><br><span class="line">		tmp[k] = arr[j]</span><br><span class="line">		j += <span class="number">1</span></span><br><span class="line">		k += <span class="number">1</span></span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">0</span>,k):</span><br><span class="line">		arr[first + x] = tmp[x]</span><br><span class="line">		</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_sort</span><span class="params">(arr,first,last,tmp)</span>:</span></span><br><span class="line">	<span class="keyword">if</span> first &lt; last:</span><br><span class="line">				mid = (int)((first + last) / <span class="number">2</span>)</span><br><span class="line">				merge_sort(arr,first,mid,tmp)</span><br><span class="line">				merge_sort(arr,mid+<span class="number">1</span>,last,tmp)</span><br><span class="line">				mergeSort(arr,first,mid,last,tmp)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_array</span><span class="params">(arr)</span>:</span></span><br><span class="line">	tmp = len(arr) * [<span class="number">0</span>]</span><br><span class="line">	merge_sort(arr,<span class="number">0</span>,len(arr)<span class="number">-1</span>,tmp)</span><br></pre></td></tr></table></figure>
+
+<h2 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h2><h3 id="原理-4"><a href="#原理-4" class="headerlink" title="原理"></a>原理</h3><p>通过一趟排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列。</p>
+<p><img src="/images/algorithm/2_5.gif" alt=""></p>
+<h3 id="代码-3"><a href="#代码-3" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">quickSort</span><span class="params">(L,start,end)</span>:</span></span><br><span class="line">	<span class="keyword">if</span> start &lt; end:</span><br><span class="line">		i,j,pivot = start,end,L[start]</span><br><span class="line">		<span class="keyword">while</span>(i &lt; j):</span><br><span class="line">			<span class="keyword">while</span>(i &lt; j) <span class="keyword">and</span> (L[j] &gt;= pivot):</span><br><span class="line">				j -= <span class="number">1</span></span><br><span class="line">			<span class="keyword">if</span>(i &lt; j):</span><br><span class="line">				L[i] = L[j]</span><br><span class="line">				i += <span class="number">1</span></span><br><span class="line">			<span class="keyword">while</span>(i &lt; j) <span class="keyword">and</span> (L[i] &lt; pivot):</span><br><span class="line">				i += <span class="number">1</span></span><br><span class="line">			<span class="keyword">if</span>(i &lt; j):</span><br><span class="line">				L[j] = L[i]</span><br><span class="line">				j -= <span class="number">1</span></span><br><span class="line">		L[i]=pivot</span><br><span class="line">		quickSort(L,start,i<span class="number">-1</span>)</span><br><span class="line">		quickSort(L,i+<span class="number">1</span>,end)</span><br></pre></td></tr></table></figure>
+
+<p>第一轮排序结构</p>
+<div style="width: 50%;padding-left: 25%">
+
+<p><img src="/images/algorithm/2_9.png" alt=""></p>
+</div>
+
+<h2 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h2><h3 id="原理-5"><a href="#原理-5" class="headerlink" title="原理"></a>原理</h3><p>堆分为大根堆和小根堆，是完全二叉树。</p>
+<p><img src="/images/algorithm/2_6.gif" alt=""></p>
+<h3 id="过程图解"><a href="#过程图解" class="headerlink" title="过程图解"></a>过程图解</h3><p>数据如下：</p>
+<pre><code>arr = [4,2,3,7,1,5,6]</code></pre><h3 id="构建大顶堆"><a href="#构建大顶堆" class="headerlink" title="构建大顶堆"></a>构建大顶堆</h3><p><img src="/images/algorithm/2_7.png" alt=""></p>
+<h3 id="输出以及调整大顶堆"><a href="#输出以及调整大顶堆" class="headerlink" title="输出以及调整大顶堆"></a>输出以及调整大顶堆</h3><p><img src="/images/algorithm/2_8.png" alt=""></p>
+<p>代码最后的答案可能和图片有点出入，是因为图片我才用比较右在比较左，而代码正好相反。小事情，在这里提一下。</p>
+<h3 id="代码-4"><a href="#代码-4" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">LEFT</span><span class="params">(i)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">2</span> * i + <span class="number">1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">RIGHT</span><span class="params">(i)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">2</span> * i + <span class="number">2</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">adjustHeap</span><span class="params">(arr,length,i)</span>:</span></span><br><span class="line">	largest = i</span><br><span class="line">	<span class="keyword">while</span>(<span class="literal">True</span>):</span><br><span class="line">		left,right = LEFT(i),RIGHT(i)</span><br><span class="line">		<span class="keyword">if</span>(left &lt; length) <span class="keyword">and</span> (arr[left] &gt; arr[i]):</span><br><span class="line">			largest = left</span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">			largest = i</span><br><span class="line">		<span class="keyword">if</span>(right &lt; length) <span class="keyword">and</span> (arr[right] &gt; arr[largest]):</span><br><span class="line">			largest = right</span><br><span class="line">		<span class="keyword">if</span>(largest != i):</span><br><span class="line">			arr[i],arr[largest] = arr[largest],arr[i]</span><br><span class="line">			i = largest</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		<span class="keyword">else</span>:</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">			</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">buildHeap</span><span class="params">(arr)</span>:</span></span><br><span class="line">	length = len(arr)</span><br><span class="line">	<span class="keyword">for</span> x <span class="keyword">in</span> range((int)((length - <span class="number">1</span>)/<span class="number">2</span>),<span class="number">-1</span>,<span class="number">-1</span>):</span><br><span class="line">		adjustHeap(arr,length,x)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heapSort</span><span class="params">(arr)</span>:</span></span><br><span class="line">	buildHeap(arr)</span><br><span class="line">	i = len(arr)</span><br><span class="line">	<span class="keyword">while</span>(i &gt; <span class="number">0</span>):</span><br><span class="line">		arr[<span class="number">0</span>],arr[i<span class="number">-1</span>] = arr[i<span class="number">-1</span>],arr[<span class="number">0</span>]</span><br><span class="line">		i -= <span class="number">1</span></span><br><span class="line">		adjustHeap(arr,i,<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">arr = [<span class="number">4</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">7</span>,<span class="number">1</span>,<span class="number">5</span>,<span class="number">6</span>]</span><br></pre></td></tr></table></figure>
+
+<h2 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h2><pre><code>O(n * log(n))
+快速排序、希尔排序、堆排序、归并排序
+当然快速排序在最坏的情况下是 O(n ^ 2)
+O(n ^ 2)
+大部分的算法都是这个
+O(d(n + e))
+基数排序</code></pre><h2 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h2><pre><code>O(1)
+插入排序、选择排序、冒泡排序、堆排序、希尔排序
+O(logN)
+快速排序、堆排序（使用递归）
+O(N)
+归并排序
+O(M) # M 代表桶数量
+计数排序、计数排序</code></pre><h2 id="稳定性"><a href="#稳定性" class="headerlink" title="稳定性"></a>稳定性</h2><pre><code>稳定的排序
+冒泡排序、插入排序、选择排序（插入版）、归并排序、计数排序、基数排序、桶排序
+不稳定的排序
+选择排序（交换版）、快速排序、希尔排序、堆排序</code></pre><h2 id="补充1"><a href="#补充1" class="headerlink" title="补充1"></a>补充1</h2><pre><code>没有什么算法是绝对的好坏。
+选择哪种算法还是要看具体的数据。
+比如人的身高排序，因为数据范围很小，所以计数排序就很占优势。</code></pre><h2 id="补充2"><a href="#补充2" class="headerlink" title="补充2"></a>补充2</h2><pre><code>快速排序之所以叫快速排序，并不是它的性能最好。
+而是，在最好的情况下，它的常量系数比较低。</code></pre><h2 id="补充3"><a href="#补充3" class="headerlink" title="补充3"></a>补充3</h2><pre><code>工程上的排序是综合排序，并不是单独的排序。</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/30/thought7/" rel="prev" title="大学好友-叶某某">
+      <i class="fa fa-chevron-left"></i> 大学好友-叶某某
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/30/algorithm3/" rel="next" title="二叉树创建、四大遍历">
+      二叉树创建、四大遍历 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#冒泡排序"><span class="nav-number">1.</span> <span class="nav-text">冒泡排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理"><span class="nav-number">1.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码"><span class="nav-number">1.2.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择排序"><span class="nav-number">2.</span> <span class="nav-text">选择排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理-1"><span class="nav-number">2.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码-1"><span class="nav-number">2.2.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插入排序"><span class="nav-number">3.</span> <span class="nav-text">插入排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理-2"><span class="nav-number">3.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自己写的代码"><span class="nav-number">3.2.</span> <span class="nav-text">自己写的代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网上流传的代码"><span class="nav-number">3.3.</span> <span class="nav-text">网上流传的代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后面相当于变相的冒泡排序"><span class="nav-number">3.4.</span> <span class="nav-text">后面相当于变相的冒泡排序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#归并排序"><span class="nav-number">4.</span> <span class="nav-text">归并排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理-3"><span class="nav-number">4.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码-2"><span class="nav-number">4.2.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速排序"><span class="nav-number">5.</span> <span class="nav-text">快速排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理-4"><span class="nav-number">5.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码-3"><span class="nav-number">5.2.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#堆排序"><span class="nav-number">6.</span> <span class="nav-text">堆排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理-5"><span class="nav-number">6.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过程图解"><span class="nav-number">6.2.</span> <span class="nav-text">过程图解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建大顶堆"><span class="nav-number">6.3.</span> <span class="nav-text">构建大顶堆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输出以及调整大顶堆"><span class="nav-number">6.4.</span> <span class="nav-text">输出以及调整大顶堆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码-4"><span class="nav-number">6.5.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#时间复杂度"><span class="nav-number">7.</span> <span class="nav-text">时间复杂度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#空间复杂度"><span class="nav-number">8.</span> <span class="nav-text">空间复杂度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#稳定性"><span class="nav-number">9.</span> <span class="nav-text">稳定性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补充1"><span class="nav-number">10.</span> <span class="nav-text">补充1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补充2"><span class="nav-number">11.</span> <span class="nav-text">补充2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补充3"><span class="nav-number">12.</span> <span class="nav-text">补充3</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

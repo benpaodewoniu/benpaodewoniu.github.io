@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这里介绍在 linux 中的文本处理方法。  awk sed grep wc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux | 文本处理">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/10/19/linux17/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里介绍在 linux 中的文本处理方法。  awk sed grep wc">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-19T12:08:04.000Z">
+<meta property="article:modified_time" content="2020-10-25T09:30:44.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/10/19/linux17/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>linux | 文本处理 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/10/19/linux17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux | 文本处理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-19 20:08:04" itemprop="dateCreated datePublished" datetime="2020-10-19T20:08:04+08:00">2020-10-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-25 17:30:44" itemprop="dateModified" datetime="2020-10-25T17:30:44+08:00">2020-10-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/10/19/linux17/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/10/19/linux17/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里介绍在 <code>linux</code> 中的文本处理方法。</p>
+<ul>
+<li><code>awk</code></li>
+<li><code>sed</code></li>
+<li><code>grep</code></li>
+<li><code>wc</code></li>
+</ul>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="wc"><a href="#wc" class="headerlink" title="wc"></a>wc</h1><br/>
+
+<p><code>Linux</code> <code>wc</code>命令用于计算字数。</p>
+<p>利用<code>wc</code>指令我们可以计算文件的<code>Byte数</code>、字数、或是列数，若不指定文件名称、或是所给予的文件名为 <code>-</code>，则<code>wc</code>指令会从标准输入设备读取数据。</p>
+<pre><code>wc [-clw][--help][--version][文件...]</code></pre><ul>
+<li><code>-c</code>或<code>--bytes</code>或<code>--chars</code> 只显示<code>Bytes</code>数。</li>
+<li><code>-l</code>或<code>--lines</code> 只显示行数。</li>
+<li><code>-w</code>或<code>--words</code> 只显示字数。</li>
+<li><code>--help</code> 在线帮助。</li>
+<li><code>--version</code> 显示版本信息。</li>
+</ul>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>在默认的情况下，<code>wc</code>将计算指定文件的行数、字数，以及字节数。使用的命令为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wc testfile</span><br></pre></td></tr></table></figure>
+
+<p>先查看testfile文件的内容，可以看到：</p>
+<pre><code>$ cat testfile  
+Linux networks are becoming more and more common, but scurity is often an overlooked  
+issue. Unfortunately, in today’s environment all networks are potential hacker targets,  
+fro0m tp-secret military research networks to small home LANs.  
+Linux Network Securty focuses on securing Linux in a networked environment, where the  
+security of the entire network needs to be considered rather than just isolated machines.  
+It uses a mix of theory and practicl techniques to teach administrators how to install and  
+use security applications, as well as how the applcations work and why they are necesary. </code></pre><p>使用 <code>wc</code>统计，结果如下：</p>
+<pre><code>$ wc testfile           # testfile文件的统计信息  
+3 92 598 testfile       # testfile文件的行数为3、单词数92、字节数598 </code></pre><p>其中，<code>3</code> 个数字分别表示<code>testfile</code>文件的行数、单词数，以及该文件的字节数。</p>
+<p>如果想同时统计多个文件的信息，例如同时统计<code>testfile</code>、<code>testfile_1</code>、<code>testfile_2</code>，可使用如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wc testfile testfile_1 testfile_2   #统计三个文件的信息</span><br></pre></td></tr></table></figure>
+
+<p>输出结果如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wc testfile testfile_1 testfile_2  <span class="comment">#统计三个文件的信息  </span></span></span><br><span class="line">3 92 598 testfile                    #第一个文件行数为3、单词数92、字节数598  </span><br><span class="line">9 18 78 testfile_1                   #第二个文件的行数为9、单词数18、字节数78  </span><br><span class="line">3 6 32 testfile_2                    #第三个文件的行数为3、单词数6、字节数32  </span><br><span class="line">15 116 708 总用量                    #三个文件总共的行数为15、单词数116、字节数708</span><br></pre></td></tr></table></figure>
+
+<h3 id="统计进程行数"><a href="#统计进程行数" class="headerlink" title="统计进程行数"></a>统计进程行数</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -e | wc -l</span><br></pre></td></tr></table></figure>
+
+<br/>
+
+<h1 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h1><br/>
+
+<p>ps: 该命令的执行方式在 <code>linux</code> 中和 <code>MacBook</code> 表现不一样。</p>
+<p><code>Linux sed</code> 命令是利用脚本来处理文本文件。</p>
+<p><code>sed</code> 可依照脚本的指令来处理、编辑文本文件。</p>
+<p><code>Sed</code> 主要用来自动编辑一个或多个文件、简化对文件的反复操作、编写转换程序等。</p>
+<pre><code>sed [-hnV][-e&lt;script&gt;][-f&lt;script文件&gt;][文本文件]</code></pre><ul>
+<li><code>-e&lt;script&gt;</code>或<code>--expression=&lt;script&gt;</code> 以选项中指定的<code>script</code>来处理输入的文本文件。</li>
+<li><code>-f&lt;script文件&gt;</code>或<code>--file=&lt;script文件&gt;</code> 以选项中指定的<code>script</code>文件来处理输入的文本文件。</li>
+<li><code>-h</code>或<code>--help</code> 显示帮助。</li>
+<li><code>-n</code>或<code>--quiet</code>或<code>--silent</code> 仅显示<code>script</code>处理后的结果。</li>
+<li><code>-V</code>或<code>--version</code> 显示版本信息。</li>
+</ul>
+<p>动作说明：</p>
+<ul>
+<li><code>a</code> ：新增， <code>a</code> 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～</li>
+<li><code>c</code> ：取代， <code>c</code> 的后面可以接字串，这些字串可以取代 <code>n1</code>,<code>n2</code> 之间的行！</li>
+<li><code>d</code> ：删除，因为是删除啊，所以 <code>d</code> 后面通常不接任何咚咚；</li>
+<li><code>i</code> ：插入， <code>i</code> 的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)；</li>
+<li><code>p</code> ：打印，亦即将某个选择的数据印出。通常 <code>p</code> 会与参数 <code>sed -n</code> 一起运行～</li>
+<li><code>s</code> ：取代，可以直接进行取代的工作哩！通常这个 <code>s</code> 的动作可以搭配正规表示法！例如 <code>1,20s/old/new/g</code> 就是啦！</li>
+</ul>
+<h2 id="实例-1"><a href="#实例-1" class="headerlink" title="实例"></a>实例</h2><p>在<code>testfile</code>文件的第四行后添加一行，并将结果输出到标准输出，在命令行提示符下输入如下命令：</p>
+<pre><code>sed -e 4a\newLine testfile</code></pre><p><code>sed -e</code> 没有 <code>-e</code> 也行啦！同时也要注意的是，<code>sed</code> 后面接的动作，请务必以 <code>&#39;&#39;</code> 两个单引号括住喔！</p>
+<pre><code>sed &apos;4a newLine&apos; testfile # 效果和上面相同</code></pre><h3 id="以行为单位的新增-删除"><a href="#以行为单位的新增-删除" class="headerlink" title="以行为单位的新增/删除"></a>以行为单位的新增/删除</h3><p>将 <code>/etc/passwd</code> 的内容列出并且列印行号，同时，请将第 <code>2~5</code> 行删除！</p>
+<pre><code>nl /etc/passwd | sed &apos;2,5d&apos;</code></pre><p>只要删除第 <code>2</code> 行</p>
+<pre><code>nl /etc/passwd | sed &apos;2d&apos; </code></pre><p>要删除第 <code>3</code> 到最后一行</p>
+<pre><code>nl /etc/passwd | sed &apos;3,$d&apos; </code></pre><p>在第二行前写东西</p>
+<pre><code>nl /etc/passwd | sed &apos;2i drink tea&apos; </code></pre><p>增加多行</p>
+<pre><code>nl /etc/passwd | sed &apos;2a Drink tea or ......\
+&gt; drink beer ?&apos;</code></pre><p>命令行中有 <code>\</code> 的时候，指可以继续向下写，每一行之间都必须要以反斜杠『 <code>\</code> 』来进行新行的添加喔！</p>
+<p>具体到某一段添加</p>
+<pre><code>nl test | sed &apos;/i21/a\55&apos;</code></pre><p>在行为 <code>i21</code> 后面添加 <code>55</code></p>
+<h3 id="以行为单位的替换与显示"><a href="#以行为单位的替换与显示" class="headerlink" title="以行为单位的替换与显示"></a>以行为单位的替换与显示</h3><p>将第<code>2-5</code>行的内容取代成为<code>No 2-5 number</code>呢？</p>
+<pre><code>nl /etc/passwd | sed &apos;2,5c No 2-5 number&apos;</code></pre><p>透过这个方法我们就能够将数据整行取代了！</p>
+<p>仅列出 <code>/etc/passwd</code> 文件内的第 <code>5-7</code> 行</p>
+<pre><code>nl /etc/passwd | sed -n &apos;5,7p&apos;</code></pre><h3 id="数据的搜寻并显示"><a href="#数据的搜寻并显示" class="headerlink" title="数据的搜寻并显示"></a>数据的搜寻并显示</h3><p>搜索 <code>/etc/passwd</code>有<code>root</code>关键字的行</p>
+<pre><code>nl /etc/passwd | sed &apos;/root/p&apos;</code></pre><p>如果<code>root</code>找到，除了输出所有行，还会输出匹配行。</p>
+<p>使用<code>-n</code>的时候将只打印包含模板的行。</p>
+<p>比如，一个文件 <code>test</code> 内容如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">i21</span><br><span class="line">213</span><br><span class="line">qwe</span><br><span class="line">231</span><br><span class="line">da</span><br></pre></td></tr></table></figure>
+
+<p>执行</p>
+<pre><code>nl test | sed &apos;/21/p&apos;</code></pre><p>输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1	i21</span><br><span class="line">1	i21</span><br><span class="line">2	213</span><br><span class="line">2	213</span><br><span class="line">3	qwe</span><br><span class="line">4	231</span><br><span class="line">5	da</span><br></pre></td></tr></table></figure>
+
+<p>执行 </p>
+<pre><code>nl test | sed -n &apos;/21/p&apos;</code></pre><p>输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1	i21</span><br><span class="line">2	213</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据的搜寻并删除"><a href="#数据的搜寻并删除" class="headerlink" title="数据的搜寻并删除"></a>数据的搜寻并删除</h3><p>删除<code>/etc/passwd</code>所有包含<code>root</code>的行，其他行输出</p>
+<pre><code>nl /etc/passwd | sed  &apos;/root/d&apos;</code></pre><h3 id="数据的搜寻并执行命令"><a href="#数据的搜寻并执行命令" class="headerlink" title="数据的搜寻并执行命令"></a>数据的搜寻并执行命令</h3><p>搜索<code>/etc/passwd</code>,找到<code>root</code>对应的行，执行后面花括号中的一组命令，每个命令之间用分号分隔，这里把<code>bash</code>替换为<code>blueshell</code>，再输出这行：</p>
+<pre><code>nl /etc/passwd | sed -n &apos;/root/{s/bash/blueshell/;p;q}&apos;   </code></pre><p>最后的<code>q</code>是退出。</p>
+<p>这个命令我没执行成功。</p>
+<h3 id="数据的搜寻并替换"><a href="#数据的搜寻并替换" class="headerlink" title="数据的搜寻并替换"></a>数据的搜寻并替换</h3><p>除了整行的处理模式之外， <code>sed</code> 还可以用行为单位进行部分数据的搜寻并取代。基本上 <code>sed</code> 的搜寻与替代的与 <code>vi</code> 相当的类似！他有点像这样：</p>
+<pre><code>sed &apos;s/要被取代的字串/新的字串/g&apos;</code></pre><p>先观察原始信息，利用 <code>/sbin/ifconfig</code> 查询 <code>IP</code></p>
+<p>命令</p>
+<pre><code>ifconfig eno1</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">eno1      Link encap:Ethernet  HWaddr ac:1f:6b:26:4d:fc  </span><br><span class="line">          inet addr:219.244.171.32  Bcast:219.244.171.127  Mask:255.255.255.128</span><br><span class="line">          inet6 addr: fe80::3fb4:8d96:de56:9324&#x2F;64 Scope:Link</span><br><span class="line">          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1</span><br><span class="line">          RX packets:291344722 errors:0 dropped:0 overruns:147 frame:0</span><br><span class="line">          TX packets:217593618 errors:0 dropped:0 overruns:0 carrier:0</span><br><span class="line">          collisions:0 txqueuelen:1000 </span><br><span class="line">          RX bytes:356581381856 (356.5 GB)  TX bytes:168166493142 (168.1 GB)</span><br><span class="line">          Memory:fb120000-fb13ffff</span><br></pre></td></tr></table></figure>
+
+<p>命令</p>
+<pre><code>/sbin/ifconfig eno1 | grep &apos;inet addr&apos;</code></pre><p>输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inet addr:219.244.171.32  Bcast:219.244.171.127  Mask:255.255.255.128</span><br></pre></td></tr></table></figure>
+
+<p>命令</p>
+<pre><code>/sbin/ifconfig eno1 | grep &apos;inet addr&apos;|sed &apos;s/^.*addr://g&apos;</code></pre><p>输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">219.244.171.32  Bcast:219.244.171.127  Mask:255.255.255.128</span><br></pre></td></tr></table></figure>
+
+<p>命令</p>
+<pre><code>/sbin/ifconfig eno1 | grep &apos;inet addr&apos;|sed &apos;s/^.*addr://g&apos; | sed &apos;s/Bca.*$//g&apos;</code></pre><p>输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">219.244.171.32</span><br></pre></td></tr></table></figure>
+
+<h3 id="多点编辑"><a href="#多点编辑" class="headerlink" title="多点编辑"></a>多点编辑</h3><p>一条<code>sed</code>命令，删除<code>/etc/passwd</code>第三行到末尾的数据，并把<code>bash</code>替换为<code>blueshell</code></p>
+<pre><code>nl /etc/passwd | sed -e &apos;3,$d&apos; -e &apos;s/bash/blueshell/&apos;</code></pre><h3 id="直接修改文件内容"><a href="#直接修改文件内容" class="headerlink" title="直接修改文件内容"></a>直接修改文件内容</h3><p>利用 <code>sed</code> 将 <code>regular_express.txt</code> 内每一行结尾若为 <code>.</code> 则换成 <code>!</code></p>
+<pre><code>sed -i &apos;s/\.$/\!/g&apos; regular_express.txt</code></pre><p>利用 <code>sed</code> 直接在 <code>regular_express.txt</code> 最后一行加入 <code># This is a test</code>:</p>
+<pre><code>sed -i &apos;$a # This is a test&apos; regular_express.txt</code></pre><p>由於 <code>$</code> 代表的是最后一行，而 <code>a</code> 的动作是新增，因此该文件最后新增 <code># This is a test！</code></p>
+<p><code>sed</code> 的 <code>-i</code> 选项可以直接修改文件内容，这功能非常有帮助！举例来说，如果你有一个 100 万行的文件，你要在第 100 行加某些文字，此时使用 <code>vim</code> 可能会疯掉！因为文件太大了！那怎办？就利用 <code>sed</code> 啊！透过 <code>sed</code> 直接修改/取代的功能，你甚至不需要使用 <code>vim</code> 去修订！</p>
+<br/>
+
+<h1 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h1><br/>
+
+<p><code>grep（global search regular expression(RE) and print out the line</code>，全面搜索正则表达式并把行打印出来）是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-a</td>
+<td>不要忽略二进制数据。</td>
+</tr>
+<tr>
+<td>-A</td>
+<td>&lt;显示列数&gt; 除了显示符合范本样式的那一行之外，并显示该行之后的内容。</td>
+</tr>
+<tr>
+<td>-b</td>
+<td>在显示符合范本样式的那一行之外，并显示该行之前的内容。</td>
+</tr>
+<tr>
+<td>-c</td>
+<td>计算符合范本样式的列数。</td>
+</tr>
+<tr>
+<td>-C</td>
+<td>&lt;显示列数&gt;或-&lt;显示列数&gt;  除了显示符合范本样式的那一列之外，并显示该列之前后的内容。</td>
+</tr>
+<tr>
+<td>-d</td>
+<td>&lt;进行动作&gt; 当指定要查找的是目录而非文件时，必须使用这项参数，否则grep命令将回报信息并停止动作。</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>&lt;范本样式&gt; 指定字符串作为查找文件内容的范本样式。</td>
+</tr>
+<tr>
+<td>-E</td>
+<td>将范本样式为延伸的普通表示法来使用，意味着使用能使用扩展正则表达式。</td>
+</tr>
+<tr>
+<td>-f</td>
+<td>&lt;范本文件&gt; 指定范本文件，其内容有一个或多个范本样式，让grep查找符合范本条件的文件内容，格式为每一列的范本样式。</td>
+</tr>
+<tr>
+<td>-F</td>
+<td>将范本样式视为固定字符串的列表。</td>
+</tr>
+<tr>
+<td>-G</td>
+<td>将范本样式视为普通的表示法来使用。</td>
+</tr>
+<tr>
+<td>-h</td>
+<td>在显示符合范本样式的那一列之前，不标示该列所属的文件名称。</td>
+</tr>
+<tr>
+<td>-H</td>
+<td>在显示符合范本样式的那一列之前，标示该列的文件名称。</td>
+</tr>
+<tr>
+<td>-i</td>
+<td>忽略字符大小写的差别。</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>列出文件内容符合指定的范本样式的文件名称。</td>
+</tr>
+<tr>
+<td>-L</td>
+<td>列出文件内容不符合指定的范本样式的文件名称。</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>在显示符合范本样式的那一列之前，标示出该列的编号。</td>
+</tr>
+<tr>
+<td>-q</td>
+<td>不显示任何信息。</td>
+</tr>
+<tr>
+<td>-R/-r</td>
+<td>此参数的效果和指定“-d recurse”参数相同。</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>不显示错误信息。</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>反转查找。</td>
+</tr>
+<tr>
+<td>-w</td>
+<td>只显示全字符合的列。</td>
+</tr>
+<tr>
+<td>-x</td>
+<td>只显示全列符合的列。</td>
+</tr>
+<tr>
+<td>-y</td>
+<td>此参数效果跟“-i”相同。</td>
+</tr>
+<tr>
+<td>-o</td>
+<td>只输出文件中匹配到的部分。</td>
+</tr>
+</tbody></table>
+<p>在文件中搜索一个单词，命令会返回一个包含“<code>match_pattern</code>”的文本行：</p>
+<pre><code>grep match_pattern file_name
+grep &quot;match_pattern&quot; file_name</code></pre><p>在多个文件中查找：</p>
+<pre><code>grep &quot;match_pattern&quot; file_1 file_2 file_3 ...</code></pre><p>输出除之外的所有行 <code>-v</code> 选项：</p>
+<pre><code>grep -v &quot;match_pattern&quot; file_name</code></pre><p>标记匹配颜色 <code>--color=auto</code> 选项：</p>
+<pre><code>grep &quot;match_pattern&quot; file_name --color=auto</code></pre><p>使用正则表达式 <code>-E</code> 选项：</p>
+<pre><code>grep -E &quot;[1-9]+&quot;
+或
+egrep &quot;[1-9]+&quot;</code></pre><p>只输出文件中匹配到的部分 <code>-o</code> 选项：</p>
+<pre><code>echo this is a test line. | grep -o -E &quot;[a-z]+\.&quot;
+line.
+
+echo this is a test line. | egrep -o &quot;[a-z]+\.&quot;
+line.</code></pre><p>统计文件或者文本中包含匹配字符串的行数 <code>-c</code> 选项：</p>
+<pre><code>grep -c &quot;text&quot; file_name</code></pre><p>输出包含匹配字符串的行数 <code>-n</code> 选项：</p>
+<pre><code>grep &quot;text&quot; -n file_name    
+或
+cat file_name | grep &quot;text&quot; -n
+#多个文件
+grep &quot;text&quot; -n file_1 file_2</code></pre><p>打印样式匹配所位于的字符或字节偏移：</p>
+<pre><code>echo gun is not unix | grep -b -o &quot;not&quot;
+7:not</code></pre><p>一行中字符串的字符便宜是从该行的第一个字符开始计算，起始值为    <code>0</code>。选项 <code>-b</code> <code>-o</code> 一般总是配合使用。</p>
+<p>搜索多个文件并查找匹配文本在哪些文件中：</p>
+<pre><code>grep -l &quot;text&quot; file1 file2 file3...</code></pre><h2 id="grep递归搜索文件"><a href="#grep递归搜索文件" class="headerlink" title="grep递归搜索文件"></a>grep递归搜索文件</h2><p>在多级目录中对文本进行递归搜索：</p>
+<pre><code>grep &quot;text&quot; . -r -n
+# .表示当前目录。</code></pre><p>忽略匹配样式中的字符大小写：</p>
+<pre><code>echo &quot;hello world&quot; | grep -i &quot;HELLO&quot;
+hello</code></pre><p>选项 <code>-e</code> 制动多个匹配样式：</p>
+<pre><code>echo this is a text line | grep -e &quot;is&quot; -e &quot;line&quot; -o
+is
+line
+
+#也可以使用-f选项来匹配多个样式，在样式文件中逐行写出需要匹配的字符。
+cat patfile
+aaa
+bbb
+
+echo aaa bbb ccc ddd eee | grep -f patfile -o</code></pre><p>在<code>grep</code>搜索结果中包括或者排除指定文件：</p>
+<pre><code>#只在目录中所有的.php和.html文件中递归搜索字符&quot;main()&quot;
+grep &quot;main()&quot; . -r --include *.{php,html}
+
+#在搜索结果中排除所有README文件
+grep &quot;main()&quot; . -r --exclude &quot;README&quot;
+
+#在搜索结果中排除filelist文件列表里的文件
+grep &quot;main()&quot; . -r --exclude-from filelist</code></pre><p>使用<code>0</code>值字节后缀的<code>grep</code>与<code>xargs</code>：</p>
+<pre><code>#测试文件：
+echo &quot;aaa&quot; &gt; file1
+echo &quot;bbb&quot; &gt; file2
+echo &quot;aaa&quot; &gt; file3
+
+grep &quot;aaa&quot; file* -lZ | xargs -0 rm
+
+#执行后会删除file1和file3，grep输出用-Z选项来指定以0值字节作为终结符文件名（\0），xargs -0 读取输入并用0值字节终结符分隔文件名，然后删除匹配文件，-Z通常和-l结合使用。</code></pre><p><code>grep</code>静默输出：</p>
+<pre><code>grep -q &quot;test&quot; filename
+
+#不会输出任何信息，如果命令运行成功返回0，失败则返回非0值。一般用于条件测试。</code></pre><p>打印出匹配文本之前或者之后的行：</p>
+<pre><code>#显示匹配某个结果之后的3行，使用 -A 选项：
+seq 10 | grep &quot;5&quot; -A 3
+5
+6
+7
+8
+
+#显示匹配某个结果之前的3行，使用 -B 选项：
+seq 10 | grep &quot;5&quot; -B 3
+2
+3
+4
+5
+
+#显示匹配某个结果的前三行和后三行，使用 -C 选项：
+seq 10 | grep &quot;5&quot; -C 3
+2
+3
+4
+5
+6
+7
+8
+
+#如果匹配结果有多个，会用“--”作为各匹配结果之间的分隔符：
+echo -e &quot;a\nb\nc\na\nb\nc&quot; | grep a -A 1
+a
+b
+--
+a
+b</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/16/designthinkings6/" rel="prev" title="设计模式 | 策略模式">
+      <i class="fa fa-chevron-left"></i> 设计模式 | 策略模式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/19/linux18/" rel="next" title="linux | 进程相关">
+      linux | 进程相关 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#wc"><span class="nav-number">1.</span> <span class="nav-text">wc</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实例"><span class="nav-number">1.1.</span> <span class="nav-text">实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#统计进程行数"><span class="nav-number">1.1.1.</span> <span class="nav-text">统计进程行数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sed"><span class="nav-number">2.</span> <span class="nav-text">sed</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实例-1"><span class="nav-number">2.1.</span> <span class="nav-text">实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#以行为单位的新增-删除"><span class="nav-number">2.1.1.</span> <span class="nav-text">以行为单位的新增&#x2F;删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以行为单位的替换与显示"><span class="nav-number">2.1.2.</span> <span class="nav-text">以行为单位的替换与显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据的搜寻并显示"><span class="nav-number">2.1.3.</span> <span class="nav-text">数据的搜寻并显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据的搜寻并删除"><span class="nav-number">2.1.4.</span> <span class="nav-text">数据的搜寻并删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据的搜寻并执行命令"><span class="nav-number">2.1.5.</span> <span class="nav-text">数据的搜寻并执行命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据的搜寻并替换"><span class="nav-number">2.1.6.</span> <span class="nav-text">数据的搜寻并替换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多点编辑"><span class="nav-number">2.1.7.</span> <span class="nav-text">多点编辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#直接修改文件内容"><span class="nav-number">2.1.8.</span> <span class="nav-text">直接修改文件内容</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#grep"><span class="nav-number">3.</span> <span class="nav-text">grep</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#grep递归搜索文件"><span class="nav-number">3.1.</span> <span class="nav-text">grep递归搜索文件</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

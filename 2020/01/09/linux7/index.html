@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="linux 如何安装软件，每次安装软件执行的命令是怎么回事？这篇博文告诉你答案。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux | 软件相关的命令">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/01/09/linux7/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="linux 如何安装软件，每次安装软件执行的命令是怎么回事？这篇博文告诉你答案。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/linux/7_0.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/linux/7_1.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/linux/7_2.jpg">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/linux/7_3.png">
+<meta property="article:published_time" content="2020-01-09T10:09:01.000Z">
+<meta property="article:modified_time" content="2020-10-22T05:49:30.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="apt-get">
+<meta property="article:tag" content="dpkg">
+<meta property="article:tag" content="apt">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/linux/7_0.jpg">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/01/09/linux7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>linux | 软件相关的命令 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/01/09/linux7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux | 软件相关的命令
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-09 18:09:01" itemprop="dateCreated datePublished" datetime="2020-01-09T18:09:01+08:00">2020-01-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-22 13:49:30" itemprop="dateModified" datetime="2020-10-22T13:49:30+08:00">2020-10-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">基础</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/01/09/linux7/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/01/09/linux7/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>linux 如何安装软件，每次安装软件执行的命令是怎么回事？这篇博文告诉你答案。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="什么是-apt-get"><a href="#什么是-apt-get" class="headerlink" title="什么是 apt-get?"></a>什么是 apt-get?</h1><br/>
+
+<p>Ubuntu源自Debian Linux。Debian使用dpkg打包系统。包装系统是一种为安装提供程序和应用程序的方法。这样，您就不必从源代码构建程序。</p>
+<p>APT（高级软件包工具）是与此打包系统交互的命令行工具。已经有dpkg命令来管理它。但apt更适合处理包装。您可以使用它来查找和安装新软件包，升级软件包，清理软件包等。</p>
+<p>它有两个主要工具：apt-get和apt-cache。apt-get用于安装，升级和清理包，而apt-cache用于查找新包。我们将在本指南后面的示例中看到所有这些命令。</p>
+<br/>
+
+<h1 id="dpkg和apt-get区别"><a href="#dpkg和apt-get区别" class="headerlink" title="dpkg和apt-get区别"></a>dpkg和apt-get区别</h1><br/>
+
+<p>一般来说著名的 Linux 系统基本上分两大类：</p>
+<pre><code>RedHat 系列：Redhat、Centos、Fedora 等
+Debian 系列：Debian、Ubuntu 等</code></pre><p>Dpkg (Debian系)：Ubuntu</p>
+<p>RPM (Red Hat系)：CentOS、Fedora</p>
+<h2 id="RedHat-系列"><a href="#RedHat-系列" class="headerlink" title="RedHat 系列"></a>RedHat 系列</h2><pre><code>常见的安装包格式 rpm 包，安装rpm包的命令是“rpm -参数”
+包管理工具 yum
+支持 tar 包</code></pre><h2 id="Debian系列"><a href="#Debian系列" class="headerlink" title="Debian系列"></a>Debian系列</h2><pre><code>常见的安装包格式 deb 包，安装 deb 包的命令是“dpkg -参数”
+包管理工具 apt-get
+支持 tar 包</code></pre><p>两者的区别：dpkg绕过apt-get包管理数据库直接对软件包进行操作</p>
+<p>所以用dpkg安装过的软件包可以用apt-get可以再安装一遍，系统不知道之前已经安装过了，将会覆盖之前dpkg的安装。</p>
+<p>dpkg和apt-get：</p>
+<p>dpkg:用来安装.deb文件时，不会解决模块的依赖关系，且不会关心ubuntu的软件仓库内的软件，可以用于安装本地的deb文件。</p>
+<p>apt-get:会解决和安装模块的依赖问题，并会咨询软件仓库，但不会安装本地的deb文件，apt-get是建立在dpkg之上的软件管理工具。</p>
+<br/>
+
+<h1 id="apt-和-apt-get-的区别"><a href="#apt-和-apt-get-的区别" class="headerlink" title="apt 和 apt-get 的区别"></a>apt 和 apt-get 的区别</h1><br/>
+
+<p>Ubuntu 16.04 发布时，一个引人注目的新特性便是 apt 命令的引入。其实早在 2014 年，apt 命令就已经发布了第一个稳定版，只是直到 2016 年的 Ubuntu 16.04 系统发布时才开始引人关注。</p>
+<p>随着 apt install package 命令的使用频率和普遍性逐步超过 apt-get install package，越来越多的其它 Linux 发行版也开始遵循 Ubuntu 的脚步，开始鼓励用户使用 apt 而不是 apt-get。</p>
+<p>那么，apt-get 与 apt 命令之间到底有什么区别呢？如果它们有类似的命令结构，为什么还需要新的 apt 命令呢？是否 apt 真的比 apt-get 更好？普通用户应该使用新的 apt 命令还是坚持旧有习惯继续使用 apt-get 呢？</p>
+<h2 id="apt与apt-get"><a href="#apt与apt-get" class="headerlink" title="apt与apt-get"></a>apt与apt-get</h2><p>在开始对比 apt 与 apt-get 命令的区别之前，我们先来看看这两个命令的背景，以及它们要试图达到的目的。</p>
+<p>Debian 作为 Ubuntu、Linux Mint 和 elementary OS 等 Linux 操作系统的母板，其具有强健的「包管理」系统，它的每个组件和应用程序都内置在系统中安装的软件包中。Debian 使用一套名为 Advanced Packaging Tool（APT）的工具来管理这种包系统，不过请不要把它与 apt 命令混淆，它们之间是其实不是同一个东西。</p>
+<p>在基于 Debian 的 Linux 发行版中，有各种工具可以与 APT 进行交互，以方便用户安装、删除和管理的软件包。apt-get 便是其中一款广受欢迎的命令行工具，另外一款较为流行的是 Aptitude 这一命令行与 GUI 兼顾的小工具。</p>
+<p>如果你已阅读过我们的 apt-get 命令指南，可能已经遇到过许多类似的命令，如apt-cache、apt-config 等。如你所见，这些命令都比较低级又包含众多功能，普通的 Linux 用户也许永远都不会使用到。换种说法来说，就是最常用的 Linux 包管理命令都被分散在了 apt-get、apt-cache 和 apt-config 这三条命令当中。</p>
+<p>apt 命令的引入就是为了解决命令过于分散的问题，它包括了 apt-get 命令出现以来使用最广泛的功能选项，以及 apt-cache 和 apt-config 命令中很少用到的功能。</p>
+<p>在使用 apt 命令时，用户不必再由 apt-get 转到 apt-cache 或 apt-config，而且 apt 更加结构化，并为用户提供了管理软件包所需的必要选项。</p>
+<blockquote>
+<p>简单来说就是：apt = apt-get、apt-cache 和 apt-config 中最常用命令选项的集合。</p>
+</blockquote>
+<h2 id="apt与apt-get之间的区别"><a href="#apt与apt-get之间的区别" class="headerlink" title="apt与apt-get之间的区别"></a>apt与apt-get之间的区别</h2><p>通过 apt 命令，用户可以在同一地方集中得到所有必要的工具，apt 的主要目的是提供一种以「让终端用户满意」的方式来处理 Linux 软件包的有效方式。</p>
+<p>apt 具有更精减但足够的命令选项，而且参数选项的组织方式更为有效。除此之外，它默认启用的几个特性对最终用户也非常有帮助。例如，可以在使用 apt 命令安装或删除程序时看到进度条。</p>
+<p>apt 还会在更新存储库数据库时提示用户可升级的软件包个数。</p>
+<p>如果你使用 apt 的其它命令选项，也可以实现与使用 apt-get 时相同的操作。</p>
+<h2 id="apt和apt-get命令之间的区别"><a href="#apt和apt-get命令之间的区别" class="headerlink" title="apt和apt-get命令之间的区别"></a>apt和apt-get命令之间的区别</h2><p>虽然 apt 与 apt-get 有一些类似的命令选项，但它并不能完全向下兼容 apt-get 命令。也就是说，可以用 apt 替换部分 apt-get 系列命令，但不是全部。</p>
+<table>
+<thead>
+<tr>
+<th>apt 命令</th>
+<th>取代的命令</th>
+<th>命令的功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>apt install</td>
+<td>apt-get install</td>
+<td>安装软件包</td>
+</tr>
+<tr>
+<td>apt remove</td>
+<td>apt-get remove</td>
+<td>移除软件包</td>
+</tr>
+<tr>
+<td>apt purge</td>
+<td>apt-get purge</td>
+<td>移除软件包及配置文件</td>
+</tr>
+<tr>
+<td>apt update</td>
+<td>apt-get update</td>
+<td>刷新存储库索引</td>
+</tr>
+<tr>
+<td>apt upgrade</td>
+<td>apt-get upgrade</td>
+<td>升级所有可升级的软件包</td>
+</tr>
+<tr>
+<td>apt autoremove</td>
+<td>apt-get autoremove</td>
+<td>自动删除不需要的包</td>
+</tr>
+<tr>
+<td>apt full-upgrade</td>
+<td>apt-get dist-upgrade</td>
+<td>在升级软件包时自动处理依赖关系</td>
+</tr>
+<tr>
+<td>apt search</td>
+<td>apt-cache search</td>
+<td>搜索应用程序</td>
+</tr>
+<tr>
+<td>apt show</td>
+<td>apt-cache show</td>
+<td>显示装细节</td>
+</tr>
+</tbody></table>
+<p>当然，apt 还有一些自己的命令：</p>
+<table>
+<thead>
+<tr>
+<th>新的apt命令</th>
+<th>命令的功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>apt list</td>
+<td>列出包含条件的包（已安装，可升级等）</td>
+</tr>
+<tr>
+<td>apt edit-sources</td>
+<td>编辑源列表</td>
+</tr>
+</tbody></table>
+<p>需要大家注意的是：apt 命令也还在不断发展， 因此，你可能会在将来的版本中看到新的选项。</p>
+<h2 id="apt-get已弃用？"><a href="#apt-get已弃用？" class="headerlink" title="apt-get已弃用？"></a>apt-get已弃用？</h2><p>目前还没有任何 Linux 发行版官方放出 apt-get 将被停用的消息，至少它还有比 apt 更多、更细化的操作功能。对于低级操作，仍然需要 apt-get。</p>
+<h2 id="我应该使用apt还是apt-get？"><a href="#我应该使用apt还是apt-get？" class="headerlink" title="我应该使用apt还是apt-get？"></a>我应该使用apt还是apt-get？</h2><p>既然两个命令都有用，那么我该使用 apt 还是 apt-get 呢？作为一个常规 Linux 用户，系统极客建议大家尽快适应并开始首先使用 apt。不仅因为广大 Linux 发行商都在推荐 apt，更主要的还是它提供了 Linux 包管理的必要选项。</p>
+<p>最重要的是，apt 命令选项更少更易记，因此也更易用，所以没理由继续坚持 apt-get。</p>
+<br/>
+
+<h1 id="dpkg-的用法"><a href="#dpkg-的用法" class="headerlink" title="dpkg 的用法"></a>dpkg 的用法</h1><br/>
+
+<h2 id="安装软件包"><a href="#安装软件包" class="headerlink" title="安装软件包"></a>安装软件包</h2><table>
+<thead>
+<tr>
+<th>dpkg命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dpkg -i package_name.deb</td>
+<td>安装本地软件包，不解决依赖关系</td>
+</tr>
+<tr>
+<td>apt-get install package</td>
+<td>在线安装软件包</td>
+</tr>
+<tr>
+<td>aptitude install pattern</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>apt-get install package –reinstall</td>
+<td>重新安装软件包</td>
+</tr>
+<tr>
+<td>apitude reinstall package</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>dpkg -R /usr/local/src</td>
+<td>安装一个目录下面所有的软件包</td>
+</tr>
+</tbody></table>
+<h2 id="移除软件包"><a href="#移除软件包" class="headerlink" title="移除软件包"></a>移除软件包</h2><table>
+<thead>
+<tr>
+<th>dpkg命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dpkg -r package</td>
+<td>删除软件包</td>
+</tr>
+<tr>
+<td>dpkg -P</td>
+<td>删除软件包及配置文件</td>
+</tr>
+<tr>
+<td>apt-get autoremove</td>
+<td>自动移除不再需要的软件包</td>
+</tr>
+</tbody></table>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><table>
+<thead>
+<tr>
+<th>dpkg命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dpkg –help</td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td>dpkg –version</td>
+<td>显示dpkg的版本号</td>
+</tr>
+<tr>
+<td>dpkg -l package-name-pattern</td>
+<td>搜索Deb包(例子：dpkg -I vim)</td>
+</tr>
+<tr>
+<td>dpkg -L package-Name</td>
+<td>显示一个包安装到系统里面的文件目录信息</td>
+</tr>
+</tbody></table>
+<p>例子</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dpkg -l | grep ftp</span><br><span class="line">dpkg -L | grep ftp</span><br></pre></td></tr></table></figure>
+
+<p>很多人抱怨用了Ubuntu或者Debian以后，不知道自己的软件给安装到什么地方了。其实可以用上面的dpkg -L命令来方便的查找。看来基础还是非常重要的，图形界面并不能够包办一切。</p>
+<br/>
+
+<h1 id="apt-get的使用方法"><a href="#apt-get的使用方法" class="headerlink" title="apt-get的使用方法"></a>apt-get的使用方法</h1><br/>
+
+<h2 id="使用apt-get更新包数据库"><a href="#使用apt-get更新包数据库" class="headerlink" title="使用apt-get更新包数据库"></a>使用apt-get更新包数据库</h2><p>apt-get基本上适用于可用包的数据库。如果不更新此数据库，系统将不知道是否有更新的软件包可用。实际上，这是在全新安装后需要在任何Linux系统中运行的第一个命令。</p>
+<p>更新包数据库需要超级用户权限，因此您需要使用sudo。</p>
+<pre><code>sudo apt-get update</code></pre><p>运行此命令时，您将看到从各种服务器检索的信息。</p>
+<p><img src="/images/linux/7_0.jpg" alt=""></p>
+<p>你会在这里看到三种类型的线，hit，get和ign。让我向你解释一下：</p>
+<p>hit:包版本没有变化</p>
+<p>ign：包被忽略了。可能有各种原因。这个包太新了以至于它甚至都懒得检查，或者检索文件时出错，但错误是微不足道的，因此它被忽略了。这不是错误。没有必要担心。</p>
+<p>get:有一个新版本可用。它将下载信息（而不是包本身）。您可以在上面的屏幕截图中看到有“get”行的下载信息。</p>
+<h2 id="使用apt-get升级已安装的软件包"><a href="#使用apt-get升级已安装的软件包" class="headerlink" title="使用apt-get升级已安装的软件包"></a>使用apt-get升级已安装的软件包</h2><p>更新软件包数据库后，可以升级已安装的软件包。最方便的方法是升级所有可用更新的软件包。您可以使用以下命令来实现此目的：</p>
+<pre><code>sudo apt-get upgrade</code></pre><p>要仅升级特定程序，请使用以下命令：</p>
+<pre><code>sudo apt-get upgrade &lt;package_name&gt;</code></pre><p>还有另一种方法可以使用以下命令提供完整的升级：</p>
+<pre><code>sudo apt-get dist-upgrade</code></pre><p>这实际上是查找新版本的依赖项并尝试安装它。但你应该避免使用它。我将在下一节中解释它。</p>
+<h2 id="升级和dist-upgrade之间的区别"><a href="#升级和dist-upgrade之间的区别" class="headerlink" title="升级和dist-upgrade之间的区别"></a>升级和dist-upgrade之间的区别</h2><p>命令apt-get upgrade非常听话。它永远不会尝试删除任何包或尝试自己安装新包。</p>
+<p>另一方面，命令apt-get dist-upgrade是主动的。它会查找正在安装的较新版本软件包的依赖项，并尝试安装新软件包或自行删除现有软件包。</p>
+<p>听起来像dist-upgrade更强大，更聪明，不是吗？但它存在风险。</p>
+<p>看，它有一个“智能”冲突解决系统。有了它，它将尝试升级最重要的包，而不是那些不太重要的包。这可能会导致您删除一些您可能不想要的包。这是在生产机器上应该避免dist-upgrade的主要原因。</p>
+<h2 id="apt-get-update和apt-get升级有什么区别？"><a href="#apt-get-update和apt-get升级有什么区别？" class="headerlink" title="apt-get update和apt-get升级有什么区别？"></a>apt-get update和apt-get升级有什么区别？</h2><p>这是一个非常普遍的混乱。您不是唯一一个被术语更新和升级混淆的人。</p>
+<p>虽然听起来像是在进行apt-get更新时，但它会更新软件包。但事实并非如此。apt-get update仅更新包的数据库。例如，如果安装了XYX软件包版本1.3，则在apt-get update之后，数据库将知道有更新的版本1.4可用。</p>
+<p>当您在apt-get update之后进行apt-get升级时，它会将已安装的软件包升级（或更新，无论您喜欢哪个术语）到新版本。</p>
+<p>这就是为什么更新Ubuntu的最快和最方便的方法是使用此命令：</p>
+<pre><code>sudo apt-get update &amp;&amp; sudo apt-get upgrade -y</code></pre><h2 id="使用apt-cache命令搜索包"><a href="#使用apt-cache命令搜索包" class="headerlink" title="使用apt-cache命令搜索包"></a>使用apt-cache命令搜索包</h2><p>我会跟你说实话。这不是我搜索包的首选方式。但是当你在寻找一些特定的lib时，这非常方便。</p>
+<p>您需要做的就是使用以下命令。你甚至不需要sudo。</p>
+<pre><code>apt-cache search &lt;search term&gt;</code></pre><p><img src="/images/linux/7_1.jpg" alt=""></p>
+<p>您无需知道包的确切名称。它会搜索包名称及其简短描述，并根据该结果显示结果。</p>
+<p>如果您只想搜索具有特定包名称的包，可以使用以下命令：</p>
+<pre><code>apt-cache pkgnames &lt;search_term&gt;</code></pre><p>这将为您提供以搜索词开头的所有包的列表。</p>
+<p><img src="/images/linux/7_2.jpg" alt=""></p>
+<p>一旦知道确切的包名，就可以使用以下命令获取有关它的更多信息，例如版本，依赖关系等：</p>
+<pre><code>apt-cache showpkg &lt;package_name&gt;</code></pre><h2 id="如何使用apt-get安装新软件包"><a href="#如何使用apt-get安装新软件包" class="headerlink" title="如何使用apt-get安装新软件包"></a>如何使用apt-get安装新软件包</h2><p>如果您知道包的名称，可以使用以下命令轻松安装它：</p>
+<pre><code>sudo apt-get install &lt;package_name&gt;</code></pre><p>只需将<package_name>替换为所需的包。假设我想安装Pinta图像编辑器，我需要做的就是使用以下命令：</p>
+<pre><code>sudo apt-get install pinta</code></pre><p>这个命令的好处是它有自动完成功能。因此，如果您不确定确切的包名称，可以键入几个字母并按Tab键，它会建议所有包含这些字母的包。例如：</p>
+<p><img src="/images/linux/7_3.png" alt=""></p>
+<h2 id="如何安装多个包"><a href="#如何安装多个包" class="headerlink" title="如何安装多个包"></a>如何安装多个包</h2><pre><code>sudo apt-get install &lt;package_1&gt; &lt;package_2&gt; &lt;package_3&gt;</code></pre><h2 id="如果在已安装的软件包上运行install，该怎么办？"><a href="#如果在已安装的软件包上运行install，该怎么办？" class="headerlink" title="如果在已安装的软件包上运行install，该怎么办？"></a>如果在已安装的软件包上运行install，该怎么办？</h2><p>假设您已经安装了一个软件包，但是您已经为已安装的软件包使用了install命令。这实际上会查看数据库，如果找到更新的版本，它会将已安装的软件包升级到更新的软件包。因此，除非您不希望升级，否则使用此命令不会造成任何损害。</p>
+<h2 id="如何在不升级的情况下安装包"><a href="#如何在不升级的情况下安装包" class="headerlink" title="如何在不升级的情况下安装包"></a>如何在不升级的情况下安装包</h2><p>假设由于某种原因你想要安装一个软件包但是如果已经安装了它就不想升级它。听起来很奇怪，但你可能有理由这样做。</p>
+<p>对于这种情况，您可以按以下方式使用sub -no-upgrade：</p>
+<pre><code>sudo apt-get install &lt;package_name&gt; --no-upgrade</code></pre><h2 id="如何只升级包，而不是安装它"><a href="#如何只升级包，而不是安装它" class="headerlink" title="如何只升级包，而不是安装它"></a>如何只升级包，而不是安装它</h2><p>如果您只想升级包但不想安装它（如果尚未安装），则可以使用以下命令执行此操作：</p>
+<pre><code>sudo apt-get install &lt;package_name&gt; --only-upgrade</code></pre><h2 id="如何安装特定版本的应用程序"><a href="#如何安装特定版本的应用程序" class="headerlink" title="如何安装特定版本的应用程序"></a>如何安装特定版本的应用程序</h2><p>默认情况下，将为任何应用程序安装存储库中可用的最新版本。但由于某些原因，如果您不想安装最新版本，则可以指定版本号（您需要知道要安装的确切版本号）。</p>
+<p>您需要做的就是添加带有包名称的= version。</p>
+<pre><code>sudo apt-get install &lt;package_name&gt;=&lt;version_number&gt;</code></pre><h2 id="如何使用apt-get删除已安装的软件包"><a href="#如何使用apt-get删除已安装的软件包" class="headerlink" title="如何使用apt-get删除已安装的软件包"></a>如何使用apt-get删除已安装的软件包</h2><p>这不是你只能用apt-get安装软件包。您也可以使用它删除包。您需要做的就是以这种方式使用命令：</p>
+<pre><code>sudo apt-get remove &lt;package_name&gt;</code></pre><p>自动完成也适用于此处。所以你只需要开始输入包名称并按Tab键，它将建议所有已安装的包以这些字母开头。</p>
+<p>卸载软件包的另一种方法是使用清除。该命令以下列方式使用：</p>
+<pre><code>sudo apt-get purge &lt;package_name&gt;</code></pre><h2 id="apt-get-remove和apt-get-purge有什么区别？"><a href="#apt-get-remove和apt-get-purge有什么区别？" class="headerlink" title="apt-get remove和apt-get purge有什么区别？"></a>apt-get remove和apt-get purge有什么区别？</h2><pre><code>apt-get remove只删除包的二进制文件。它不会触及配置文件
+apt-get purge删除与包相关的所有内容，包括配置文件</code></pre><p>因此，如果您“删除”特定软件并再次安装，您的系统将具有相同的配置文件。当然，再次安装时，系统会要求您覆盖现有的配置文件。</p>
+<p>当你搞砸了程序的配置时，清除特别有用。您希望从系统中完全擦除其痕迹，并且可能重新开始。</p>
+<p>大多数情况下，简单删除对于卸载软件包来说已经足够了。</p>
+<h2 id="如何使用apt-get清理系统"><a href="#如何使用apt-get清理系统" class="headerlink" title="如何使用apt-get清理系统"></a>如何使用apt-get清理系统</h2><p>哦，是的！您还可以使用apt-get清理系统并释放一些磁盘空间。</p>
+<p>您可以使用以下命令清除检索到的包文件的本地存储库：</p>
+<pre><code>sudo apt-get clean</code></pre><p>另一种方法是使用autoclean。与上面的clean命令不同，autoclean只删除那些现在有更新版本的检索包文件，它们将不再使用。</p>
+<pre><code>sudo apt-get autoclean</code></pre><p>另一种释放磁盘空间的方法是使用autoremove。它会删除自动安装的lib和软件包，以满足已安装软件包的依赖关系。如果删除了包，则这些自动安装的包在系统中是无用的。此命令删除此类包。</p>
+<pre><code>sudo apt-get autoremove</code></pre><br/>
+
+<h1 id="源码安装"><a href="#源码安装" class="headerlink" title="源码安装"></a>源码安装</h1><br/>
+
+<p><code>linux</code> 中很多已有的源码都会按照<code>./configure -&gt; make -&gt; make installd</code>的过程编译，但是如果没有<code>sudo</code>权限就无法编译使用。其实完全可以使用<code>./configure</code>的参数来指定安装路径，然后<code>make install</code>的时候就会放在自己的目录下，如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=要指定的安装的完整路径</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<p>在此就装到了指定路径了</p>
+<p>在<code>.bashrc</code>通过<code>PATH</code>定位指定路径即可。</p>
+<br/>
+
+<h1 id="查找某一个软件"><a href="#查找某一个软件" class="headerlink" title="查找某一个软件"></a>查找某一个软件</h1><br/>
+
+<p>有的时候，我们需要查看所用机器是否安装了某个软件。</p>
+<ul>
+<li><code>rpm</code>包安装的，可以用<code>rpm -qa</code>看到，如果要查找某软件包是否安装，用 <ul>
+<li><code>rpm -qa | grep “软件或者包的名字”</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpm -qa | grep ruby</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>以<code>deb</code>包安装的，可以用<code>dpkg -l</code> 「<code>ubuntu</code>」能看到。如果是查找指定软件包<ul>
+<li><code>dpkg -l | grep “软件或者包的名字”</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dpkg-l|grepruby</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>yum</code>方法安装的，可以用<code>yum list installed</code>查找，如果是查找指定包，命令后加 <code>| grep “软件名或者包名”</code></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum list installed | grep ruby</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>如果是以源码包自己编译安装的，例如<code>.tar.gz</code>或者<code>tar.bz2</code>形式的，这个只能看可执行文件是否存在了</p>
+<ul>
+<li>可执行文件通常都在 <code>/usr/local/bin</code> 下面，除非配置时指定了安装位置</li>
+<li>具体是哪个安装目录，就得看 <code>./configure --prefix=要指定的安装的完整路径</code> 的路径指向了</li>
+</ul>
+</li>
+<li><p><code>/usr/bin</code> 这个目录通常是，别人发布的二进制包，可执行文件通常都安装到这个目录下面</p>
+</li>
+</ul>
+<h2 id="whereis"><a href="#whereis" class="headerlink" title="whereis"></a>whereis</h2><p><code>whereis</code>是查找文件或者命令的所在目录。除了可以找软件位置，还可以找到命令的二进制文件，源文件和手动页文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whereis oracle</span><br></pre></td></tr></table></figure>
+
+<pre><code>oracle: /usr/bin/oracle   /usr/lib/oracle   /usr/share/oracle  /usr/share/man/man1/oracle.1.gz</code></pre><p>如果没有安装，则不会显示文件路径出来。只提示:</p>
+<pre><code>oracle:</code></pre><h2 id="which"><a href="#which" class="headerlink" title="which"></a>which</h2><p><code>which</code>命令查找出运行文件所在地址是否已经在搜索路径中,如果不在 <code>PATH</code> 中，则查不出来。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">which oracle</span><br></pre></td></tr></table></figure>
+
+<p>则显示</p>
+<pre><code>/usr/bin/oracle</code></pre><p>注意和 <code>whereis</code> 不同的是</p>
+<ul>
+<li>只会显示运行文件所在地址</li>
+<li>只会查询 <code>PATH</code> 的指向路径，范围小，有些系统上的which命令不显示用户没有执行权限的文件。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/apt-get/" rel="tag"># apt-get</a>
+              <a href="/tags/dpkg/" rel="tag"># dpkg</a>
+              <a href="/tags/apt/" rel="tag"># apt</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/09/anaconda0/" rel="prev" title="anaconda | 配置文件 .condarc">
+      <i class="fa fa-chevron-left"></i> anaconda | 配置文件 .condarc
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/10/linux8/" rel="next" title="linux | 命令行下载，联网访问">
+      linux | 命令行下载，联网访问 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是-apt-get"><span class="nav-number">1.</span> <span class="nav-text">什么是 apt-get?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dpkg和apt-get区别"><span class="nav-number">2.</span> <span class="nav-text">dpkg和apt-get区别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RedHat-系列"><span class="nav-number">2.1.</span> <span class="nav-text">RedHat 系列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Debian系列"><span class="nav-number">2.2.</span> <span class="nav-text">Debian系列</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#apt-和-apt-get-的区别"><span class="nav-number">3.</span> <span class="nav-text">apt 和 apt-get 的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#apt与apt-get"><span class="nav-number">3.1.</span> <span class="nav-text">apt与apt-get</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apt与apt-get之间的区别"><span class="nav-number">3.2.</span> <span class="nav-text">apt与apt-get之间的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apt和apt-get命令之间的区别"><span class="nav-number">3.3.</span> <span class="nav-text">apt和apt-get命令之间的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apt-get已弃用？"><span class="nav-number">3.4.</span> <span class="nav-text">apt-get已弃用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#我应该使用apt还是apt-get？"><span class="nav-number">3.5.</span> <span class="nav-text">我应该使用apt还是apt-get？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dpkg-的用法"><span class="nav-number">4.</span> <span class="nav-text">dpkg 的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装软件包"><span class="nav-number">4.1.</span> <span class="nav-text">安装软件包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#移除软件包"><span class="nav-number">4.2.</span> <span class="nav-text">移除软件包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">4.3.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#apt-get的使用方法"><span class="nav-number">5.</span> <span class="nav-text">apt-get的使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用apt-get更新包数据库"><span class="nav-number">5.1.</span> <span class="nav-text">使用apt-get更新包数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用apt-get升级已安装的软件包"><span class="nav-number">5.2.</span> <span class="nav-text">使用apt-get升级已安装的软件包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#升级和dist-upgrade之间的区别"><span class="nav-number">5.3.</span> <span class="nav-text">升级和dist-upgrade之间的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apt-get-update和apt-get升级有什么区别？"><span class="nav-number">5.4.</span> <span class="nav-text">apt-get update和apt-get升级有什么区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用apt-cache命令搜索包"><span class="nav-number">5.5.</span> <span class="nav-text">使用apt-cache命令搜索包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用apt-get安装新软件包"><span class="nav-number">5.6.</span> <span class="nav-text">如何使用apt-get安装新软件包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何安装多个包"><span class="nav-number">5.7.</span> <span class="nav-text">如何安装多个包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如果在已安装的软件包上运行install，该怎么办？"><span class="nav-number">5.8.</span> <span class="nav-text">如果在已安装的软件包上运行install，该怎么办？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何在不升级的情况下安装包"><span class="nav-number">5.9.</span> <span class="nav-text">如何在不升级的情况下安装包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何只升级包，而不是安装它"><span class="nav-number">5.10.</span> <span class="nav-text">如何只升级包，而不是安装它</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何安装特定版本的应用程序"><span class="nav-number">5.11.</span> <span class="nav-text">如何安装特定版本的应用程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用apt-get删除已安装的软件包"><span class="nav-number">5.12.</span> <span class="nav-text">如何使用apt-get删除已安装的软件包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#apt-get-remove和apt-get-purge有什么区别？"><span class="nav-number">5.13.</span> <span class="nav-text">apt-get remove和apt-get purge有什么区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用apt-get清理系统"><span class="nav-number">5.14.</span> <span class="nav-text">如何使用apt-get清理系统</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码安装"><span class="nav-number">6.</span> <span class="nav-text">源码安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查找某一个软件"><span class="nav-number">7.</span> <span class="nav-text">查找某一个软件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#whereis"><span class="nav-number">7.1.</span> <span class="nav-text">whereis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#which"><span class="nav-number">7.2.</span> <span class="nav-text">which</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="这是关于脑电信号的入门篇章，包括但不限于，名词解释，基础，相应的算法简介，但不会有很详细的说明。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="脑电信号入门">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2018/12/05/brain-wave0/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这是关于脑电信号的入门篇章，包括但不限于，名词解释，基础，相应的算法简介，但不会有很详细的说明。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/brainwave/0_2.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/brainwave/0_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/brainwave/0_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/brainwave/0_3.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/brainwave/0_4.jpg">
+<meta property="article:published_time" content="2018-12-05T09:09:12.000Z">
+<meta property="article:modified_time" content="2020-11-28T08:09:09.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="脑电">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/brainwave/0_2.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2018/12/05/brain-wave0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>脑电信号入门 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2018/12/05/brain-wave0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          脑电信号入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-05 17:09:12" itemprop="dateCreated datePublished" datetime="2018-12-05T17:09:12+08:00">2018-12-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-28 16:09:09" itemprop="dateModified" datetime="2020-11-28T16:09:09+08:00">2020-11-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BF%A1%E5%8F%B7/" itemprop="url" rel="index"><span itemprop="name">信号</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BF%A1%E5%8F%B7/%E8%84%91%E7%94%B5/" itemprop="url" rel="index"><span itemprop="name">脑电</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/12/05/brain-wave0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/12/05/brain-wave0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这是关于脑电信号的入门篇章，包括但不限于，名词解释，基础，相应的算法简介，但不会有很详细的说明。</p>
+<a id="more"></a>
+
+<h2 id="诱发电位（EP）"><a href="#诱发电位（EP）" class="headerlink" title="诱发电位（EP）"></a>诱发电位（EP）</h2><p>诱发电位（evoked potential,EP）是指给予神经系统某一部位适宜刺激，在神经系统相应部位所记录到的电位变化。</p>
+<p>通常把与刺激信号有严格关系的特定反应电位称为特异性诱发电位，这种特异性诱发电位是诱发信息以神经发放形式，在神经通路不同水平上不断组合形成的一系列神经电活动。</p>
+<p><img src="/images/brainwave/0_2.png" alt=""></p>
+<p>被事件所引发的正负电压波动可以被称为“峰”、“波”或“（脑电）成分”，是事件相关电位研究的主要对象。</p>
+<p>一般而言，事件相关电位的主要成分（尤指事件发生100毫秒后出现的“晚”成分）遵循两种命名体系。第一套体系依据的是该成分与相应事件的时间关系，或者说该成分的“潜伏期”，例如在刺激呈现后100毫秒左右达到峰值的正成分被称为“P100”,负成分被称为“N100”；</p>
+<p>第二套体系依据的是该成分的序列性，例如刺激诱发的第一个显著的正成分被称为“P1”，而第一个负成分被称为“N1”。</p>
+<p>大多数主要的脑电成分同时具有两种称谓，例如“P300”和“P3”。巧合的是，脑电成分的潜伏期数值往往接近其序列位置的100倍，以致N1 = N100，P1 = P100，P3 = P300。由于存在这种对应关系，因此两种命名尚不至于带来研究与交流的不便。</p>
+<p>由于历史原因，两套体系经常混用而不加区分。例如，同一份研究报告可能会对较早出现的成分使用第一种命名法，称其为N1、P1；而对较晚的成分使用第二种方法，称其为P300、N400，这种情况是非常普遍的。由于脑电成分的潜伏期并不稳定，部分研究者更推崇使用第二种命名法。但是这一问题在学界内还未形成共识。</p>
+<p>其他脑电成分遵循与以上两种体系不同的命名法，如：</p>
+<pre><code>（1）根据其物理属性，例如在P300后出现的正成分被统称为晚期正成分（late positive component）；
+（2）根据其任务特异性，例如在选择性注意任务中观察到的，被非注意刺激所诱发的脑电负成分被称为失匹配负波（mismatch negativity）。</code></pre><h2 id="视觉诱发脑电波信号（VEP）"><a href="#视觉诱发脑电波信号（VEP）" class="headerlink" title="视觉诱发脑电波信号（VEP）"></a>视觉诱发脑电波信号（VEP）</h2><p>视觉诱发电位（visual evoked potential），电生理现象。在视野范围内，以一定强度的闪光或图形刺激视网膜，可在视觉皮层或头颅骨外的枕区记录到电位变化。</p>
+<h2 id="脑电波的优势"><a href="#脑电波的优势" class="headerlink" title="脑电波的优势"></a>脑电波的优势</h2><h3 id="防伪造性"><a href="#防伪造性" class="headerlink" title="防伪造性"></a>防伪造性</h3><p>人脸，虹膜，指纹等信息，因为有短时间不可变性，所以，研究人员可以根据诸多特征进行伪造。但是，人的思维是千变万化的，是动态的，伪造几乎是不可能。</p>
+<h3 id="抗胁迫性"><a href="#抗胁迫性" class="headerlink" title="抗胁迫性"></a>抗胁迫性</h3><p>由于人在平和和非平和的时候，脑电信号不一样，所以，受到威胁时可以根据这个进行报警。</p>
+<h3 id="可控制性"><a href="#可控制性" class="headerlink" title="可控制性"></a>可控制性</h3><p>同一个体不同思维状态下的脑电波也会有差异。但是通过加强对个体有效信息的识别，我们就可以做到很多很有意思的事情，比如思维控制等。</p>
+<h2 id="脑电型号的分类"><a href="#脑电型号的分类" class="headerlink" title="脑电型号的分类"></a>脑电型号的分类</h2><h3 id="ERP"><a href="#ERP" class="headerlink" title="ERP"></a>ERP</h3><p>诱发性脑电波（Event-Related Potential,ERP）</p>
+<p>这种脑电波也称为事件相关脑电波，是大脑受到外界环境的刺激，经过几百毫秒的潜伏期后产生的电位大幅波动。</p>
+<h3 id="EEG"><a href="#EEG" class="headerlink" title="EEG"></a>EEG</h3><p>自发性脑电波（Electroencephalogram,EEG）</p>
+<p>自发性脑波也称为静息态脑电波，是大脑自发产生的有节律的电位信号。</p>
+<h2 id="脑波的波形"><a href="#脑波的波形" class="headerlink" title="脑波的波形"></a>脑波的波形</h2><p><img src="/images/brainwave/0_0.png" alt=""></p>
+<p><img src="/images/brainwave/0_1.png" alt=""></p>
+<p>下面这张表来自于百度百科</p>
+<p><img src="/images/brainwave/0_3.png" alt=""></p>
+<p>在自然静息的状态下，α 波为脑电波主要成分，当然也含有少量的 θ 波和 β 波。</p>
+<p>脑电波的分类图示</p>
+<p><img src="/images/brainwave/0_4.jpg" alt=""></p>
+<h2 id="脑电噪声"><a href="#脑电噪声" class="headerlink" title="脑电噪声"></a>脑电噪声</h2><p>通常在头皮中采集到的脑电波幅度仅在 10μV - 100μV 之间，非常微弱，极其容易受到环境因素和个体因素的影响。</p>
+<h3 id="EMG"><a href="#EMG" class="headerlink" title="EMG"></a>EMG</h3><p>肌电噪声（Electromyography，EMG）</p>
+<p>肌电信号（EMG）是众多肌纤维中运动单元动作电位（MUAP）在时间和空间上的叠加。表面肌电信号（SEMG）是浅层肌肉EMG和神经干上电活动在皮肤表面的综合效应，能在一定程度上反映神经肌肉的活动；相对于针电极EMG，SEMG在测量上具有非侵入性、无创伤、操作简单等优点。</p>
+<h3 id="EOG"><a href="#EOG" class="headerlink" title="EOG"></a>EOG</h3><p>眼球转动引起的眼动噪声（Electro-Oculogram，EOG）</p>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><p>基线漂移，电子噪声，50Hz工频以及设备接触不良等。</p>
+<p>工频：</p>
+<p>工频是电网工作频率的简称，指电网中交流电的频率，同一电网中的所有发电机、输配电设备和用户均使用这一频率的交流电。目前世界上大多数国家使用50Hz作为电网工作频率，但也有美国、部分亚洲国家和地区使用60Hz工频。</p>
+<p>在第二次工业革命过程中，许多不同的频率和电压曾被使用过。由于建设电网的设备投资巨大，电网规格的标准化进展缓慢。尽管如此，21世纪以来，使用50 Hz工频的电网趋向于使用220–240伏电压；使用60 Hz工频的电网趋向于100–127 V供电。</p>
+<p>中国采用50Hz。</p>
+<h2 id="移除噪声"><a href="#移除噪声" class="headerlink" title="移除噪声"></a>移除噪声</h2><h3 id="处理-50Hz-工频"><a href="#处理-50Hz-工频" class="headerlink" title="处理 50Hz 工频"></a>处理 50Hz 工频</h3><p>一般采用数字陷波器来移除 50Hz 交流工频干扰，以保留其他频带的信息。</p>
+<h2 id="国际改进组合命名法（MCN）10-20标准导联系统定义的头部不同位置的电极"><a href="#国际改进组合命名法（MCN）10-20标准导联系统定义的头部不同位置的电极" class="headerlink" title="国际改进组合命名法（MCN）10-20标准导联系统定义的头部不同位置的电极"></a>国际改进组合命名法（MCN）10-20标准导联系统定义的头部不同位置的电极</h2><p>具体内容参考我写的一个博文。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%84%91%E7%94%B5/" rel="tag"># 脑电</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/04/es7/" rel="prev" title="GA 的案例 用圆圈拼 chrome 图标">
+      <i class="fa fa-chevron-left"></i> GA 的案例 用圆圈拼 chrome 图标
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/06/brain-wave1/" rel="next" title="脑电图的简单简介">
+      脑电图的简单简介 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#诱发电位（EP）"><span class="nav-number">1.</span> <span class="nav-text">诱发电位（EP）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视觉诱发脑电波信号（VEP）"><span class="nav-number">2.</span> <span class="nav-text">视觉诱发脑电波信号（VEP）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#脑电波的优势"><span class="nav-number">3.</span> <span class="nav-text">脑电波的优势</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#防伪造性"><span class="nav-number">3.1.</span> <span class="nav-text">防伪造性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抗胁迫性"><span class="nav-number">3.2.</span> <span class="nav-text">抗胁迫性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可控制性"><span class="nav-number">3.3.</span> <span class="nav-text">可控制性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#脑电型号的分类"><span class="nav-number">4.</span> <span class="nav-text">脑电型号的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ERP"><span class="nav-number">4.1.</span> <span class="nav-text">ERP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EEG"><span class="nav-number">4.2.</span> <span class="nav-text">EEG</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#脑波的波形"><span class="nav-number">5.</span> <span class="nav-text">脑波的波形</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#脑电噪声"><span class="nav-number">6.</span> <span class="nav-text">脑电噪声</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EMG"><span class="nav-number">6.1.</span> <span class="nav-text">EMG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EOG"><span class="nav-number">6.2.</span> <span class="nav-text">EOG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其它"><span class="nav-number">6.3.</span> <span class="nav-text">其它</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#移除噪声"><span class="nav-number">7.</span> <span class="nav-text">移除噪声</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#处理-50Hz-工频"><span class="nav-number">7.1.</span> <span class="nav-text">处理 50Hz 工频</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#国际改进组合命名法（MCN）10-20标准导联系统定义的头部不同位置的电极"><span class="nav-number">8.</span> <span class="nav-text">国际改进组合命名法（MCN）10-20标准导联系统定义的头部不同位置的电极</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

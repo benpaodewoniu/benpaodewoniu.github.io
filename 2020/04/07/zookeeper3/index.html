@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="因为单机的 MacBook 貌似构筑有点问题，并且，其维护程度不如 web 版本，所以，选择了这个版本。 下面，我会详细的说明这个是如何安装的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zookeeper | 可视化界面 zkui（web版本）安装和使用">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/04/07/zookeeper3/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="因为单机的 MacBook 貌似构筑有点问题，并且，其维护程度不如 web 版本，所以，选择了这个版本。 下面，我会详细的说明这个是如何安装的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/zookeeper/3_0.png">
+<meta property="article:published_time" content="2020-04-07T04:03:32.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:14:22.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="zookeeper">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/zookeeper/3_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/04/07/zookeeper3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>zookeeper | 可视化界面 zkui（web版本）安装和使用 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/04/07/zookeeper3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zookeeper | 可视化界面 zkui（web版本）安装和使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-07 12:03:32" itemprop="dateCreated datePublished" datetime="2020-04-07T12:03:32+08:00">2020-04-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-22 14:14:22" itemprop="dateModified" datetime="2021-01-22T14:14:22+08:00">2021-01-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">开源项目</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/zookeeper/" itemprop="url" rel="index"><span itemprop="name">zookeeper</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/python/zkui/" itemprop="url" rel="index"><span itemprop="name">zkui</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/07/zookeeper3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/07/zookeeper3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>因为单机的 MacBook 貌似构筑有点问题，并且，其维护程度不如 web 版本，所以，选择了这个版本。</p>
+<p>下面，我会详细的说明这个是如何安装的。</p>
+<a id="more"></a>
+
+<br/>
+
+<h1 id="背景信息"><a href="#背景信息" class="headerlink" title="背景信息"></a>背景信息</h1><br/>
+
+<ul>
+<li>MacBook</li>
+</ul>
+<br/>
+
+<h1 id="前置准备"><a href="#前置准备" class="headerlink" title="前置准备"></a>前置准备</h1><br/>
+
+<ul>
+<li>git</li>
+<li>maven</li>
+<li>java环境</li>
+</ul>
+<br/>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><br/>
+
+<p><a href="https://blog.csdn.net/hero272285642/article/details/100032843" rel="external nofollow noreferrer">Zookeeper界面管理神器——zkui</a><br><a href="https://github.com/DeemOpen/zkui" rel="external nofollow noreferrer">官方版本</a></p>
+<br/>
+
+<h1 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h1><br/>
+
+<h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><pre><code>git clone git@github.com:DeemOpen/zkui.git</code></pre><h2 id="mvn构建"><a href="#mvn构建" class="headerlink" title="mvn构建"></a>mvn构建</h2><pre><code>cd zkui/
+mvn clean install
+    这一步我构筑了很长时间大概 22 mins ，可能是我镜像配置错了</code></pre><p>如果上面构筑成功，会在 zkui 这个文件夹中，创建 config.cfg</p>
+<p>我们把这个文件，copy 放在 mvn 的 java 包目录，对于我就是</p>
+<pre><code>cp ./config.cfg ~/.m2/repository</code></pre><p>ps: 2020.4.20</p>
+<p>这里有一个疑问点，也就是或许不需要将 config.cfg 移动到 ~/.m2/repository, 因为在后期，我修改 ~/.m2/repository 里面的 config.cfg 的内容根本不管用，而是直接修改了 /Users/licong/python/zkui 下面的 config.cfg 才奏效。</p>
+<p>这一步参考</p>
+<p><a href="/2020/04/07/maven0/">maven | 安装</a></p>
+<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><p>我这一版构筑完后，会出现下面</p>
+<ul>
+<li>LICENSE-2.0.txt    </li>
+<li>Makefile    </li>
+<li>README.md    </li>
+<li>config.cfg    </li>
+<li>docker        </li>
+<li>images        </li>
+<li>nbactions.xml    </li>
+<li>pom.xml        </li>
+<li>run.sh        </li>
+<li>src        </li>
+<li>target        </li>
+<li>zkui.sh</li>
+</ul>
+<p>在这里我特别明确的交代一下，该目录为（以我本地为例）</p>
+<pre><code>/Users/licong/python/zkui</code></pre><p>run.sh 有三种运行模式</p>
+<ul>
+<li>start</li>
+<li>stop</li>
+<li>restart</li>
+</ul>
+<p>我们使用</p>
+<pre><code>./run.sh start</code></pre><p>如果没有意外，就可以成功运行了。</p>
+<p>ps: 2020.4.20 日</p>
+<p>我再次运行 ./run.sh 没有任何作用，经过我的探究，发现应该运行 zuki.sh</p>
+<p>其和我上面描述的 run.sh 的功能一模一样。</p>
+<br/>
+
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><br/>
+
+<p>如果上面运行起来</p>
+<p>打开UI地址，默认为</p>
+<pre><code>http://localhost:9090</code></pre><p>默认有两个账户</p>
+<pre><code>username: admin
+pwd: manager (Admin privileges, CRUD operations supported) 
+
+username: appconfig
+pwd: appconfig (Readonly privileges, Read operations supported)</code></pre><p>输入账号密码后</p>
+<p><img src="/images/zookeeper/3_0.png" alt=""></p>
+<br/>
+
+<h1 id="config-cfg-配置"><a href="#config-cfg-配置" class="headerlink" title="config.cfg 配置"></a>config.cfg 配置</h1><br/>
+
+<p>首先要注意的是。</p>
+<ul>
+<li>修改完 config.cfg 的内容要重新开启服务<ul>
+<li>./zkui.sh restart</li>
+</ul>
+</li>
+<li>直接修改 /Users/licong/python/zkui 下的 config.cfg 即可，不需要到 ~/.m2/repository 修改</li>
+</ul>
+<p>下面直接说明</p>
+<h2 id="Server-Port"><a href="#Server-Port" class="headerlink" title="Server Port"></a>Server Port</h2><pre><code>serverPort=9090</code></pre><p>这个是本地的端口号</p>
+<h2 id="zkServer"><a href="#zkServer" class="headerlink" title="zkServer"></a>zkServer</h2><pre><code>zkServer=localhost:2181,localhost:2181
+zkServer=218.30.67.43:2181,218.30.67.43:2181</code></pre><p>上面第一个连接的是 本地的 zookeeper ，第二个连接的是 远程服务器上的 zookeeper。</p>
+<p>最后，浏览器访问的地址都是</p>
+<pre><code>http://localhost:9090/</code></pre><h2 id="userSer"><a href="#userSer" class="headerlink" title="userSer"></a>userSer</h2><pre><code>userSet = {&quot;users&quot;: [{ &quot;username&quot;:&quot;admin&quot; , &quot;password&quot;:&quot;manager&quot;,&quot;role&quot;: &quot;ADMIN&quot; },{ &quot;username&quot;:&quot;appconfig&quot; , &quot;password&quot;:&quot;appconfig&quot;,&quot;role&quot;: &quot;USER&quot; }]}</code></pre><p>这个是 zkui 自带的权限账户，自己可以修改，上面的在登录的时候的权限就是</p>
+<pre><code>username: admin
+pwd: manager (Admin privileges, CRUD operations supported) 
+
+username: appconfig
+pwd: appconfig (Readonly privileges, Read operations supported)</code></pre><br/>
+
+<h1 id="远程服务器安装"><a href="#远程服务器安装" class="headerlink" title="远程服务器安装"></a>远程服务器安装</h1><br/>
+
+<p>公司的需求时把可视化放在服务器上，然后根据 IP 直接访问，而不是本地安装独立的客户端。</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><ul>
+<li>ubuntu</li>
+</ul>
+<h2 id="下载-1"><a href="#下载-1" class="headerlink" title="下载"></a>下载</h2><pre><code>git clone git@github.com:DeemOpen/zkui.git</code></pre><h2 id="mvn构建-1"><a href="#mvn构建-1" class="headerlink" title="mvn构建"></a>mvn构建</h2><pre><code>cd zkui/
+mvn clean install
+    这一步我构筑了很长时间大概 22 mins ，可能是我镜像配置错了</code></pre><p>如果上面构筑成功，会在 zkui 这个文件夹中，创建 config.cfg 。其他步骤都相同。</p>
+<p>唯一和上面有所区别的是</p>
+<pre><code>zkServer=0.0.0.0:2181,0.0.0.0:2181</code></pre><p>最后，我们在本地浏览器可以用 IP 进行访问</p>
+<pre><code>IP:9090</code></pre><p>另外，由于服务器上的 java 的版本太低了，所以，开始 mvn 的时候构筑不成功，我重新安装了 jdk ，最后的版本信息如下</p>
+<pre><code>java -version
+    openjdk version &quot;1.8.0_242&quot;
+    OpenJDK Runtime Environment (build 1.8.0_242-8u242-b08-0ubuntu3~16.04-b08)
+    OpenJDK 64-Bit Server VM (build 25.242-b08, mixed mode)</code></pre><p>然后构筑成功，后来按照上面 MacBook 下的运行条件，将服务启起来，在外面就可以访问了。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/zookeeper/" rel="tag"># zookeeper</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/04/data-structure5/" rel="prev" title="数据结构 | c 语言实现一个链表">
+      <i class="fa fa-chevron-left"></i> 数据结构 | c 语言实现一个链表
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/07/maven0/" rel="next" title="maven | 安装">
+      maven | 安装 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景信息"><span class="nav-number">1.</span> <span class="nav-text">背景信息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前置准备"><span class="nav-number">2.</span> <span class="nav-text">前置准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装过程"><span class="nav-number">4.</span> <span class="nav-text">安装过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载"><span class="nav-number">4.1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mvn构建"><span class="nav-number">4.2.</span> <span class="nav-text">mvn构建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行"><span class="nav-number">4.3.</span> <span class="nav-text">运行</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用"><span class="nav-number">5.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#config-cfg-配置"><span class="nav-number">6.</span> <span class="nav-text">config.cfg 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Server-Port"><span class="nav-number">6.1.</span> <span class="nav-text">Server Port</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zkServer"><span class="nav-number">6.2.</span> <span class="nav-text">zkServer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#userSer"><span class="nav-number">6.3.</span> <span class="nav-text">userSer</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#远程服务器安装"><span class="nav-number">7.</span> <span class="nav-text">远程服务器安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">7.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载-1"><span class="nav-number">7.2.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mvn构建-1"><span class="nav-number">7.3.</span> <span class="nav-text">mvn构建</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

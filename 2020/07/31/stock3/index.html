@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5264811375921374"
+     crossorigin="anonymous"></script>
+
+  <meta name="description" content="非常想吐槽富途的 java 文档，写的那叫一个天书，不慢慢揣摩根本不知道意思。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="富途 | java 对接">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2020/07/31/stock3/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="非常想吐槽富途的 java 文档，写的那叫一个天书，不慢慢揣摩根本不知道意思。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/stock/2_0.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/stock/2_1.png">
+<meta property="og:image" content="http://benpaodewoniu.github.io/images/stock/2_2.png">
+<meta property="article:published_time" content="2020-07-31T02:23:56.000Z">
+<meta property="article:modified_time" content="2021-01-22T06:14:22.000Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="富途">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://benpaodewoniu.github.io/images/stock/2_0.png">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2020/07/31/stock3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>富途 | java 对接 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2020/07/31/stock3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          富途 | java 对接
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-31 10:23:56" itemprop="dateCreated datePublished" datetime="2020-07-31T10:23:56+08:00">2020-07-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-22 14:14:22" itemprop="dateModified" datetime="2021-01-22T14:14:22+08:00">2021-01-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%82%A1%E7%A5%A8/" itemprop="url" rel="index"><span itemprop="name">股票</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%82%A1%E7%A5%A8/futu/" itemprop="url" rel="index"><span itemprop="name">futu</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/07/31/stock3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/07/31/stock3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>非常想吐槽富途的 java 文档，写的那叫一个天书，不慢慢揣摩根本不知道意思。</p>
+<a id="more"></a>
+
+<p>在这里我先假设你已经安装了富途的中间接口层，然后知道 python 对接的原理。如果你不知道，你可以看我下面的博文。</p>
+<ul>
+<li><a href="/2020/04/01/stock1/">股票 | 富途接口对接</a></li>
+</ul>
+<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>首先要下载 java 的例子和各种包。</p>
+<p><img src="/images/stock/2_0.png" alt=""></p>
+<p>下载下来的包解压后，里面有几个文件夹和文件</p>
+<p>其中 <code>FTAPI4J</code> 是 java 的源代码，点进去</p>
+<p>里面有一个 <code>lib</code> 文件，这里面放着各种需要的包。</p>
+<h3 id="jar-文件"><a href="#jar-文件" class="headerlink" title="jar 文件"></a>jar 文件</h3><ul>
+<li>ftpi4j.jar 这个是富途官方提供的包</li>
+</ul>
+<p>这个包，我们需要添加到项目中，如果你是 <code>gradle</code> 项目，并且假如你不会添加第三方包，可以看我下面的博文。</p>
+<ul>
+<li><a href="/2020/07/15/gradle0/">gradle | 加载项目中的本地jar文件</a></li>
+</ul>
+<p>其他 <code>jar</code> 包都是依赖，如果你是 <code>gradle</code> 你可以使用下面的语法来引入相关的依赖包。</p>
+<pre><code>compile group: &apos;com.google.protobuf&apos;, name: &apos;protobuf-java&apos;, version: &apos;3.5.1&apos;
+compile group: &apos;net.java.dev.jna&apos;, name: &apos;jna&apos;, version: &apos;5.3.1&apos;
+compile group: &apos;net.java.dev.jna&apos;, name: &apos;jna-platform&apos;, version: &apos;5.3.1&apos;</code></pre><p>另外，我们还看到有各种平台的文件夹，比如</p>
+<h3 id="平台编译包"><a href="#平台编译包" class="headerlink" title="平台编译包"></a>平台编译包</h3><ul>
+<li>darwin「这个对应于 MacBook」<ul>
+<li>libFTAPIChannel.dylib</li>
+</ul>
+</li>
+<li>ubuntu<ul>
+<li>libFTAPIChannel.so</li>
+</ul>
+</li>
+</ul>
+<p>等，这个是，平台编译的相关的文件，我们根据不同的平台，将相关的文件放置在项目的根目录下。</p>
+<p>另外，比较重要的一点是，<code>sample</code> 文件夹里面存着官方给的例子。</p>
+<p>在这里我们不直接看 <code>sample</code> 代码，而是，看一下官方文档中给的例子。</p>
+<h2 id="快速上手"><a href="#快速上手" class="headerlink" title="快速上手"></a>快速上手</h2><ul>
+<li><a href="https://futunnopen.github.io/futu-api-doc/java/start.html" rel="external nofollow noreferrer">快速上手</a></li>
+</ul>
+<p>如果我们直接按照上面的环境配好，并且，将上面的代码都写好</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">package com.star;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.futu.openapi.*;</span><br><span class="line"><span class="keyword">import</span> com.futu.openapi.pb.*;</span><br><span class="line"></span><br><span class="line">public class FutuStart &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        FTAPI.init(); //初始化环境</span><br><span class="line">        FTAPI_Conn_Qot client = new FTAPI_Conn_Qot(); //创建行情对象</span><br><span class="line">        client.setConnSpi(new SampleQotCallback()); //创建连接回调类</span><br><span class="line">        client.setQotSpi(new SampleQotCallback()); //创建行情数据回调类</span><br><span class="line">        client.setClientInfo(<span class="string">"FTAPI4J_Sample"</span>, <span class="number">1</span>); //建立标识</span><br><span class="line">        client.initConnect(<span class="string">"127.0.0.1"</span>, (short)<span class="number">11111</span>, false); //开始连接</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class SampleQotCallback implements FTSPI_Qot, FTSPI_Conn</span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onInitConnect(FTAPI_Conn client, long errCode, String desc)</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Qot onInitConnect: ret=%b desc=%s connID=%d\n"</span>, errCode, desc, client.getConnectID());</span><br><span class="line">        //简单演示一下获取用户行情基本信息</span><br><span class="line">        FTAPI_Conn_Qot qot = (FTAPI_Conn_Qot)client;</span><br><span class="line">        &#123;</span><br><span class="line">            GetGlobalState.Request req = GetGlobalState.Request.newBuilder().setC2S(</span><br><span class="line">                    GetGlobalState.C2S.newBuilder().setUserID(<span class="number">15891586</span>)</span><br><span class="line">            ).build();</span><br><span class="line">            int seqNo = qot.getGlobalState(req);</span><br><span class="line">            System.out.printf(<span class="string">"Send GetGlobalState: %d\n"</span>, seqNo);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onDisconnect(FTAPI_Conn client, long errCode) &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Qot onDisConnect: %d\n"</span>, errCode);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onReply_GetGlobalState(FTAPI_Conn client, int nSerialNo, GetGlobalState.Response rsp) &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Reply: GetGlobalState: %d  %s\n"</span>, nSerialNo, rsp.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当你运行之后，会发现什么也没有输出，这是因为，我们必须给源代码加上 <code>sleep</code>。</p>
+<p>改成</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">package com.star;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.futu.openapi.*;</span><br><span class="line"><span class="keyword">import</span> com.futu.openapi.pb.*;</span><br><span class="line"></span><br><span class="line">public class FutuStart &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        FTAPI.init(); //初始化环境</span><br><span class="line">        FTAPI_Conn_Qot client = new FTAPI_Conn_Qot(); //创建行情对象</span><br><span class="line">        client.setConnSpi(new SampleQotCallback()); //创建连接回调类</span><br><span class="line">        client.setQotSpi(new SampleQotCallback()); //创建行情数据回调类</span><br><span class="line">        client.setClientInfo(<span class="string">"FTAPI4J_Sample"</span>, <span class="number">1</span>); //建立标识</span><br><span class="line">        client.initConnect(<span class="string">"127.0.0.1"</span>, (short)<span class="number">11111</span>, false); //开始连接</span><br><span class="line">        Thread.sleep(<span class="number">1000</span> * <span class="number">600</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class SampleQotCallback implements FTSPI_Qot, FTSPI_Conn</span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onInitConnect(FTAPI_Conn client, long errCode, String desc)</span><br><span class="line">    &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Qot onInitConnect: ret=%b desc=%s connID=%d\n"</span>, errCode, desc, client.getConnectID());</span><br><span class="line">        //简单演示一下获取用户行情基本信息</span><br><span class="line">        FTAPI_Conn_Qot qot = (FTAPI_Conn_Qot)client;</span><br><span class="line">        &#123;</span><br><span class="line">            GetGlobalState.Request req = GetGlobalState.Request.newBuilder().setC2S(</span><br><span class="line">                    GetGlobalState.C2S.newBuilder().setUserID(<span class="number">15891586</span>)</span><br><span class="line">            ).build();</span><br><span class="line">            int seqNo = qot.getGlobalState(req);</span><br><span class="line">            System.out.printf(<span class="string">"Send GetGlobalState: %d\n"</span>, seqNo);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">	public void onInitConnect(FTAPI_Conn client, long errCode, String desc) &#123;</span><br><span class="line">	    System.out.printf(<span class="string">"Qot connect"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onDisconnect(FTAPI_Conn client, long errCode) &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Qot onDisConnect: %d\n"</span>, errCode);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onReply_GetGlobalState(FTAPI_Conn client, int nSerialNo, GetGlobalState.Response rsp) &#123;</span><br><span class="line">        System.out.printf(<span class="string">"Reply: GetGlobalState: %d  %s\n"</span>, nSerialNo, rsp.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就会发现有输出了。</p>
+<p>在这里我讲一下 <code>java</code> 的代码编写逻辑。</p>
+<p>首先，<code>java</code> 有两个暴漏接口「在这里只针对行情，对下单不做分析」</p>
+<ul>
+<li>FTSPI_Qot</li>
+<li>FTSPI_Conn</li>
+</ul>
+<p>我们用一个类组合上面的两个接口，然后，会重写回调函数。</p>
+<p>比如，如果</p>
+<pre><code>client.initConnect(&quot;127.0.0.1&quot;, (short)11111, false); //开始连接</code></pre><p>调用成功后，会回调</p>
+<pre><code>@Override
+public void onInitConnect(FTAPI_Conn client, long errCode, String desc) {
+    你写的代码
+}</code></pre><p>再比如，上面的调用</p>
+<pre><code>qot.getGlobalState(req);</code></pre><p>如果调用成功，会回调</p>
+<pre><code>@Override
+public void onReply_GetGlobalState(FTAPI_Conn client, int nSerialNo, GetGlobalState.Response rsp) {
+    System.out.printf(&quot;Reply: GetGlobalState: %d  %s\n&quot;, nSerialNo, rsp.toString());
+}</code></pre><p>那如何知道怎么调用接口，以及回调函数。</p>
+<p>这个时候，没有啥好办法，只能看文档和 <code>sample</code> 中的例子。</p>
+<ul>
+<li><a href="https://futunnopen.github.io/futu-api-doc/java/Quote_API.html" rel="external nofollow noreferrer">行情API</a></li>
+</ul>
+<p>不得不说，他们的文档写的非常烂，所以，只能结合 <code>sample</code> 中的例子看。</p>
+<h2 id="对接-websocket"><a href="#对接-websocket" class="headerlink" title="对接 websocket"></a>对接 websocket</h2><p>另外，这这里，我贴一下如何对接 <code>websocket</code> 的代码，供大家参考。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">package com.star;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.futu.openapi.*;</span><br><span class="line"><span class="keyword">import</span> com.futu.openapi.pb.*;</span><br><span class="line"></span><br><span class="line">public class Futu &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">        FTAPI.init(); //初始化环境</span><br><span class="line">        SampleQotCallback_ qot = new SampleQotCallback_();</span><br><span class="line">        <span class="keyword">while</span> (true) &#123;</span><br><span class="line">            Thread.sleep(<span class="number">1000</span> * <span class="number">600</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class SampleQotCallback_ implements FTSPI_Qot, FTSPI_Conn &#123;</span><br><span class="line">    FTAPI_Conn_Qot client = new FTAPI_Conn_Qot(); //创建行情对象</span><br><span class="line"></span><br><span class="line">    public SampleQotCallback_() &#123;</span><br><span class="line">        client.setConnSpi(this); //创建连接回调类</span><br><span class="line">        client.setQotSpi(this); //创建行情数据回调类</span><br><span class="line">        client.setClientInfo(<span class="string">"FTAPI4J_Sample"</span>, <span class="number">1</span>); //建立标识</span><br><span class="line">        client.initConnect(<span class="string">"127.0.0.1"</span>, (short) <span class="number">11111</span>, false); //开始连接</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onInitConnect(FTAPI_Conn client, long errCode, String desc) &#123;</span><br><span class="line">        this.sub();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @Override</span></span><br><span class="line">    public void onPush_UpdateOrderBook(FTAPI_Conn client, QotUpdateOrderBook.Response rsp)&#123;</span><br><span class="line">        System.out.printf(<span class="string">"onPush_UpdateOrderBook: %s\n"</span>, rsp.toString());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //测试订阅行情</span><br><span class="line">    void sub() &#123;</span><br><span class="line">        QotCommon.Security sec = QotCommon.Security.newBuilder().setCode(<span class="string">"00700"</span>)</span><br><span class="line">                .setMarket(QotCommon.QotMarket.QotMarket_HK_Security_VALUE)</span><br><span class="line">                .build();</span><br><span class="line">        QotSub.C2S c2s = QotSub.C2S.newBuilder().addSecurityList(sec)</span><br><span class="line">                .addSubTypeList(QotCommon.SubType.SubType_OrderBook_VALUE)</span><br><span class="line">                .setIsSubOrUnSub(true)</span><br><span class="line">                .setIsRegOrUnRegPush(true)</span><br><span class="line">                .setIsFirstPush(true)</span><br><span class="line">                .build();</span><br><span class="line">        QotSub.Request req = QotSub.Request.newBuilder().setC2S(c2s).build();</span><br><span class="line">        client.sub(req);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="api-如何看"><a href="#api-如何看" class="headerlink" title="api 如何看"></a>api 如何看</h2><p><code>futu</code> java 文档，写得比狗屎还烂。</p>
+<p>属于那种感动自己的文档，就是自己内部技术人员逻辑清晰，讲起来头头是道，但是，如果没经过内部人的讲解，直接看的话，比狗屎还烂，读起来非常恶心。</p>
+<p>我们以其中一个接口，获取某一板块下，所有股票的信息为例。</p>
+<p><img src="/images/stock/2_1.png" alt=""></p>
+<p>其中，对于 java 而言，一个完整的请求包括</p>
+<ul>
+<li>请求 request<ul>
+<li>包含一个 C2S<ul>
+<li>该例是 Qot_GetStaticInfo</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>回复 response<ul>
+<li>内容包含在 S2C</li>
+</ul>
+</li>
+</ul>
+<h3 id="request"><a href="#request" class="headerlink" title="request"></a>request</h3><p>上面的请求</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">message Request</span><br><span class="line">&#123;</span><br><span class="line">        required C2S c2s = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也就是里面包含 C2S。</p>
+<p>这个 C2S 的内容如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">message C2S</span><br><span class="line">&#123;</span><br><span class="line">        optional int32 market = <span class="number">1</span>; <span class="comment">//Qot_Common.QotMarket,股票市场</span></span><br><span class="line">        optional int32 secType = <span class="number">2</span>; <span class="comment">//Qot_Common.SecurityType,股票类型</span></span><br><span class="line">        repeated Qot_Common.Security securityList = <span class="number">3</span>; <span class="comment">//股票，若该字段存在，忽略其他字段，只返回该字段股票的静态信息</span></span><br><span class="line">        <span class="comment">//当传入程序无法识别的股票时（包括很久之前退市的股票和不存在的股票），仍然返回股票信息，用静态信息标志来该股票不存在。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个意思就是这个 C2S 的类是</p>
+<pre><code>Qot_GetStaticInfo</code></pre><p>至于为什么是这个，纯粹是我猜的，因为，这个包名，也就是上面 <code>package Qot_GetStaticInfo</code> ，一般这个 api 都是这个套路。你也可以用 IDEA 自动补全来检测。没啥好办法。</p>
+<p>下面就是 <code>QotGetStaticInfo</code> 如何设置参数，里面有两个要求</p>
+<pre><code>optional int32 market = 1; //Qot_Common.QotMarket,股票市场
+optional int32 secType = 2; //Qot_Common.SecurityType,股票类型
+第三个不需要管</code></pre><p>所以，上面的这个 C2S 的写法应该是如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">QotGetStaticInfo.C2S.newBuilder().setMarket(QotCommon.QotMarket.QotMarket_HK_Security_VALUE)</span><br><span class="line">                .setSecType(QotCommon.SecurityType.SecurityType_Eqty_VALUE)</span><br></pre></td></tr></table></figure>
+
+<p>这个时候，你可能就要问了</p>
+<pre><code>optional int32 market = 1; //Qot_Common.QotMarket,股票市场
+optional int32 secType = 2; //Qot_Common.SecurityType,股票类型</code></pre><p>我怎么知道这里面的含义代表啥意思，所以，你可以点击图片中的注解看一下。</p>
+<p><img src="/images/stock/2_2.png" alt=""></p>
+<p>然后，重写一下回调函数。</p>
+<p>至此，一个完整的请求，就完成了。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AF%8C%E9%80%94/" rel="tag"># 富途</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/30/gradle1/" rel="prev" title="命令行运行 gradle 项目">
+      <i class="fa fa-chevron-left"></i> 命令行运行 gradle 项目
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/03/python123/" rel="next" title="python | 内置函数">
+      python | 内置函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境配置"><span class="nav-number">1.</span> <span class="nav-text">环境配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#jar-文件"><span class="nav-number">1.1.</span> <span class="nav-text">jar 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#平台编译包"><span class="nav-number">1.2.</span> <span class="nav-text">平台编译包</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速上手"><span class="nav-number">2.</span> <span class="nav-text">快速上手</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对接-websocket"><span class="nav-number">3.</span> <span class="nav-text">对接 websocket</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#api-如何看"><span class="nav-number">4.</span> <span class="nav-text">api 如何看</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#request"><span class="nav-number">4.1.</span> <span class="nav-text">request</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2154</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1169</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">632</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
