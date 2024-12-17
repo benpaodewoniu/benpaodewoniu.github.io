@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benpaodewoniu.github.io","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这里说一下怎么和后端的 webhook 进行交互。这里的 webhook 指的是通过调用 telegram 的 setWebhook 来设置的后台 api webhook 地址，具体可以看 telegram | 数据传递 这里的 mini app 指的是，bot 中打开 open app 的按钮。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="telegram | mini app 与 后端以及 webhook 交互方式">
+<meta property="og:url" content="http://benpaodewoniu.github.io/2024/12/16/telegram3/index.html">
+<meta property="og:site_name" content="犀牛的博客">
+<meta property="og:description" content="这里说一下怎么和后端的 webhook 进行交互。这里的 webhook 指的是通过调用 telegram 的 setWebhook 来设置的后台 api webhook 地址，具体可以看 telegram | 数据传递 这里的 mini app 指的是，bot 中打开 open app 的按钮。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-16T15:30:53.000Z">
+<meta property="article:modified_time" content="2024-12-17T07:34:12.521Z">
+<meta property="article:author" content="犀牛">
+<meta property="article:tag" content="telegram">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://benpaodewoniu.github.io/2024/12/16/telegram3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>telegram | mini app 与 后端以及 webhook 交互方式 | 犀牛的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">犀牛的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">姑苏城外一茅屋，万树梅花月满天</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-help">
+
+    <a href="/help/" rel="section"><i class="fa fa-fw fa-question"></i>指引</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-project">
+
+    <a href="/project/" rel="section"><i class="fa fa-fw fa-book"></i>开源</a>
+
+  </li>
+        <li class="menu-item menu-item-invest">
+
+    <a href="/invest/" rel="section"><i class="fa fa-fw fa-book"></i>投资</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/links/" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-books">
+
+    <a href="/books/" rel="section"><i class="fa fa-fw fa-book"></i>书籍</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-fw fa-sitemap"></i>地图</a>
+
+  </li>
+        <li class="menu-item menu-item-problem">
+
+    <a href="/problem/" rel="section"><i class="fa fa-fw fa-question"></i>问前需看</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://benpaodewoniu.github.io/2024/12/16/telegram3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/icon/icon.png">
+      <meta itemprop="name" content="犀牛">
+      <meta itemprop="description" content="合作或者其它，欢迎联系">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="犀牛的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          telegram | mini app 与 后端以及 webhook 交互方式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-12-16 23:30:53" itemprop="dateCreated datePublished" datetime="2024-12-16T23:30:53+08:00">2024-12-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-17 15:34:12" itemprop="dateModified" datetime="2024-12-17T15:34:12+08:00">2024-12-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B9%B3%E5%8F%B0/" itemprop="url" rel="index"><span itemprop="name">平台</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B9%B3%E5%8F%B0/telegram/" itemprop="url" rel="index"><span itemprop="name">telegram</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B9%B3%E5%8F%B0/telegram/mini-app/" itemprop="url" rel="index"><span itemprop="name">mini app</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2024/12/16/telegram3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2024/12/16/telegram3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>这里说一下怎么和后端的 <code>webhook</code> 进行交互。这里的 <code>webhook</code> 指的是通过调用 <code>telegram</code> 的 <code>setWebhook</code> 来设置的后台 <code>api webhook</code> 地址，具体可以看 <a href="/2024/12/16/telegram1/">telegram | 数据传递</a></p>
+<p>这里的 <code>mini app</code> 指的是，<code>bot</code> 中打开 <code>open app</code> 的按钮。</p>
+<a id="more"></a>
+
+<p>那么，通过 <code>open app</code> 如何和 <code>bot</code> 绑定的后端进行交互？</p>
+<p>有两个方法。</p>
+<ul>
+<li>调用 bot 的 sendMessage 方法<ul>
+<li><code>https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/sendMessage</code>，但是，这样就会把 <code>token</code> 暴漏出来，没有任何安全性</li>
+</ul>
+</li>
+<li>直接和后端进行 <code>webhook</code> 发送请求</li>
+</ul>
+<p>之前有一种和后台 <code>webhook</code> 的交互方式，就是直接和 <code>bot</code> 聊天，<a href="/2024/12/16/telegram2/">telegram | 前后端 3种 简单的交互案例</a>，而在 <code>mini app</code> 中是无法做到这样的。无法调用 <code>tg.sendData</code> 直接发给 <code>telegram</code> 服务器，然后 <code>telegram</code> 服务器转发给后台。</p>
+<p>对于，mini app，要时刻记住一点，打开后，它就是一个普通的网页，只不过，如果这个网页是在 telegram 中打开的，可以通过 telegram 的 js 获取相关的数据。</p>
+<p>这里举一个例子。</p>
+<ul>
+<li>前端：地址是 <code>https://tg.thlm.bond</code></li>
+<li>后端：地址是 <code>https://tgapi.thlm.bond</code></li>
+</ul>
+<h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><p>在 <code>telegram</code> 中打开，可以在 <code>telegram</code> 中获取用户信息发到后端中。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"zh"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Telegram Bot Interface<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 引入 Telegram WebApp JS SDK --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://telegram.org/js/telegram-web-app.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span></span><br><span class="line">        body &#123;</span><br><span class="line">            font-family: Arial, sans-serif;</span><br><span class="line">            max-width: 800px;</span><br><span class="line">            margin: 0 auto;</span><br><span class="line">            padding: 20px;</span><br><span class="line"><span class="css">            <span class="selector-tag">background-color</span>: <span class="selector-tag">var</span>(<span class="selector-tag">--tg-theme-bg-color</span>, <span class="selector-id">#ffffff</span>);</span></span><br><span class="line"><span class="css">            <span class="selector-tag">color</span>: <span class="selector-tag">var</span>(<span class="selector-tag">--tg-theme-text-color</span>, <span class="selector-id">#000000</span>);</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="css">        <span class="selector-class">.container</span> &#123;</span></span><br><span class="line">            text-align: center;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="css">        <span class="selector-class">.btn</span> &#123;</span></span><br><span class="line"><span class="css">            <span class="selector-tag">background-color</span>: <span class="selector-tag">var</span>(<span class="selector-tag">--tg-theme-button-color</span>, <span class="selector-id">#0088cc</span>);</span></span><br><span class="line"><span class="css">            <span class="selector-tag">color</span>: <span class="selector-tag">var</span>(<span class="selector-tag">--tg-theme-button-text-color</span>, <span class="selector-id">#ffffff</span>);</span></span><br><span class="line">            padding: 10px 20px;</span><br><span class="line">            border: none;</span><br><span class="line">            border-radius: 5px;</span><br><span class="line">            cursor: pointer;</span><br><span class="line">            font-size: 16px;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="css">        <span class="selector-class">.btn</span><span class="selector-pseudo">:hover</span> &#123;</span></span><br><span class="line"><span class="css">            <span class="selector-tag">opacity</span>: 0<span class="selector-class">.9</span>;</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="css">        <span class="selector-id">#status</span> &#123;</span></span><br><span class="line">            margin-top: 20px;</span><br><span class="line">            padding: 10px;</span><br><span class="line">            border-radius: 5px;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="css">        <span class="selector-class">.success</span> &#123;</span></span><br><span class="line"><span class="css">            <span class="selector-tag">background-color</span>: <span class="selector-id">#dff0d8</span>;</span></span><br><span class="line"><span class="css">            <span class="selector-tag">color</span>: <span class="selector-id">#3c763d</span>;</span></span><br><span class="line">        &#125;</span><br><span class="line"><span class="css">        <span class="selector-class">.error</span> &#123;</span></span><br><span class="line"><span class="css">            <span class="selector-tag">background-color</span>: <span class="selector-id">#f2dede</span>;</span></span><br><span class="line"><span class="css">            <span class="selector-tag">color</span>: <span class="selector-id">#a94442</span>;</span></span><br><span class="line">        &#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span>Telegram Bot Interface<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"sendInfoBtn"</span> <span class="attr">class</span>=<span class="string">"btn"</span>&gt;</span>点击：发送用户信息<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"status"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="actionscript">        <span class="comment">// 确保 Telegram WebApp 已准备就绪</span></span></span><br><span class="line"><span class="javascript">        <span class="built_in">window</span>.Telegram.WebApp.ready();</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">        <span class="comment">// 获取 Telegram WebApp 实例</span></span></span><br><span class="line"><span class="javascript">        <span class="keyword">const</span> tg = <span class="built_in">window</span>.Telegram.WebApp;</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">        <span class="comment">// 设置主题</span></span></span><br><span class="line"><span class="javascript">        <span class="built_in">document</span>.documentElement.style.setProperty(<span class="string">'--tg-theme-bg-color'</span>, tg.backgroundColor);</span></span><br><span class="line"><span class="javascript">        <span class="built_in">document</span>.documentElement.style.setProperty(<span class="string">'--tg-theme-text-color'</span>, tg.textColor);</span></span><br><span class="line"><span class="javascript">        <span class="built_in">document</span>.documentElement.style.setProperty(<span class="string">'--tg-theme-button-color'</span>, tg.buttonColor);</span></span><br><span class="line"><span class="javascript">        <span class="built_in">document</span>.documentElement.style.setProperty(<span class="string">'--tg-theme-button-text-color'</span>, tg.buttonTextColor);</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">        <span class="built_in">document</span>.getElementById(<span class="string">'sendInfoBtn'</span>).addEventListener(<span class="string">'click'</span>, <span class="keyword">async</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            <span class="keyword">const</span> statusDiv = <span class="built_in">document</span>.getElementById(<span class="string">'status'</span>);</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">            <span class="keyword">try</span> &#123;</span></span><br><span class="line"><span class="actionscript">                <span class="comment">// 检查是否在 Telegram WebApp 环境中</span></span></span><br><span class="line">                if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) &#123;</span><br><span class="line"><span class="javascript">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'无法获取 Telegram 用户信息'</span>);</span></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line"><span class="actionscript">                <span class="keyword">const</span> user = tg.initDataUnsafe.user;</span></span><br><span class="line"></span><br><span class="line"><span class="javascript">                <span class="keyword">const</span> response = <span class="keyword">await</span> fetch(<span class="string">'https://tgapi.thlm.bond/info'</span>, &#123;</span></span><br><span class="line"><span class="actionscript">                    method: <span class="string">'POST'</span>,</span></span><br><span class="line">                    headers: &#123;</span><br><span class="line"><span class="actionscript">                        <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,</span></span><br><span class="line"><span class="actionscript">                        <span class="comment">// 添加 Telegram 初始化数据作为验证</span></span></span><br><span class="line"><span class="actionscript">                        <span class="string">'Telegram-Data'</span>: tg.initData</span></span><br><span class="line">                    &#125;,</span><br><span class="line"><span class="javascript">                    body: <span class="built_in">JSON</span>.stringify(&#123;</span></span><br><span class="line">                        userId: user.id,</span><br><span class="line">                        username: user.username,</span><br><span class="line">                        firstName: user.first_name,</span><br><span class="line">                        lastName: user.last_name,</span><br><span class="line">                        languageCode: user.language_code</span><br><span class="line">                    &#125;)</span><br><span class="line">                &#125;);</span><br><span class="line"></span><br><span class="line"><span class="javascript">                <span class="keyword">const</span> data = <span class="keyword">await</span> response.json();</span></span><br><span class="line"></span><br><span class="line">                if (response.ok) &#123;</span><br><span class="line"><span class="actionscript">                    statusDiv.className = <span class="string">'success'</span>;</span></span><br><span class="line"><span class="actionscript">                    statusDiv.textContent = <span class="string">'信息发送成功！'</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">                    <span class="comment">// 显示 Telegram 弹窗提示</span></span></span><br><span class="line">                    tg.showPopup(&#123;</span><br><span class="line"><span class="actionscript">                        title: <span class="string">'成功'</span>,</span></span><br><span class="line"><span class="actionscript">                        message: <span class="string">'用户信息已成功发送'</span>,</span></span><br><span class="line"><span class="actionscript">                        buttons: [&#123;text: <span class="string">'确定'</span>&#125;]</span></span><br><span class="line">                    &#125;);</span><br><span class="line"><span class="actionscript">                &#125; <span class="keyword">else</span> &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(data.message || <span class="string">'请求失败'</span>);</span></span><br><span class="line">                &#125;</span><br><span class="line"><span class="actionscript">            &#125; <span class="keyword">catch</span> (error) &#123;</span></span><br><span class="line"><span class="javascript">                <span class="built_in">console</span>.error(<span class="string">'Error:'</span>, error);</span></span><br><span class="line"><span class="actionscript">                statusDiv.className = <span class="string">'error'</span>;</span></span><br><span class="line"><span class="actionscript">                statusDiv.textContent = <span class="string">'发送失败：'</span> + error.message;</span></span><br><span class="line"></span><br><span class="line"><span class="actionscript">                <span class="comment">// 显示错误提示</span></span></span><br><span class="line">                tg.showPopup(&#123;</span><br><span class="line"><span class="actionscript">                    title: <span class="string">'错误'</span>,</span></span><br><span class="line">                    message: error.message,</span><br><span class="line"><span class="actionscript">                    buttons: [&#123;text: <span class="string">'确定'</span>&#125;]</span></span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line"><span class="actionscript">        <span class="comment">// 设置 Telegram WebApp 返回按钮</span></span></span><br><span class="line">        tg.BackButton.show();</span><br><span class="line"><span class="javascript">        tg.BackButton.onClick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span></span><br><span class="line">            tg.close();</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line"><span class="actionscript">        <span class="comment">// 展开 WebApp 到全屏</span></span></span><br><span class="line">        tg.expand();</span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>后端通过 <code>nginx</code> 把 <code>https://tgapi.thlm.bond</code> 的请求都转移到 <code>http://127.0.0.1:8334</code> 上。</p>
+<p>这个后端不仅可以接受来自前端的请求，还可以接收用户和 <code>bot</code> 聊天的信息。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, request, jsonify</span><br><span class="line"><span class="keyword">from</span> flask_cors <span class="keyword">import</span> CORS</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">CORS(app)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置日志</span></span><br><span class="line">logging.basicConfig(</span><br><span class="line">    level=logging.INFO,</span><br><span class="line">    format=<span class="string">'%(asctime)s - %(levelname)s - %(message)s'</span></span><br><span class="line">)</span><br><span class="line">logger = logging.getLogger(__name__)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置</span></span><br><span class="line">BOT_TOKEN = <span class="string">'YOUR_BOT_TOKEN'</span>  <span class="comment"># 替换为你的 bot token</span></span><br><span class="line">WEBHOOK_URL = <span class="string">'https://tgapi.thlm.bond/webhook'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">setup_webhook</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""设置 Telegram webhook"""</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 首先删除现有的 webhook</span></span><br><span class="line">        delete_url = <span class="string">f'https://api.telegram.org/bot<span class="subst">&#123;BOT_TOKEN&#125;</span>/deleteWebhook'</span></span><br><span class="line">        delete_response = requests.get(delete_url)</span><br><span class="line">        logger.info(<span class="string">f"Delete webhook response: <span class="subst">&#123;delete_response.json()&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 设置新的 webhook</span></span><br><span class="line">        set_url = <span class="string">f'https://api.telegram.org/bot<span class="subst">&#123;BOT_TOKEN&#125;</span>/setWebhook'</span></span><br><span class="line">        set_response = requests.get(</span><br><span class="line">            set_url,</span><br><span class="line">            params=&#123;</span><br><span class="line">                <span class="string">'url'</span>: WEBHOOK_URL,</span><br><span class="line">                <span class="string">'allowed_updates'</span>: [<span class="string">'message'</span>, <span class="string">'callback_query'</span>]  <span class="comment"># 指定需要接收的更新类型</span></span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> set_response.status_code == <span class="number">200</span>:</span><br><span class="line">            result = set_response.json()</span><br><span class="line">            <span class="keyword">if</span> result.get(<span class="string">'ok'</span>):</span><br><span class="line">                logger.info(<span class="string">"Webhook set successfully!"</span>)</span><br><span class="line">                logger.info(<span class="string">f"Webhook info: <span class="subst">&#123;result&#125;</span>"</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                logger.error(<span class="string">f"Failed to set webhook: <span class="subst">&#123;result&#125;</span>"</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            logger.error(<span class="string">f"Failed to set webhook. Status code: <span class="subst">&#123;set_response.status_code&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 获取当前 webhook 信息</span></span><br><span class="line">        info_url = <span class="string">f'https://api.telegram.org/bot<span class="subst">&#123;BOT_TOKEN&#125;</span>/getWebhookInfo'</span></span><br><span class="line">        info_response = requests.get(info_url)</span><br><span class="line">        logger.info(<span class="string">f"Current webhook info: <span class="subst">&#123;info_response.json()&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        logger.error(<span class="string">f"Error setting up webhook: <span class="subst">&#123;str(e)&#125;</span>"</span>)</span><br><span class="line">        <span class="keyword">raise</span> e</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 用户信息存储</span></span><br><span class="line">users_info = &#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/info', methods=['POST'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_user_info</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""处理从前端发送来的用户信息"""</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        user_info = request.json</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 记录用户信息</span></span><br><span class="line">        user_id = user_info.get(<span class="string">'userId'</span>)</span><br><span class="line">        <span class="keyword">if</span> user_id:</span><br><span class="line">            users_info[user_id] = &#123;</span><br><span class="line">                <span class="string">'info'</span>: user_info,</span><br><span class="line">                <span class="string">'timestamp'</span>: datetime.now().isoformat()</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        logger.info(<span class="string">f"Received user info: <span class="subst">&#123;user_info&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> jsonify(&#123;</span><br><span class="line">            <span class="string">'status'</span>: <span class="string">'success'</span>,</span><br><span class="line">            <span class="string">'message'</span>: <span class="string">'User information received successfully'</span></span><br><span class="line">        &#125;), <span class="number">200</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        logger.error(<span class="string">f"Error processing user info: <span class="subst">&#123;str(e)&#125;</span>"</span>)</span><br><span class="line">        <span class="keyword">return</span> jsonify(&#123;</span><br><span class="line">            <span class="string">'status'</span>: <span class="string">'error'</span>,</span><br><span class="line">            <span class="string">'message'</span>: str(e)</span><br><span class="line">        &#125;), <span class="number">500</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/webhook', methods=['POST'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">webhook</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""处理来自 Telegram 的 webhook 请求"""</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        update = request.json</span><br><span class="line">        logger.info(<span class="string">f"Received webhook update: <span class="subst">&#123;update&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 获取消息信息</span></span><br><span class="line">        <span class="keyword">if</span> <span class="string">'message'</span> <span class="keyword">in</span> update:</span><br><span class="line">            chat_id = update[<span class="string">'message'</span>][<span class="string">'chat'</span>][<span class="string">'id'</span>]</span><br><span class="line">            user_id = update[<span class="string">'message'</span>][<span class="string">'from'</span>][<span class="string">'id'</span>]</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 检查是否有该用户的stored信息</span></span><br><span class="line">            user_stored_info = users_info.get(str(user_id))</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> user_stored_info:</span><br><span class="line">                <span class="comment"># 如果有存储的用户信息，发送回复</span></span><br><span class="line">                response_text = <span class="string">"已收到您的信息！"</span></span><br><span class="line">                send_telegram_message(chat_id, response_text)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> jsonify(&#123;<span class="string">'status'</span>: <span class="string">'ok'</span>&#125;), <span class="number">200</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        logger.error(<span class="string">f"Error processing webhook: <span class="subst">&#123;str(e)&#125;</span>"</span>)</span><br><span class="line">        <span class="keyword">return</span> jsonify(&#123;</span><br><span class="line">            <span class="string">'status'</span>: <span class="string">'error'</span>,</span><br><span class="line">            <span class="string">'message'</span>: str(e)</span><br><span class="line">        &#125;), <span class="number">500</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_telegram_message</span><span class="params">(chat_id, text)</span>:</span></span><br><span class="line">    <span class="string">"""发送 Telegram 消息的辅助函数"""</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        url = <span class="string">f'https://api.telegram.org/bot<span class="subst">&#123;BOT_TOKEN&#125;</span>/sendMessage'</span></span><br><span class="line">        data = &#123;</span><br><span class="line">            <span class="string">'chat_id'</span>: chat_id,</span><br><span class="line">            <span class="string">'text'</span>: text</span><br><span class="line">        &#125;</span><br><span class="line">        response = requests.post(url, json=data)</span><br><span class="line">        <span class="keyword">return</span> response.json()</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        logger.error(<span class="string">f"Error sending telegram message: <span class="subst">&#123;str(e)&#125;</span>"</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""健康检查端点"""</span></span><br><span class="line">    <span class="keyword">return</span> jsonify(&#123;</span><br><span class="line">        <span class="string">'status'</span>: <span class="string">'ok'</span>,</span><br><span class="line">        <span class="string">'timestamp'</span>: datetime.now().isoformat()</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">init_app</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""初始化应用"""</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 设置 webhook</span></span><br><span class="line">        setup_webhook()</span><br><span class="line">        logger.info(<span class="string">"Application initialized successfully"</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        logger.error(<span class="string">f"Failed to initialize application: <span class="subst">&#123;str(e)&#125;</span>"</span>)</span><br><span class="line">        <span class="comment"># 在生产环境中，你可能想要在这里优雅地处理错误</span></span><br><span class="line">        <span class="keyword">raise</span> e</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># 初始化应用</span></span><br><span class="line">    init_app()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 启动应用</span></span><br><span class="line">    app.run(host=<span class="string">'127.0.0.1'</span>, port=<span class="number">8443</span>)</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>请我喝杯咖啡吧～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/wechat.jpeg" alt="犀牛 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/icon/aipay.jpeg" alt="犀牛 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/telegram/" rel="tag"># telegram</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/16/telegram2/" rel="prev" title="telegram | 前后端 3种 交互案例">
+      <i class="fa fa-chevron-left"></i> telegram | 前后端 3种 交互案例
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/16/telegram4/" rel="next" title="telegram | stars 支付案例">
+      telegram | stars 支付案例 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前端"><span class="nav-number">1.</span> <span class="nav-text">前端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后端"><span class="nav-number">2.</span> <span class="nav-text">后端</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="犀牛"
+      src="/images/icon/icon.png">
+  <p class="site-author-name" itemprop="name">犀牛</p>
+  <div class="site-description" itemprop="description">合作或者其它，欢迎联系</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">2171</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1179</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">636</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:xiniublog@163.com" title="E-Mail → mailto:xiniublog@163.com" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/xiniuweb3" title="Telegram → https:&#x2F;&#x2F;t.me&#x2F;xiniuweb3" rel="noopener external nofollow noreferrer" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">犀牛</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener external nofollow noreferrer" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'E96BxDaGNGpHB8Fp5JadyD1A-MdYXbMMI',
+      appKey     : 'Hp34boCFr2uY72f9aj2V2jgn',
+      placeholder: "由于 leancloud 限制，评论只允许海外IP访问。如果你无法通过留言询问问题，请发送邮件到 xiniublog@163.com 。另外，提问问题请遵守 https://benpaodewoniu.github.io/problem/ 。如果你真的想要我联系你或者想交个朋友，请通过邮箱联系我，告知我你的微信号。在评论里留下邮箱，处于岁月静好的原则，我是不会加也不会去打扰的。",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : 'https://e96bxdag.api.lncldglobal.com'
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
